@@ -3,20 +3,20 @@ set -o pipefail
 set -o nounset
 
 RCS_DATA=$(pwd)/rcs-data
+TARGET_BOX=rcs.rust-lang.org
+RCS_BOX_USER=$USER
+
 if [ ! -d "$RCS_DATA" ]; then
 	echo "No rcs dir '$RCS_DATA'"
 	exit 1
 fi
 
-#ssh $USER@rcs.rust-lang.org '
-bash -c '
+ssh $RCS_BOX_USER@$TARGET_BOX '
 	sudo mkdir -p /opt/rcs &&
 	chown $USER: /opt/rcs
 '
-#rsync -avr --delete rcs-data/ $USER@rcs.rust-lang.org:/opt/rcs/data/
-rsync -avr --delete rcs-data/ /opt/rcs/data/
-#ssh $USER@rcs.rust-lang.org '
-bash -c '
+rsync -avr --delete rcs-data/ $RCS_BOX_USER@$TARGET_BOX:/opt/rcs/data/
+ssh $RCS_BOX_USER@$TARGET_BOX '
 	set -o errexit &&
 	set -o pipefail &&
 	set -o nounset &&
