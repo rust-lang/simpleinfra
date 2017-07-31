@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Initial deployment instructions:
+#
+#    mkdir -p /opt/rcs/logs/nginx /opts/rcs/data/letsencrypt
+#    # copy secrets.toml.example to /opt/rcs/data and configure it
+#
+# And... I think that's it!
+
 set -o errexit
 set -o pipefail
 set -o nounset
