@@ -5,9 +5,8 @@ set -o pipefail
 set -o nounset
 
 TARGET_BOX=rcs.rust-lang.org
-RCS_BOX_USER=$USER
 
-ssh $RCS_BOX_USER@$TARGET_BOX '
+ssh $TARGET_BOX '
     set -o errexit &&
     set -o pipefail &&
     set -o nounset &&
