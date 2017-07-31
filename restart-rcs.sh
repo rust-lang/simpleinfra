@@ -7,7 +7,6 @@ set -o nounset
 TARGET_BOX=rcs.rust-lang.org
 RCS_BOX_USER=$USER
 
-rsync -avr --delete rcs-data/ $RCS_BOX_USER@$TARGET_BOX:/opt/rcs/data/
 ssh $RCS_BOX_USER@$TARGET_BOX '
     set -o errexit &&
     set -o pipefail &&
