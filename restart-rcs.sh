@@ -10,8 +10,9 @@ ssh $TARGET_BOX '
     set -o errexit &&
     set -o pipefail &&
     set -o nounset &&
+    set -o xtrace &&
     cd /opt/rcs &&
-    test -d data &&
+    (test -d data || (echo "no data dir" && exit 1)) &&
     docker pull alexcrichton/rust-central-station &&
     (docker rm -f rcs || true) &&
     docker run \
