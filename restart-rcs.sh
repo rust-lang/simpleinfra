@@ -27,7 +27,7 @@ ssh $TARGET_BOX '
         --name rcs \
         --volume `pwd`/data:/data \
         --volume `pwd`/data/letsencrypt:/etc/letsencrypt \
-        --volume `pwd`/logs:/var/log \
+        --volume /dev/log:/dev/log \
         --publish 80:80 \
         --publish 443:443 \
         --rm \
