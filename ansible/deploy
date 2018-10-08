@@ -1,0 +1,71 @@
+#!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
+
+
+DIR_PLAYBOOKS="playbooks"
+DIR_ENVIRONMENTS="envs"
+DIR_ROLES="roles"
+DIR_GROUP_VARS="group_vars"
+
+BIN_ANSIBLE_PLAYBOOK="ansible-playbook"
+
+
+usage() {
+    echo "usage: $0 <environment> <playbook>"
+    exit 1
+}
+
+
+# Load arguments from CLI
+if [[ $# -lt 2 ]]; then usage; fi
+environment="$1"
+playbook="$2"
+shift 2
+
+env="${DIR_ENVIRONMENTS}/${environment}"
+playbook_file="${DIR_PLAYBOOKS}/${playbook}.yml"
+
+# Support local environments
+# Local environments overrides git ones
+if [[ -d "${env}.local" ]]; then
+    env="${env}.local"
+fi
+
+# Validate CLI arguments
+if [[ ! -d "${env}" ]]; then
+    echo "error: environment not found: ${environment}"
+    echo
+
+    echo "available environments:"
+    for available in `ls -1 "${DIR_ENVIRONMENTS}"`; do
+        echo " - ${available}"
+    done
+    exit 1
+fi
+if [[ ! -f "${playbook_file}" ]]; then
+    echo "error: playbook not found: ${playbook}"
+    echo
+
+    echo "available playbooks:"
+    for available in `ls -1 "${DIR_PLAYBOOKS}"`; do
+        echo " - `echo "${available}" | sed 's/\.yml$//'`"
+    done
+    exit 1
+fi
+
+# Create the temporary working directory
+DIR_TEMP="$(mktemp -d -t deploy-ansible-home-XXXXXXX)"
+function cleanup () { rm -rf "$DIR_TEMP"; }
+mkdir -p "$DIR_TEMP/play"
+trap cleanup EXIT
+
+ln -s "`readlink -e "${DIR_ROLES}"`" "${DIR_TEMP}/play/roles"
+ln -s "`readlink -e "${DIR_GROUP_VARS}"`" "${DIR_TEMP}/play/group_vars"
+ln -s "`readlink -e "${playbook_file}"`" "${DIR_TEMP}/play/playbook.yml"
+ln -s "`readlink -e "${env}"`" "${DIR_TEMP}/env"
+
+# Finally execute the playbook against the server
+"${BIN_ANSIBLE_PLAYBOOK}" -i "${DIR_TEMP}/env/hosts" \
+                         "${DIR_TEMP}/play/playbook.yml" \
+                         $@

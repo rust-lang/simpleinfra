@@ -1,0 +1,13 @@
+---
+
+- name: install packages
+  include: apt.yml
+
+- name: setup users
+  include: users.yml
+
+- name: setup ssh
+  include: ssh.yml
+
+- name: cleanup default things
+  include: cleanup.yml

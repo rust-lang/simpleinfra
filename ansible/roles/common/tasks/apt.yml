@@ -1,0 +1,17 @@
+---
+
+- name: update apt cache
+  apt:
+    update_cache: true
+    cache_valid_time: 14400  # 4 hours
+
+- name: install apt packages
+  apt:
+    name:
+      - ca-certificates
+      - htop
+      - iptables
+      - openssh-server
+      - python3
+      - vim
+    state: present

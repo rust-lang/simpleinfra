@@ -1,0 +1,14 @@
+---
+
+- name: common.reload-ssh
+  service:
+    name: ssh
+    state: restarted
+
+- name: common.reload-firewall
+  service:
+    name: firewall
+    state: restarted
+
+- name: common.reload-systemd
+  shell: systemctl daemon-reload

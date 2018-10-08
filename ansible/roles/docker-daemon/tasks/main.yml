@@ -1,0 +1,8 @@
+---
+
+- name: install docker
+  include: install.yml
+
+- name: enable docker swap limit
+  include: swap_limit.yml
+  when: enable_swap_limit

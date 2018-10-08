@@ -1,0 +1,15 @@
+---
+
+- name: add swap limit flags to the grub configuration file
+  lineinfile:
+    path: /etc/default/grub
+    line: 'GRUB_CMDLINE_LINUX="${GRUB_CMDLINE_LINUX} cgroup_enable=memory swapaccount=1"'
+  register: grub_config_changed
+
+- name: update grub configuration
+  shell: update-grub
+  when: grub_config_changed is changed
+
+- name: reboot the server to apply grub configuration changes
+  reboot:
+  when: grub_config_changed is changed

@@ -1,0 +1,18 @@
+---
+
+- name: remove unwanted users
+  user:
+    name: "{{ item }}"
+    state: absent
+
+  with_items:
+    - ubuntu  # default user
+
+- name: remove unwanted paths
+  file:
+    name: "{{ item }}"
+    state: absent
+
+  with_items:
+    - /home/ubuntu  # home of the ubuntu user
+    - /etc/sudoers.d/90-cloud-init-users  # sudo for the ubuntu user

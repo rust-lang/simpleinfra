@@ -1,0 +1,5 @@
+---
+
+# Use python3 on the remote servers
+# Ubuntu doesn't ship with python3 preinstalled anymore.
+ansible_python_interpreter: python3

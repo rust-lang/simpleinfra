@@ -1,0 +1,26 @@
+---
+
+# SSH keys are stored in /etc/ssh/authorized_keys/$user
+# This prevents users without sudo access from changing the keys without
+# committing the changes into ansible.
+
+- name: upload sshd configuration
+  template:
+    src: ssh/sshd_config
+    dest: /etc/ssh/sshd_config
+
+  notify: common.reload-ssh
+
+- name: create authorized keys directory
+  file:
+    path: /etc/ssh/authorized_keys
+    state: directory
+    mode: 0755
+
+- name: upload users ssh keys
+  copy:
+    src: "ssh-keys/{{ item }}.pub"
+    dest: "/etc/ssh/authorized_keys/{{ item }}"
+    mode: 0444
+
+  with_items: "{{ allow_users }}"

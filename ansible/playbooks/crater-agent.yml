@@ -1,0 +1,24 @@
+---
+
+- hosts: crater-agents
+  become: true
+  become_user: root
+
+  roles:
+
+    - name: common
+
+      allow_users:
+        - aidanhs
+        - acrichto
+        - simulacrum
+        - pietro
+
+      sudo_users:
+        - aidanhs
+        - acrichto
+        - simulacrum
+        - pietro
+
+    - name: docker-daemon
+      enable_swap_limit: true

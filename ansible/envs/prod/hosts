@@ -1,0 +1,6 @@
+[all:children]
+crater-agents
+
+[crater-agents]
+crater-aws-1 ansible_host=54.193.124.229
+crater-aws-2 ansible_host=13.57.209.195

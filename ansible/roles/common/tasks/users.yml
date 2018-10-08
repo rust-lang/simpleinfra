@@ -1,0 +1,44 @@
+---
+
+- name: create default groups
+  group:
+    name: "{{ item }}"
+    state: present
+
+  with_items:
+    - infra
+    - allow-ssh
+    - passwordless-sudo
+
+- name: create user accounts
+  user:
+    name: "{{ item }}"
+    group: infra
+    groups:
+      - allow-ssh
+    append: true
+
+    shell: /bin/bash
+    state: present
+
+  with_items: "{{ allow_users }}"
+
+- name: authorize sudo users
+  user:
+    name: "{{ item }}"
+    groups:
+      - passwordless-sudo
+    append: true
+
+  with_items: "{{ sudo_users }}"
+
+- name: authorize passwordless-sudo in sudoers
+  template:
+    src: users/sudoers-passwordless-sudo
+    dest: /etc/sudoers.d/passwordless-sudo
+    mode: 0440
+
+- name: register users as facts
+  set_fact:
+    fact_users: "{{ allow_users }}"
+    fact_sudo_users: "{{ sudo_users }}"

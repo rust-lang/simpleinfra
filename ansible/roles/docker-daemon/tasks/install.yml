@@ -1,0 +1,33 @@
+---
+
+- name: install dependencies for docker
+  apt:
+    name: apt-transport-https
+    state: present
+
+- name: add the docker apt repository gpg key
+  apt_key:
+    id: 9DC858229FC7DD38854AE2D88D81803C0EBFCD88
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: add the docker apt repository
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+    filename: docker-ce
+
+    update_cache: yes
+    state: present
+
+- name: install docker
+  apt:
+    name: docker-ce
+    state: present
+
+- name: allow sudo users to interact with docker
+  user:
+    name: "{{ item }}"
+    groups: docker
+    append: true
+
+  with_items: "{{ fact_sudo_users }}"
