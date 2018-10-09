@@ -9,6 +9,7 @@ license.
 This repository contains the following playbooks:
 
 * `crater-agent`: deploy Crater agent machines
+* `bastion`: deploy the bastion
 
 ## Execute the playbooks on the production servers
 

@@ -1,0 +1,20 @@
+---
+
+- hosts: bastion
+  become: true
+  become_user: root
+
+  roles:
+
+    - name: common
+
+      allow_users:
+        - aidanhs
+        - acrichto
+        - simulacrum
+        - pietro
+
+      sudo_users:
+        - aidanhs
+        - acrichto
+        - simulacrum
