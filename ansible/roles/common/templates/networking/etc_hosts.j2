@@ -1,0 +1,22 @@
+#
+# {{ ansible_managed }}
+#
+
+# IPv4 localhost
+127.0.1.1 {{ inventory_hostname_short }} {{ inventory_hostname }}
+127.0.0.1 localhost
+
+# IPv6 localhost
+::1 ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+ff02::3 ip6-allhosts
+
+# Other Rust infrastructure servers
+{% for host in groups["all"] %}
+{% if host != inventory_hostname -%}
+{{ hostvars[host]["ansible_host"] }} {{ host }}
+{% endif %}
+{% endfor %}

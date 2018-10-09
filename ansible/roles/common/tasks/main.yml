@@ -9,5 +9,8 @@
 - name: setup ssh
   include: ssh.yml
 
+- name: setup networking
+  include: networking.yml
+
 - name: cleanup default things
   include: cleanup.yml

@@ -1,0 +1,12 @@
+---
+
+- name: disable cloud-init's management of /etc/hosts
+  lineinfile:
+    path: /etc/cloud/cloud.cfg
+    line: " - update_etc_hosts"
+    state: absent
+
+- name: upload /etc/hosts
+  template:
+    src: networking/etc_hosts.j2
+    dest: /etc/hosts
