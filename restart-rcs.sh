@@ -21,7 +21,7 @@ ssh $TARGET_BOX '
     set -o xtrace &&
     cd /opt/rcs &&
     (test -d data || (echo "no data dir" && exit 1)) &&
-    docker pull alexcrichton/rust-central-station &&
+    docker pull 890664054962.dkr.ecr.us-west-1.amazonaws.com/rust-central-station:latest &&
     (docker rm -f rcs || true) &&
     docker run \
         --name rcs \
@@ -32,5 +32,5 @@ ssh $TARGET_BOX '
         --publish 443:443 \
         --rm \
         --detach \
-        alexcrichton/rust-central-station
+        890664054962.dkr.ecr.us-west-1.amazonaws.com/rust-central-station:latest
 '
