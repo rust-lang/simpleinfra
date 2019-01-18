@@ -1,7 +1,7 @@
 mod config;
 
 use crate::config::Config;
-use failure::{Error, bail};
+use failure::{bail, Error};
 use log::{error, info, warn};
 use std::collections::HashMap;
 use structopt::StructOpt;
@@ -23,6 +23,10 @@ fn normalize(mut details: github::types::HookDetails) -> github::types::HookDeta
         details.config.url = format!("{}{}", APPVEYOR_BASE, "{secret}");
     }
     details
+}
+
+fn webhook_url(name: &str, id: usize) -> String {
+    format!("https://github.com/{}/settings/hooks/{}", name, id)
 }
 
 fn app() -> Result<(), Error> {
@@ -67,21 +71,28 @@ fn app() -> Result<(), Error> {
                             name, expected.config.url
                         );
                     } else {
-                        info!("{}: updating webhook: {}", name, expected.config.url);
-                        if !cli.dry {
-                            github.edit_hook(&name, hook.id, &expected)?;
+                        if expected.events != hook.details.events {
+                            info!("{}: updating webhook events: {}", name, expected.config.url);
+                            if !cli.dry {
+                                github.edit_hook_events(&name, hook.id, &expected.events)?;
+                            }
+                        }
+                        if expected.config != hook.details.config {
+                            warn!(
+                                "{}: update configuration: {}",
+                                name,
+                                webhook_url(&name, hook.id)
+                            );
                         }
                     }
                 }
                 if hook.details.config.secret.is_none() && expected_config.require_secret {
-                    warn!(
-                        "{}: missing secret key, manually add it: {}",
-                        name, expected.config.url
-                    );
+                    warn!("{}: set secret key: {}", name, webhook_url(&name, hook.id),);
                 } else if hook.details.config.secret.is_some() && !expected_config.require_secret {
                     warn!(
-                        "{}: has a secret key even if it doesn't need one: {}",
-                        name, expected.config.url
+                        "{}: remove secret key: {}",
+                        name,
+                        webhook_url(&name, hook.id),
                     );
                 }
             } else {
@@ -101,13 +112,14 @@ fn app() -> Result<(), Error> {
             } else {
                 info!("{}: creating webhook: {}", name, new.config.url);
                 if !cli.dry {
-                    github.create_hook(&name, &new)?;
-                }
-                if expected_config.require_secret {
-                    warn!(
-                        "{}: you need to manually set a secret key: {}",
-                        name, new.config.url
-                    );
+                    let new_hook = github.create_hook(&name, &new)?;
+                    if expected_config.require_secret {
+                        warn!(
+                            "{}: set secret key: {}",
+                            name,
+                            webhook_url(&name, new_hook.id),
+                        );
+                    }
                 }
             }
         }

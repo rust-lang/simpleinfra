@@ -7,6 +7,7 @@ use reqwest::{
     header::{AUTHORIZATION, LINK, USER_AGENT},
     Client, Method, RequestBuilder, Response,
 };
+use std::collections::HashSet;
 
 pub struct GitHub {
     token: String,
@@ -76,17 +77,26 @@ impl GitHub {
         Ok(hooks)
     }
 
-    pub fn create_hook(&self, repo: &str, hook: &types::HookDetails) -> Result<(), Error> {
-        self.build_request(Method::POST, &format!("repos/{}/hooks", repo))
+    pub fn create_hook(&self, repo: &str, hook: &types::HookDetails) -> Result<types::Hook, Error> {
+        let res = self
+            .build_request(Method::POST, &format!("repos/{}/hooks", repo))
             .json(&hook)
             .send()?
-            .error_for_status()?;
-        Ok(())
+            .error_for_status()?
+            .json()?;
+        Ok(res)
     }
 
-    pub fn edit_hook(&self, repo: &str, id: usize, hook: &types::HookDetails) -> Result<(), Error> {
+    pub fn edit_hook_events(
+        &self,
+        repo: &str,
+        id: usize,
+        events: &HashSet<types::EventKind>,
+    ) -> Result<(), Error> {
         self.build_request(Method::PATCH, &format!("repos/{}/hooks/{}", repo, id))
-            .json(&hook)
+            .json(&serde_json::json!({
+                "events": events,
+            }))
             .send()?
             .error_for_status()?;
         Ok(())
