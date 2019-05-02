@@ -1,0 +1,36 @@
+---
+
+# This Travis CI snippet is used to deploy static websites hosted on GitHub
+# Pages and managed by the Rust Infrastructure team.
+
+before_deploy:
+  - |
+    ensure_var() {
+        var="$1"
+        if [[ -z "${!var+x}" ]]; then
+            echo "Environment variable $var is not set!"
+            return 1
+        fi
+    }
+    ensure_var RUSTINFRA_DEPLOY_DIR
+    ensure_var RUSTINFRA_CLOUDFRONT_DISTRIBUTION
+    ensure_var AWS_ACCESS_KEY_ID
+    ensure_var AWS_SECRET_ACCESS_KEY
+  # Install the AWS cli, which will be used to perform CloudFront invalidations
+  - pip install --user awscli; export PATH=$PATH:$HOME/.local/bin
+  # Ensure GitHub doesn't mess around with the uploaded file.
+  # Without the file, for example, files with an underscore in the name won't
+  # be included in the pages.
+  - touch $RUSTINFRA_DEPLOY_DIR/.nojekyll
+
+# Deploy the content of $RUSTINFRA_DEPLOY_DIR to GitHub Pages using deploy keys.
+deploy:
+  provider: script
+  script: curl -LsSf https://git.io/fhJ8n | rustc - -o /tmp/deploy && (cd $RUSTINFRA_DEPLOY_DIR && /tmp/deploy)
+  skip_cleanup: true
+  on:
+    branch: master
+
+after_deploy:
+  # Invalidate the CloudFront caches to prevent stale content being served.
+  - aws cloudfront create-invalidation --distribution-id $RUSTINFRA_CLOUDFRONT_DISTRIBUTION --paths "/*"
