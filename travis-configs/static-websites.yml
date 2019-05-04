@@ -31,7 +31,7 @@ before_deploy:
 # Deploy the content of $RUSTINFRA_DEPLOY_DIR to GitHub Pages using deploy keys.
 deploy:
   provider: script
-  script: curl -LsSf https://git.io/fhJ8n | rustc - -o /tmp/deploy && (cd $RUSTINFRA_DEPLOY_DIR && /tmp/deploy)
+  script: curl -LsSf https://raw.githubusercontent.com/rust-lang/simpleinfra/master/setup-deploy-keys/src/deploy.rs | rustc - -o /tmp/deploy && (cd $RUSTINFRA_DEPLOY_DIR && /tmp/deploy)
   skip_cleanup: true
   on:
     branch: master
