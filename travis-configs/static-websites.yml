@@ -14,10 +14,15 @@ before_deploy:
     }
     ensure_var RUSTINFRA_DEPLOY_DIR
     ensure_var RUSTINFRA_CLOUDFRONT_DISTRIBUTION
-    ensure_var AWS_ACCESS_KEY_ID
-    ensure_var AWS_SECRET_ACCESS_KEY
+    if ! [[ -z "${RUSTINFRA_CLOUDFRONT_DISTRIBUTION+x}" ]]; then
+        ensure_var AWS_ACCESS_KEY_ID
+        ensure_var AWS_SECRET_ACCESS_KEY
+    fi
   # Install the AWS cli, which will be used to perform CloudFront invalidations
-  - pip install --user awscli; export PATH=$PATH:$HOME/.local/bin
+  - |
+    if ! [[ -z "${RUSTINFRA_CLOUDFRONT_DISTRIBUTION+x}" ]]; then
+        pip install --user awscli; export PATH=$PATH:$HOME/.local/bin
+    fi
   # Ensure GitHub doesn't mess around with the uploaded file.
   # Without the file, for example, files with an underscore in the name won't
   # be included in the pages.
@@ -33,4 +38,7 @@ deploy:
 
 after_deploy:
   # Invalidate the CloudFront caches to prevent stale content being served.
-  - aws cloudfront create-invalidation --distribution-id $RUSTINFRA_CLOUDFRONT_DISTRIBUTION --paths "/*"
+  - |
+    if ! [[ -z "${RUSTINFRA_CLOUDFRONT_DISTRIBUTION+x}" ]]; then
+        aws cloudfront create-invalidation --distribution-id $RUSTINFRA_CLOUDFRONT_DISTRIBUTION --paths "/*"
+    fi
