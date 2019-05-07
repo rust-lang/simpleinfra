@@ -9,3 +9,4 @@ name = "deploy"
 path = "src/deploy.rs"
 
 [dependencies]
+structopt = "0.2.15"

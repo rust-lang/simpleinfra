@@ -1,30 +1,19 @@
 use std::env;
 use std::fs;
 use std::process::{Command, Stdio};
+use structopt::StructOpt;
+
+#[derive(StructOpt)]
+struct Cli {
+    #[structopt(help = "the name of the repository to setup")]
+    repo: String,
+}
 
 fn main() {
-    let remotes = run_capture(Command::new("git").arg("remote").arg("show"));
-    let remotes = remotes
-        .trim()
-        .split('\n')
-        .filter(|l| !l.is_empty())
-        .collect::<Vec<_>>();
-
-    let url = remotes.iter()
-        .map(|remote| {
-            run_capture(Command::new("git")
-                .arg("config")
-                .arg(format!("remote.{}.url", remote)))
-        })
-        .find(|url| url.contains("git@github.com:"))
-        .expect("found no suitable remote");
-    println!("remote: {}", url);
-    let url = url.trim();
-    let pos = url.find(':').unwrap();
-    let slug = &url[pos + 1..];
+    let cli = Cli::from_args();
     let date = run_capture(Command::new("date").arg("+%Y-%m-%d"));
     let date = date.trim();
-    let comment = format!("{} {}", slug, date);
+    let comment = format!("{} {}", cli.repo, date);
 
     let gh_token = env::var("GITHUB_TOKEN").expect("no GITHUB_TOKEN env var");
 
@@ -66,7 +55,7 @@ fn main() {
         .arg("-i")
         .arg("-H").arg("Accept: application/vnd.github.v3+json")
         .arg("-H").arg(format!("Authorization: token {}", gh_token))
-        .arg(format!("https://api.github.com/repos/{}/keys", slug))
+        .arg(format!("https://api.github.com/repos/{}/keys", cli.repo))
         .arg("-d").arg(&data));
 
     println!("
