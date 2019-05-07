@@ -1,21 +1,24 @@
-use std::env;
 use std::fs;
 use std::process::{Command, Stdio};
 use structopt::StructOpt;
 use chrono::Utc;
+use std::error::Error;
+use reqwest::header::{HeaderValue, USER_AGENT, ACCEPT, AUTHORIZATION};
 
 #[derive(StructOpt)]
 struct Cli {
     #[structopt(help = "the name of the repository to setup")]
     repo: String,
+    #[structopt(long = "github-token", env = "GITHUB_TOKEN", help = "GitHub API key")]
+    github_token: String,
 }
 
-fn main() {
+fn main() -> Result<(), Box<Error>> {
     let cli = Cli::from_args();
     let date = Utc::today().format("%Y-%m-%d");
     let comment = format!("{} {}", cli.repo, date);
 
-    let gh_token = env::var("GITHUB_TOKEN").expect("no GITHUB_TOKEN env var");
+    let client = reqwest::Client::new();
 
     // https://security.stackexchange.com/questions/143442/what-are-ssh-keygen-best-practices
     run(Command::new("ssh-keygen")
@@ -34,12 +37,6 @@ fn main() {
     let pubkey = fs::read_to_string("_ssh_keygen_tmp_out.pub").unwrap();
     fs::remove_file("_ssh_keygen_tmp_out.pub").unwrap();
 
-    let data = format!("{{\
-        \"title\":\"CI deploy key {}\",\
-        \"key\":\"{}\",\
-        \"read_only\":false\
-    }}", date, pubkey.trim());
-
     if std::path::Path::new(".travis.yml").exists() {
         run(Command::new("travis")
             .arg("env")
@@ -51,12 +48,17 @@ fn main() {
         println!("GITHUB_DEPLOY_KEY={}", key);
     }
 
-    run(Command::new("curl")
-        .arg("-i")
-        .arg("-H").arg("Accept: application/vnd.github.v3+json")
-        .arg("-H").arg(format!("Authorization: token {}", gh_token))
-        .arg(format!("https://api.github.com/repos/{}/keys", cli.repo))
-        .arg("-d").arg(&data));
+    client.post(&format!("https://api.github.com/repos/{}/keys", cli.repo))
+        .header(USER_AGENT, HeaderValue::from_static("rust-lang/simpleinfra"))
+        .header(ACCEPT, HeaderValue::from_static("application/vnd.github.v3+json"))
+        .header(AUTHORIZATION, HeaderValue::from_str(&format!("token {}", cli.github_token))?)
+        .json(&serde_json::json!({
+            "title": format!("CI deploy key - {} - {}", cli.repo, date),
+            "key": pubkey.trim(),
+            "read_only": false,
+        }))
+        .send()?
+        .error_for_status()?;
 
     println!("
 
@@ -87,6 +89,8 @@ matrix:
         GITHUB_DEPLOY_KEY: $(GITHUB_DEPLOY_KEY)
 
 ");
+
+    Ok(())
 }
 
 fn run(cmd: &mut Command) {
