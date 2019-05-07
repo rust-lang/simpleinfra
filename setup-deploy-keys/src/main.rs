@@ -21,6 +21,7 @@ fn main() -> Result<(), Box<Error>> {
     let date = Utc::today().format("%Y-%m-%d");
     let comment = format!("{} {}", cli.repo, date);
 
+    println!("generating the ssh key...");
     // https://security.stackexchange.com/questions/143442/what-are-ssh-keygen-best-practices
     run(Command::new("ssh-keygen")
         .arg("-t").arg("ed25519")
@@ -57,6 +58,7 @@ fn main() -> Result<(), Box<Error>> {
         println!("GITHUB_DEPLOY_KEY={}", key);
     }
 
+    println!("uploading the deploy key...");
     let client = Client::new();
     client.post(&format!("https://api.github.com/repos/{}/keys", cli.repo))
         .header(USER_AGENT, HeaderValue::from_static("rust-lang/simpleinfra"))
@@ -70,47 +72,18 @@ fn main() -> Result<(), Box<Error>> {
         .send()?
         .error_for_status()?;
 
-    println!("
-
-Add this to .travis.yml:
-
-matrix:
-  include:
-    - name: \"master doc to gh-pages\"
-      rust: nightly
-      script:
-        - cargo doc --no-deps
-      deploy:
-        provider: script
-        script: curl -LsSf https://git.io/fhJ8n | rustc - && (cd target/doc && ../../rust_out)
-        skip_cleanup: true
-        on:
-          branch: master
-
-... or
-
-- job: docs
-  steps:
-    - template: ci/azure-install-rust.yml
-    - script: cargo doc --no-deps --all-features
-    - script: curl -LsSf https://git.io/fhJ8n | rustc - && (cd target/doc && ../../rust_out)
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-      env:
-        GITHUB_DEPLOY_KEY: $(GITHUB_DEPLOY_KEY)
-
-");
-
+    println!();
+    println!("the deploy key has been configured!");
+    println!("please use the shared configuration snippets in the simpleinfra repo to use it");
     Ok(())
 }
 
 fn run(cmd: &mut Command) {
-    println!("{:?}", cmd);
     let status = cmd.status().unwrap();
     assert!(status.success());
 }
 
 fn run_capture(cmd: &mut Command) -> String {
-    println!("{:?}", cmd);
     let output = cmd.stderr(Stdio::inherit()).output().unwrap();
     assert!(output.status.success());
     String::from_utf8_lossy(&output.stdout).into()
