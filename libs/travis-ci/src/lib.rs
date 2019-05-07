@@ -31,17 +31,33 @@ impl TravisCI {
         Ok(None)
     }
 
-    pub fn add_env_var(
+    pub fn env_vars(&self, repo: &str) -> Result<EnvVars, Box<Error>> {
+        Ok(self
+            .request(
+                Method::GET,
+                &format!("repo/{}/env_vars", self.encode_repo(repo)),
+            )?
+            .send()?
+            .error_for_status()?
+            .json()?)
+    }
+
+    pub fn set_env_var(
         &self,
         repo: &str,
         key: &str,
         value: &str,
         public: bool,
     ) -> Result<(), Box<Error>> {
-        self.request(
-            Method::POST,
-            &format!("repo/{}/env_vars", self.encode_repo(repo)),
-        )?
+        // Issue the rigth call to either add or override the var
+        let vars = self.env_vars(repo)?;
+        let (method, url) = if let Some(existing) = vars.env_vars.iter().find(|var| var.name == key) {
+            (Method::PATCH, format!("repo/{}/env_var/{}", self.encode_repo(repo), existing.id))
+        } else {
+            (Method::POST, format!("repo/{}/env_vars", self.encode_repo(repo)))
+        };
+
+        self.request(method, &url)?
         .json(&serde_json::json!({
             "env_var.name": key,
             "env_var.value": value,
@@ -78,4 +94,15 @@ impl TravisCI {
 #[derive(serde::Deserialize)]
 pub struct Repository {
     pub active: bool,
+}
+
+#[derive(serde::Deserialize)]
+pub struct EnvVars {
+    pub env_vars: Vec<EnvVar>,
+}
+
+#[derive(serde::Deserialize)]
+pub struct EnvVar {
+    pub id: String,
+    pub name: String,
 }

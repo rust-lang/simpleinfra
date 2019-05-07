@@ -47,7 +47,7 @@ fn main() -> Result<(), Box<Error>> {
         if let Some(repo) = travis.repo(&cli.repo)? {
             if repo.active {
                 println!("the repository is active on Travis CI, adding the environment var...");
-                travis.add_env_var(&cli.repo, "GITHUB_DEPLOY_KEY", key, false)?;
+                travis.set_env_var(&cli.repo, "GITHUB_DEPLOY_KEY", key, false)?;
                 var_added = true;
             }
         }
