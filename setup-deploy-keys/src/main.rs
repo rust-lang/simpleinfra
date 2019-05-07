@@ -2,6 +2,7 @@ use std::env;
 use std::fs;
 use std::process::{Command, Stdio};
 use structopt::StructOpt;
+use chrono::Utc;
 
 #[derive(StructOpt)]
 struct Cli {
@@ -11,8 +12,7 @@ struct Cli {
 
 fn main() {
     let cli = Cli::from_args();
-    let date = run_capture(Command::new("date").arg("+%Y-%m-%d"));
-    let date = date.trim();
+    let date = Utc::today().format("%Y-%m-%d");
     let comment = format!("{} {}", cli.repo, date);
 
     let gh_token = env::var("GITHUB_TOKEN").expect("no GITHUB_TOKEN env var");
