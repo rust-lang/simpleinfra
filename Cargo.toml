@@ -1,4 +1,5 @@
 [workspace]
 members = [
     "setup-deploy-keys",
+    "libs/travis-ci",
 ]
