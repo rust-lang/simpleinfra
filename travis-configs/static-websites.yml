@@ -13,7 +13,6 @@ before_deploy:
         fi
     }
     ensure_var RUSTINFRA_DEPLOY_DIR
-    ensure_var RUSTINFRA_CLOUDFRONT_DISTRIBUTION
     if ! [[ -z "${RUSTINFRA_CLOUDFRONT_DISTRIBUTION+x}" ]]; then
         ensure_var AWS_ACCESS_KEY_ID
         ensure_var AWS_SECRET_ACCESS_KEY
