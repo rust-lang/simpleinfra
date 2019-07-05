@@ -1,0 +1,37 @@
+---
+
+# This Travis CI snippet is used to upload Docker images to the Rust
+# Infrastructure team's AWS container registry.
+
+before_deploy:
+  - |
+    ensure_var() {
+        var="$1"
+        if [[ -z "${!var+x}" ]]; then
+            echo "Environment variable $var is not set!"
+            return 1
+        fi
+    }
+    ensure_var RUSTINFRA_IMAGE_TAG
+    ensure_var RUSTINFRA_REGISTRY_NAME
+    ensure_var AWS_ACCESS_KEY_ID
+    ensure_var AWS_SECRET_ACCESS_KEY
+  # Install the AWS cli, which will be used to authenticate with the registry
+  - pip install --user awscli; export PATH=$PATH:$HOME/.local/bin
+  # Prepare the deployment script
+  - |
+    cat > /tmp/deploy-docker.sh << EOF
+    set -e
+    ECR_IMAGE="890664054962.dkr.ecr.us-west-1.amazonaws.com/${RUSTINFRA_REGISTRY_NAME}:latest"
+    $(aws ecr get-login --no-include-email --region us-west-1)
+    docker tag ${RUSTINFRA_IMAGE_TAG} ${ECR_IMAGE}
+    docker push ${ECR_IMAGE}
+    EOF
+
+# Deploy the content of $RUSTINFRA_DEPLOY_DIR to GitHub Pages using deploy keys.
+deploy:
+  provider: script
+  script: bash /tmp/deploy-docker.sh
+  skip_cleanup: true
+  on:
+    branch: master
