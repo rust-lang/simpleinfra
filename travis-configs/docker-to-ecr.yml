@@ -17,16 +17,23 @@ before_deploy:
     ensure_var AWS_ACCESS_KEY_ID
     ensure_var AWS_SECRET_ACCESS_KEY
   # Install the AWS cli, which will be used to authenticate with the registry
-  - pip install --user awscli; export PATH=$PATH:$HOME/.local/bin
-  # Prepare the deployment script
+  # If this is not running inside a virtualenv install the AWS cli in the
+  # user's home directory.
   - |
-    cat > /tmp/deploy-docker.sh << EOF
+    if [[ -z "${VIRTUAL_ENV+x}" ]]; then
+        pip install --user awscli; export PATH=$PATH:$HOME/.local/bin
+    else
+        pip install awscli
+    fi
+  # Prepare the deployment script
+  - >
+    cat > /tmp/deploy-docker.sh << RUSTINFRA_EOF
     set -e
     ECR_IMAGE="890664054962.dkr.ecr.us-west-1.amazonaws.com/${RUSTINFRA_REGISTRY_NAME}:latest"
     $(aws ecr get-login --no-include-email --region us-west-1)
     docker tag ${RUSTINFRA_IMAGE_TAG} ${ECR_IMAGE}
     docker push ${ECR_IMAGE}
-    EOF
+    RUSTINFRA_EOF
 
 # Deploy the content of $RUSTINFRA_DEPLOY_DIR to GitHub Pages using deploy keys.
 deploy:
