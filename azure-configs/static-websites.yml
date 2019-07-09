@@ -1,0 +1,56 @@
+---
+
+# This Azure Pipelines snippet is used to deploy static websites hosted on
+# GitHub Pages and managed by the Rust Infrastructure team.
+#
+# Basic usage:
+# - template: azure-configs/static-websites.yml@rustinfra
+#   parameters:
+#     deploy_dir: path/to/output
+#     # Optional, only needed if GitHub pages is behind CloudFront
+#     cloudfront_distribution: AAAAAAAAAAAAAA
+
+parameters:
+  deploy_dir: ''
+  cloudfront_distribution: ''
+
+steps:
+  - bash: |
+      set -e
+      if [[ -z "${DEPLOY_DIR}" ]]; then
+          echo "##vso[task.logissue type=error;]Missing template parameter 'deploy_dir'"
+          echo "##vso[task.complete result=Failed;]"
+      fi
+    env:
+      DEPLOY_DIR: ${{ parameters.deploy_dir }}
+    displayName: (static-websites) Validare parameters
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+
+  - bash: |
+      set -e
+      # Ensure GitHub doesn't mess around with the uploaded file.
+      # Without the file, for example, files with an underscore in the name won't
+      # be included in the pages.
+      touch $RUSTINFRA_DEPLOY_DIR/.nojekyll
+      # Download, compile and run the deploy script
+      curl -LsSf https://raw.githubusercontent.com/rust-lang/simpleinfra/master/setup-deploy-keys/src/deploy.rs | rustc - -o /tmp/deploy
+      (cd $DEPLOY_DIR && /tmp/deploy)
+    env:
+      DEPLOY_DIR: ${{ parameters.deploy_dir }}
+      GITHUB_DEPLOY_KEY: $(GITHUB_DEPLOY_KEY)
+    displayName: (static websites) Deploy to GitHub Pages
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+
+  - ${{ if parameters.cloudfront_distribution }}:
+    - bash: |
+        set -e
+        # Install the AWS cli, which will be used to perform CloudFront invalidations
+        pip install --user awscli; export PATH=$PATH:$HOME/.local/bin
+        # Invalidate the CloudFront caches to prevent stale content being served.
+        aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION --paths "/*"
+      env:
+        CLOUDFRONT_DISTRIBUTION: ${{ parameters.cloudfront_distribution }}
+        AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+        AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+      displayName: (static websites) Invalidate CloudFront cache
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))

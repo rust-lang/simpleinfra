@@ -39,8 +39,6 @@ fn main() -> Result<(), Box<Error>> {
     let pubkey = fs::read_to_string("_ssh_keygen_tmp_out.pub").unwrap();
     fs::remove_file("_ssh_keygen_tmp_out.pub").unwrap();
 
-    let mut var_added = false;
-
     // If a Travis CI token is present try to add the key to the repo
     if let Some(token) = &cli.travis_token {
         let travis = TravisCI::new(token);
@@ -48,15 +46,12 @@ fn main() -> Result<(), Box<Error>> {
             if repo.active {
                 println!("the repository is active on Travis CI, adding the environment var...");
                 travis.set_env_var(&cli.repo, "GITHUB_DEPLOY_KEY", key, false)?;
-                var_added = true;
             }
         }
     }
 
-    if !var_added {
-        println!("add this environment variable to the CI configuration:");
-        println!("GITHUB_DEPLOY_KEY={}", key);
-    }
+    println!("if you're not using Travis CI add this variable to the CI configuration:");
+    println!("GITHUB_DEPLOY_KEY={}", key);
 
     println!("uploading the deploy key...");
     let client = Client::new();
