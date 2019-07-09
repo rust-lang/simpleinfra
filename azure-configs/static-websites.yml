@@ -2,13 +2,6 @@
 
 # This Azure Pipelines snippet is used to deploy static websites hosted on
 # GitHub Pages and managed by the Rust Infrastructure team.
-#
-# Basic usage:
-# - template: azure-configs/static-websites.yml@rustinfra
-#   parameters:
-#     deploy_dir: path/to/output
-#     # Optional, only needed if GitHub pages is behind CloudFront
-#     cloudfront_distribution: AAAAAAAAAAAAAA
 
 parameters:
   deploy_dir: ''

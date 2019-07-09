@@ -17,6 +17,7 @@ resources:
     - repository: rustinfra
       type: github
       name: rust-lang/simpleinfra
+      endpoint: rust-lang
 ```
 
 Then you can use all the templates in this repo by suffixing them with
@@ -27,7 +28,7 @@ steps:
   - template: azure-configs/static-websites.yml@rustinfra
 ```
 
-## static-websites.yml
+### static-websites.yml
 
 The `static-websites.yml` template deploys a directory to GitHub pages using
 deploy keys setup with the `setup-deploy-keys` tool in this repository.
