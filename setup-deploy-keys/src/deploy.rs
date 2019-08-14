@@ -8,6 +8,7 @@ use std::process::{Command, Stdio};
 fn main() {
     let slug = env::var("TRAVIS_REPO_SLUG")
         .or(env::var("BUILD_REPOSITORY_ID"))
+        .or(env::var("GITHUB_REPOSITORY"))
         .unwrap();
     let key = env::var("GITHUB_DEPLOY_KEY").unwrap();
 
@@ -38,6 +39,7 @@ fn main() {
 
     let sha = env::var("TRAVIS_COMMIT")
         .or(env::var("BUILD_SOURCEVERSION"))
+        .or(env::var("GITHUB_SHA"))
         .unwrap();
     let msg = format!("Deploy {} to gh-pages", sha);
 
