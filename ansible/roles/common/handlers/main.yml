@@ -1,0 +1,23 @@
+---
+
+- name: reload-ssh
+  service:
+    name: ssh
+    state: restarted
+
+- name: reload-firewall
+  service:
+    name: firewall
+    state: restarted
+
+- name: restart-node_exporter
+  service:
+    name: node_exporter
+    state: restarted
+  when: collect_metrics_from|length > 0
+
+- name: reload-systemd
+  shell: systemctl daemon-reload
+
+- name: reboot
+  reboot:

@@ -1,0 +1,5 @@
+{
+    "name": "postgresql",
+    "path": "/tmp/postgresql-backups",
+    "before-script": "/usr/local/bin/generate-postgresql-dumps"
+}

@@ -1,0 +1,21 @@
+---
+
+- name: create database users
+  postgresql_user:
+    name: "{{ item }}"
+    password: "{{ users[item].password|default('') }}"
+    state: present
+
+  loop: "{{ users.keys() | list }}"
+  become_user: postgres
+
+
+- name: create databases
+  postgresql_db:
+    name: "{{ item }}"
+    owner: "{{ databases[item].owner }}"
+    encoding: "{{ databases[item].encoding }}"
+    state: present
+
+  loop: "{{ databases.keys() | list }}"
+  become_user: postgres

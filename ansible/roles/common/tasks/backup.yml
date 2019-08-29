@@ -1,0 +1,15 @@
+---
+
+- name: create backup user
+  user:
+    name: local-backup
+    state: present
+    system: true
+
+- name: create backup config dir
+  file:
+    path: /etc/backup.d
+    state: directory
+    mode: 0750
+    owner: root
+    group: local-backup

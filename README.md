@@ -4,6 +4,7 @@ This repository containing the tools and automation written by the [Rust
 infrastructure team][team] to manage our services. Using some of the tools in
 this repo require privileges only infra team members have.
 
+* [**ansible**](ansible/README.md): Ansible playbooks to deploy our servers
 * [**azure-configs**](azure-configs/README.md): shared CI templates for Azure
   Pipelines
 * [**github-actions**](github-actions/README.md): shared actions for GitHub

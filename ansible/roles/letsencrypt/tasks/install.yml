@@ -1,0 +1,46 @@
+---
+
+- name: check which version of lego is installed
+  command: lego --version
+  ignore_errors: yes
+  changed_when: false
+  failed_when: false
+  register: lego_capture
+
+- block:
+
+    - name: "download lego {{ lego_version }}"
+      get_url:
+        url: "https://github.com/go-acme/lego/releases/download/v{{ lego_version }}/lego_v{{ lego_version }}_linux_{{ lego_arch }}.tar.gz"
+        checksum: "{{ lego_checksum }}"
+        dest: /tmp/ansible-install-lego.tar.gz
+        mode: 0400
+
+    - name: extract lego
+      unarchive:
+        src: /tmp/ansible-install-lego.tar.gz
+        dest: /usr/local/bin
+        remote_src: true
+        extra_opts:
+          - lego
+
+    - name: cleanup lego installation files
+      file:
+        path: /tmp/ansible-install-lego.tar.gz
+        state: absent
+
+  when: |
+    lego_capture.rc != 0 or not lego_capture.stdout.startswith(
+      "lego version " + lego_version
+    )
+
+- name: set the correct permissions for lego
+  file:
+    path: /usr/local/bin/lego
+    mode: 0755
+
+- name: allow lego to bind port 80
+  capabilities:
+    path: /usr/local/bin/lego
+    capability: cap_net_bind_service=+ep
+    state: present

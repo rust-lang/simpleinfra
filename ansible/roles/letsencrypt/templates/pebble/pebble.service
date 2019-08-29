@@ -1,0 +1,19 @@
+#
+# {{ ansible_managed }}
+#
+
+[Unit]
+Description=pebble: dummy ACME certificate authority
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/pebble -config /etc/pebble/config.json
+User=pebble
+Group=pebble
+Environment=PEBBLE_VA_NOSLEEP=1
+Environment=PEBBLE_VA_ALWAYS_VALID=1
+Environment=PEBBLE_WFE_NONCEREJECT=0
+Environment=PEBBLE_AUTHZREUSE=100
+
+[Install]
+WantedBy=multi-user.target

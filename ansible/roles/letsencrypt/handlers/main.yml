@@ -1,0 +1,9 @@
+---
+
+- name: restart-pebble
+  service:
+    name: pebble
+    state: restarted
+
+- name: reload-systemd
+  command: systemctl daemon-reload

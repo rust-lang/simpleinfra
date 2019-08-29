@@ -1,0 +1,87 @@
+---
+
+- name: check which version of node_exporter is installed
+  command: node_exporter --version
+  ignore_errors: yes
+  changed_when: false
+  failed_when: false
+  register: node_exporter_capture
+
+- block:
+
+    - name: "download node_exporter {{ node_exporter_version }}"
+      get_url:
+        url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-{{ node_exporter_arch }}.tar.gz"
+        checksum: "{{ node_exporter_checksum }}"
+        dest: /tmp/ansible-install-node_exporter.tar.gz
+        mode: 0400
+
+    - name: extract node_exporter
+      unarchive:
+        src: /tmp/ansible-install-node_exporter.tar.gz
+        dest: /usr/local/bin
+        remote_src: true
+        extra_opts:
+          - --strip=1
+          - "node_exporter-{{ node_exporter_version }}.linux-{{ node_exporter_arch }}/node_exporter"
+      notify:
+        - restart-node_exporter
+
+    - name: cleanup node_exporter installation files
+      file:
+        path: /tmp/ansible-install-node_exporter.tar.gz
+        state: absent
+
+  when: |
+    node_exporter_capture.rc != 0 or not node_exporter_capture.stderr.startswith(
+      "node_exporter, version " + node_exporter_version
+    )
+
+- name: set the correct permissions for node_exporter
+  file:
+    path: /usr/local/bin/node_exporter
+    mode: 0755
+
+- name: create the node_exporter group
+  group:
+    name: node_exporter
+    system: true
+    state: present
+
+- name: create the node_exporter user
+  user:
+    name: node_exporter
+    group: node_exporter
+    system: true
+    create_home: false
+    state: present
+
+- name: upload the node_exporter systemd service
+  template:
+    src: metrics/node_exporter.service
+    dest: /etc/systemd/system/node_exporter.service
+  notify:
+    - reload-systemd
+    - restart-node_exporter
+
+- name: enable the node_exporter systemd service
+  service:
+    name: node_exporter
+    state: started
+    enabled: true
+  when: collect_metrics_from|length > 0
+
+- name: disable the node_exporter systemd service
+  service:
+    name: node_exporter
+    state: stopped
+    enabled: false
+  when: collect_metrics_from|length == 0
+
+- name: upload firewall script to allow node_exporter scraping
+  template:
+    src: metrics/node_exporter-firewall.sh
+    dest: /etc/firewall/node_exporter.sh
+    mode: 0755
+  notify:
+    - reload-firewall

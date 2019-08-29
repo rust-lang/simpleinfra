@@ -1,0 +1,19 @@
+---
+
+- name: restart-prometheus
+  service:
+    name: prometheus
+    state: restarted
+
+- name: restart-alertmanager
+  service:
+    name: alertmanager
+    state: restarted
+
+- name: restart-grafana
+  service:
+    name: grafana-server
+    state: restarted
+
+- name: reload-systemd
+  shell: systemctl daemon-reload

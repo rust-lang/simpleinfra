@@ -1,0 +1,14 @@
+#
+# {{ ansible_managed }}
+#
+
+[Unit]
+Description=backup with restic
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/backup-restic
+
+WorkingDirectory=/home/local-backup
+User=local-backup
+Group=local-backup

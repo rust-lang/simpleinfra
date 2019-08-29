@@ -1,0 +1,5 @@
+---
+
+- include: prometheus.yml
+- include: alertmanager.yml
+- include: grafana.yml

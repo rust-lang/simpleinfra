@@ -1,0 +1,40 @@
+---
+
+- name: set the system hostname
+  hostname:
+    name: "{{ inventory_hostname }}"
+  notify: reboot
+
+- name: upload /etc/hosts
+  template:
+    src: networking/etchosts
+    dest: /etc/hosts
+
+- name: create the firewall config dir
+  file:
+    path: /etc/firewall
+    mode: 0755
+    state: directory
+
+- name: upload main firewall script
+  template:
+    src: networking/firewall.sh
+    dest: /usr/local/sbin/firewall
+    mode: 0755
+
+  notify:
+    - reload-firewall
+
+- name: upload firewall service
+  template:
+    src: networking/firewall.service
+    dest: /etc/systemd/system/firewall.service
+
+  notify:
+    - reload-systemd
+    - reload-firewall
+
+- name: enable firewall
+  service:
+    name: firewall
+    enabled: true

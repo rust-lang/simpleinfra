@@ -1,0 +1,8 @@
+[Unit]
+Description=Renew SSL certificates
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/renew-ssl-certs
+User=ssl-renew
+Group=ssl-read-keys

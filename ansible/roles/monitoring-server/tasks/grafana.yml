@@ -1,0 +1,83 @@
+---
+
+- name: ensure grafana dependencies are installed
+  apt:
+    name: libfontconfig1
+    state: present
+
+- name: check which version of grafana is installed
+  command: grafana-cli --version
+  ignore_errors: yes
+  changed_when: false
+  failed_when: false
+  register: grafana_capture
+
+- block:
+
+    - name: "download grafana {{ grafana_version }}"
+      get_url:
+        url: "https://dl.grafana.com/oss/release/grafana_{{ grafana_version }}_{{ grafana_arch }}.deb"
+        checksum: "{{ grafana_checksum }}"
+        dest: /tmp/ansible-install-grafana.deb
+        mode: 0400
+
+    - name: install grafana
+      command: dpkg -i /tmp/ansible-install-grafana.deb
+      notify:
+        - restart-grafana
+
+    - name: cleanup grafana installation files
+      file:
+        path: /tmp/ansible-install-grafana.deb
+        state: absent
+
+  when: |
+    grafana_capture.rc != 0 or not grafana_capture.stdout.startswith(
+      "Grafana cli version " + grafana_version
+    )
+
+- name: check if a grafana secret key was generated
+  stat:
+    path: /etc/grafana/secret-key
+  register: stat_grafana_secret_key
+
+- name: generate a new grafana secret key
+  lineinfile:
+    # Generate a new random password
+    line: "{{ lookup('password', '/dev/null') }}"
+    path: /etc/grafana/secret-key
+    mode: 0400
+    create: true
+    state: present
+  when: not stat_grafana_secret_key.stat.exists
+
+- name: ensure permissions on the grafana secret key are correct
+  file:
+    path: /etc/grafana/secret-key
+    mode: 0400
+    owner: root
+    group: root
+
+- name: try to load the grafana secret key content
+  slurp:
+    src: /etc/grafana/secret-key
+  register: grafana_secret_key
+
+- name: upload grafana configuration
+  template:
+    src: "grafana/{{ item }}"
+    dest: "/etc/grafana/{{ item }}"
+    owner: root
+    group: grafana
+    mode: 0750
+  loop:
+    - grafana.ini
+    - provisioning/datasources/prometheus.yml
+  notify:
+    - restart-grafana
+
+- name: enable the grafana systemd service
+  service:
+    name: grafana-server
+    state: started
+    enabled: true

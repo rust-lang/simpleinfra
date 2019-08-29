@@ -1,0 +1,5 @@
+#
+# {{ ansible_managed }}
+#
+
+groups: {{ prometheus_rule_groups | to_json }}

@@ -1,0 +1,15 @@
+#
+# {{ ansible_managed }}
+#
+
+[Unit]
+Description=prometheus: metrics scraper and aggregator
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/prometheus --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/var/lib/prometheus --storage.tsdb.retention.time={{ prometheus_retention }}
+User=prometheus
+Group=prometheus
+
+[Install]
+WantedBy=multi-user.target

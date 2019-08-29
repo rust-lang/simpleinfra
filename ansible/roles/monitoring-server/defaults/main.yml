@@ -1,0 +1,12 @@
+---
+
+# See this role's README for documentation about these defaults.
+prometheus_scrape_interval: 15s
+prometheus_retention: 15d
+prometheus_scrape: []
+prometheus_rule_groups: []
+grafana_github_teams: []
+alertmanager_resolve_timeout: 5m
+alertmanager_route: {}
+alertmanager_receivers: []
+alertmanager_inhibit_rules: []

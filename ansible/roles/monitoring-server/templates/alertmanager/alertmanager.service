@@ -1,0 +1,15 @@
+#
+# {{ ansible_managed }}
+#
+
+[Unit]
+Description=alertmanager: alerting for prometheus
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/alertmanager --config.file=/etc/alertmanager/alertmanager.yml --storage.path=/var/lib/alertmanager
+User=alertmanager
+Group=alertmanager
+
+[Install]
+WantedBy=multi-user.target

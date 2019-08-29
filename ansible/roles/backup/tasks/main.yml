@@ -1,0 +1,63 @@
+---
+
+- name: check which version of restic is installed
+  slurp:
+    path: /home/local-backup/.restic-version
+  ignore_errors: yes
+  changed_when: false
+  failed_when: false
+  register: restic_slurp
+
+- block:
+
+    - name: "download restic {{ restic_version }}"
+      get_url:
+        url: "https://github.com/restic/restic/releases/download/v{{ restic_version }}/restic_{{ restic_version }}_linux_{{ restic_arch }}.bz2"
+        checksum: "{{ restic_checksum }}"
+        dest: /tmp/ansible-restic.bz2
+        mode: 0400
+
+    - name: extract restic
+      shell: bzcat /tmp/ansible-restic.bz2 > /usr/local/bin/restic
+
+    - name: cleanup restic installation files
+      file:
+        path: /tmp/ansible-restic.bz2
+        state: absent
+
+  when: '"content" not in restic_slurp or restic_slurp.content|b64decode|trim != restic_version'
+
+- name: store installed restic version
+  copy:
+    content: "{{ restic_version }}"
+    dest: /home/local-backup/.restic-version
+
+- name: set the correct permissions for restic
+  file:
+    path: /usr/local/bin/restic
+    mode: 0755
+
+- name: upload backup script
+  template:
+    src: backup.py
+    dest: /usr/local/bin/backup-restic
+
+    mode: 0750
+    owner: root
+    group: local-backup
+
+- name: upload systemd configuration
+  template:
+    src: "{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+  loop:
+    - backup-restic.service
+    - backup-restic.timer
+  notify:
+    - reload-systemd
+
+- name: enable backup timer
+  service:
+    name: backup-restic.timer
+    enabled: yes
+    state: started

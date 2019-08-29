@@ -1,0 +1,99 @@
+---
+
+- name: check which version of alertmanager is installed
+  command: alertmanager --version
+  ignore_errors: yes
+  changed_when: false
+  failed_when: false
+  register: alertmanager_capture
+
+- block:
+
+    - name: "download alertmanager {{ alertmanager_version }}"
+      get_url:
+        url: "https://github.com/prometheus/alertmanager/releases/download/v{{ alertmanager_version }}/alertmanager-{{ alertmanager_version }}.linux-{{ alertmanager_arch }}.tar.gz"
+        checksum: "{{ alertmanager_checksum }}"
+        dest: /tmp/ansible-install-alertmanager.tar.gz
+        mode: 0400
+
+    - name: extract alertmanager
+      unarchive:
+        src: /tmp/ansible-install-alertmanager.tar.gz
+        dest: /usr/local/bin
+        remote_src: true
+        extra_opts:
+          - --strip=1
+          - "alertmanager-{{ alertmanager_version }}.linux-{{ alertmanager_arch }}/alertmanager"
+          - "alertmanager-{{ alertmanager_version }}.linux-{{ alertmanager_arch }}/amtool"
+      notify:
+        - restart-alertmanager
+
+    - name: cleanup alertmanager installation files
+      file:
+        path: /tmp/ansible-install-alertmanager.tar.gz
+        state: absent
+
+  when: |
+    alertmanager_capture.rc != 0 or not alertmanager_capture.stderr.startswith(
+      "alertmanager, version " + alertmanager_version
+    )
+
+- name: set the correct permissions for alertmanager
+  file:
+    path: "/usr/local/bin/{{ item }}"
+    mode: 0755
+  loop:
+    - alertmanager
+    - amtool
+
+- name: create the alertmanager group
+  group:
+    name: alertmanager
+    system: true
+    state: present
+
+- name: create the alertmanager user
+  user:
+    name: alertmanager
+    group: alertmanager
+    system: true
+    create_home: false
+    state: present
+
+- name: create /var/lib/alertmanager
+  file:
+    path: /var/lib/alertmanager
+    owner: alertmanager
+    group: alertmanager
+    mode: 0700
+    state: directory
+
+- name: create /etc/alertmanager
+  file:
+    path: /etc/alertmanager
+    mode: 0755
+    state: directory
+
+- name: upload alertmanager configuration file
+  template:
+    src: alertmanager/alertmanager.yml
+    dest: /etc/alertmanager/alertmanager.yml
+    mode: 0750
+    owner: root
+    group: alertmanager
+  notify:
+    - restart-alertmanager
+
+- name: upload the alertmanager systemd service
+  template:
+    src: alertmanager/alertmanager.service
+    dest: /etc/systemd/system/alertmanager.service
+  notify:
+    - reload-systemd
+    - restart-alertmanager
+
+- name: enable the alertmanager systemd service
+  service:
+    name: alertmanager
+    state: started
+    enabled: true

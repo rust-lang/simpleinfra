@@ -1,0 +1,78 @@
+---
+
+- name: create default groups
+  group:
+    name: "{{ item }}"
+    state: present
+
+  loop:
+    - infra
+    - allow-ssh
+    - passwordless-sudo
+
+- name: create user accounts
+  user:
+    name: "{{ item }}"
+    group: infra
+    groups:
+      - infra
+      - allow-ssh
+    append: true
+
+    shell: /bin/bash
+    state: present
+
+  loop: "{{ unprivileged_users + sudo_users }}"
+
+- name: authorize sudo users
+  user:
+    name: "{{ item }}"
+    groups:
+      - passwordless-sudo
+    append: true
+
+  loop: "{{ sudo_users }}"
+
+- name: authorize passwordless-sudo in sudoers
+  template:
+    src: users/sudoers-passwordless-sudo
+    dest: /etc/sudoers.d/passwordless-sudo
+    mode: 0440
+
+# This is needed for the next task, as it loads group memberships in the
+# getent_group variable.
+- name: load group memberships
+  getent:
+    database: group
+
+# Apparently Ansible doesn't have a native way to do this, so this generates a
+# list of people to remove from the groups and then iterate over it to actually
+# remove them.
+- name: remove old group memberships
+  command: "gpasswd -d {{ item.member | quote }} {{ item.group | quote }}"
+  loop: "{{ to_remove }}"
+  vars:
+    # Configure the groups to check and their expected members list
+    expected:
+      infra: "{{ unprivileged_users + sudo_users }}"
+      allow-ssh: "{{ unprivileged_users + sudo_users }}"
+      passwordless-sudo: "{{ sudo_users }}"
+    # I tried everything but (without resorting to a custom module) the only
+    # way to properly generate this list is to first generate a JSON
+    # representation of the data with a Jinja2 template and then parse it.
+    # It's just horrible.
+    to_remove_str: '
+      [
+        {% set comma = joiner(",") %}
+        {% for group, expected_members in expected.items() %}
+          {% for member in getent_group[group][2].split(",") %}
+            {% if member not in expected_members %}
+              {{ comma() }}
+              {"group":"{{ group }}","member":"{{ member }}"}
+            {% endif %}
+          {% endfor %}
+        {% endfor %}
+      ]'
+    # Output for each user to remove:
+    # [ {"group": "group_name", "member": "user_name"}, ... ]
+    to_remove: "{{ to_remove_str | from_json }}"

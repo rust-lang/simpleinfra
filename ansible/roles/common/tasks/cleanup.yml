@@ -1,0 +1,6 @@
+---
+
+- name: disable sudo access of the ubuntu user
+  file:
+    name: /etc/sudoers.d/90-cloud-init-users
+    state: absent

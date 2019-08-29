@@ -1,0 +1,9 @@
+---
+
+- name: install postgresql
+  apt:
+    name:
+      - postgresql
+      - python-psycopg2  # needed by ansible
+      - python3-psycopg2  # needed by ansible
+    state: present

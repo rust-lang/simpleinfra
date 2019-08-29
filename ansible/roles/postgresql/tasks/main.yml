@@ -1,0 +1,5 @@
+---
+
+- include: setup.yml
+- include: databases.yml
+- include: backup.yml

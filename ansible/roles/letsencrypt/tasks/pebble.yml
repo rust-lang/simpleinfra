@@ -1,0 +1,68 @@
+---
+
+- name: check whether pebble is installed
+  stat:
+    path: /usr/local/bin/pebble
+  register: stat_pebble
+
+- name: "download pebble {{ pebble_version }}"
+  get_url:
+    url: "https://github.com/letsencrypt/pebble/releases/download/v{{ pebble_version }}/pebble_linux-{{ pebble_arch }}"
+    checksum: "{{ pebble_checksum }}"
+    dest: /usr/local/bin/pebble
+  when: not stat_pebble.stat.exists
+
+- name: set the correct permissions for pebble
+  file:
+    path: /usr/local/bin/pebble
+    mode: 0755
+
+- name: create the pebble group
+  group:
+    name: pebble
+    system: true
+    state: present
+
+- name: create the pebble user
+  user:
+    name: pebble
+    group: pebble
+    system: true
+    create_home: false
+    state: present
+
+- name: create pebble configuration directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - /etc/pebble
+    - /etc/pebble/certs
+    - /etc/pebble/certs/localhost
+
+- name: upload pebble configuration files
+  template:
+    src: "pebble/{{ item }}"
+    dest: "/etc/pebble/{{ item }}"
+  loop:
+    - config.json
+    - certs/pebble.minica.pem
+    - certs/pebble.minica.key.pem
+    - certs/localhost/cert.pem
+    - certs/localhost/key.pem
+  notify:
+    - restart-pebble
+
+- name: upload systemd service for pebble
+  template:
+    src: pebble/pebble.service
+    dest: /etc/systemd/system/pebble.service
+  notify:
+    - restart-pebble
+    - reload-systemd
+
+- name: start pebble and enable it at boot
+  service:
+    name: pebble
+    enabled: true
+    state: started

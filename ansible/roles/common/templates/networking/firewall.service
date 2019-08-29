@@ -1,0 +1,17 @@
+#
+# {{ ansible_managed }}
+#
+
+[Unit]
+Description=Firewall initialization script
+After=network.target
+
+[Service]
+Type=oneshot
+KillMode=none
+ExecStart=/usr/local/sbin/firewall
+ExecStop=/usr/local/sbin/firewall --reset
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

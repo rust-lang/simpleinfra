@@ -1,0 +1,6 @@
+---
+
+- include: pebble.yml
+  when: dummy_certs
+- include: install.yml
+- include: renewer.yml

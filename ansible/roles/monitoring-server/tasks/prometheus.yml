@@ -1,0 +1,106 @@
+---
+
+- name: check which version of prometheus is installed
+  command: prometheus --version
+  ignore_errors: yes
+  changed_when: false
+  failed_when: false
+  register: prometheus_capture
+
+- block:
+
+    - name: "download prometheus {{ prometheus_version }}"
+      get_url:
+        url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/prometheus-{{ prometheus_version }}.linux-{{ prometheus_arch }}.tar.gz"
+        checksum: "{{ prometheus_checksum }}"
+        dest: /tmp/ansible-install-prometheus.tar.gz
+        mode: 0400
+
+    - name: extract prometheus
+      unarchive:
+        src: /tmp/ansible-install-prometheus.tar.gz
+        dest: /usr/local/bin
+        remote_src: true
+        extra_opts:
+          - --strip=1
+          - "prometheus-{{ prometheus_version }}.linux-{{ prometheus_arch }}/prometheus"
+          - "prometheus-{{ prometheus_version }}.linux-{{ prometheus_arch }}/promtool"
+      notify:
+        - restart-prometheus
+
+    - name: cleanup prometheus installation files
+      file:
+        path: /tmp/ansible-install-prometheus.tar.gz
+        state: absent
+
+  when: |
+    prometheus_capture.rc != 0 or not prometheus_capture.stderr.startswith(
+      "prometheus, version " + prometheus_version
+    )
+
+- name: set the correct permissions for prometheus
+  file:
+    path: "/usr/local/bin/{{ item }}"
+    mode: 0755
+  loop:
+    - prometheus
+    - promtool
+
+- name: create the prometheus group
+  group:
+    name: prometheus
+    system: true
+    state: present
+
+- name: create the prometheus user
+  user:
+    name: prometheus
+    group: prometheus
+    system: true
+    create_home: false
+    state: present
+
+- name: create /var/lib/prometheus
+  file:
+    path: /var/lib/prometheus
+    owner: prometheus
+    group: prometheus
+    mode: 0700
+    state: directory
+
+- name: create prometheus configuration directories
+  file:
+    path: "{{ item }}"
+    mode: 0755
+    state: directory
+  loop:
+    - /etc/prometheus
+    - /etc/prometheus/rules.d
+
+- name: upload prometheus configuration file
+  template:
+    src: prometheus/prometheus.yml
+    dest: /etc/prometheus/prometheus.yml
+  notify:
+    - restart-prometheus
+
+- name: upload prometheus managed rules
+  template:
+    src: prometheus/rules.yml
+    dest: /etc/prometheus/rules.yml
+  notify:
+    - restart-prometheus
+
+- name: upload the prometheus systemd service
+  template:
+    src: prometheus/prometheus.service
+    dest: /etc/systemd/system/prometheus.service
+  notify:
+    - reload-systemd
+    - restart-prometheus
+
+- name: enable the prometheus systemd service
+  service:
+    name: prometheus
+    state: started
+    enabled: true

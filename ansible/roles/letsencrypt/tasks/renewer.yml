@@ -1,0 +1,94 @@
+---
+
+- name: create the ssl-read-keys group
+  group:
+    name: ssl-read-keys
+    system: true
+    state: present
+
+- name: create the ssl-renew user
+  user:
+    name: ssl-renew
+    group: ssl-read-keys
+    system: true
+    state: present
+
+- name: upload renew script
+  template:
+    src: renew-ssl-certs.sh
+    dest: /usr/local/bin/renew-ssl-certs
+    owner: ssl-renew
+    group: root
+    mode: 0700
+
+- name: create directories readable by ssl-read-keys
+  file:
+    path: "{{ item }}"
+    owner: ssl-renew
+    group: ssl-read-keys
+    mode: 0750
+    state: directory
+  with_items:
+    - /var/run/acme-challenges
+    - /etc/ssl/letsencrypt
+    - /etc/ssl/letsencrypt/certificates
+
+- name: create private directories of ssl-renew
+  file:
+    path: "{{ item }}"
+    owner: ssl-renew
+    group: root
+    mode: 0700
+    state: directory
+  with_items:
+    - /etc/ssl/letsencrypt/accounts
+
+- name: create private directories of root
+  file:
+    path: "{{ item }}"
+    owner: root
+    group: root
+    mode: 0700
+    state: directory
+  with_items:
+    - /etc/ssl/letsencrypt/after-renew.d
+
+- name: upload after-renew script
+  template:
+    src: after-renew.sh
+    dest: /etc/ssl/letsencrypt/after-renew
+    owner: root
+    group: root
+    mode: 0700
+
+- name: authorize ssl-renew to execute the after-renew script
+  lineinfile:
+    path: /etc/sudoers.d/ssl-renew
+    line: "ssl-renew ALL=(root:root) NOPASSWD: /etc/ssl/letsencrypt/after-renew"
+    create: true
+    state: present
+
+- name: upload systemd timer files
+  template:
+    src: "{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+  with_items:
+    - renew-ssl-certs.service
+    - renew-ssl-certs.timer
+  notify:
+    - reload-systemd
+
+- name: enable renew timer
+  service:
+    name: renew-ssl-certs.timer
+    enabled: true
+    state: started
+
+- name: check if the certificates already exist
+  stat:
+    path: /etc/ssl/letsencrypt/certificates/main.crt
+  register: cert_exists
+
+- name: request ssl certificates
+  shell: bash -c "sudo -u ssl-renew -- renew-ssl-certs initial-renew"
+  when: not cert_exists.stat.exists

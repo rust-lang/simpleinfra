@@ -1,0 +1,17 @@
+#
+# {{ ansible_managed }}
+#
+
+apiVersion: 1
+
+deleteDatasources:
+  - name: prometheus
+
+datasources:
+  # Local prometheus server
+  - name: prometheus
+    type: prometheus
+    access: proxy
+    url: http://localhost:9090
+    isDefault: true
+    editable: false

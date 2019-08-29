@@ -1,0 +1,50 @@
+---
+
+# Version of https://github.com/prometheus/node_exporter to install on our
+# instances. The checksum is the hash of the downloadable tarball for the
+# specified architecture, found in the GitHub releases.
+node_exporter_version: 0.18.1
+node_exporter_arch: amd64
+node_exporter_checksum: sha256:b2503fd932f85f4e5baf161268854bf5d22001869b84f00fd2d1f57b51b72424
+
+# Version of https://github.com/prometheus/prometheus to install on our
+# instances. The checksum is the hash of the downloadable tarball for the
+# specified architecture, found in the GitHub releases.
+prometheus_version: 2.12.0
+prometheus_arch: amd64
+prometheus_checksum: sha256:b9f57b6e64fb3048742cfa7dbcc727e1df906d8020ef246a5e81b7959ae97e08
+
+# Version of https://github.com/prometheus/alertmanager to install on our
+# instances. The checksum is the hash of the downloadable tarball for the
+# specified architecture, found in the GitHub releases.
+alertmanager_version: 0.18.0
+alertmanager_arch: amd64
+alertmanager_checksum: sha256:5f17155d669a8d2243b0d179fa46e609e0566876afd0afb09311a8bc7987ab15
+
+# Version of https://grafana.com to install in our instances. The checksum is
+# the hash of the .deb for the specified architecture, found here:
+# https://grafana.com/grafana/download
+grafana_version: 6.3.3
+grafana_arch: amd64
+grafana_checksum: sha256:7e2c05fb8c2b2595b7230cb34c3cd761891a4c3346e6d45518669d3946755e2d
+
+# Version of https://github.com/letsencrypt/pebble to install on our instances.
+# The checksum is the hash of the downloadable binary for the specific
+# architecture, found in the GitHub releases.
+pebble_version: 2.2.2
+pebble_arch: amd64
+pebble_checksum: sha256:dcfe3106149885ebc3c1783aa1874b3cfb9bc78815737015127db641ef6be8c9
+
+# Version of https://github.com/go-acme/lego to install on our instances. The
+# checksum is the hash of the downloadable tarball for the specified
+# architecture, found in the GitHub releases.
+lego_version: 3.0.2
+lego_arch: amd64
+lego_checksum: sha256:6fb29df71eb920196459a4a8b5803c3e31639c26fb45967650a247a36f81f618
+
+# Version of https://github.com/restic/restic to install on our instances. The
+# checksum is the hash of the downloadable binary for the specified
+# architecture, found in the GitHub release.
+restic_version: 0.9.5
+restic_arch: amd64
+restic_checksum: sha256:08cd75e56a67161e9b16885816f04b2bf1fb5b03bc0677b0ccf3812781c1a2ec

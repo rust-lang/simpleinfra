@@ -1,0 +1,9 @@
+[Unit]
+Description=Renew SSL certificates each week
+
+[Timer]
+OnCalendar=weekly
+Persistent=true
+
+[Install]
+WantedBy=timers.target

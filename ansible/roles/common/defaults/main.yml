@@ -1,0 +1,6 @@
+---
+
+# See this role's README for documentation about these defaults.
+unprivileged_users: []
+sudo_users: []
+collect_metrics_from: []

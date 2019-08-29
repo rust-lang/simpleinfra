@@ -1,0 +1,91 @@
+---
+
+- name: upload backup generation script
+  template:
+    src: backup/generate.sh
+    dest: /usr/local/bin/generate-postgresql-dumps
+    mode: 0750
+    owner: root
+    group: local-backup
+
+- name: upload backup manifest
+  template:
+    src: backup/manifest.json
+    dest: /etc/backup.d/postgresql.json
+
+- name: create local-backup database user
+  postgresql_user:
+    name: local-backup
+    state: present
+  become_user: postgres
+
+- block:
+
+  - name: grant connect privileges to the local-backup user
+    postgresql_privs:
+      database: "{{ item }}"
+      type: database
+      privs: CONNECT
+      roles: local-backup
+    loop: "{{ databases.keys() | list }}"
+
+  - name: grant usage privileges to public schemas to the local-backup user
+    postgresql_privs:
+      database: "{{ item }}"
+      type: schema
+      objs: public
+      privs: USAGE
+      roles: local-backup
+    loop: "{{ databases.keys() | list }}"
+
+  - name: remove table creating privieges from the local-backup user
+    postgresql_privs:
+      database: "{{ item }}"
+      type: schema
+      objs: public
+      privs: CREATE
+      roles: local-backup
+      state: absent
+    loop: "{{ databases.keys() | list }}"
+
+  - name: grant select privileges to all tables to the local-backup user
+    postgresql_privs:
+      database: "{{ item }}"
+      type: table
+      schema: public
+      objs: ALL_IN_SCHEMA
+      privs: SELECT
+      roles: local-backup
+    loop: "{{ databases.keys() | list }}"
+
+  - name: grant select privileges to all sequences to the local-backup user
+    postgresql_privs:
+      database: "{{ item }}"
+      type: sequence
+      schema: public
+      objs: ALL_IN_SCHEMA
+      privs: SELECT
+      roles: local-backup
+    loop: "{{ databases.keys() | list }}"
+
+  - name: grant select privileges to future tables to the local-backup user
+    postgresql_privs:
+      db: "{{ item }}"
+      schema: public
+      objs: TABLES
+      privs: SELECT
+      type: default_privs
+      role: local-backup
+    loop: "{{ databases.keys() | list }}"
+
+  - name: grant select privileges to future sequences to the local-backup user
+    postgresql_privs:
+      db: "{{ item }}"
+      schema: public
+      objs: SEQUENCES
+      privs: SELECT
+      type: default_privs
+      role: local-backup
+    loop: "{{ databases.keys() | list }}"
+
+  become_user: postgres

@@ -1,0 +1,15 @@
+#
+# {{ ansible_managed }}
+#
+
+[Unit]
+Description=node_exporter: export Prometheus metrics about this instance
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/node_exporter --collector.systemd
+User=node_exporter
+Group=node_exporter
+
+[Install]
+WantedBy=multi-user.target

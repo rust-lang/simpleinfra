@@ -1,0 +1,21 @@
+---
+
+- name: install nginx
+  apt:
+    name: nginx
+    state: present
+
+- name: upload nginx.conf
+  template:
+    src: nginx.conf
+    dest: /etc/nginx/nginx.conf
+  notify:
+    - reload-nginx
+
+- name: upload firewall rules for nginx
+  template:
+    src: firewall.sh
+    dest: /etc/firewall/nginx.sh
+    mode: 0750
+  notify:
+    - restart-firewall

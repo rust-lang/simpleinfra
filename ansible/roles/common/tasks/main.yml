@@ -1,0 +1,9 @@
+---
+
+- include: apt.yml
+- include: users.yml
+- include: ssh.yml
+- include: networking.yml
+- include: cleanup.yml
+- include: backup.yml
+- include: metrics.yml

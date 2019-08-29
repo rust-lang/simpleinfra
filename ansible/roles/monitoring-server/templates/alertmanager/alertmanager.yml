@@ -1,0 +1,12 @@
+#
+# {{ ansible_managed }}
+#
+
+global:
+  resolve_timeout: {{ alertmanager_resolve_timeout }}
+
+route: {{ alertmanager_route | to_json }}
+
+receivers: {{ alertmanager_receivers | to_json }}
+
+inhibit_rules: {{ alertmanager_inhibit_rules | to_json }}

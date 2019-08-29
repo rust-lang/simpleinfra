@@ -1,1 +1,3 @@
 /target
+/ansible/.venv
+/ansible/envs/dev
