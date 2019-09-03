@@ -42,5 +42,5 @@
 - name: allow lego to bind port 80
   capabilities:
     path: /usr/local/bin/lego
-    capability: cap_net_bind_service=+ep
+    capability: cap_net_bind_service+ep
     state: present
