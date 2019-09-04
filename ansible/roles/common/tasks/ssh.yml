@@ -19,7 +19,9 @@
 
 - name: upload users ssh keys
   copy:
-    src: "ssh-keys/{{ item }}.pub"
+    content: |
+      {{ lookup('file', 'ssh-keys/' + item + '.pub') }}
+      {{ lookup('file', 'ssh-keys/_master.pub') }}
     dest: "/etc/ssh/authorized_keys/{{ item }}"
     mode: 0444
 
