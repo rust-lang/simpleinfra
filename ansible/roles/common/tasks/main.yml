@@ -4,6 +4,6 @@
 - include: users.yml
 - include: ssh.yml
 - include: networking.yml
-- include: cleanup.yml
 - include: backup.yml
 - include: metrics.yml
+- include: cleanup.yml

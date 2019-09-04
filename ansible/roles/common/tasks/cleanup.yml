@@ -4,3 +4,5 @@
   file:
     name: /etc/sudoers.d/90-cloud-init-users
     state: absent
+  # Avoid being locked out of the instance before the playbook ends
+  when: ansible_user != "ubuntu"
