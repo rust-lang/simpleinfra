@@ -19,7 +19,7 @@ server="https://localhost:14000/dir"
 # Use Pebble's CA to validate connections to it
 export LEGO_CA_CERTIFICATES=/etc/pebble/certs/pebble.minica.pem
 # Remove the account as Pebble doesn't persist it
-rm -f "/etc/ssl/letsencrypt/accounts/localhost_14000/{{ email }}"
+rm -rf "/etc/ssl/letsencrypt/accounts/localhost_14000/{{ email }}"
 {% else %}
 server="https://acme-v02.api.letsencrypt.org/directory"
 {% endif %}
