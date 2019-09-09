@@ -55,6 +55,13 @@
               - rcs.infra.rust-lang.org:9100
               - docsrs.infra.rust-lang.org:9100
 
+        - job_name: docsrs
+          metrics_path: /about/metrics
+          scheme: https
+          static_configs:
+            - targets:
+              - docs.rs:443
+
       prometheus_rule_groups:
         - name: node
           rules:
@@ -72,16 +79,40 @@
                 summary: "{{ '{{ $labels.name }}' }} on {{ '{{ $labels.instance }}' }} failed"
                 description: "The systemd unit {{ '{{ $labels.name }}' }} on the {{ '{{ $labels.instance }}' }} instance failed to execute."
 
+        - name: docsrs
+          rules:
+            - alert: LongQueue
+              expr: docsrs_queued_crates_count{job="docsrs"} >= 100
+              for: 1h
+              labels:
+                dispatch: docsrs
+              annotations:
+                summary: "The docs.rs build queue is unreasonably long"
+                description: "There are more than 100 crates in the docs.rs queue, and the situation didn't resolve itself in the past hour. The build queue is available at https://docs.rs/releases/queue"
+
       alertmanager_route:
         group_by: ['alertname']
         group_wait: 30s
         group_interval: 5m
         receiver: discord-infra
 
+        routes:
+          - receiver: discord-docsrs
+            group_by: ['alertname']
+            match:
+              dispatch: docsrs
+
       alertmanager_receivers:
         - name: discord-infra
           slack_configs:
             - api_url: "{{ vars_alertmanager_receiver_discord_infra }}/slack"
+              channel: doesnt-matter
+              title: "{{ '{{ .Alerts.Firing | len }} alerts fired!' }}"
+              text: "{{ '{{ range .Alerts }}**{{ .Annotations.summary }}**\n{{ .Annotations.description }}\n{{ end }}' }}"
+
+        - name: discord-docsrs
+          slack_configs:
+            - api_url: "{{ vars_alertmanager_receiver_discord_docsrs }}/slack"
               channel: doesnt-matter
               title: "{{ '{{ .Alerts.Firing | len }} alerts fired!' }}"
               text: "{{ '{{ range .Alerts }}**{{ .Annotations.summary }}**\n{{ .Annotations.description }}\n{{ end }}' }}"
