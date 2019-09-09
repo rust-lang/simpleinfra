@@ -1,5 +1,8 @@
 ---
 
+global_collect_metrics_from:
+  - 52.9.166.219  # monitoring.infra.rust-lang.org
+
 # Version of https://github.com/prometheus/node_exporter to install on our
 # instances. The checksum is the hash of the downloadable tarball for the
 # specified architecture, found in the GitHub releases.

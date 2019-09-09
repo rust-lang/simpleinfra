@@ -1,0 +1,21 @@
+---
+
+- hosts: bastion
+  become: yes
+  become_user: root
+
+  roles:
+
+    - role: common
+      papertrail_url: "{{ vars_papertrail_url }}"
+      collect_metrics_from: "{{ global_collect_metrics_from }}"
+      sudo_users:
+        - aidanhs
+        - acrichto
+        - simulacrum
+        - pietro
+      unprivileged_users:
+        - guillaumegomez  # puppeteer.infra.rust-lang.org
+        - onur  # docsrs.infra.rust-lang.org
+        - quietmisdreavus  # docsrs.infra.rust-lang.org
+        - shep  # play.rust-lang.org

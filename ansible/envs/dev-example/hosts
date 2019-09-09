@@ -1,2 +1,5 @@
+[bastion]
+# bastion-server.local
+
 [monitoring]
 # monitoring-server.local

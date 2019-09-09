@@ -1,2 +1,5 @@
+[bastion]
+bastion.infra.rust-lang.org
+
 [monitoring]
 monitoring.infra.rust-lang.org
