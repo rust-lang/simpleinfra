@@ -29,7 +29,6 @@
     mode: 0750
     state: directory
   with_items:
-    - /var/run/acme-challenges
     - /etc/ssl/letsencrypt
     - /etc/ssl/letsencrypt/certificates
 
