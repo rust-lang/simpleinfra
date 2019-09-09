@@ -108,14 +108,14 @@
             - api_url: "{{ vars_alertmanager_receiver_discord_infra }}/slack"
               channel: doesnt-matter
               title: "{{ '{{ .Alerts.Firing | len }} alerts fired!' }}"
-              text: "{{ '{{ range .Alerts }}**{{ .Annotations.summary }}**\n{{ .Annotations.description }}\ncc @infra-page\n{{ end }}' }}"
+              text: "{{ '{{ range .Alerts }}**{{ .Annotations.summary }}**\n{{ .Annotations.description }}\n{{ end }}\ncc @infra-page' }}"
 
         - name: discord-docsrs
           slack_configs:
             - api_url: "{{ vars_alertmanager_receiver_discord_docsrs }}/slack"
               channel: doesnt-matter
               title: "{{ '{{ .Alerts.Firing | len }} alerts fired!' }}"
-              text: "{{ '{{ range .Alerts }}**{{ .Annotations.summary }}**\n{{ .Annotations.description }}\ncc @docsrs-page\n{{ end }}' }}"
+              text: "{{ '{{ range .Alerts }}**{{ .Annotations.summary }}**\n{{ .Annotations.description }}\n{{ end }}\ncc @docsrs-page' }}"
 
       grafana_github_teams:
         - 2357301  # rust-lang/infra
