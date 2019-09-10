@@ -4,3 +4,4 @@
 unprivileged_users: []
 sudo_users: []
 collect_metrics_from: []
+papertrail_url: null

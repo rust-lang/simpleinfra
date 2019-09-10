@@ -1,0 +1,17 @@
+---
+
+- name: upload papertrail rsyslog configuration
+  template:
+    src: papertrail/rsyslog.conf
+    dest: /etc/rsyslog.d/00-papertrail.conf
+  when: papertrail_url is not none
+  notify:
+    - restart-rsyslog
+
+- name: remove papertrail rsyslog configuratin
+  file:
+    path: /etc/rsyslog.d/00-papertrail.conf
+    state: absent
+  when: papertrail_url is none
+  notify:
+    - restart-rsyslog

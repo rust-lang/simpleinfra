@@ -53,4 +53,8 @@ want to preserve.
   # If the list is empty or missing node-exporter will be disabled.
   collect_metrics_from:
     - 127.0.0.1
+
+  # Papertrail logs collection URL. [optional]
+  # If the URL is missing logs will not be shipped to Papertrail.
+  papertrail_url: logsN.papertrailapp.com:NNNNN
 ```

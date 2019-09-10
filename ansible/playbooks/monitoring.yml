@@ -7,6 +7,7 @@
   roles:
 
     - role: common
+      papertrail_url: "{{ vars_papertrail_url }}"
       collect_metrics_from:
         - 127.0.0.1
       sudo_users:

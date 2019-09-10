@@ -6,4 +6,5 @@
 - include: networking.yml
 - include: backup.yml
 - include: metrics.yml
+- include: papertrail.yml
 - include: cleanup.yml

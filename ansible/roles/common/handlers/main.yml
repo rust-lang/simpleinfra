@@ -16,6 +16,11 @@
     state: restarted
   when: collect_metrics_from|length > 0
 
+- name: restart-rsyslog
+  service:
+    name: rsyslog
+    state: restarted
+
 - name: reload-systemd
   shell: systemctl daemon-reload
 

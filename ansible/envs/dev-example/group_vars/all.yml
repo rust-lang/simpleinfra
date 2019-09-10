@@ -1,3 +1,5 @@
 ---
 
+vars_papertrail_url: null
+
 vars_letsencrypt_dummy_certs: true

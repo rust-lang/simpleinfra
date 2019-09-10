@@ -1,3 +1,5 @@
 ---
 
+vars_papertrail_url: "{{ lookup('onepassword', 'ansible:all', field='vars_papertrail_url') }}"
+
 vars_letsencrypt_dummy_certs: false
