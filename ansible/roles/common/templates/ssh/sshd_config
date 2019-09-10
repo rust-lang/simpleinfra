@@ -6,10 +6,6 @@ Port 22
 HostKey /etc/ssh/ssh_host_rsa_key
 HostKey /etc/ssh/ssh_host_ecdsa_key
 HostKey /etc/ssh/ssh_host_ed25519_key
-UsePrivilegeSeparation yes
-
-KeyRegenerationInterval 3600
-ServerKeyBits 1024
 
 SyslogFacility AUTH
 LogLevel INFO
@@ -22,13 +18,11 @@ PermitRootLogin no
 PermitEmptyPasswords no
 
 PasswordAuthentication no
-RSAAuthentication yes
 PubkeyAuthentication yes
 ChallengeResponseAuthentication no
 AuthorizedKeysFile /etc/ssh/authorized_keys/%u
 
 IgnoreRhosts yes
-RhostsRSAAuthentication no
 HostbasedAuthentication no
 
 X11Forwarding no
