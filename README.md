@@ -11,6 +11,8 @@ this repo require privileges only infra team members have.
   Actions
 * [**restart-rcs**](#restart-rcs): redeploying [rust-central-station][rcs]
 * [**setup-deploy-keys**](#setup-deploy-keys): automation for GitHub deploy keys
+* [**terraform**](terraform/README.md): Terraform configuration to deploy our
+  cloud resources
 * [**travis-configs**](travis-configs/README.md): shared importable config
   files for Travis CI
 * [**with-rust-key**](#with-rust-key): execute commands using the Rust release
