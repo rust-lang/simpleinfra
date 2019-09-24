@@ -5,30 +5,30 @@
 
 module "ecr_crater" {
   source = "./modules/ecr-repo"
-  name = "crater"
+  name   = "crater"
 }
 
 module "ecr_discord_mods_bot" {
   source = "./modules/ecr-repo"
-  name = "discord-mods-bot"
+  name   = "discord-mods-bot"
 }
 
 module "ecr_rust_central_station" {
   source = "./modules/ecr-repo"
-  name = "rust-central-station"
+  name   = "rust-central-station"
 }
 
 module "ecr_rust_highfive" {
   source = "./modules/ecr-repo"
-  name = "rust-highfive"
+  name   = "rust-highfive"
 }
 
 module "ecr_rust_log_analyzer" {
   source = "./modules/ecr-repo"
-  name = "rust-log-analyzer"
+  name   = "rust-log-analyzer"
 }
 
 module "ecr_rust_triagebot" {
   source = "./modules/ecr-repo"
-  name = "rust-triagebot"
+  name   = "rust-triagebot"
 }
