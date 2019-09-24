@@ -12,3 +12,5 @@ provider "aws" {
   profile = "default"
   region  = "us-west-1"
 }
+
+data "aws_caller_identity" "current" {}
