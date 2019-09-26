@@ -5,6 +5,7 @@ terraform {
     key            = "simpleinfra.tfstate"
     region         = "us-west-1"
     dynamodb_table = "terraform-state-lock"
+    encrypt = true
   }
 }
 
