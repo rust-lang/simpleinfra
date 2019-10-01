@@ -33,3 +33,23 @@ jobs:
           cd terraform
           terraform init -backend=false
           terraform validate
+
+  actions-js:
+    name: GitHub Actions (JS)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Ensure the bundled action is the same as the source code
+        run: |
+          for action in $(ls github-actions/); do
+            if [[ -f "github-actions/${action}/package.json" ]]; then
+              pushd "github-actions/${action}"
+              sha256sum dist/* > "/tmp/sha256-${action}-before"
+              npm install
+              npm run build
+              sha256sum dist/* > "/tmp/sha256-${action}-after"
+              diff -u --color "/tmp/sha256-${action}-before" "/tmp/sha256-${action}-after"
+              popd
+            fi
+          done
