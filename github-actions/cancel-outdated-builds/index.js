@@ -4,18 +4,18 @@ const fetch = require("node-fetch");
 const psList = require("ps-list");
 
 const WORKER_NAME = "Runner.Worker";
-const CHECK_EVERY_SECONDS = 1;
 
 const main = (async () => {
+    let checkEverySeconds = parseInt(actions.getInput("check_every_seconds", { required: true }));
     while (true) {
         if (await isLatestCommit() === false) {
             let pid = await findWorkerPid();
             if (pid !== null) {
                 process.kill(pid, 'SIGTERM');
-                return;
             }
+            return;
         }
-        await new Promise(resolve => setTimeout(resolve, CHECK_EVERY_SECONDS * 1000));
+        await new Promise(resolve => setTimeout(resolve, checkEverySeconds * 1000));
     }
 });
 
@@ -32,14 +32,18 @@ const isLatestCommit = async () => {
             "Authorization": "token " + token,
         },
     });
-    let current_commit = await resp.text();
+    let currentCommit = await resp.text();
 
-    if (resp.status === 200 && current_commit !== commit) {
+    if (resp.status === 200 && currentCommit !== commit) {
         // If-None-Match did not work, the commit changed
         return false;
     } else if (resp.status === 304) {
         // A "Not modified" was returned (without impacting the rate limits),
         // so the commit is indeed the last one
+        return true;
+    } else if (resp.status === 429) {
+        // If we're rate limited just fake that the commit is the latest so it
+        // will be checked later.
         return true;
     } else {
         actions.setFailed("Failed to fetch the latest commit!");
@@ -48,8 +52,8 @@ const isLatestCommit = async () => {
 };
 
 const daemonize = async () => {
-    let worker_pid = await findWorkerPid();
-    if (worker_pid === null) {
+    let workerPid = await findWorkerPid();
+    if (workerPid === null) {
         actions.setFailed("A process named " + WORKER_NAME + " is not running!");
         return;
     }

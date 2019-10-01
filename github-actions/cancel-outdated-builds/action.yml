@@ -5,6 +5,10 @@ inputs:
   github_token:
     description: GitHub token used to interact with the GitHub API
     required: true
+  check_every_seconds:
+    description: How many seconds to wait between checks
+    required: true
+    default: "60"
 
 runs:
   using: node12
