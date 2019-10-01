@@ -2,3 +2,4 @@
 /ansible/.venv
 /ansible/envs/dev
 /terraform/.terraform
+node_modules

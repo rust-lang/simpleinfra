@@ -1,0 +1,19 @@
+{
+  "name": "cancel-outdated-builds",
+  "version": "1.0.0",
+  "description": "Start a daemon that will cancel the current build if a new commit is pushed to the branch",
+  "main": "index.js",
+  "scripts": {
+    "build": "node_modules/.bin/ncc build --minify index.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.1.1",
+    "node-fetch": "^2.6.0",
+    "ps-list": "^6.3.0"
+  },
+  "devDependencies": {
+    "@zeit/ncc": "^0.20.5"
+  }
+}
