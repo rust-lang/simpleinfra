@@ -18,3 +18,18 @@ jobs:
 
       - name: Run clippy
         run: cargo clippy --all -- -Dwarnings
+
+  terraform:
+    name: Terraform configuration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Ensure the terraform files are formatted correctly
+        run: terraform fmt -check -diff -recursive
+
+      - name: Validate the terraform directory
+        run: |
+          cd terraform
+          terraform init -backend=false
+          terraform validate
