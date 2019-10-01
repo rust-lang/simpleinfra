@@ -1,0 +1,11 @@
+name: Prepare to cancel the build when it becomes outdated
+description: Start a daemon that will cancel the current build if a new commit is pushed to the branch
+
+inputs:
+  github_token:
+    description: GitHub token used to interact with the GitHub API
+    required: true
+
+runs:
+  using: nodejs12
+  main: dist/index.js
