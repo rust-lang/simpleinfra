@@ -17,7 +17,7 @@ impl TravisCI {
         }
     }
 
-    pub fn repo(&self, repo: &str) -> Result<Option<Repository>, Box<Error>> {
+    pub fn repo(&self, repo: &str) -> Result<Option<Repository>, Box<dyn Error>> {
         let mut resp = self
             .request(Method::GET, &format!("repo/{}", self.encode_repo(repo)))?
             .send()?;
@@ -31,7 +31,7 @@ impl TravisCI {
         Ok(None)
     }
 
-    pub fn env_vars(&self, repo: &str) -> Result<EnvVars, Box<Error>> {
+    pub fn env_vars(&self, repo: &str) -> Result<EnvVars, Box<dyn Error>> {
         Ok(self
             .request(
                 Method::GET,
@@ -48,27 +48,34 @@ impl TravisCI {
         key: &str,
         value: &str,
         public: bool,
-    ) -> Result<(), Box<Error>> {
+    ) -> Result<(), Box<dyn Error>> {
         // Issue the rigth call to either add or override the var
         let vars = self.env_vars(repo)?;
-        let (method, url) = if let Some(existing) = vars.env_vars.iter().find(|var| var.name == key) {
-            (Method::PATCH, format!("repo/{}/env_var/{}", self.encode_repo(repo), existing.id))
+        let (method, url) = if let Some(existing) = vars.env_vars.iter().find(|var| var.name == key)
+        {
+            (
+                Method::PATCH,
+                format!("repo/{}/env_var/{}", self.encode_repo(repo), existing.id),
+            )
         } else {
-            (Method::POST, format!("repo/{}/env_vars", self.encode_repo(repo)))
+            (
+                Method::POST,
+                format!("repo/{}/env_vars", self.encode_repo(repo)),
+            )
         };
 
         self.request(method, &url)?
-        .json(&serde_json::json!({
-            "env_var.name": key,
-            "env_var.value": value,
-            "env_var.public": public,
-        }))
-        .send()?
-        .error_for_status()?;
+            .json(&serde_json::json!({
+                "env_var.name": key,
+                "env_var.value": value,
+                "env_var.public": public,
+            }))
+            .send()?
+            .error_for_status()?;
         Ok(())
     }
 
-    fn request(&self, method: Method, url: &str) -> Result<RequestBuilder, Box<Error>> {
+    fn request(&self, method: Method, url: &str) -> Result<RequestBuilder, Box<dyn Error>> {
         Ok(self
             .client
             .request(method, &format!("https://api.travis-ci.com/{}", url))

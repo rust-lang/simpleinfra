@@ -1,0 +1,20 @@
+on: [push, pull_request]
+
+jobs:
+  rust:
+    name: Rust projects
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Install Rust stable
+        run: rustup update stable && rustup default stable
+
+      - name: Run rustfmt
+        run: cargo fmt --all -- --check
+
+      - name: Run the test suite
+        run: cargo test --all
+
+      - name: Run clippy
+        run: cargo clippy --all -- -Dwarnings

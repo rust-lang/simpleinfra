@@ -7,8 +7,8 @@ use std::process::{Command, Stdio};
 
 fn main() {
     let slug = env::var("TRAVIS_REPO_SLUG")
-        .or(env::var("BUILD_REPOSITORY_ID"))
-        .or(env::var("GITHUB_REPOSITORY"))
+        .or_else(|_| env::var("BUILD_REPOSITORY_ID"))
+        .or_else(|_| env::var("GITHUB_REPOSITORY"))
         .unwrap();
     let key = env::var("GITHUB_DEPLOY_KEY").unwrap();
 
@@ -24,7 +24,12 @@ fn main() {
         .stdout(Stdio::piped())
         .spawn()
         .unwrap();
-    decode.stdin.take().unwrap().write_all(&key.as_bytes()).unwrap();
+    decode
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(&key.as_bytes())
+        .unwrap();
     let mut key = Vec::new();
     decode.stdout.take().unwrap().read_to_end(&mut key).unwrap();
     decode.wait().unwrap();
@@ -38,14 +43,17 @@ fn main() {
     fs::remove_file(&path).unwrap();
 
     let sha = env::var("TRAVIS_COMMIT")
-        .or(env::var("BUILD_SOURCEVERSION"))
-        .or(env::var("GITHUB_SHA"))
+        .or_else(|_| env::var("BUILD_SOURCEVERSION"))
+        .or_else(|_| env::var("GITHUB_SHA"))
         .unwrap();
     let msg = format!("Deploy {} to gh-pages", sha);
 
     drop(fs::remove_dir_all(".git"));
     run(Command::new("git").arg("init"));
-    run(Command::new("git").arg("config").arg("user.name").arg("Deploy from CI"));
+    run(Command::new("git")
+        .arg("config")
+        .arg("user.name")
+        .arg("Deploy from CI"));
     run(Command::new("git").arg("config").arg("user.email").arg(""));
     run(Command::new("git").arg("add").arg("."));
     run(Command::new("git").arg("commit").arg("-m").arg(&msg));

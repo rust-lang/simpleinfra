@@ -1,9 +1,12 @@
+use chrono::Utc;
+use reqwest::{
+    header::{HeaderValue, ACCEPT, AUTHORIZATION, USER_AGENT},
+    Client,
+};
+use std::error::Error;
 use std::fs;
 use std::process::{Command, Stdio};
 use structopt::StructOpt;
-use chrono::Utc;
-use std::error::Error;
-use reqwest::{Client, header::{HeaderValue, USER_AGENT, ACCEPT, AUTHORIZATION}};
 use travis_ci::TravisCI;
 
 #[derive(StructOpt)]
@@ -12,11 +15,15 @@ struct Cli {
     repo: String,
     #[structopt(long = "github-token", env = "GITHUB_TOKEN", help = "GitHub API key")]
     github_token: String,
-    #[structopt(long = "travis-token", env = "TRAVIS_TOKEN", help = "Travis CI API key")]
+    #[structopt(
+        long = "travis-token",
+        env = "TRAVIS_TOKEN",
+        help = "Travis CI API key"
+    )]
     travis_token: Option<String>,
 }
 
-fn main() -> Result<(), Box<Error>> {
+fn main() -> Result<(), Box<dyn Error>> {
     let cli = Cli::from_args();
     let date = Utc::today().format("%Y-%m-%d");
     let comment = format!("{} {}", cli.repo, date);
@@ -24,16 +31,23 @@ fn main() -> Result<(), Box<Error>> {
     println!("generating the ssh key...");
     // https://security.stackexchange.com/questions/143442/what-are-ssh-keygen-best-practices
     run(Command::new("ssh-keygen")
-        .arg("-t").arg("ed25519")
-        .arg("-a").arg("100")
-        .arg("-f").arg("_ssh_keygen_tmp_out")
+        .arg("-t")
+        .arg("ed25519")
+        .arg("-a")
+        .arg("100")
+        .arg("-f")
+        .arg("_ssh_keygen_tmp_out")
         .arg("-q")
-        .arg("-N").arg("") // no passphrase
-        .arg("-C").arg(&comment));
-    let key = run_capture(Command::new("base64")
-        .arg("-w")
-        .arg("0")
-        .arg("_ssh_keygen_tmp_out"));
+        .arg("-N")
+        .arg("") // no passphrase
+        .arg("-C")
+        .arg(&comment));
+    let key = run_capture(
+        Command::new("base64")
+            .arg("-w")
+            .arg("0")
+            .arg("_ssh_keygen_tmp_out"),
+    );
     fs::remove_file("_ssh_keygen_tmp_out").unwrap();
     let key = key.trim();
     let pubkey = fs::read_to_string("_ssh_keygen_tmp_out.pub").unwrap();
@@ -55,10 +69,20 @@ fn main() -> Result<(), Box<Error>> {
 
     println!("uploading the deploy key...");
     let client = Client::new();
-    client.post(&format!("https://api.github.com/repos/{}/keys", cli.repo))
-        .header(USER_AGENT, HeaderValue::from_static("rust-lang/simpleinfra"))
-        .header(ACCEPT, HeaderValue::from_static("application/vnd.github.v3+json"))
-        .header(AUTHORIZATION, HeaderValue::from_str(&format!("token {}", cli.github_token))?)
+    client
+        .post(&format!("https://api.github.com/repos/{}/keys", cli.repo))
+        .header(
+            USER_AGENT,
+            HeaderValue::from_static("rust-lang/simpleinfra"),
+        )
+        .header(
+            ACCEPT,
+            HeaderValue::from_static("application/vnd.github.v3+json"),
+        )
+        .header(
+            AUTHORIZATION,
+            HeaderValue::from_str(&format!("token {}", cli.github_token))?,
+        )
         .json(&serde_json::json!({
             "title": format!("CI deploy key - {} - {}", cli.repo, date),
             "key": pubkey.trim(),
