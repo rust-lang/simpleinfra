@@ -3,6 +3,8 @@ const childProcess = require("child_process");
 const fetch = require("node-fetch");
 const psList = require("ps-list");
 
+// Name of the process that will be killed when the build is outdated. On
+// Windows `.exe` will be appended to the name.
 const WORKER_NAME = "Runner.Worker";
 
 const main = (async () => {
@@ -27,9 +29,13 @@ const isLatestCommit = async () => {
 
     let resp = await fetch("https://api.github.com/repos/" + repo + "/commits/" + ref, {
         headers: {
-            "If-None-Match": '"' + commit + '"',
             "Accept": "application/vnd.github.v3.sha",
             "Authorization": "token " + token,
+            // If-None-Match allows a periodic polling without hitting the rate
+            // limits: when the commit is the same as the one provided in the
+            // header GitHub will return a 304 status code without impacting
+            // the limits.
+            "If-None-Match": '"' + commit + '"',
         },
     });
     let currentCommit = await resp.text();
