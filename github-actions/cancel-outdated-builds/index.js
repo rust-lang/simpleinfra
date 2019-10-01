@@ -23,7 +23,7 @@ const isLatestCommit = async () => {
     let commit = process.env["GITHUB_SHA"];
     let ref = process.env["GITHUB_REF"];
     let repo = process.env["GITHUB_REPOSITORY"];
-    let token = process.env["GITHUB_TOKEN"];
+    let token = actions.getInput("github_token", { required: true });
 
     let resp = await fetch("https://api.github.com/repos/" + repo + "/commits/" + ref, {
         headers: {
