@@ -69,13 +69,22 @@ const daemonize = async () => {
 };
 
 const findWorkerPid = async () => {
-    let proc = (await psList()).find(proc => proc.name === WORKER_NAME);
+    let procName = binaryName(WORKER_NAME);
+    let proc = (await psList()).find(proc => proc.name === procName);
     if (proc === undefined) {
         return null;
     } else {
         return proc.pid;
     }
 }
+
+const binaryName = name => {
+    if (process.platform === "win32") {
+        return name + ".exe";
+    } else {
+        return name;
+    }
+};
 
 if (process.argv.length == 3 && process.argv[2] == "foreground") {
     main();
