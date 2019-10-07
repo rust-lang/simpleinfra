@@ -67,6 +67,22 @@
     create: true
     state: present
 
+- name: create symlinks pointing to the certs
+  file:
+    src: "/etc/ssl/letsencrypt/certificates/{{ domains[0] }}.{{ item }}"
+    dest: "/etc/ssl/letsencrypt/certificates/main.{{ item }}"
+    owner: ssl-renew
+    group: ssl-read-keys
+    mode: 0750
+    force: true
+    follow: false
+    state: link
+  loop:
+    - crt
+    - issuer.crt
+    - json
+    - key
+
 - name: upload systemd timer files
   template:
     src: "{{ item }}"
@@ -85,7 +101,7 @@
 
 - name: check if the certificates already exist
   stat:
-    path: /etc/ssl/letsencrypt/certificates/main.crt
+    path: "/etc/ssl/letsencrypt/certificates/{{ domains[0] }}.crt"
   register: cert_exists
 
 - name: request ssl certificates

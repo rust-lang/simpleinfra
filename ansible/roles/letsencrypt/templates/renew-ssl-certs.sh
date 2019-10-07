@@ -9,8 +9,10 @@ IFS=$'\n\t'
 # missing, so lego will have to serve port 80.
 if [[ $# -eq 1 ]] && [[ $1 = "initial-renew" ]]; then
     renew_kind="--http.port=:80"
+    action="run"
 else
     renew_kind="--http.webroot=/var/run/acme-challenges"
+    action="renew"
 fi
 
 {% if dummy_certs %}
@@ -30,10 +32,9 @@ lego --email "{{ email }}" \
     --path /etc/ssl/letsencrypt \
     --http \
     ${renew_kind} \
-    --filename main \
     {% for domain in domains -%}
     -d "{{ domain }}" \
     {% endfor -%}
-    run
+    ${action}
 
 sudo /etc/ssl/letsencrypt/after-renew
