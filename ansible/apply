@@ -73,6 +73,8 @@ def run_playbook(args):
         ]
         if args.user is not None:
             ansible_args += ["-u", args.user]
+        if args.start_at_task is not None:
+            ansible_args += ["--start-at-task", args.start_at_task]
         res = subprocess.run(ansible_args, cwd=str(tempdir), env=env)
         if res.returncode != 0:
             exit(1)
@@ -85,6 +87,10 @@ if __name__ == "__main__":
     parser.add_argument("playbook")
     parser.add_argument(
         "-u", "--user", help="user to log into instances as", default=None,
+    )
+    parser.add_argument(
+        "--start-at-task", help="start at a task with the provided name",
+        default=None,
     )
     args = parser.parse_args()
 
