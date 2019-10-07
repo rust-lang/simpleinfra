@@ -19,3 +19,8 @@
     mode: 0750
   notify:
     - restart-firewall
+
+- name: upload nginx's after ssl renew script
+  template:
+    src: after-ssl-renew.sh
+    dest: /etc/ssl/letsencrypt/after-renew.d
