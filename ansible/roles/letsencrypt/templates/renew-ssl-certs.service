@@ -10,4 +10,4 @@ Group=ssl-read-keys
 # Create /var/run/acme-challenges when the unit starts and delete it
 # afterwards. It will be owned by the user and group defined above.
 RuntimeDirectory=acme-challenges
-RuntimeDirectoryMode=0750
+RuntimeDirectoryMode=0755
