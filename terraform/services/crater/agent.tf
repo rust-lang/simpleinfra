@@ -40,3 +40,8 @@ resource "aws_iam_role_policy_attachment" "agent_pull_ecr" {
   role       = "${aws_iam_role.agent.name}"
   policy_arn = "${var.ecr_repo.policy_pull_arn}"
 }
+
+resource "aws_iam_instance_profile" "agent" {
+  name = "crater-agent"
+  role = "${aws_iam_role.agent.name}"
+}
