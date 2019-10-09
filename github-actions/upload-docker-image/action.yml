@@ -1,0 +1,23 @@
+name: Upload a Docker image to ECR
+description: This action uploads a Docker image to AWS's container registry.
+
+inputs:
+  image:
+    description: The name of the local image to upload
+    required: true
+  repository:
+    description: The name of the ECR repository to upload to.
+    required: true
+  region:
+    description: The name of the AWS region the repository was created into.
+    required: true
+  aws_access_key_id:
+    description: Value of AWS_ACCESS_KEY_ID
+    required: true
+  aws_secret_access_key:
+    description: Value of AWS_SECRET_ACCESS_KEY
+    required: true
+
+runs:
+  using: node12
+  main: dist/index.js
