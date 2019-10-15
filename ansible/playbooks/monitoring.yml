@@ -67,6 +67,12 @@
             - targets:
               - docs.rs:443
 
+        - job_name: crater
+          scheme: https
+          static_configs:
+            - targets:
+              - crater.rust-lang.org:443
+
       prometheus_rule_groups:
         - name: node
           rules:
