@@ -16,7 +16,7 @@ steps:
       fi
     env:
       DEPLOY_DIR: ${{ parameters.deploy_dir }}
-    displayName: (static-websites) Validare parameters
+    displayName: (static-websites) Validate parameters
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 
   - bash: |
