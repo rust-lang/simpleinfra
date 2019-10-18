@@ -1,0 +1,13 @@
+#
+# {{ ansible_managed }}
+#
+
+[Unit]
+Description=docker images update
+
+[Timer]
+OnBootSec={{ images.update_every }}
+OnUnitActiveSec={{ images.update_every }}
+
+[Install]
+WantedBy=timers.target

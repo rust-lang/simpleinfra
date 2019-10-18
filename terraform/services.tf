@@ -2,8 +2,12 @@
 // and configures them.
 
 module "service_crater" {
-  source   = "./services/crater"
-  ecr_repo = module.ecr_crater
+  source                   = "./services/crater"
+  ecr_repo                 = module.ecr_crater
+  agent_ami_id             = data.aws_ami.ubuntu_bionic.id
+  agent_subnet_id          = aws_subnet.rust_prod.id
+  agent_key_pair           = aws_key_pair.buildbot_west_slave_key.key_name
+  common_security_group_id = aws_security_group.rust_prod_common.id
 }
 
 module "service_bastion" {

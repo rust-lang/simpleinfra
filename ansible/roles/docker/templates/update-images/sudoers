@@ -1,0 +1,5 @@
+#
+# {{ ansible_managed }}
+#
+
+docker-update-images ALL= NOPASSWD: {% for container in containers %}/bin/systemctl restart container-{{ container }}.service{% if not loop.last %},{% endif %}{% endfor %}

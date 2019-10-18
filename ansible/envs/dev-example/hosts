@@ -3,3 +3,6 @@
 
 [monitoring]
 # monitoring-server.local
+
+[crater]
+# crater-agent.local

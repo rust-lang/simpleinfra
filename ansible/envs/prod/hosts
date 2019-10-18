@@ -3,3 +3,7 @@ bastion.infra.rust-lang.org
 
 [monitoring]
 monitoring.infra.rust-lang.org
+
+[crater]
+crater-aws-1.infra.rust-lang.org
+crater-azure-1.infra.rust-lang.org

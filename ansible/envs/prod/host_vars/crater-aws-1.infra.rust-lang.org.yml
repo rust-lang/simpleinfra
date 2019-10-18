@@ -1,0 +1,5 @@
+---
+
+vars_aws_credentials: null
+vars_crater_token: "{{ lookup('onepassword', 'ansible:crater-aws-1', field='vars_crater_token') }}"
+vars_crater_threads: 8

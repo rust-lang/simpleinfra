@@ -1,0 +1,21 @@
+#
+# {{ ansible_managed }}
+#
+
+[Unit]
+Description=update docker images
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/home/docker-update-images/update.sh
+
+WorkingDirectory=/home/docker-update-images
+Environment=HOME=/home/docker-update-images
+
+User=docker-update-images
+Group=docker
+
+[Install]
+WantedBy=multi-user.target

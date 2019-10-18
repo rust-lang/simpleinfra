@@ -1,0 +1,23 @@
+#
+# {{ ansible_managed }}
+#
+
+[Unit]
+Description=pull docker images
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/home/docker-update-images/update.sh
+
+WorkingDirectory=/home/docker-update-images
+Environment=HOME=/home/docker-update-images
+Environment=NO_CONTAINER_RESTART=1
+
+User=docker-update-images
+Group=docker
+
+[Install]
+WantedBy=multi-user.target

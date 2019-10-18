@@ -1,0 +1,14 @@
+---
+
+- name: install docker
+  apt:
+    name:
+      - docker.io
+      # Needed to pull images from ECR:
+      - awscli
+    state: present
+
+- name: unmask docker.service
+  systemd:
+    name: docker.service
+    masked: false

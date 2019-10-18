@@ -1,0 +1,29 @@
+{% set container = containers[item] -%}
+{% set mounts = container.mounts|default({}) %}
+{% set env = container.env|default({}) %}
+{% set expose = container.expose|default({}) %}
+#
+# {{ ansible_managed }}
+#
+
+[Unit]
+Description=docker container {{ item }}
+After=docker.service docker-images-pull.service
+Requires=docker.service docker-images-pull.service
+
+[Service]
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker stop {{ item }}
+ExecStartPre=-/usr/bin/docker rm {{ item }}
+ExecStart=/usr/bin/docker run --init --rm --name {{ item }} \
+    {% for host, inside in mounts.items() %} -v {{ host }}:{{ inside }}{% endfor %} \
+    {% for key in env.keys() %} -e {{ key }}{% endfor %} \
+    {% for host, inside in expose.items() %} -p {{ host }}:{{ inside }}{% endfor %} \
+    {{ container.image }} {{ container.exec }}
+ExecStop=/usr/bin/docker stop {{ item }}
+{% for key, value in env.items() %}
+Environment={{ key }}={{ value }}
+{% endfor %}
+
+[Install]
+WantedBy=multi-user.target

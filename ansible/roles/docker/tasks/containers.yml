@@ -1,0 +1,27 @@
+---
+
+- name: upload systemd configuration for containers
+  template:
+    src: containers/container.service
+    dest: "/etc/systemd/system/container-{{ item }}.service"
+  loop: "{{ containers.keys()|list }}"
+  register: containers_config_upload
+
+# The following two tasks should've been implemented as handlers, but
+# unfortunately Ansible doesn't support calling handlers just on a few items of
+# a loop. If we didn't do this after a single container configuration changed
+# we'd have to restart all the containers on the machine.
+
+- name: reload systemd
+  systemd:
+    daemon_reload: true
+  when: containers_config_upload is changed
+
+- name: enable and start the containers
+  systemd:
+    name: "container-{{ item.item }}.service"
+    enabled: true
+    state: "{% if item is changed %}restarted{% else %}started{% endif %}"
+  loop: "{{ containers_config_upload.results }}"
+  loop_control:
+    label: "{{ item.item }}"

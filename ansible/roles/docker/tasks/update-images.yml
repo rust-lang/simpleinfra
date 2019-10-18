@@ -1,0 +1,60 @@
+---
+
+- name: create the docker-update-images user
+  user:
+    name: docker-update-images
+    group: docker
+    state: present
+
+- name: create the .aws directory for the docker-update-images user
+  file:
+    path: /home/docker-update-images/.aws
+    mode: 0700
+    state: directory
+    owner: docker-update-images
+
+- name: upload the aws credentials file
+  template:
+    src: update-images/aws-credentials
+    dest: /home/docker-update-images/.aws/credentials
+    mode: 0400
+    owner: docker-update-images
+
+- name: create the .docker directory for the docker-update-images user
+  file:
+    path: /home/docker-update-images/.docker
+    mode: 0700
+    state: directory
+    owner: docker-update-images
+
+- name: upload the updater script
+  template:
+    src: update-images/update.sh
+    dest: /home/docker-update-images/update.sh
+    mode: 0755
+
+- name: allow docker-update-images to restart containers
+  template:
+    src: update-images/sudoers
+    dest: /etc/sudoers.d/docker-update-images
+    mode: 0440
+
+- name: upload updater systemd units
+  template:
+    src: "update-images/{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+  loop:
+    - docker-images-pull.service
+    - docker-images-update.service
+    - docker-images-update.timer
+  notify:
+    - reload-systemd
+
+- name: start enable systemd units for updating the images
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop:
+    - docker-images-pull.service
+    - docker-images-update.timer

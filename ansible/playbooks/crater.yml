@@ -1,0 +1,31 @@
+---
+
+- hosts: crater
+  become: yes
+  become_user: root
+
+  roles:
+
+    - role: common
+      papertrail_url: "{{ vars_papertrail_url }}"
+      collect_metrics_from: "{{ global_collect_metrics_from }}"
+      sudo_users:
+        - aidanhs
+        - acrichto
+        - simulacrum
+        - pietro
+
+    - role: docker
+      images:
+        region: us-west-1
+        update_every: 5min
+        aws_credentials: "{{ vars_aws_credentials }}"
+      containers:
+        crater-agent:
+          image: 890664054962.dkr.ecr.us-west-1.amazonaws.com/crater:latest
+          exec: "agent {{ vars_crater_url }} {{ vars_crater_token }} --threads {{ vars_crater_threads }}"
+          mounts:
+            "/var/lib/crater-agent-workspace": "/workspace"
+            "/var/run/docker.sock": "/var/run/docker.sock"
+          env:
+            RUST_LOG: crater=trace,rustwide=info
