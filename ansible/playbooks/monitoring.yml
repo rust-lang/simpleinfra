@@ -120,6 +120,12 @@
             match:
               dispatch: docsrs
 
+          - receiver: discord-docsrs
+            group_by: ['alertname']
+            match:
+              job: node
+              instance: docsrs.infra.rust-lang.org:9100
+
       alertmanager_receivers:
         - name: discord-infra
           slack_configs:
