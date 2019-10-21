@@ -37,3 +37,11 @@ module "service_bastion" {
     "simulacrum",
   ]
 }
+
+module "service_promote_release" {
+  source = "./services/promote-release"
+
+  static_bucket_arn     = "arn:aws:s3:::static-rust-lang-org"
+  dev_static_bucket_arn = "arn:aws:s3:::dev-static-rust-lang-org"
+  ci_bucket_arn         = "arn:aws:s3:::rust-lang-ci2"
+}
