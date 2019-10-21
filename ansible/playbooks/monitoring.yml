@@ -90,6 +90,13 @@
                 summary: "{{ '{{ $labels.name }}' }} on {{ '{{ $labels.instance }}' }} failed"
                 description: "The systemd unit {{ '{{ $labels.name }}' }} on the {{ '{{ $labels.instance }}' }} instance failed to execute."
 
+            - alert: DiskFull
+              expr: node_filesystem_avail_bytes{fstype!="tmpfs",fstype!="fuse.lxcfs"} / node_filesystem_size_bytes{fstype!="tmpfs",fstype!="fuse.lxcfs"} < 0.025
+              for: 1m
+              annotations:
+                summary: "Filesystem {{ '{{ $labels.mountpoint }}' }} on {{ '{{ $labels.instance }}' }} is full"
+                description: "There is less than 2.5% disk space left on the mount point {{ '{{ $labels.mountpoint }}' }} (device {{ '{{ $labels.device }}' }}) of the instance {{ '{{ $labels.instance }}' }}."
+
         - name: docsrs
           rules:
             - alert: LongQueue
