@@ -10,6 +10,7 @@ After=network.target
 ExecStart=/usr/local/bin/node_exporter --collector.systemd
 User=node_exporter
 Group=node_exporter
+Nice=-15
 
 [Install]
 WantedBy=multi-user.target
