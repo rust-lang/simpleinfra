@@ -22,8 +22,8 @@ data "aws_iam_policy_document" "promote_release" {
     resources = flatten([
       for bucket in local.static_buckets : [
         for directory in local.static_directories : [
-          "${bucket}:${directory}",
-          "${bucket}:${directory}/*",
+          "${bucket}/${directory}",
+          "${bucket}/${directory}/*",
         ]
       ]
     ])
@@ -43,8 +43,8 @@ data "aws_iam_policy_document" "promote_release" {
     resources = flatten([
       for bucket in local.ci_buckets : [
         for directory in local.ci_directories : [
-          "${bucket}:${directory}",
-          "${bucket}:${directory}/*",
+          "${bucket}/${directory}",
+          "${bucket}/${directory}/*",
         ]
       ]
     ])
