@@ -18,6 +18,49 @@ resource "aws_s3_bucket" "rust_inventories" {
   }
 }
 
+resource "aws_s3_bucket_policy" "rust_inventories" {
+  bucket = aws_s3_bucket.rust_inventories.id
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowInventoryGeneration",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "s3.amazonaws.com"
+      },
+      "Action": "s3:PutObject",
+      "Resource": "${aws_s3_bucket.rust_inventories.arn}/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:SourceAccount": "${data.aws_caller_identity.current.account_id}",
+          "s3:x-amz-acl": "bucket-owner-full-control"
+        },
+        "ArnLike": {
+          "aws:SourceArn": [
+            "arn:aws:s3:::static-rust-lang-org",
+            "arn:aws:s3:::crates-io",
+            "${module.service_cratesio_staging.static_bucket_arn}",
+            "${aws_s3_bucket.rust_lang_ci_mirrors.arn}"
+          ]
+        }
+      }
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_s3_bucket_public_access_block" "rust_inventories" {
+  bucket = aws_s3_bucket.rust_inventories.id
+
+  block_public_acls = true
+  block_public_policy = true
+  ignore_public_acls = true
+  restrict_public_buckets = true
+}
+
 resource "aws_s3_bucket" "rust_lang_ci_mirrors" {
   bucket = "rust-lang-ci-mirrors"
   acl    = "public"
