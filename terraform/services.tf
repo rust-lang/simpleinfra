@@ -45,3 +45,22 @@ module "service_promote_release" {
   dev_static_bucket_arn = "arn:aws:s3:::dev-static-rust-lang-org"
   ci_bucket_arn         = "arn:aws:s3:::rust-lang-ci2"
 }
+
+module "service_cratesio_staging" {
+  source = "./services/cratesio"
+  providers = {
+    aws       = "aws"
+    aws.east1 = "aws.east1"
+  }
+
+  webapp_domain_name = "staging.cratesio.com"
+  static_domain_name = "static.staging.cratesio.com"
+  dns_zone           = aws_route53_zone.cratesio_com.id
+
+  static_bucket_name     = "staging-crates-io"
+  inventories_bucket_arn = aws_s3_bucket.rust_inventories.arn
+
+  webapp_origin_domain = "staging-crates-io.herokuapp.com"
+
+  iam_prefix = "staging-crates-io"
+}
