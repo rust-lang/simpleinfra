@@ -1,7 +1,22 @@
 resource "aws_s3_bucket" "static" {
   bucket = var.static_bucket_name
+
   versioning {
     enabled = true
+  }
+
+  // Keep only the live db-dump.tar.gz and the previous day's version, removing
+  // all the other ones. This is needed because we don't want this file to be
+  // versioned, while all the other ones in the bucket should be versioned.
+  lifecycle_rule {
+    id = "purge-db-dump"
+    enabled = true
+    prefix = "/db-dump.tar.gz"
+
+    abort_incomplete_multipart_upload_days = 1
+    noncurrent_version_expiration {
+      days = 1
+    }
   }
 }
 
