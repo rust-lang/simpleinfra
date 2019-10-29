@@ -21,6 +21,8 @@ struct Cli {
         help = "Travis CI API key"
     )]
     travis_token: Option<String>,
+    #[structopt(long = "rsa")]
+    rsa: bool,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -32,7 +34,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // https://security.stackexchange.com/questions/143442/what-are-ssh-keygen-best-practices
     run(Command::new("ssh-keygen")
         .arg("-t")
-        .arg("ed25519")
+        .arg(if cli.rsa { "rsa" } else { "ed25519" })
         .arg("-a")
         .arg("100")
         .arg("-f")

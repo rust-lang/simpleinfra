@@ -56,6 +56,14 @@ To use the key the easiest way is to cd into the directory you want to deploy,
 snippets available for [Azure Pipelines][setup-deploy-keys-azure] and [Travis
 CI][setup-deploy-keys-travis].
 
+By default the tool generates ed25519 keys, but some libraries (like `git2`)
+don't support them yet. In those cases you can generate RSA keys by passing the
+`--rsa` flag:
+
+```
+cargo run --bin setup-deploy-keys org-name/repo-name --rsa
+```
+
 [travis-token]: https://travis-ci.com/account/preferences
 [setup-deploy-keys-deploy]: https://raw.githubusercontent.com/rust-lang/simpleinfra/master/setup-deploy-keys/src/deploy.rs
 [setup-deploy-keys-azure]: https://github.com/rust-lang/simpleinfra/tree/master/azure-configs#static-websitesyml
