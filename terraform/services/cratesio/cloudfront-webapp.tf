@@ -24,7 +24,7 @@ resource "aws_cloudfront_distribution" "webapp" {
 
     default_ttl = 0
     min_ttl     = 0
-    max_ttl     = 31536000  // 1 year
+    max_ttl     = 31536000 // 1 year
 
     forwarded_values {
       headers      = ["Accept", "User-Agent"]
