@@ -64,3 +64,8 @@ module "service_cratesio_staging" {
 
   iam_prefix = "staging-crates-io"
 }
+
+module "service_docsrs" {
+  source   = "./services/docsrs"
+  ecr_repo = module.ecr_docsrs
+}

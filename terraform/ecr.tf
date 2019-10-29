@@ -13,6 +13,11 @@ module "ecr_discord_mods_bot" {
   name   = "discord-mods-bot"
 }
 
+module "ecr_docsrs" {
+  source = "./modules/ecr-repo"
+  name   = "docsrs"
+}
+
 module "ecr_rust_central_station" {
   source = "./modules/ecr-repo"
   name   = "rust-central-station"
