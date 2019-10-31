@@ -126,6 +126,16 @@
               job: node
               instance: docsrs.infra.rust-lang.org:9100
 
+          # Suppress disk full alerts for Crater agents. They're supposed to go
+          # near the limit and they're configured to handle things properly,
+          # cleaning up unused files when they reach a threshold.
+          - receiver: devnull
+            match:
+              job: node
+              alertname: DiskFull
+            match_re:
+              instance: ^crater-[^\.]+\.infra\.rust-lang\.org:9100$
+
       alertmanager_receivers:
         - name: discord-infra
           slack_configs:
@@ -140,6 +150,8 @@
               channel: doesnt-matter
               title: "{{ '{{ .Alerts.Firing | len }} alerts fired!' }}"
               text: "{{ '{{ range .Alerts }}**{{ .Annotations.summary }}**\n{{ .Annotations.description }}\n{{ end }}\ncc @docsrs-page' }}"
+
+        - name: devnull
 
       grafana_github_teams:
         - 2357301  # rust-lang/infra
