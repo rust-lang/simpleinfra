@@ -27,7 +27,22 @@ resource "aws_cloudfront_distribution" "webapp" {
     max_ttl     = 31536000 // 1 year
 
     forwarded_values {
-      headers      = ["Accept", "User-Agent"]
+      headers = [
+        // The crates.io website and API respond with different content based
+        // on what the client is accepting (i.e. HTML, JSON...)
+        "Accept",
+        // The header needs to be forwarded so it can be stored in the logs and
+        // analyzed for abuse prevention and rate limiting purposes.
+        "Referer",
+        // Users of the API are tracked based on the user agent, for abuse
+        // prevention purposes. The header needs to be forwarded so we can
+        // inspect it in the logs.
+        "User-Agent",
+        // Heroku will use an existing header if it is set by the client, so we
+        // may want to forward it along at this layer as well. This might be
+        // helpful for debugging at some point.
+        "X-Request-Id",
+      ]
       query_string = true
       cookies {
         forward = "all"

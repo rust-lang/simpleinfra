@@ -5,6 +5,14 @@ resource "aws_s3_bucket" "static" {
     enabled = true
   }
 
+  // Allow the crates.io frontend to fetch the READMEs from JavaScript.
+  cors_rule {
+    allowed_methods = ["GET"]
+    allowed_headers = ["*"]
+    allowed_origins = ["*"]
+    max_age_seconds = 3000
+  }
+
   // Keep only the live db-dump.tar.gz and the previous day's version, removing
   // all the other ones. This is needed because we don't want this file to be
   // versioned, while all the other ones in the bucket should be versioned.

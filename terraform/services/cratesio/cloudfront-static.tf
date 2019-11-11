@@ -23,7 +23,13 @@ resource "aws_cloudfront_distribution" "static" {
     viewer_protocol_policy = "redirect-to-https"
 
     forwarded_values {
-      headers      = []
+      headers = [
+        // Following the spec, AWS S3 only replies with the CORS headers when
+        // an Origin is present, and varies its response based on that. If we
+        // don't forward the header CloudFront is going to cache the first CORS
+        // response it receives, even if it's empty.
+        "Origin",
+      ]
       query_string = false
       cookies {
         forward = "none"
