@@ -141,15 +141,17 @@
           slack_configs:
             - api_url: "{{ vars_alertmanager_receiver_discord_infra }}/slack"
               channel: doesnt-matter
-              title: "{{ '{{ .Alerts.Firing | len }} alerts fired!' }}"
-              text: "{{ '{{ range .Alerts }}**{{ .Annotations.summary }}**\n{{ .Annotations.description }}\n{{ end }}\ncc @infra-page' }}"
+              title: "{{ '{{ .Alerts.Firing | len }} alerts fired, {{ .Alerts.Resolved | len }} alerts resolved!' }}"
+              text: "{{ '{{ range .Alerts }}**{{ if eq .Status \"firing\" }}Fired{{ else }}Resolved{{ end }}: {{ .Annotations.summary }}**\n{{ .Annotations.description }}\n{{ end }}' }}"
+              send_resolved: true
 
         - name: discord-docsrs
           slack_configs:
             - api_url: "{{ vars_alertmanager_receiver_discord_docsrs }}/slack"
               channel: doesnt-matter
-              title: "{{ '{{ .Alerts.Firing | len }} alerts fired!' }}"
-              text: "{{ '{{ range .Alerts }}**{{ .Annotations.summary }}**\n{{ .Annotations.description }}\n{{ end }}\ncc @docsrs-page' }}"
+              title: "{{ '{{ .Alerts.Firing | len }} alerts fired, {{ .Alerts.Resolved | len }} alerts resolved!' }}"
+              text: "{{ '{{ range .Alerts }}**{{ if eq .Status \"firing\" }}Fired{{ else }}Resolved{{ end }}: {{ .Annotations.summary }}**\n{{ .Annotations.description }}\n{{ end }}' }}"
+              send_resolved: true
 
         - name: devnull
 
