@@ -49,7 +49,7 @@ resource "aws_cloudfront_distribution" "static" {
   }
 }
 
-resource "aws_route53_record" "website" {
+resource "aws_route53_record" "static" {
   zone_id = var.dns_zone
   name    = var.static_domain_name
   type    = "CNAME"
