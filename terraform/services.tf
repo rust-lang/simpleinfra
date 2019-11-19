@@ -46,6 +46,26 @@ module "service_promote_release" {
   ci_bucket_arn         = "arn:aws:s3:::rust-lang-ci2"
 }
 
+module "service_cratesio" {
+  source = "./services/cratesio"
+  providers = {
+    aws       = "aws"
+    aws.east1 = "aws.east1"
+  }
+
+  webapp_domain_name = "crates.io"
+  static_domain_name = "static.crates.io"
+  dns_zone           = aws_route53_zone.crates_io.id
+  dns_apex           = true
+
+  static_bucket_name     = "crates-io"
+  inventories_bucket_arn = aws_s3_bucket.rust_inventories.arn
+
+  webapp_origin_domain = "crates-io.herokuapp.com"
+
+  iam_prefix = "crates-io"
+}
+
 module "service_cratesio_staging" {
   source = "./services/cratesio"
   providers = {

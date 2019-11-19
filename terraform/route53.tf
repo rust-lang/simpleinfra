@@ -5,6 +5,11 @@ resource "aws_route53_zone" "rust_lang_org" {
   comment = "main domain name for the project"
 }
 
+resource "aws_route53_zone" "crates_io" {
+  name    = "crates.io"
+  comment = "main domain for crates-io"
+}
+
 resource "aws_route53_zone" "cratesio_com" {
   name    = "cratesio.com"
   comment = "parked and reserved for future use"

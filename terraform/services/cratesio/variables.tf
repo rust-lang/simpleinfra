@@ -25,3 +25,8 @@ variable "webapp_origin_domain" {
 variable "iam_prefix" {
   type = string
 }
+
+variable "dns_apex" {
+  type    = bool
+  default = false
+}
