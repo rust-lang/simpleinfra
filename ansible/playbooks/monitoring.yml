@@ -108,6 +108,16 @@
                 summary: "The docs.rs build queue is unreasonably long"
                 description: "There are more than 100 crates in the docs.rs queue, and the situation didn't resolve itself in the past hour. The build queue is available at https://docs.rs/releases/queue"
 
+        - name: crater
+          rules:
+            - alert: StuckAgent
+              expr: (sum by (agent) (increase(crater_completed_jobs_total{job="crater"}[5m]))) == 0 and (sum by (agent) (crater_agent_supposed_to_work{job="crater"}))
+              for: 25m
+              annotations:
+                summary: "Crater agent {{ '{{ $labels.agent }}' }} is stuck"
+                description: "The Crater agent {{ '{{ $labels.agent }}' }} has work to do, but it reported no results for the past 30 minutes."
+
+
       alertmanager_route:
         group_by: ['alertname']
         group_wait: 30s
