@@ -11,21 +11,21 @@ variable "ttl" {
 }
 
 variable "A" {
-  type = map(list(string))
+  type    = map(list(string))
   default = {}
 }
 
 variable "CNAME" {
-  type = map(list(string))
+  type    = map(list(string))
   default = {}
 }
 
 variable "MX" {
-  type = map(list(string))
+  type    = map(list(string))
   default = {}
 }
 
 variable "TXT" {
-  type = map(list(string))
+  type    = map(list(string))
   default = {}
 }
