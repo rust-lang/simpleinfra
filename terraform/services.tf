@@ -1,6 +1,10 @@
 // This terraform module imports all the services from the services/ directory,
 // and configures them.
 
+module "dns" {
+  source = "./services/dns"
+}
+
 module "service_crater" {
   source                   = "./services/crater"
   ecr_repo                 = module.ecr_crater
@@ -55,7 +59,7 @@ module "service_cratesio" {
 
   webapp_domain_name = "crates.io"
   static_domain_name = "static.crates.io"
-  dns_zone           = aws_route53_zone.crates_io.id
+  dns_zone           = module.dns.zone_crates_io
   dns_apex           = true
 
   static_bucket_name     = "crates-io"
@@ -75,7 +79,7 @@ module "service_cratesio_staging" {
 
   webapp_domain_name = "staging.cratesio.com"
   static_domain_name = "static.staging.cratesio.com"
-  dns_zone           = aws_route53_zone.cratesio_com.id
+  dns_zone           = module.dns.zone_cratesio_com
 
   static_bucket_name     = "staging-crates-io"
   inventories_bucket_arn = aws_s3_bucket.rust_inventories.arn
