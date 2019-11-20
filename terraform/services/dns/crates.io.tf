@@ -9,7 +9,7 @@ module "crates_io" {
     "status.crates.io." = ["pvbm341xnpgm.stspg-customer.com"],
     "ping.crates.io."   = ["status.ping.apex.sh"],
     # Source: https://github.com/rust-lang/cargo/tree/gh-pages
-    "doc.crates.io."    = ["rust-lang.github.io"],
+    "doc.crates.io." = ["rust-lang.github.io"],
   }
 
   MX = {
