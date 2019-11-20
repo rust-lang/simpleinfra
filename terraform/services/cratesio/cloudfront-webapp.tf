@@ -92,18 +92,25 @@ resource "aws_cloudfront_distribution" "webapp" {
 }
 
 resource "aws_route53_record" "webapp" {
+  for_each = toset(var.dns_apex ? [] : [""])
+
   zone_id = var.dns_zone
   name    = var.webapp_domain_name
-  type    = var.dns_apex ? "A" : "CNAME"
-  ttl     = var.dns_apex ? null : 300
-  records = var.dns_apex ? null : [aws_cloudfront_distribution.webapp.domain_name]
+  type    = "CNAME"
+  ttl     = 300
+  records = [aws_cloudfront_distribution.webapp.domain_name]
+}
 
-  dynamic "alias" {
-    for_each = var.dns_apex ? [true] : []
-    content {
-      name                   = aws_cloudfront_distribution.webapp.domain_name
-      zone_id                = aws_cloudfront_distribution.webapp.hosted_zone_id
-      evaluate_target_health = false
-    }
+resource "aws_route53_record" "webapp_apex" {
+  for_each = toset(var.dns_apex ? ["A", "AAAA"] : [])
+
+  zone_id = var.dns_zone
+  name    = var.webapp_domain_name
+  type    = each.value
+
+  alias {
+    name                   = aws_cloudfront_distribution.webapp.domain_name
+    zone_id                = aws_cloudfront_distribution.webapp.hosted_zone_id
+    evaluate_target_health = false
   }
 }
