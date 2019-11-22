@@ -42,6 +42,14 @@ module "service_bastion" {
   ]
 }
 
+module "service_ci_gha" {
+  source = "./services/ci"
+
+  iam_prefix       = "gha"
+  caches_bucket    = "rust-lang-gha"
+  artifacts_bucket = "rust-lang-gha-caches"
+}
+
 module "service_promote_release" {
   source = "./services/promote-release"
 
