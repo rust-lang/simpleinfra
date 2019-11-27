@@ -5,7 +5,7 @@ resource "aws_iam_user" "agent_outside_aws" {
 }
 
 resource "aws_iam_access_key" "agent_outside_aws" {
-  user = "${aws_iam_user.agent_outside_aws.name}"
+  user = aws_iam_user.agent_outside_aws.name
 }
 
 resource "aws_iam_role" "agent" {
@@ -37,13 +37,13 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "agent_pull_ecr" {
-  role       = "${aws_iam_role.agent.name}"
-  policy_arn = "${var.ecr_repo.policy_pull_arn}"
+  role       = aws_iam_role.agent.name
+  policy_arn = var.ecr_repo.policy_pull_arn
 }
 
 resource "aws_iam_instance_profile" "agent" {
   name = "crater-agent"
-  role = "${aws_iam_role.agent.name}"
+  role = aws_iam_role.agent.name
 }
 
 resource "aws_network_interface" "agent" {
@@ -79,6 +79,6 @@ resource "aws_instance" "agent" {
 
   lifecycle {
     # Don't recreate the instance automatically when the AMI changes.
-    ignore_changes = ["ami"]
+    ignore_changes = [ami]
   }
 }

@@ -66,7 +66,7 @@ resource "aws_instance" "bastion" {
 
   lifecycle {
     # Don't recreate the instance automatically when the AMI changes.
-    ignore_changes = ["ami"]
+    ignore_changes = [ami]
   }
 }
 

@@ -8,8 +8,8 @@
 module "redirect_www_crates_io" {
   source = "./modules/subdomain-redirect"
   providers = {
-    aws       = "aws"
-    aws.east1 = "aws.east1"
+    aws       = aws
+    aws.east1 = aws.east1
   }
 
   to = "https://crates.io"

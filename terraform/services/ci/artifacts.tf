@@ -8,7 +8,7 @@ resource "aws_s3_bucket" "artifacts" {
       id      = "cleanup-${lifecycle_rule.value}"
       enabled = true
 
-      prefix = "${lifecycle_rule.value}"
+      prefix = lifecycle_rule.value
 
       expiration {
         days = 168

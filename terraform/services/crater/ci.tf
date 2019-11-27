@@ -5,15 +5,15 @@ resource "aws_iam_user" "ci" {
 }
 
 resource "aws_iam_access_key" "ci" {
-  user = "${aws_iam_user.ci.name}"
+  user = aws_iam_user.ci.name
 }
 
 resource "aws_iam_user_policy_attachment" "ci_push" {
-  user       = "${aws_iam_user.ci.name}"
-  policy_arn = "${var.ecr_repo.policy_push_arn}"
+  user       = aws_iam_user.ci.name
+  policy_arn = var.ecr_repo.policy_push_arn
 }
 
 resource "aws_iam_user_policy_attachment" "ci_pull" {
-  user       = "${aws_iam_user.ci.name}"
-  policy_arn = "${var.ecr_repo.policy_pull_arn}"
+  user       = aws_iam_user.ci.name
+  policy_arn = var.ecr_repo.policy_pull_arn
 }

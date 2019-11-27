@@ -3,7 +3,7 @@
 module "static_website_ci_mirrors" {
   source = "./modules/static-website"
   providers = {
-    aws = "aws.east1"
+    aws = aws.east1
   }
 
   domain_name        = "ci-mirrors.rust-lang.org"

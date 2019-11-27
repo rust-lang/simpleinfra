@@ -61,8 +61,8 @@ module "service_promote_release" {
 module "service_cratesio" {
   source = "./services/cratesio"
   providers = {
-    aws       = "aws"
-    aws.east1 = "aws.east1"
+    aws       = aws
+    aws.east1 = aws.east1
   }
 
   webapp_domain_name = "crates.io"
@@ -81,8 +81,8 @@ module "service_cratesio" {
 module "service_cratesio_staging" {
   source = "./services/cratesio"
   providers = {
-    aws       = "aws"
-    aws.east1 = "aws.east1"
+    aws       = aws
+    aws.east1 = aws.east1
   }
 
   webapp_domain_name = "staging.cratesio.com"

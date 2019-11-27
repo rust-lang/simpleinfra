@@ -1,7 +1,7 @@
 // This file configures crates.io
 
 resource "aws_cloudfront_distribution" "webapp" {
-  comment = "${var.webapp_domain_name}"
+  comment = var.webapp_domain_name
 
   enabled             = true
   wait_for_deployment = false

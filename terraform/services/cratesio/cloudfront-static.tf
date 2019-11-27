@@ -1,7 +1,7 @@
 // This file configures static.crates.io
 
 resource "aws_cloudfront_distribution" "static" {
-  comment = "${var.static_domain_name}"
+  comment = var.static_domain_name
 
   enabled             = true
   wait_for_deployment = false
