@@ -5,3 +5,7 @@ resource "aws_route53_zone" "rust_lang_org" {
   comment = "main domain name for the project"
 }
 
+resource "aws_route53_zone" "docs_rs" {
+  name    = "docs.rs"
+  comment = "Not registered here, steve registered on netim"
+}

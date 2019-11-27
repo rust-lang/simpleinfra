@@ -10,6 +10,10 @@ output "zone_cratesio_com" {
   value = module.cratesio_com.zone_id
 }
 
+output "zone_docsrs_com" {
+  value = module.docsrs_com.zone_id
+}
+
 output "zone_rustaceans_org" {
   value = module.rustaceans_org.zone_id
 }

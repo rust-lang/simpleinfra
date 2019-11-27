@@ -19,3 +19,18 @@ module "redirect_www_crates_io" {
     "www.cratesio.com" = module.dns.zone_cratesio_com,
   }
 }
+
+module "redirect_docs_rs" {
+  source = "./modules/subdomain-redirect"
+  providers = {
+    aws       = aws
+    aws.east1 = aws.east1
+  }
+
+  to = "https://docs.rs"
+  from = {
+    "www.docs.rs"    = aws_route53_zone.docs_rs.id
+    "docsrs.com"     = module.dns.zone_docsrs_com,
+    "www.docsrs.com" = module.dns.zone_docsrs_com,
+  }
+}
