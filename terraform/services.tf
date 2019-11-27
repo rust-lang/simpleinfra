@@ -98,6 +98,8 @@ module "service_cratesio_staging" {
 }
 
 module "service_docsrs" {
-  source   = "./services/docsrs"
-  ecr_repo = module.ecr_docsrs
+  source         = "./services/docsrs"
+  ecr_repo       = module.ecr_docsrs
+  storage_bucket = "rust-docs-rs"
+  backups_bucket = "docs.rs-backups"
 }

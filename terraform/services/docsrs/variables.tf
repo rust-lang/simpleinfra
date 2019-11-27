@@ -4,3 +4,11 @@ variable "ecr_repo" {
     policy_pull_arn = string
   })
 }
+
+variable "storage_bucket" {
+  type = string
+}
+
+variable "backups_bucket" {
+  type = string
+}
