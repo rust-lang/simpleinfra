@@ -32,6 +32,7 @@ module "service_bastion" {
     "acrichto",
     "aidanhs",
     "guillaumegomez",
+    "joshua",
     "mozilla-mountain-view",
     "mozilla-portland",
     "mozilla-san-francisco",
