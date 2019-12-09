@@ -167,7 +167,7 @@
 
       grafana_github_teams:
         - 2357301  # rust-lang/infra
-        - 3484533  # rust-lang/docsrs-ops
+        - 3552538  # rust-lang/docs-rs
 
       grafana_domain: "{{ vars_grafana_domain }}"
       grafana_admin_password: "{{ vars_grafana_admin_password }}"
