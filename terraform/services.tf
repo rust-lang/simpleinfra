@@ -29,6 +29,7 @@ module "service_bastion" {
   //     /prod/bastion/allowed-ips/${user}
   //
   allowed_users = [
+    "acrichto",
     "aidanhs",
     "guillaumegomez",
     "mozilla-mountain-view",
