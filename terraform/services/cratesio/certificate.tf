@@ -7,6 +7,10 @@ resource "aws_acm_certificate" "cert" {
   domain_name               = var.webapp_domain_name
   subject_alternative_names = [var.static_domain_name]
   validation_method         = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_route53_record" "cert_validation_0" {
