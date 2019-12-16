@@ -44,8 +44,8 @@ module "service_bastion" {
   ]
 }
 
-module "service_ci_gha" {
-  source = "./services/ci"
+module "service_rustc_ci_gha" {
+  source = "./services/rustc-ci"
 
   iam_prefix       = "gha"
   caches_bucket    = "rust-lang-gha-caches"
