@@ -44,6 +44,14 @@ module "service_bastion" {
   ]
 }
 
+module "service_rustc_ci" {
+  source = "./services/rustc-ci"
+
+  iam_prefix       = "ci--rust-lang--rust"
+  caches_bucket    = "rust-lang-ci-sccache2"
+  artifacts_bucket = "rust-lang-ci2"
+}
+
 module "service_rustc_ci_gha" {
   source = "./services/rustc-ci"
 
@@ -57,7 +65,7 @@ module "service_promote_release" {
 
   static_bucket_arn     = "arn:aws:s3:::static-rust-lang-org"
   dev_static_bucket_arn = "arn:aws:s3:::dev-static-rust-lang-org"
-  ci_bucket_arn         = "arn:aws:s3:::rust-lang-ci2"
+  ci_bucket_arn         = module.service_rustc_ci.artifacts_bucket_arn
 }
 
 module "service_cratesio" {
