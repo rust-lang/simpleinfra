@@ -60,11 +60,26 @@ module "service_rustc_ci_gha" {
   artifacts_bucket = "rust-lang-gha"
 }
 
+module "service_dev_releases_cdn" {
+  source = "./services/releases-cdn"
+  providers = {
+    aws       = aws
+    aws.east1 = aws.east1
+  }
+
+  bucket             = "dev-static-rust-lang-org"
+  static_domain_name = "dev-static.rust-lang.org"
+  doc_domain_name    = "dev-doc.rust-lang.org"
+  dns_zone           = aws_route53_zone.rust_lang_org.id
+
+  inventories_bucket_arn = aws_s3_bucket.rust_inventories.arn
+}
+
 module "service_promote_release" {
   source = "./services/promote-release"
 
   static_bucket_arn     = "arn:aws:s3:::static-rust-lang-org"
-  dev_static_bucket_arn = "arn:aws:s3:::dev-static-rust-lang-org"
+  dev_static_bucket_arn = module.service_dev_releases_cdn.bucket_arn
   ci_bucket_arn         = module.service_rustc_ci.artifacts_bucket_arn
 }
 
