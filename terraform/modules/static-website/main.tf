@@ -1,3 +1,11 @@
+module "certificate" {
+  source = "../../modules/acm-certificate"
+
+  domains = {
+    (var.domain_name) = var.dns_zone,
+  }
+}
+
 resource "aws_cloudfront_distribution" "website" {
   comment = "static website ${var.domain_name}"
 
@@ -9,7 +17,7 @@ resource "aws_cloudfront_distribution" "website" {
 
   aliases = [var.domain_name]
   viewer_certificate {
-    acm_certificate_arn = aws_acm_certificate_validation.cert.certificate_arn
+    acm_certificate_arn = module.certificate.arn
     ssl_support_method  = "sni-only"
   }
 

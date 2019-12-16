@@ -9,6 +9,15 @@ provider "aws" {
   alias = "east1"
 }
 
+module "certificate" {
+  source = "../acm-certificate"
+  providers = {
+    aws = aws.east1
+  }
+
+  domains = var.from
+}
+
 resource "aws_s3_bucket" "redirect" {
   bucket = "rust-http-redirect-${local.url_hash}"
   acl    = "public-read"
@@ -27,7 +36,7 @@ resource "aws_cloudfront_distribution" "redirect" {
 
   aliases = keys(var.from)
   viewer_certificate {
-    acm_certificate_arn = aws_acm_certificate_validation.cert.certificate_arn
+    acm_certificate_arn = module.certificate.arn
     ssl_support_method  = "sni-only"
   }
 
