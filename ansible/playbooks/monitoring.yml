@@ -97,6 +97,13 @@
                 summary: "Filesystem {{ '{{ $labels.mountpoint }}' }} on {{ '{{ $labels.instance }}' }} is full"
                 description: "There is less than 10% disk space left on the mount point {{ '{{ $labels.mountpoint }}' }} (device {{ '{{ $labels.device }}' }}) of the instance {{ '{{ $labels.instance }}' }}."
 
+            - alert: TooMuchRamUsage
+              expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes < 0.2
+              for: 1m
+              annotations:
+                summary: "High RAM usage on {{ '{{ $labels.instance }}' }}"
+                description: "There is less than 20% available RAM on the {{ '{{ $labels.instance }}' }} instance, for more than 1 minute."
+
         - name: docsrs
           rules:
             - alert: LongQueue
