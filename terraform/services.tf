@@ -128,3 +128,11 @@ module "service_docsrs" {
   storage_bucket = "rust-docs-rs"
   backups_bucket = "docs.rs-backups"
 }
+
+module "service_ecs_cluster" {
+  source = "./services/ecs-cluster"
+
+  cluster_name         = "rust-ecs-prod"
+  load_balancer_domain = "ecs-prod.infra.rust-lang.org"
+  dns_zone             = aws_route53_zone.rust_lang_org.id
+}
