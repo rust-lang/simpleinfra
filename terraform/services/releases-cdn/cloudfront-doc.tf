@@ -25,7 +25,7 @@ module "lambda_doc_response" {
 }
 
 resource "aws_cloudfront_distribution" "doc" {
-  comment = var.static_domain_name
+  comment = var.doc_domain_name
 
   enabled             = true
   wait_for_deployment = false
