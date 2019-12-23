@@ -30,3 +30,9 @@ variable "dns_apex" {
   type    = bool
   default = false
 }
+
+variable "logs_bucket" {
+  description = "If this is set, URL of the bucket to store access logs into."
+  type        = string
+  default     = null
+}

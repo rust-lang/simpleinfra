@@ -89,3 +89,30 @@ resource "aws_s3_bucket_inventory" "rust_lang_ci_mirrors" {
     }
   }
 }
+
+resource "aws_s3_bucket" "temp_logs_cratesio" {
+  bucket = "rust-temp-cratesio-logs"
+  acl    = "private"
+
+  lifecycle_rule {
+    id      = "clean logs"
+    enabled = true
+
+    abort_incomplete_multipart_upload_days = 1
+    expiration {
+      days = 7
+    }
+    noncurrent_version_expiration {
+      days = 7
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "temp_logs_cratesio" {
+  bucket = aws_s3_bucket.temp_logs_cratesio.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}

@@ -47,6 +47,15 @@ resource "aws_cloudfront_distribution" "static" {
       restriction_type = "none"
     }
   }
+
+  dynamic "logging_config" {
+    for_each = var.logs_bucket != null ? toset([var.logs_bucket]) : toset([])
+    content {
+      bucket          = logging_config.value
+      prefix          = "static/"
+      include_cookies = false
+    }
+  }
 }
 
 resource "aws_route53_record" "static" {
