@@ -6,7 +6,7 @@
 resource "aws_lb" "lb" {
   name               = var.cluster_name
   load_balancer_type = "application"
-  subnets            = aws_subnet.public.*.id
+  subnets            = var.subnet_ids
   security_groups    = [aws_security_group.lb.id]
   ip_address_type    = "dualstack"
 
@@ -26,7 +26,7 @@ resource "aws_route53_record" "lb" {
 resource "aws_security_group" "lb" {
   name        = "${var.cluster_name}-load-balancer"
   description = "Allow incoming traffic for the load balancer"
-  vpc_id      = aws_vpc.cluster.id
+  vpc_id      = var.vpc_id
 
   ingress {
     from_port        = 80

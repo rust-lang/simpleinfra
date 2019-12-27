@@ -18,26 +18,8 @@ resource "aws_key_pair" "buildbot_west_slave_key" {
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCdGoRV9XPamZwqCMr4uk1oHWPnknzwOOSjuRBnu++WRkn7TtCM4ndDfqtKnvzlX5mzPhdvO1KKx1K8TiJ3wiq7WS4AFLGKQmPHWjg8qxGW7x4S8DHrb4ctmaujZ1+XCNSK3nsCl1lLW8DOrRlKbfeHIAllbMBZxIRmQ+XICVvhKAmSmxzTmYC8tBqvqQprG/uIuKonjLxL/ljtBxXBNECXl/JFCYG0AsB0aiuiMVeHLVzMiEppQ7YP/5Ml1Rpmn6h0dDzFtoD7xenroS98BIQF5kQWhakHbtWcNMz7DVFghWgi9wYr0gtoIshhqWYorC4yJq6HGXd0qdNHuLWNz39h buildbot-west-slave-key.pem"
 }
 
-resource "aws_vpc" "rust_prod" {
-  cidr_block = "172.30.0.0/16"
-
-  tags = {
-    Name = "rust-prod"
-  }
-}
-
-resource "aws_subnet" "rust_prod" {
-  vpc_id                  = aws_vpc.rust_prod.id
-  cidr_block              = "172.30.0.0/24"
-  map_public_ip_on_launch = true
-
-  tags = {
-    Name = "rust-prod"
-  }
-}
-
-resource "aws_security_group" "rust_prod_common" {
-  vpc_id      = aws_vpc.rust_prod.id
+resource "aws_security_group" "legacy_common" {
+  vpc_id      = aws_vpc.legacy.id
   name        = "rust-prod-common"
   description = "Common rules for all our instances"
 
@@ -70,8 +52,8 @@ resource "aws_security_group" "rust_prod_common" {
   }
 }
 
-resource "aws_security_group" "rust_prod_http" {
-  vpc_id      = aws_vpc.rust_prod.id
+resource "aws_security_group" "legacy_http" {
+  vpc_id      = aws_vpc.legacy.id
   name        = "rust-prod-http"
   description = "Inbound access for HTTP and HTTPS requests"
 

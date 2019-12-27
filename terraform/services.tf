@@ -9,17 +9,17 @@ module "service_crater" {
   source                   = "./services/crater"
   ecr_repo                 = module.ecr_crater
   agent_ami_id             = data.aws_ami.ubuntu_bionic.id
-  agent_subnet_id          = aws_subnet.rust_prod.id
+  agent_subnet_id          = aws_subnet.legacy.id
   agent_key_pair           = aws_key_pair.buildbot_west_slave_key.key_name
-  common_security_group_id = aws_security_group.rust_prod_common.id
+  common_security_group_id = aws_security_group.legacy_common.id
 }
 
 module "service_bastion" {
   source                   = "./services/bastion"
   ami_id                   = data.aws_ami.ubuntu_bionic.id
-  vpc_id                   = aws_vpc.rust_prod.id
-  subnet_id                = aws_subnet.rust_prod.id
-  common_security_group_id = aws_security_group.rust_prod_common.id
+  vpc_id                   = aws_vpc.legacy.id
+  subnet_id                = aws_subnet.legacy.id
+  common_security_group_id = aws_security_group.legacy_common.id
   key_pair                 = aws_key_pair.buildbot_west_slave_key.key_name
 
   // Users allowed to connect to the bastion through SSH. Each user needs to
@@ -137,4 +137,6 @@ module "service_ecs_cluster" {
   cluster_name         = "rust-ecs-prod"
   load_balancer_domain = "ecs-prod.infra.rust-lang.org"
   dns_zone             = aws_route53_zone.rust_lang_org.id
+  vpc_id               = aws_vpc.prod.id
+  subnet_ids           = aws_subnet.prod_public.*.id
 }
