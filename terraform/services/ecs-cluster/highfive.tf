@@ -8,7 +8,7 @@ data "aws_ssm_parameter" "highfive" {
 }
 
 module "task_highfive" {
-  source = "./task"
+  source = "../../modules/ecs-task"
 
   name   = "highfive"
   cpu    = 256
@@ -55,7 +55,7 @@ EOF
 }
 
 module "service_highfive" {
-  source         = "./service"
+  source         = "../../modules/ecs-service"
   cluster_config = local.cluster_config
 
   name        = "highfive"
