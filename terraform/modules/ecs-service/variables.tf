@@ -37,5 +37,5 @@ variable "cluster_config" {
     subnet_ids                = list(string),
     vpc_id                    = string,
   })
-  description = "Shared configuration of the cluster"
+  description = "Shared configuration of the ECS cluster"
 }

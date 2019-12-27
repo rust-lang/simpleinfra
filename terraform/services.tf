@@ -140,3 +140,11 @@ module "service_ecs_cluster" {
   vpc_id               = aws_vpc.prod.id
   subnet_ids           = aws_subnet.prod_public.*.id
 }
+
+module "service_highfive" {
+  source = "./services/highfive"
+
+  domain_name    = "highfive.ecs-prod.infra.rust-lang.org"
+  dns_zone       = aws_route53_zone.rust_lang_org.id
+  cluster_config = module.service_ecs_cluster.config
+}

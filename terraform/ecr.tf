@@ -23,11 +23,6 @@ module "ecr_rust_central_station" {
   name   = "rust-central-station"
 }
 
-module "ecr_rust_highfive" {
-  source = "./modules/ecr-repo"
-  name   = "rust-highfive"
-}
-
 module "ecr_rust_log_analyzer" {
   source = "./modules/ecr-repo"
   name   = "rust-log-analyzer"
