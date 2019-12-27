@@ -14,6 +14,7 @@ const main = async () => {
 
         let sts = new AWS.STS();
         let ecr = new AWS.ECR({ region: region });
+        let ecs = new AWS.ECS({ region: region });
 
         let account_id = (await sts.getCallerIdentity().promise())["Account"];
         let auth = (await ecr.getAuthorizationToken().promise())["authorizationData"][0];
@@ -29,6 +30,20 @@ const main = async () => {
         await exec.exec("docker", ["login", "-u", username, "-p", password, auth["proxyEndpoint"]]);
         await exec.exec("docker", ["tag", image, ecr_image]);
         await exec.exec("docker", ["push", ecr_image]);
+
+        let redeploy_ecs_cluster = actions.getInput("redeploy_ecs_cluster", { required: false });
+        let redeploy_ecs_service = actions.getInput("redeploy_ecs_service", { required: false });
+
+        if (redeploy_ecs_service !== "") {
+            let options = {
+                service: redeploy_ecs_service,
+                forceNewDeployment: true,
+            };
+            if (redeploy_ecs_cluster !== "") {
+                options.cluster = redeploy_ecs_cluster;
+            }
+            await ecs.updateService(options).promise();
+        }
     } catch (e) {
         console.log("error: "+e);
         process.exit(1);
