@@ -20,3 +20,13 @@ variable "containers" {
     https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#container_definitions
   EOD
 }
+
+variable "log_retention_days" {
+  type        = number
+  description = "After how many days should CloudWatch purge the logs"
+}
+
+variable "ecr_repositories_arns" {
+  type        = list(string)
+  description = "List of ECR repository ARNs this task is allowed to pull"
+}

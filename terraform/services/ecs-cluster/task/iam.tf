@@ -2,13 +2,9 @@
 // which is used by ECS to start the containers included in the current task.
 //
 // The role has the following permissions:
-// - Download any image from any ECR repository.
-// - Upload logs to any CloudWatch destination.
+// - Download images from the whitelisted ECR repository.
+// - Upload logs to this task's CloudWatch destination.
 // - Access the SSM parameters in the /prod/ecs/${var.name} namespace.
-
-data "aws_iam_policy" "aws_task_execution" {
-  arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-}
 
 resource "aws_iam_policy" "task_execution" {
   name   = "ecs-task-execution--${var.name}"
@@ -23,6 +19,31 @@ resource "aws_iam_policy" "task_execution" {
       "Resource": [
         "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/prod/ecs/${var.name}/*"
       ]
+    },
+    {
+      "Sid": "AllowLogs",
+      "Effect": "Allow",
+      "Action": [
+        "logs:PutLogEvents",
+        "logs:CreateLogStream"
+      ],
+      "Resource": "${aws_cloudwatch_log_group.task.arn}"
+    },
+    {
+      "Sid": "AllowContainersDownload",
+      "Effect": "Allow",
+      "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:BatchGetImage"
+      ],
+      "Resource": ${jsonencode(var.ecr_repositories_arns)}
+    },
+    {
+      "Sid": "ECRAuthentication",
+      "Effect": "Allow",
+      "Action": "ecr:GetAuthorizationToken",
+      "Resource": "*"
     }
   ]
 }
@@ -48,12 +69,7 @@ resource "aws_iam_role" "task_execution" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "task_execution_aws" {
-  role       = aws_iam_role.task_execution.name
-  policy_arn = data.aws_iam_policy.aws_task_execution.arn
-}
-
-resource "aws_iam_role_policy_attachment" "task_execution_custom" {
+resource "aws_iam_role_policy_attachment" "task_execution" {
   role       = aws_iam_role.task_execution.name
   policy_arn = aws_iam_policy.task_execution.arn
 }

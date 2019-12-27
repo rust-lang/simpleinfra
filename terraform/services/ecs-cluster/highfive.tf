@@ -14,6 +14,11 @@ module "task_highfive" {
   cpu    = 256
   memory = 512
 
+  log_retention_days = 7
+  ecr_repositories_arns = [
+    data.aws_ecr_repository.highfive.arn,
+  ]
+
   containers = <<EOF
 [
   {
@@ -26,6 +31,14 @@ module "task_highfive" {
         "hostPort": 80
       }
     ],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "/ecs/highfive",
+        "awslogs-region": "us-west-1",
+        "awslogs-stream-prefix": "highfive"
+      }
+    },
     "secrets": [
       {
         "name": "HIGHFIVE_GITHUB_TOKEN",
