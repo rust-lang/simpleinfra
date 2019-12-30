@@ -144,7 +144,7 @@ module "service_ecs_cluster" {
 module "service_highfive" {
   source = "./services/highfive"
 
-  domain_name    = "highfive.ecs-prod.infra.rust-lang.org"
+  domain_name    = "highfive.infra.rust-lang.org"
   dns_zone       = aws_route53_zone.rust_lang_org.id
   cluster_config = module.service_ecs_cluster.config
 }
