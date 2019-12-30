@@ -3,6 +3,11 @@ variable "name" {
   description = "Name of the service to create"
 }
 
+variable "lb_priority" {
+  type        = number
+  description = "Priority for this rule"
+}
+
 variable "task_arn" {
   type        = string
   description = "ARN of the task to spawn in the service"

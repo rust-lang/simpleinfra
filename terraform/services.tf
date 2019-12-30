@@ -148,3 +148,11 @@ module "service_highfive" {
   dns_zone       = aws_route53_zone.rust_lang_org.id
   cluster_config = module.service_ecs_cluster.config
 }
+
+module "service_triagebot" {
+  source = "./services/triagebot"
+
+  domain_name    = "triagebot.infra.rust-lang.org"
+  dns_zone       = aws_route53_zone.rust_lang_org.id
+  cluster_config = module.service_ecs_cluster.config
+}

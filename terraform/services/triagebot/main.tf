@@ -2,21 +2,18 @@
 // then be fetched by the ECS service.
 module "ecr" {
   source = "../../modules/ecr-repo"
-  name   = "rust-highfive"
+  name   = "rust-triagebot"
 }
 
-// The application is hosted on an ECS cluster. The following modules setup
-// both the task definition, and the actual service running on the cluster.
-
-data "aws_ssm_parameter" "highfive" {
-  for_each = toset(["github-token", "webhook-secrets"])
-  name     = "/prod/ecs/highfive/${each.value}"
+data "aws_ssm_parameter" "triagebot" {
+  for_each = toset(["github-token", "webhook-secret"])
+  name     = "/prod/ecs/triagebot/${each.value}"
 }
 
 module "ecs_task" {
   source = "../../modules/ecs-task"
 
-  name   = "highfive"
+  name   = "triagebot"
   cpu    = 256
   memory = 512
 
@@ -40,19 +37,25 @@ module "ecs_task" {
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
-        "awslogs-group": "/ecs/highfive",
+        "awslogs-group": "/ecs/triagebot",
         "awslogs-region": "us-west-1",
-        "awslogs-stream-prefix": "highfive"
+        "awslogs-stream-prefix": "triagebot"
       }
     },
+    "environment": [
+      {
+        "name": "RUST_LOG",
+        "value": "parser=trace,triagebot=trace"
+      }
+    ],
     "secrets": [
       {
-        "name": "HIGHFIVE_GITHUB_TOKEN",
-        "valueFrom": "${data.aws_ssm_parameter.highfive["github-token"].arn}"
+        "name": "GITHUB_API_TOKEN",
+        "valueFrom": "${data.aws_ssm_parameter.triagebot["github-token"].arn}"
       },
       {
-        "name": "HIGHFIVE_WEBHOOK_SECRETS",
-        "valueFrom": "${data.aws_ssm_parameter.highfive["webhook-secrets"].arn}"
+        "name": "GITHUB_WEBHOOK_SECRET",
+        "valueFrom": "${data.aws_ssm_parameter.triagebot["webhook-secret"].arn}"
       }
     ]
   }
@@ -64,8 +67,8 @@ module "ecs_service" {
   source         = "../../modules/ecs-service"
   cluster_config = var.cluster_config
 
-  name        = "highfive"
-  lb_priority = 100
+  name        = "triagebot"
+  lb_priority = 101
   task_arn    = module.ecs_task.arn
   tasks_count = 1
 

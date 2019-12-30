@@ -27,8 +27,3 @@ module "ecr_rust_log_analyzer" {
   source = "./modules/ecr-repo"
   name   = "rust-log-analyzer"
 }
-
-module "ecr_rust_triagebot" {
-  source = "./modules/ecr-repo"
-  name   = "rust-triagebot"
-}
