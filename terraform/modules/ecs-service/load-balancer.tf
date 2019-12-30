@@ -31,6 +31,8 @@ resource "aws_lb_target_group" "service" {
 
   port     = var.http_port
   protocol = "HTTP"
+
+  deregistration_delay = 30
 }
 
 resource "aws_route53_record" "service" {
