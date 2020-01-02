@@ -137,8 +137,8 @@ module "service_ecs_cluster" {
   cluster_name         = "rust-ecs-prod"
   load_balancer_domain = "ecs-prod.infra.rust-lang.org"
   dns_zone             = aws_route53_zone.rust_lang_org.id
-  vpc_id               = aws_vpc.prod.id
-  subnet_ids           = aws_subnet.prod_public.*.id
+  vpc_id               = module.vpc_prod.id
+  subnet_ids           = module.vpc_prod.public_subnets
 }
 
 module "service_highfive" {
