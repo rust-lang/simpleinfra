@@ -65,7 +65,6 @@ module "ecs_service" {
   cluster_config = var.cluster_config
 
   name        = "highfive"
-  lb_priority = 100
   task_arn    = module.ecs_task.arn
   tasks_count = 1
 

@@ -68,7 +68,6 @@ module "ecs_service" {
   cluster_config = var.cluster_config
 
   name        = "triagebot"
-  lb_priority = 101
   task_arn    = module.ecs_task.arn
   tasks_count = 1
 
