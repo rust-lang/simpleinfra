@@ -4,3 +4,5 @@
 /terraform/.terraform
 /terraform/modules/lambda/packages
 node_modules
+__pycache__
+*.py[co]
