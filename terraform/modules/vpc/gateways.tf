@@ -33,7 +33,7 @@ resource "aws_vpc_endpoint" "dynamodb" {
 // inside the first public subnet of each AZ.
 
 resource "aws_eip" "nat" {
-  for_each = toset(values(var.subnets_public)) # Name of the AZs
+  for_each = toset(values(var.public_subnets)) # Name of the AZs
 
   vpc = true
   tags = {
@@ -52,7 +52,7 @@ resource "aws_nat_gateway" "nat" {
   #
   for_each = {
     for az, subnets in transpose({
-      for num, az in var.subnets_public : num => [az]
+      for num, az in var.public_subnets : num => [az]
     }) : az => subnets[0]
   }
 

@@ -5,7 +5,7 @@
 // associated with each resource as well.
 
 resource "aws_subnet" "public" {
-  for_each = var.subnets_public
+  for_each = var.public_subnets
 
   vpc_id          = aws_vpc.vpc.id
   cidr_block      = cidrsubnet(aws_vpc.vpc.cidr_block, 8, parseint(each.key, 10))
@@ -44,7 +44,7 @@ resource "aws_route_table" "public" {
 }
 
 resource "aws_route_table_association" "public" {
-  for_each = var.subnets_public
+  for_each = var.public_subnets
 
   subnet_id      = aws_subnet.public[each.key].id
   route_table_id = aws_route_table.public.id

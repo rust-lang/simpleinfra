@@ -4,11 +4,11 @@ module "vpc_prod" {
   name      = "rust-prod"
   ipv4_cidr = "10.0.0.0/16"
 
-  subnets_public = {
+  public_subnets = {
     0 = "usw1-az1",
     1 = "usw1-az3",
   }
-  subnets_private = {
+  private_subnets = {
     2 = "usw1-az1",
     3 = "usw1-az3",
   }

@@ -4,7 +4,7 @@
 // only communicate with the Internet through a NAT Gateway.
 
 resource "aws_subnet" "private" {
-  for_each = var.subnets_private
+  for_each = var.private_subnets
 
   vpc_id          = aws_vpc.vpc.id
   cidr_block      = cidrsubnet(aws_vpc.vpc.cidr_block, 8, parseint(each.key, 10))
@@ -26,7 +26,7 @@ resource "aws_subnet" "private" {
 // table is then attached to all the private subnets.
 
 resource "aws_route_table" "private" {
-  for_each = toset(values(var.subnets_private))
+  for_each = toset(values(var.private_subnets))
 
   vpc_id = aws_vpc.vpc.id
 
@@ -46,7 +46,7 @@ resource "aws_route_table" "private" {
 }
 
 resource "aws_route_table_association" "private" {
-  for_each = var.subnets_private
+  for_each = var.private_subnets
 
   subnet_id      = aws_subnet.private[each.key].id
   route_table_id = aws_route_table.private[each.value].id
@@ -58,14 +58,14 @@ resource "aws_route_table_association" "private" {
 // bill, as data going through the NAT gateway is not free.
 
 resource "aws_vpc_endpoint_route_table_association" "private_s3" {
-  for_each = toset(values(var.subnets_private))
+  for_each = toset(values(var.private_subnets))
 
   route_table_id  = aws_route_table.private[each.value].id
   vpc_endpoint_id = aws_vpc_endpoint.s3.id
 }
 
 resource "aws_vpc_endpoint_route_table_association" "private_dynamodb" {
-  for_each = toset(values(var.subnets_private))
+  for_each = toset(values(var.private_subnets))
 
   vpc_endpoint_id = aws_vpc_endpoint.dynamodb.id
   route_table_id  = aws_route_table.private[each.value].id

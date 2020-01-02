@@ -8,12 +8,12 @@ variable "ipv4_cidr" {
   description = "CIDR of the IPv4 address range of the VPC"
 }
 
-variable "subnets_public" {
+variable "public_subnets" {
   type        = map(string)
   description = "Map of public subnet numbers and the associated AZ IDs"
 }
 
-variable "subnets_private" {
+variable "private_subnets" {
   type        = map(string)
   description = "Map of private subnet numbers and the associated AZ IDs"
 }
