@@ -5,7 +5,7 @@ data "aws_region" "current" {}
 data "external" "source_zip" {
   program = ["${path.module}/pack.py"]
   query = {
-    source_dir = var.source_dir,
+    source_dir  = var.source_dir,
     destination = "${path.module}/packages/${data.aws_region.current.name}/${var.name}.zip"
   }
 }
