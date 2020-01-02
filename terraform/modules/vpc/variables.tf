@@ -10,5 +10,10 @@ variable "ipv4_cidr" {
 
 variable "subnets_public" {
   type        = map(string)
-  description = "Map of subnet numbers and the associated AZ ID"
+  description = "Map of public subnet numbers and the associated AZ IDs"
+}
+
+variable "subnets_private" {
+  type        = map(string)
+  description = "Map of private subnet numbers and the associated AZ IDs"
 }

@@ -21,30 +21,25 @@ resource "aws_subnet" "public" {
 }
 
 // By default subnets don't have any kind of internet access available, but can
-// only communicate with other hosts inside the same VPC. The following
-// resources create an internet gateway, and a route table to route all the
-// connections outside the VPC to that gateway. The route table is then
-// associated with all the public subnets.
-
-resource "aws_internet_gateway" "public" {
-  vpc_id = aws_vpc.vpc.id
-}
+// only communicate with other hosts inside the same VPC. This creates a new
+// route table, forwarding public routes to the internet gateway created in
+// gateways.tf. The route table is then attached to all the public subnets.
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.vpc.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.public.id
+    gateway_id = aws_internet_gateway.igw.id
   }
 
   route {
     ipv6_cidr_block = "::/0"
-    gateway_id      = aws_internet_gateway.public.id
+    gateway_id      = aws_internet_gateway.igw.id
   }
 
   tags = {
-    Name = "${aws_vpc.vpc.tags["Name"]}--public"
+    Name = "${var.name}--public"
   }
 }
 

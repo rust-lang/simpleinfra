@@ -6,7 +6,7 @@
 resource "aws_lb" "lb" {
   name               = var.cluster_name
   load_balancer_type = "application"
-  subnets            = var.subnet_ids
+  subnets            = var.load_balancer_subnet_ids
   security_groups    = [aws_security_group.lb.id]
   ip_address_type    = "dualstack"
 

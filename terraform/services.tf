@@ -134,11 +134,12 @@ module "service_docsrs" {
 module "service_ecs_cluster" {
   source = "./services/ecs-cluster"
 
-  cluster_name         = "rust-ecs-prod"
-  load_balancer_domain = "ecs-prod.infra.rust-lang.org"
-  dns_zone             = aws_route53_zone.rust_lang_org.id
-  vpc_id               = module.vpc_prod.id
-  subnet_ids           = module.vpc_prod.public_subnets
+  cluster_name             = "rust-ecs-prod"
+  load_balancer_domain     = "ecs-prod.infra.rust-lang.org"
+  load_balancer_subnet_ids = module.vpc_prod.public_subnets
+  dns_zone                 = aws_route53_zone.rust_lang_org.id
+  vpc_id                   = module.vpc_prod.id
+  subnet_ids               = module.vpc_prod.private_subnets
 }
 
 module "service_highfive" {
