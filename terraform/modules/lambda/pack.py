@@ -19,7 +19,6 @@ import base64
 import hashlib
 import json
 import os
-import stripzip
 import sys
 import zipfile
 
@@ -39,17 +38,31 @@ def pack(query):
     paths = list(sorted(paths))
 
     # Then add all of them to the destination archive.
-    os.makedirs(os.path.dirname(query["destination"]), exist_ok=True)
+    parent = os.path.dirname(query["destination"])
+    if parent:
+        os.makedirs(parent, exist_ok=True)
     zip = zipfile.ZipFile(query["destination"], mode="w")
     for path in paths:
-        zip.write(path, os.path.relpath(path, query["source_dir"]))
+        # Override the permissions to set 0644 if the file is not executable,
+        # or 0755 if the file is executable.
+        permission = 0o100644
+        if os.access(path, os.X_OK):
+            permission = 0o100755
+
+        # Force the permissions and the modification date, to avoid different
+        # outputs on different machines.
+        info = zipfile.ZipInfo(os.path.relpath(path, query["source_dir"]))
+        info.external_attr = permission << 16
+        info.date_time = (1980, 1, 1, 0, 0, 0)
+
+        zip.writestr(
+            info,
+            open(path, "rb").read(),
+            compress_type=zipfile.ZIP_DEFLATED,
+        )
     zip.close()
 
-    # Finally strip the zip's modification time.
-    with open(query["destination"], "r+b") as f:
-        stripzip._zero_zip_date_time(f)
-
-    # Calculate hashes, included in the script's output.
+    # Finally calculate hashes, passed back later to Terraform.
     with open(query["destination"], "rb") as f:
         content = f.read()
 
