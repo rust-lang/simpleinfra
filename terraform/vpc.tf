@@ -12,6 +12,10 @@ module "vpc_prod" {
     2 = "usw1-az1",
     3 = "usw1-az3",
   }
+  untrusted_subnets = {
+    4 = "usw1-az1",
+    5 = "usw1-az3",
+  }
 }
 
 // This defines the legacy VPC, used before we switched to Terraform. Old

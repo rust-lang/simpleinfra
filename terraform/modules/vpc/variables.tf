@@ -17,3 +17,8 @@ variable "private_subnets" {
   type        = map(string)
   description = "Map of private subnet numbers and the associated AZ IDs"
 }
+
+variable "untrusted_subnets" {
+  type        = map(string)
+  description = "Map of untrusted subnet numbers and the associated AZ IDs"
+}

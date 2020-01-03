@@ -12,3 +12,8 @@ output "private_subnets" {
   value       = [for count, subnet in aws_subnet.private : subnet.id]
   description = "IDs of the private subnets inside the VPC"
 }
+
+output "untrusted_subnets" {
+  value       = [for count, subnet in aws_subnet.untrusted : subnet.id]
+  description = "IDs of the untrusted subnets inside the VPC"
+}
