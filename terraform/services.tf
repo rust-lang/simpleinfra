@@ -103,6 +103,7 @@ module "service_cratesio" {
   iam_prefix = "crates-io"
 
   logs_bucket = aws_s3_bucket.temp_logs_cratesio.bucket_domain_name
+  temp_flag_root_object = true
 }
 
 module "service_cratesio_staging" {
@@ -122,6 +123,8 @@ module "service_cratesio_staging" {
   webapp_origin_domain = "staging-crates-io.herokuapp.com"
 
   iam_prefix = "staging-crates-io"
+
+  temp_flag_root_object = false
 }
 
 module "service_docsrs" {
