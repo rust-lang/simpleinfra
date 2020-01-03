@@ -102,7 +102,7 @@ module "service_cratesio" {
 
   iam_prefix = "crates-io"
 
-  logs_bucket = aws_s3_bucket.temp_logs_cratesio.bucket_domain_name
+  logs_bucket           = aws_s3_bucket.temp_logs_cratesio.bucket_domain_name
   temp_flag_root_object = true
 }
 
