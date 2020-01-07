@@ -36,7 +36,3 @@ variable "logs_bucket" {
   type        = string
   default     = null
 }
-
-variable "temp_flag_root_object" {
-  type = bool
-}

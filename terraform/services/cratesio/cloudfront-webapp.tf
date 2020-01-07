@@ -6,7 +6,6 @@ resource "aws_cloudfront_distribution" "webapp" {
   enabled             = true
   wait_for_deployment = false
   is_ipv6_enabled     = true
-  default_root_object = var.temp_flag_root_object ? "index.html" : null
   price_class         = "PriceClass_All"
 
   aliases = [var.webapp_domain_name]
