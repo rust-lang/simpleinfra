@@ -41,7 +41,11 @@ resource "aws_cloudfront_distribution" "static" {
         // response it receives, even if it's empty.
         "Origin",
       ]
-      query_string = false
+      // Forwarding the query string is needed to make the file listing work:
+      // list-files.html requests the directory content with the ?prefix=/foo
+      // query string, and if the query string is not forwarded S3 will return
+      // the same data forever, causing a loop in the JS.
+      query_string = true
       cookies {
         forward = "none"
       }
