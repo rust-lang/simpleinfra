@@ -68,8 +68,8 @@ module "service_dev_releases_cdn" {
   }
 
   bucket             = "dev-static-rust-lang-org"
-  static_domain_name = "dev-static.rust-lang.org"
-  doc_domain_name    = "dev-doc.rust-lang.org"
+  static_domain_name = "dev-static.${local.rustlang.domain}"
+  doc_domain_name    = "dev-doc.${local.rustlang.domain}"
   dns_zone           = aws_route53_zone.rust_lang_org.id
 
   inventories_bucket_arn = aws_s3_bucket.rust_inventories.arn
@@ -90,8 +90,8 @@ module "service_cratesio" {
     aws.east1 = aws.east1
   }
 
-  webapp_domain_name = "crates.io"
-  static_domain_name = "static.crates.io"
+  webapp_domain_name = local.cratesio.domain
+  static_domain_name = "static.${local.cratesio.domain}"
   dns_zone           = module.dns.zone_crates_io
   dns_apex           = true
 
@@ -112,8 +112,8 @@ module "service_cratesio_staging" {
     aws.east1 = aws.east1
   }
 
-  webapp_domain_name = "staging.crates.io"
-  static_domain_name = "static.staging.crates.io"
+  webapp_domain_name = "staging.${local.cratesio.domain}"
+  static_domain_name = "static.staging.${local.cratesio.domain}"
   dns_zone           = module.dns.zone_crates_io
 
   static_bucket_name     = "staging-crates-io"
@@ -135,7 +135,7 @@ module "service_ecs_cluster" {
   source = "./services/ecs-cluster"
 
   cluster_name             = "rust-ecs-prod"
-  load_balancer_domain     = "ecs-prod.infra.rust-lang.org"
+  load_balancer_domain     = "ecs-prod.infra.${local.rustlang.domain}"
   load_balancer_subnet_ids = module.vpc_prod.public_subnets
   dns_zone                 = aws_route53_zone.rust_lang_org.id
   vpc_id                   = module.vpc_prod.id
@@ -145,7 +145,7 @@ module "service_ecs_cluster" {
 module "service_highfive" {
   source = "./services/highfive"
 
-  domain_name    = "highfive.infra.rust-lang.org"
+  domain_name    = "highfive.infra.${local.rustlang.domain}"
   dns_zone       = aws_route53_zone.rust_lang_org.id
   cluster_config = module.service_ecs_cluster.config
 }
@@ -153,7 +153,7 @@ module "service_highfive" {
 module "service_triagebot" {
   source = "./services/triagebot"
 
-  domain_name    = "triagebot.infra.rust-lang.org"
+  domain_name    = "triagebot.infra.${local.rustlang.domain}"
   dns_zone       = aws_route53_zone.rust_lang_org.id
   cluster_config = module.service_ecs_cluster.config
 }

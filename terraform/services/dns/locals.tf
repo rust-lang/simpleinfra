@@ -5,4 +5,7 @@ locals {
     "185.199.110.153",
     "185.199.111.153",
   ]
+  cratesio = {
+    domain = "crates.io"
+  }
 }

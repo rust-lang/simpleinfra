@@ -6,7 +6,7 @@ module "static_website_ci_mirrors" {
     aws = aws.east1
   }
 
-  domain_name        = "ci-mirrors.rust-lang.org"
+  domain_name        = "ci-mirrors.${local.rustlang.domain}"
   dns_zone           = aws_route53_zone.rust_lang_org.id
   origin_domain_name = aws_s3_bucket.rust_lang_ci_mirrors.bucket_regional_domain_name
 }
