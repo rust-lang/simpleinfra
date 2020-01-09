@@ -1,18 +1,21 @@
-// Terraform requires some state to be persisted between runs. This file
-// configures storage and locking support on S3 and DynamoDB.
+// This file contains the definition of the resources needed to store the
+// Terraform State, **except** the underlying S3 bucket and DynamoDB table.
 //
-// https://www.terraform.io/docs/backends/index.html
-// https://www.terraform.io/docs/backends/types/s3.html
+// Those are not configured through Terraform to avoid cyclic dependencies: the
+// cycle could make solving issues if things go wrong way harder.
 
-resource "aws_s3_bucket" "rust_terraform" {
+data "aws_s3_bucket" "rust_terraform" {
   bucket = "rust-terraform"
-  acl    = "private"
+}
 
-  // Not all the administrators should be able to access the Terraform state.
-  // Because of that the bucket has a policy to deny access to everyone except
-  // selected infra team members and the root account.
-  //
-  // https://aws.amazon.com/blogs/security/how-to-restrict-amazon-s3-bucket-access-to-a-specific-iam-role/
+// Not all the administrators should be able to access the Terraform state.
+// Because of that the bucket has a policy to deny access to everyone except
+// selected infra team members and the root account.
+//
+// https://aws.amazon.com/blogs/security/how-to-restrict-amazon-s3-bucket-access-to-a-specific-iam-role/
+resource "aws_s3_bucket_policy" "rust_terraform" {
+  bucket = data.aws_s3_bucket.rust_terraform.id
+
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -40,27 +43,4 @@ resource "aws_s3_bucket" "rust_terraform" {
   ]
 }
 EOF
-
-  versioning {
-    enabled = true
-  }
-
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
-    }
-  }
-}
-
-resource "aws_dynamodb_table" "terraform_state_lock" {
-  name         = "terraform-state-lock"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "LockID"
-
-  attribute {
-    name = "LockID"
-    type = "S"
-  }
 }
