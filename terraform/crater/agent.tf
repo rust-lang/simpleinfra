@@ -46,17 +46,32 @@ resource "aws_iam_instance_profile" "agent" {
   role = aws_iam_role.agent.name
 }
 
+data "aws_ami" "ubuntu_bionic" {
+  most_recent = true
+  owners      = ["099720109477"] # Canonical
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
 resource "aws_network_interface" "agent" {
-  subnet_id = var.agent_subnet_id
+  subnet_id = data.terraform_remote_state.shared.outputs.legacy_vpc.subnet_id
   security_groups = [
-    var.common_security_group_id,
+    data.terraform_remote_state.shared.outputs.legacy_vpc.common_security_group_id
   ]
 }
 
 resource "aws_instance" "agent" {
-  ami                     = var.agent_ami_id
+  ami                     = data.aws_ami.ubuntu_bionic.id
   instance_type           = "c5.2xlarge"
-  key_name                = var.agent_key_pair
+  key_name                = data.terraform_remote_state.shared.outputs.master_ec2_key_pair
   ebs_optimized           = true
   disable_api_termination = true
   monitoring              = false

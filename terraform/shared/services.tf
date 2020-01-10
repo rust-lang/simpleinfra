@@ -1,14 +1,6 @@
 // This terraform module imports all the services from the services/ directory,
 // and configures them.
 
-module "service_crater" {
-  source                   = "./services/crater"
-  agent_ami_id             = data.aws_ami.ubuntu_bionic.id
-  agent_subnet_id          = aws_subnet.legacy.id
-  agent_key_pair           = aws_key_pair.buildbot_west_slave_key.key_name
-  common_security_group_id = aws_security_group.legacy_common.id
-}
-
 module "service_bastion" {
   source                   = "./services/bastion"
   ami_id                   = data.aws_ami.ubuntu_bionic.id
