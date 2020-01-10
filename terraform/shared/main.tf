@@ -2,7 +2,7 @@ terraform {
   required_version = ">= 0.12"
   backend "s3" {
     bucket         = "rust-terraform"
-    key            = "simpleinfra.tfstate"
+    key            = "simpleinfra/shared.tfstate"
     region         = "us-west-1"
     dynamodb_table = "terraform-state-lock"
     encrypt        = true
