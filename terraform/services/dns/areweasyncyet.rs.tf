@@ -6,6 +6,6 @@ module "areweasyncyet_rs" {
   ttl     = 300
 
   A = {
-    "areweasyncyet.rs." = local.github_pages_ipv4,
+    "@" = local.github_pages_ipv4,
   }
 }

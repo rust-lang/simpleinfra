@@ -6,11 +6,11 @@ module "rustaceans_org" {
   ttl     = 300
 
   A = {
-    "rustaceans.org." = ["107.170.197.220"],
+    "@" = ["107.170.197.220"],
   }
 
   CNAME = {
-    "www.rustaceans.org." = ["rustaceans.org."],
+    "www" = ["rustaceans.org."],
   }
 }
 
