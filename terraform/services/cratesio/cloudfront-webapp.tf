@@ -102,17 +102,22 @@ resource "aws_cloudfront_distribution" "webapp" {
 resource "aws_route53_record" "webapp" {
   for_each = toset(var.dns_apex ? [] : [""])
 
-  zone_id = var.dns_zone
+  zone_id = data.aws_route53_zone.webapp.id
   name    = var.webapp_domain_name
   type    = "CNAME"
   ttl     = 300
   records = [aws_cloudfront_distribution.webapp.domain_name]
 }
 
+data "aws_route53_zone" "webapp" {
+  // Convert foo.bar.baz into bar.baz
+  name = join(".", reverse(slice(reverse(split(".", var.webapp_domain_name)), 0, 2)))
+}
+
 resource "aws_route53_record" "webapp_apex" {
   for_each = toset(var.dns_apex ? ["A", "AAAA"] : [])
 
-  zone_id = var.dns_zone
+  zone_id = data.aws_route53_zone.webapp.id
   name    = var.webapp_domain_name
   type    = each.value
 

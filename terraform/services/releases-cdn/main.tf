@@ -13,8 +13,8 @@ module "certificate" {
     aws = aws.east1
   }
 
-  domains = {
-    (var.static_domain_name) = var.dns_zone,
-    (var.doc_domain_name)    = var.dns_zone,
-  }
+  domains = [
+    var.doc_domain_name,
+    var.static_domain_name,
+  ]
 }

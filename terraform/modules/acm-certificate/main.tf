@@ -1,12 +1,15 @@
 locals {
-  domain_names       = keys(var.domains)
-  main_domain_name   = local.domain_names[0]
-  other_domain_names = slice(local.domain_names, 1, length(local.domain_names))
+  top_level_domains = { for domain in var.domains : domain => join(".", reverse(slice(reverse(split(".", domain)), 0, 2))) }
+}
+
+data "aws_route53_zone" "zones" {
+  for_each = toset(values(local.top_level_domains))
+  name     = each.value
 }
 
 resource "aws_acm_certificate" "cert" {
-  domain_name               = local.main_domain_name
-  subject_alternative_names = local.other_domain_names
+  domain_name               = var.domains[0]
+  subject_alternative_names = slice(var.domains, 1, length(var.domains))
   validation_method         = "DNS"
 
   lifecycle {
@@ -15,10 +18,9 @@ resource "aws_acm_certificate" "cert" {
 }
 
 resource "aws_route53_record" "cert_validation" {
-  count = length(local.domain_names)
+  count = length(var.domains)
 
-  zone_id = var.domains[element(aws_acm_certificate.cert.domain_validation_options, count.index).domain_name]
-  ttl     = 60
+  ttl = 60
 
   # The element function is used here instead of the square brackets syntax
   # since the function is lazily evaluated. This is needed when adding a new
@@ -27,6 +29,7 @@ resource "aws_route53_record" "cert_validation" {
   name    = element(aws_acm_certificate.cert.domain_validation_options, count.index).resource_record_name
   type    = element(aws_acm_certificate.cert.domain_validation_options, count.index).resource_record_type
   records = [element(aws_acm_certificate.cert.domain_validation_options, count.index).resource_record_value]
+  zone_id = data.aws_route53_zone.zones[local.top_level_domains[element(aws_acm_certificate.cert.domain_validation_options, count.index).domain_name]].id
 }
 
 resource "aws_acm_certificate_validation" "cert" {

@@ -1,7 +1,8 @@
 locals {
-  url_hash     = substr(sha1(var.to), 0, 7)
-  apex_domains = { for d, z in var.from : d => z if length(split(".", d)) <= 2 }
-  subdomains   = { for d, z in var.from : d => z if length(split(".", d)) > 2 }
+  url_hash          = substr(sha1(var.to), 0, 7)
+  apex_domains      = [for d in var.from : d if length(split(".", d)) <= 2]
+  subdomains        = [for d in var.from : d if length(split(".", d)) > 2]
+  top_level_domains = { for domain in var.from : domain => join(".", reverse(slice(reverse(split(".", domain)), 0, 2))) }
 }
 
 provider "aws" {}
@@ -16,6 +17,11 @@ module "certificate" {
   }
 
   domains = var.from
+}
+
+data "aws_route53_zone" "zones" {
+  for_each = toset(values(local.top_level_domains))
+  name     = each.value
 }
 
 resource "aws_s3_bucket" "redirect" {
@@ -34,7 +40,7 @@ resource "aws_cloudfront_distribution" "redirect" {
   is_ipv6_enabled = true
   price_class     = "PriceClass_All"
 
-  aliases = keys(var.from)
+  aliases = var.from
   viewer_certificate {
     acm_certificate_arn = module.certificate.arn
     ssl_support_method  = "sni-only"
@@ -76,9 +82,9 @@ resource "aws_cloudfront_distribution" "redirect" {
 }
 
 resource "aws_route53_record" "redirect_subdomain" {
-  for_each = local.subdomains
+  for_each = toset(local.subdomains)
 
-  zone_id = each.value
+  zone_id = data.aws_route53_zone.zones[local.top_level_domains[each.value]].id
   name    = each.key
   type    = "CNAME"
   ttl     = 300
@@ -86,10 +92,10 @@ resource "aws_route53_record" "redirect_subdomain" {
 }
 
 resource "aws_route53_record" "redirect_apex_a" {
-  for_each = local.apex_domains
+  for_each = toset(local.apex_domains)
 
-  zone_id = each.value
-  name    = each.key
+  zone_id = data.aws_route53_zone.zones[local.top_level_domains[each.value]].id
+  name    = each.value
   type    = "A"
 
   alias {
@@ -100,9 +106,9 @@ resource "aws_route53_record" "redirect_apex_a" {
 }
 
 resource "aws_route53_record" "redirect_apex_aaaa" {
-  for_each = local.apex_domains
+  for_each = toset(local.apex_domains)
 
-  zone_id = each.value
+  zone_id = data.aws_route53_zone.zones[local.top_level_domains[each.value]].id
   name    = each.key
   type    = "AAAA"
 

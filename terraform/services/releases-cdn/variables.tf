@@ -13,7 +13,3 @@ variable "static_domain_name" {
 variable "doc_domain_name" {
   type = string
 }
-
-variable "dns_zone" {
-  type = string
-}

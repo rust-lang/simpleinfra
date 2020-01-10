@@ -1,4 +1,4 @@
 variable "domains" {
-  description = "Map of domain names and their Route 53 zones"
-  type        = map(string)
+  description = "List of domain names included in the certificate"
+  type        = list(string)
 }

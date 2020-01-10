@@ -77,8 +77,13 @@ resource "aws_cloudfront_distribution" "static" {
   }
 }
 
+data "aws_route53_zone" "static" {
+  // Convert foo.bar.baz into bar.baz
+  name = join(".", reverse(slice(reverse(split(".", var.static_domain_name)), 0, 2)))
+}
+
 resource "aws_route53_record" "static" {
-  zone_id = var.dns_zone
+  zone_id = data.aws_route53_zone.static.id
   name    = var.static_domain_name
   type    = "CNAME"
   ttl     = 300

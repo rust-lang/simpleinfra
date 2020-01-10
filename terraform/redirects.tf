@@ -13,11 +13,11 @@ module "redirect_www_crates_io" {
   }
 
   to = "https://crates.io"
-  from = {
-    "www.crates.io"    = module.dns.zone_crates_io,
-    "cratesio.com"     = module.dns.zone_cratesio_com,
-    "www.cratesio.com" = module.dns.zone_cratesio_com,
-  }
+  from = [
+    "cratesio.com",
+    "www.crates.io",
+    "www.cratesio.com",
+  ]
 }
 
 module "redirect_docs_rs" {
@@ -28,9 +28,9 @@ module "redirect_docs_rs" {
   }
 
   to = "https://docs.rs"
-  from = {
-    "www.docs.rs"    = aws_route53_zone.docs_rs.id
-    "docsrs.com"     = module.dns.zone_docsrs_com,
-    "www.docsrs.com" = module.dns.zone_docsrs_com,
-  }
+  from = [
+    "docsrs.com",
+    "www.docs.rs",
+    "www.docsrs.com",
+  ]
 }

@@ -3,11 +3,6 @@ variable "domain_name" {
   description = "Domain name hosting the highfive application"
 }
 
-variable "dns_zone" {
-  type        = string
-  description = "DNS zone hosting the domain name"
-}
-
 variable "cluster_config" {
   type = object({
     cluster_id                = string,

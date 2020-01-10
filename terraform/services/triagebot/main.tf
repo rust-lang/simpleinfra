@@ -74,7 +74,7 @@ module "ecs_service" {
   http_container = "app"
   http_port      = 80
 
-  domains = {
-    (var.domain_name) = var.dns_zone,
-  }
+  domains = [
+    var.domain_name,
+  ]
 }

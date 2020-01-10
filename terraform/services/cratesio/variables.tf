@@ -6,10 +6,6 @@ variable "static_domain_name" {
   type = string
 }
 
-variable "dns_zone" {
-  type = string
-}
-
 variable "static_bucket_name" {
   type = string
 }

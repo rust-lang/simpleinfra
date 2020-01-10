@@ -24,8 +24,8 @@ variable "http_port" {
 }
 
 variable "domains" {
-  type        = map(string)
-  description = "Map of domain names and DNS Zone IDs the load balancer will forward to the container"
+  type        = list(string)
+  description = "List of domain names the load balancer will forward to the container"
 }
 
 variable "cluster_config" {

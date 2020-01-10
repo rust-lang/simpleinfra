@@ -17,7 +17,3 @@ variable "vpc_id" {
 variable "subnet_ids" {
   type = list(string)
 }
-
-variable "dns_zone" {
-  type = string
-}

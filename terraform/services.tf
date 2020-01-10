@@ -70,7 +70,6 @@ module "service_dev_releases_cdn" {
   bucket             = "dev-static-rust-lang-org"
   static_domain_name = "dev-static.rust-lang.org"
   doc_domain_name    = "dev-doc.rust-lang.org"
-  dns_zone           = aws_route53_zone.rust_lang_org.id
 
   inventories_bucket_arn = aws_s3_bucket.rust_inventories.arn
 }
@@ -92,7 +91,6 @@ module "service_cratesio" {
 
   webapp_domain_name = "crates.io"
   static_domain_name = "static.crates.io"
-  dns_zone           = module.dns.zone_crates_io
   dns_apex           = true
 
   static_bucket_name     = "crates-io"
@@ -114,7 +112,6 @@ module "service_cratesio_staging" {
 
   webapp_domain_name = "staging.crates.io"
   static_domain_name = "static.staging.crates.io"
-  dns_zone           = module.dns.zone_crates_io
 
   static_bucket_name     = "staging-crates-io"
   inventories_bucket_arn = aws_s3_bucket.rust_inventories.arn
@@ -137,7 +134,6 @@ module "service_ecs_cluster" {
   cluster_name             = "rust-ecs-prod"
   load_balancer_domain     = "ecs-prod.infra.rust-lang.org"
   load_balancer_subnet_ids = module.vpc_prod.public_subnets
-  dns_zone                 = aws_route53_zone.rust_lang_org.id
   vpc_id                   = module.vpc_prod.id
   subnet_ids               = module.vpc_prod.private_subnets
 }
@@ -146,7 +142,6 @@ module "service_highfive" {
   source = "./services/highfive"
 
   domain_name    = "highfive.infra.rust-lang.org"
-  dns_zone       = aws_route53_zone.rust_lang_org.id
   cluster_config = module.service_ecs_cluster.config
 }
 
@@ -154,6 +149,5 @@ module "service_triagebot" {
   source = "./services/triagebot"
 
   domain_name    = "triagebot.infra.rust-lang.org"
-  dns_zone       = aws_route53_zone.rust_lang_org.id
   cluster_config = module.service_ecs_cluster.config
 }

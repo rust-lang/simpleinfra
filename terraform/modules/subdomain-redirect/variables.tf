@@ -1,6 +1,6 @@
 variable "from" {
-  description = "Map of source domains, with Route53 Zone IDs as values"
-  type        = map(string)
+  description = "List of source domains"
+  type        = list(string)
 }
 
 variable "to" {

@@ -1,9 +1,9 @@
 module "certificate" {
   source = "../../modules/acm-certificate"
 
-  domains = {
-    (var.domain_name) = var.dns_zone,
-  }
+  domains = [
+    var.domain_name,
+  ]
 }
 
 resource "aws_cloudfront_distribution" "website" {
@@ -49,8 +49,13 @@ resource "aws_cloudfront_distribution" "website" {
   }
 }
 
+data "aws_route53_zone" "zone" {
+  // Convert foo.bar.baz into bar.baz
+  name = join(".", reverse(slice(reverse(split(".", var.domain_name)), 0, 2)))
+}
+
 resource "aws_route53_record" "website" {
-  zone_id = var.dns_zone
+  zone_id = data.aws_route53_zone.zone.id
   name    = var.domain_name
   type    = "CNAME"
   ttl     = 300

@@ -88,8 +88,13 @@ resource "aws_cloudfront_distribution" "doc" {
   }
 }
 
+data "aws_route53_zone" "doc" {
+  // Convert foo.bar.baz into bar.baz
+  name = join(".", reverse(slice(reverse(split(".", var.doc_domain_name)), 0, 2)))
+}
+
 resource "aws_route53_record" "doc" {
-  zone_id = var.dns_zone
+  zone_id = data.aws_route53_zone.doc.id
   name    = var.doc_domain_name
   type    = "CNAME"
   ttl     = 300

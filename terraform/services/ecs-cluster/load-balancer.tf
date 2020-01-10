@@ -15,8 +15,13 @@ resource "aws_lb" "lb" {
   }
 }
 
+data "aws_route53_zone" "zone" {
+  // Convert foo.bar.baz into bar.baz
+  name = join(".", reverse(slice(reverse(split(".", var.load_balancer_domain)), 0, 2)))
+}
+
 resource "aws_route53_record" "lb" {
-  zone_id = var.dns_zone
+  zone_id = data.aws_route53_zone.zone.id
   name    = var.load_balancer_domain
   type    = "CNAME"
   ttl     = 300
@@ -86,9 +91,9 @@ resource "aws_lb_listener" "lb_http" {
 module "default_lb_certificate" {
   source = "../../modules/acm-certificate"
 
-  domains = {
-    (var.load_balancer_domain) = var.dns_zone,
-  }
+  domains = [
+    var.load_balancer_domain,
+  ]
 }
 
 resource "aws_lb_listener" "lb_https" {
