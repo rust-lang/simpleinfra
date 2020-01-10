@@ -28,19 +28,6 @@ jobs:
       - name: Ensure the terraform files are formatted correctly
         run: terraform fmt -check -diff -recursive
 
-      - name: Validate the terraform directory
-        run: |
-          cd terraform
-          for service in $(ls "${GITHUB_WORKSPACE}/terraform"); do
-            path="${GITHUB_WORKSPACE}/terraform/${service}"
-            if [[ -d "${path}" ]]; then
-              echo "validating ${service}"
-              cd "${path}"
-              terraform init -backend=false
-              terraform validate
-            fi
-          done
-
   actions-js:
     name: GitHub Actions (JS)
     runs-on: ubuntu-latest
