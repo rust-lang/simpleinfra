@@ -3,11 +3,6 @@
 // To create a new registry add a new call to the module. See
 // modules/ecr-repo/README.md for more information on what the module does.
 
-module "ecr_crater" {
-  source = "./modules/ecr-repo"
-  name   = "crater"
-}
-
 module "ecr_discord_mods_bot" {
   source = "./modules/ecr-repo"
   name   = "discord-mods-bot"
