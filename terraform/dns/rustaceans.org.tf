@@ -1,5 +1,7 @@
+// DNS records for the rustaceans.org domain.
+
 module "rustaceans_org" {
-  source = "./domain"
+  source = "./impl"
 
   domain  = "rustaceans.org"
   comment = "domain for nrc/rustaceans.org"
