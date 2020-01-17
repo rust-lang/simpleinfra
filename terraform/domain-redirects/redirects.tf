@@ -1,9 +1,4 @@
-// This file contains the definition of all the HTTP redirects from a subdomain
-// we control to another URL. See the documentation for information on our
-// setup, and how to make changes to it:
-//
-//    https://forge.rust-lang.org/infra/docs/dns.html
-//
+// Definition of the domain redirects we have.
 
 module "crates_io" {
   source = "./impl"
