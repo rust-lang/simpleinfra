@@ -5,8 +5,8 @@
 //    https://forge.rust-lang.org/infra/docs/dns.html
 //
 
-module "redirect_www_crates_io" {
-  source = "./modules/subdomain-redirect"
+module "crates_io" {
+  source = "./impl"
   providers = {
     aws       = aws
     aws.east1 = aws.east1
@@ -20,8 +20,8 @@ module "redirect_www_crates_io" {
   ]
 }
 
-module "redirect_docs_rs" {
-  source = "./modules/subdomain-redirect"
+module "docs_rs" {
+  source = "./impl"
   providers = {
     aws       = aws
     aws.east1 = aws.east1

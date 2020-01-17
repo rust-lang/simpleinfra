@@ -11,7 +11,7 @@ provider "aws" {
 }
 
 module "certificate" {
-  source = "../acm-certificate"
+  source = "../../shared/modules/acm-certificate"
   providers = {
     aws = aws.east1
   }
