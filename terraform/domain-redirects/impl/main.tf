@@ -1,14 +1,52 @@
 locals {
-  url_hash          = substr(sha1(var.to), 0, 7)
-  apex_domains      = [for d in var.from : d if length(split(".", d)) <= 2]
-  subdomains        = [for d in var.from : d if length(split(".", d)) > 2]
+  // Split the source domain names in two lists: one for the ones with a
+  // subdomain, and one for the ones without ("apex domains"). This will be
+  // used to create the proper DNS records.
+  apex_domains = [for d in var.from : d if length(split(".", d)) <= 2]
+  subdomains   = [for d in var.from : d if length(split(".", d)) > 2]
+
+  // Map of the source domain names and the corresponding top-level domain,
+  // used to retrieve the correct DNS Zone ID. For example, assuming the list
+  // of source domains is the following:
+  //
+  //    ["foo.bar.com", "bar.com", "foo.bar.baz.com"]
+  //
+  // The content of the variable will be:
+  //
+  //    {
+  //      "foo.bar.com"     = "bar.com",
+  //      "bar.com"         = "baz.com",
+  //      "foo.bar.baz.com" = "baz.com",
+  //    }
+  //
   top_level_domains = { for domain in var.from : domain => join(".", reverse(slice(reverse(split(".", domain)), 0, 2))) }
 }
 
+// Terraform boilerplate to define two connections to AWS: one for our default
+// region (us-west-1) and one for the us-east-1 region. Users of the module
+// are going to then forward the already-configured providers to it.
+
 provider "aws" {}
+
 provider "aws" {
   alias = "east1"
 }
+
+// S3 bucket used to perform the actual redirect when request comes in, thanks
+// to S3's static website hosting feature. The name of the bucket contains the
+// URL hash, to avoid collisions.
+
+resource "aws_s3_bucket" "redirect" {
+  bucket = "rust-http-redirect-${substr(sha1(var.to), 0, 7)}"
+  acl    = "public-read"
+
+  website {
+    redirect_all_requests_to = var.to
+  }
+}
+
+// CloudFront distribution used to cache the redirects near the users and to
+// add HTTPS support (S3 static websites are only available through HTTP).
 
 module "certificate" {
   source = "../../shared/modules/acm-certificate"
@@ -17,20 +55,6 @@ module "certificate" {
   }
 
   domains = var.from
-}
-
-data "aws_route53_zone" "zones" {
-  for_each = toset(values(local.top_level_domains))
-  name     = each.value
-}
-
-resource "aws_s3_bucket" "redirect" {
-  bucket = "rust-http-redirect-${local.url_hash}"
-  acl    = "public-read"
-
-  website {
-    redirect_all_requests_to = var.to
-  }
 }
 
 resource "aws_cloudfront_distribution" "redirect" {
@@ -79,6 +103,17 @@ resource "aws_cloudfront_distribution" "redirect" {
       restriction_type = "none"
     }
   }
+}
+
+// Create the DNS records for the source domain names.
+//
+// - For the ones with a subdomain, a standard CNAME record will be creatated.
+// - For the ones without a subdomain (like example.com or rust-lang.org), an
+//   ALIAS will be created for both IPv4 (A) and IPv6 (AAAA).
+
+data "aws_route53_zone" "zones" {
+  for_each = toset(values(local.top_level_domains))
+  name     = each.value
 }
 
 resource "aws_route53_record" "redirect_subdomain" {
