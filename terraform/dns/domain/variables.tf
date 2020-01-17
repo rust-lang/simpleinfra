@@ -1,31 +1,43 @@
+// Basic information about the domain.
+
 variable "domain" {
-  type = string
+  description = "Domain name of the domain managed by this module"
+  type        = string
 }
 
 variable "comment" {
-  type = string
+  description = "Comment about the domain, shown in the console"
+  type        = string
 }
 
 variable "ttl" {
-  type = number
+  description = "Cache TTL for the records created by the module"
+  type        = number
 }
 
+// List of records to create for this domain. Each record type has to be
+// defined in the variable related to its kind.
+
 variable "A" {
-  type    = map(list(string))
-  default = {}
+  description = "Map of A records and the list of their targets"
+  type        = map(list(string))
+  default     = {}
 }
 
 variable "CNAME" {
-  type    = map(list(string))
-  default = {}
+  description = "Map of CNAME records and the list of their targets"
+  type        = map(list(string))
+  default     = {}
 }
 
 variable "MX" {
-  type    = map(list(string))
-  default = {}
+  description = "Map of MX records and the list of their targets"
+  type        = map(list(string))
+  default     = {}
 }
 
 variable "TXT" {
-  type    = map(list(string))
-  default = {}
+  description = "Map of TXT records and the list of their content"
+  type        = map(list(string))
+  default     = {}
 }

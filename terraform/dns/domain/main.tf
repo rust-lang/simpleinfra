@@ -1,7 +1,16 @@
+// A Route53 zone is the container for all the DNS records of a domain. We
+// create one for the domain managed by this module, allowing us to add records
+// to it later in the file.
+
 resource "aws_route53_zone" "zone" {
   name    = var.domain
   comment = "[terraform] ${var.comment}"
 }
+
+// Each record requested in the module variables is then added to the zone
+// previously created. If you need to add a kind of record not currently
+// supported you'll need to both create a resource here and a variable in
+// `variables.tf`.
 
 resource "aws_route53_record" "a" {
   for_each = var.A
