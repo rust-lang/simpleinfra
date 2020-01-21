@@ -6,3 +6,5 @@
 node_modules
 __pycache__
 *.py[co]
+
+.aws-creds-mfa-arn

@@ -7,6 +7,7 @@ this repo require privileges only infra team members have.
 * [**ansible**](ansible/README.md): Ansible playbooks to deploy our servers
 * [**azure-configs**](azure-configs/README.md): shared CI templates for Azure
   Pipelines
+* [**aws-creds**](TODO): log into AWS with two factor authentication
 * [**github-actions**](github-actions/README.md): shared actions for GitHub
   Actions
 * [**restart-rcs**](#restart-rcs): redeploying [rust-central-station][rcs]
