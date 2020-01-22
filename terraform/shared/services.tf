@@ -113,6 +113,8 @@ module "service_docsrs" {
   ecr_repo       = module.ecr_docsrs
   storage_bucket = "rust-docs-rs"
   backups_bucket = "docs.rs-backups"
+
+  inventories_bucket_arn = aws_s3_bucket.rust_inventories.arn
 }
 
 module "service_ecs_cluster" {

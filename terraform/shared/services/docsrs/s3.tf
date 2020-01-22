@@ -3,6 +3,26 @@ resource "aws_s3_bucket" "storage" {
   acl    = "private"
 }
 
+resource "aws_s3_bucket_inventory" "storage" {
+  name    = "all-objects-csv"
+  bucket  = aws_s3_bucket.storage.id
+  enabled = true
+
+  included_object_versions = "Current"
+  optional_fields          = ["ETag", "ReplicationStatus", "Size"]
+
+  schedule {
+    frequency = "Weekly"
+  }
+  destination {
+    bucket {
+      bucket_arn = var.inventories_bucket_arn
+      prefix     = aws_s3_bucket.storage.id
+      format     = "CSV"
+    }
+  }
+}
+
 resource "aws_s3_bucket_public_access_block" "storage" {
   bucket = aws_s3_bucket.storage.id
 
