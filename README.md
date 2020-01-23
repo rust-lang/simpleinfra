@@ -7,7 +7,7 @@ this repo require privileges only infra team members have.
 * [**ansible**](ansible/README.md): Ansible playbooks to deploy our servers
 * [**azure-configs**](azure-configs/README.md): shared CI templates for Azure
   Pipelines
-* [**aws-creds**](TODO): log into AWS with two factor authentication
+* [**aws-creds**][aws-2fa]: log into AWS with two factor authentication
 * [**github-actions**](github-actions/README.md): shared actions for GitHub
   Actions
 * [**restart-rcs**](#restart-rcs): redeploying [rust-central-station][rcs]
@@ -21,6 +21,7 @@ this repo require privileges only infra team members have.
 
 The contents of this repository are released under the MIT license.
 
+[aws-2fa]: https://forge.rust-lang.org/infra/docs/aws-access.html#2-factor-authentication
 [team]: https://github.com/rust-lang/infra-team
 [rcs]: https://github.com/rust-lang/rust-central-station
 
