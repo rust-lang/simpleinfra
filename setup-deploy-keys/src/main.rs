@@ -5,7 +5,7 @@ use reqwest::{
 };
 use std::error::Error;
 use std::fs;
-use std::process::{Command, Stdio};
+use std::process::Command;
 use structopt::StructOpt;
 use travis_ci::TravisCI;
 
@@ -44,14 +44,9 @@ fn main() -> Result<(), Box<dyn Error>> {
         .arg("") // no passphrase
         .arg("-C")
         .arg(&comment));
-    let key = run_capture(
-        Command::new("base64")
-            .arg("-w")
-            .arg("0")
-            .arg("_ssh_keygen_tmp_out"),
-    );
+    let key = fs::read_to_string("_ssh_keygen_tmp_out").unwrap();
+    let key = base64::encode(&key);
     fs::remove_file("_ssh_keygen_tmp_out").unwrap();
-    let key = key.trim();
     let pubkey = fs::read_to_string("_ssh_keygen_tmp_out.pub").unwrap();
     fs::remove_file("_ssh_keygen_tmp_out.pub").unwrap();
 
@@ -61,7 +56,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         if let Some(repo) = travis.repo(&cli.repo)? {
             if repo.active {
                 println!("the repository is active on Travis CI, adding the environment var...");
-                travis.set_env_var(&cli.repo, "GITHUB_DEPLOY_KEY", key, false)?;
+                travis.set_env_var(&cli.repo, "GITHUB_DEPLOY_KEY", &key, false)?;
             }
         }
     }
@@ -102,10 +97,4 @@ fn main() -> Result<(), Box<dyn Error>> {
 fn run(cmd: &mut Command) {
     let status = cmd.status().unwrap();
     assert!(status.success());
-}
-
-fn run_capture(cmd: &mut Command) -> String {
-    let output = cmd.stderr(Stdio::inherit()).output().unwrap();
-    assert!(output.status.success());
-    String::from_utf8_lossy(&output.stdout).into()
 }
