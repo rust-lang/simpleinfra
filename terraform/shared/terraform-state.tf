@@ -8,7 +8,6 @@ locals {
   // List of IAM users authorized to access the Terraform bucket.
   terraform_state_users = [
     "acrichto",
-    "aidanhs",
     "pietroalbini",
     "simulacrum",
   ]
