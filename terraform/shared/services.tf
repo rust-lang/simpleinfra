@@ -8,27 +8,7 @@ module "service_bastion" {
   subnet_id                = aws_subnet.legacy.id
   common_security_group_id = aws_security_group.legacy_common.id
   key_pair                 = aws_key_pair.buildbot_west_slave_key.key_name
-
-  // Users allowed to connect to the bastion through SSH. Each user needs to
-  // have the CIDR of the static IP they want to connect from stored in AWS SSM
-  // Parameter Store (us-west-1), in a string key named:
-  //
-  //     /prod/bastion/allowed-ips/${user}
-  //
-  allowed_users = [
-    "acrichto",
-    "aidanhs",
-    "guillaumegomez",
-    "joshua",
-    "mozilla-mountain-view",
-    "mozilla-portland",
-    "mozilla-san-francisco",
-    "onur",
-    "pietro",
-    "quietmisdreavus",
-    "shep",
-    "simulacrum",
-  ]
+  allowed_users            = local.allowed_users
 }
 
 module "service_rustc_ci" {

@@ -10,6 +10,31 @@ data "aws_ssm_parameter" "triagebot" {
   name     = "/prod/ecs/triagebot/${each.value}"
 }
 
+resource "random_password" "db" {
+  length           = 25
+  special          = true
+  override_special = "_%@"
+}
+
+resource "postgresql_role" "triagebot" {
+  name     = "triagebot"
+  login    = true
+  password = random_password.db.result
+}
+
+resource "postgresql_database" "triagebot" {
+  name              = "triagebot"
+  owner             = postgresql_role.triagebot.name
+  template          = "template0"
+  lc_collate        = "en_US.UTF-8"
+  lc_ctype          = "en_US.UTF-8"
+  allow_connections = true
+}
+
+data "aws_db_instance" "database" {
+    db_instance_identifier = "shared"
+}
+
 module "ecs_task" {
   source = "../../modules/ecs-task"
 
@@ -46,6 +71,10 @@ module "ecs_task" {
       {
         "name": "RUST_LOG",
         "value": "parser=trace,triagebot=trace"
+      },
+      {
+        "name": "DATABASE_URL",
+        "value": "postgres://triagebot:${random_password.db.result}@${data.aws_db_instance.database.address}/triagebot"
       }
     ],
     "secrets": [
