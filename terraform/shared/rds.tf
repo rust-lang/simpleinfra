@@ -36,6 +36,14 @@ resource "aws_security_group" "rust_prod_db" {
     }
   }
 
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    security_groups = [module.service_ecs_cluster.config.service_security_group_id]
+    description = "Connections from ECS"
+  }
+
   tags = {
     Name = "rust-prod-database"
   }
