@@ -1,0 +1,11 @@
+name: Simple CI
+description: Easily build and test Rust projects.
+
+inputs:
+  check_fmt:
+    description: Check code formatting
+    required: false
+
+runs:
+  using: node12
+  main: dist/index.js
