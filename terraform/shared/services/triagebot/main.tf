@@ -6,8 +6,13 @@ module "ecr" {
 }
 
 data "aws_ssm_parameter" "triagebot" {
-  for_each = toset(["github-token", "webhook-secret", "zulip-token"])
-  name     = "/prod/ecs/triagebot/${each.value}"
+  for_each = toset([
+    "github-token",
+    "webhook-secret",
+    "zulip-token",
+    "zulip-api-token",
+  ])
+  name = "/prod/ecs/triagebot/${each.value}"
 }
 
 resource "random_password" "db" {
@@ -89,6 +94,10 @@ module "ecs_task" {
       {
         "name": "ZULIP_TOKEN",
         "valueFrom": "${data.aws_ssm_parameter.triagebot["zulip-token"].arn}"
+      },
+      {
+        "name": "ZULIP_API_TOKEN",
+        "valueFrom": "${data.aws_ssm_parameter.triagebot["zulip-api-token"].arn}"
       }
     ]
   }
