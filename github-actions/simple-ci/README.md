@@ -5,13 +5,34 @@ See [`actions.yml`] for configuration options.
 
 [`actions.yml`]: ./actions.yml
 
-## Example
-This example builds an mdbook project on linux.
+## Examples
 
+### Simple
+This builds, tests, and checks the formatting of your project.
 ```yaml
 - uses: rust-lang/simpleinfra/github-actions/simple-ci@master
   with:
     check_fmt: true
+```
+
+### Complete Template
+This template builds and tests your project on stable, beta, and nightly across
+linux, macos, windows.
+
+```yaml
+name: CI
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - run: rustup default ${{ matrix.channel }}
+      - uses: rust-lang/simpleinfra/github-actions/simple-ci@master
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        channel: [stable, beta, nightly]
 ```
 
 ## Development
