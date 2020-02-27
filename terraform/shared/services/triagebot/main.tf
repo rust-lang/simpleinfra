@@ -118,5 +118,6 @@ module "ecs_service" {
 
   domains = [
     var.domain_name,
+    "triage.rust-lang.org",
   ]
 }
