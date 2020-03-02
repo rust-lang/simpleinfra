@@ -1,25 +1,8 @@
-// This file defines the users and permissions related to docs.rs team members
-// with access to the production environment.
-
-locals {
-  docs_rs = [
-    "jynelson",
-  ]
-}
-
-resource "aws_iam_user" "docs_rs" {
-  for_each = toset(local.docs_rs)
-  name     = each.value
-}
+// This file defines the permissions of docs.rs team members with access to the
+// production environment.
 
 resource "aws_iam_group" "docs_rs" {
   name = "docs-rs"
-}
-
-resource "aws_iam_user_group_membership" "docs_rs" {
-  for_each = aws_iam_user.docs_rs
-  user     = each.key
-  groups   = [aws_iam_group.docs_rs.name]
 }
 
 resource "aws_iam_group_policy_attachment" "docs_rs_manage_own_credentials" {
