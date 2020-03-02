@@ -99,7 +99,8 @@ EOF
 }
 
 # Prevent any action from the user unless they logged in with 2-factor
-# authentication.
+# authentication. Changing the password is also allowed, to allow resetting the
+# password during the first login.
 resource "aws_iam_policy" "enforce_mfa" {
   name   = "enforce-mfa"
   policy = <<EOF
@@ -116,6 +117,7 @@ resource "aws_iam_policy" "enforce_mfa" {
         "iam:ListMFADevices",
         "iam:ListVirtualMFADevices",
         "iam:ResyncMFADevice",
+        "iam:ChangePassword",
         "sts:GetSessionToken"
       ],
       "Resource": "*",
