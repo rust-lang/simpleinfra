@@ -118,7 +118,7 @@
         - name: crater
           rules:
             - alert: StuckAgent
-              expr: (sum by (agent) (increase(crater_completed_jobs_total{job="crater"}[5m]))) == 0 and (sum by (agent) (crater_agent_supposed_to_work{job="crater"}))
+              expr: (sum by (agent) (increase(crater_completed_jobs_total{job="crater"}[5m]))) == 0 and (sum by (agent) (crater_agent_supposed_to_work{job="crater"})) == 1
               for: 25m
               annotations:
                 summary: "Crater agent {{ '{{ $labels.agent }}' }} is stuck"
