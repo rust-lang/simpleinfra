@@ -37,7 +37,6 @@ locals {
     "mozilla-san-francisco",
     "onur",
     "pietro",
-    "quietmisdreavus",
     "shep",
     "simulacrum",
   ]
