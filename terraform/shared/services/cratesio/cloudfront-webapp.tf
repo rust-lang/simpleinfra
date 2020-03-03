@@ -97,6 +97,10 @@ resource "aws_cloudfront_distribution" "webapp" {
       include_cookies = false
     }
   }
+
+  tags = {
+    TeamAccess = "crates-io"
+  }
 }
 
 resource "aws_route53_record" "webapp" {

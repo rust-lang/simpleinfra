@@ -56,6 +56,10 @@ resource "aws_cloudfront_distribution" "static" {
       include_cookies = false
     }
   }
+
+  tags = {
+    TeamAccess = "crates-io"
+  }
 }
 
 data "aws_route53_zone" "static" {
