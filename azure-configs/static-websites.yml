@@ -24,7 +24,7 @@ steps:
       # Ensure GitHub doesn't mess around with the uploaded file.
       # Without the file, for example, files with an underscore in the name won't
       # be included in the pages.
-      touch $RUSTINFRA_DEPLOY_DIR/.nojekyll
+      touch $DEPLOY_DIR/.nojekyll
       # Download, compile and run the deploy script
       curl -LsSf https://raw.githubusercontent.com/rust-lang/simpleinfra/master/setup-deploy-keys/src/deploy.rs | rustc - -o /tmp/deploy
       (cd $DEPLOY_DIR && /tmp/deploy)
