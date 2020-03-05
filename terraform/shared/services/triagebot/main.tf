@@ -15,29 +15,28 @@ data "aws_ssm_parameter" "triagebot" {
   name = "/prod/ecs/triagebot/${each.value}"
 }
 
-resource "random_password" "db" {
-  length           = 25
-  special          = true
-  override_special = "_%@"
+data "aws_ssm_parameter" "database_url" {
+  name = "/prod/rds/shared/connection-urls/triagebot"
 }
 
-resource "postgresql_role" "triagebot" {
-  name     = "triagebot"
-  login    = true
-  password = random_password.db.result
+resource "aws_iam_policy" "read_database_url" {
+  name = "ecs--triagebot"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "AllowReadingConnectionUrl"
+        Effect   = "Allow"
+        Action   = "ssm:GetParameters"
+        Resource = data.aws_ssm_parameter.database_url.arn
+      }
+    ]
+  })
 }
 
-resource "postgresql_database" "triagebot" {
-  name              = "triagebot"
-  owner             = postgresql_role.triagebot.name
-  template          = "template0"
-  lc_collate        = "en_US.UTF-8"
-  lc_ctype          = "en_US.UTF-8"
-  allow_connections = true
-}
-
-data "aws_db_instance" "database" {
-  db_instance_identifier = "shared"
+resource "aws_iam_role_policy_attachment" "read_database_url" {
+  role       = module.ecs_task.execution_role_name
+  policy_arn = aws_iam_policy.read_database_url.arn
 }
 
 module "ecs_task" {
@@ -76,10 +75,6 @@ module "ecs_task" {
       {
         "name": "RUST_LOG",
         "value": "parser=trace,triagebot=trace"
-      },
-      {
-        "name": "DATABASE_URL",
-        "value": "postgres://triagebot:${random_password.db.result}@${data.aws_db_instance.database.address}/triagebot"
       }
     ],
     "secrets": [
@@ -98,6 +93,10 @@ module "ecs_task" {
       {
         "name": "ZULIP_API_TOKEN",
         "valueFrom": "${data.aws_ssm_parameter.triagebot["zulip-api-token"].arn}"
+      },
+      {
+        "name": "DATABASE_URL",
+        "valueFrom": "${data.aws_ssm_parameter.database_url.arn}"
       }
     ]
   }
