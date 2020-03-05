@@ -75,6 +75,20 @@ resource "aws_cloudfront_distribution" "webapp" {
     }
   }
 
+  // Stop CloudFront from caching error responses.
+  //
+  // Before we did this users were seeing error pages even after we resolved
+  // outages, forcing us to invalidate the caches every time. The team agreed
+  // the best solution was instead to stop CloudFront from caching error
+  // responses altogether.
+  dynamic "custom_error_response" {
+    for_each = toset([400, 403, 404, 405, 414, 500, 501, 502, 503, 504])
+    content {
+      error_code            = custom_error_response.value
+      error_caching_min_ttl = 0
+    }
+  }
+
   tags = {
     TeamAccess = "docs-rs"
   }
