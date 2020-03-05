@@ -25,3 +25,7 @@ output "allowed_users" {
 output "ecs_cluster_config" {
   value = module.service_ecs_cluster.config
 }
+
+output "inventories_bucket_arn" {
+  value = aws_s3_bucket.rust_inventories.arn
+}

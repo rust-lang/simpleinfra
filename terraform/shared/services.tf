@@ -88,14 +88,6 @@ module "service_cratesio_staging" {
   iam_prefix = "staging-crates-io"
 }
 
-module "service_docsrs" {
-  source         = "./services/docsrs"
-  storage_bucket = "rust-docs-rs"
-  backups_bucket = "docs.rs-backups"
-
-  inventories_bucket_arn = aws_s3_bucket.rust_inventories.arn
-}
-
 module "service_ecs_cluster" {
   source = "./services/ecs-cluster"
 
