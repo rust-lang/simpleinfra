@@ -36,5 +36,5 @@ resource "aws_ssm_parameter" "connection_urls" {
 
   name  = "/prod/rds/shared/connection-urls/${each.value}"
   type  = "SecureString"
-  value = "postgres://${each.value}:${random_password.users[each.value].result}@${aws_db_instance.primary.address}/${each.value}"
+  value = "postgres://${each.value}:${random_password.users[each.value].result}@${aws_db_instance.shared.address}/${each.value}"
 }

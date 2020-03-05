@@ -1,4 +1,4 @@
-resource "random_password" "database" {
+resource "random_password" "shared_root" {
   length           = 25
   special          = true
   override_special = "_%@"
@@ -6,7 +6,7 @@ resource "random_password" "database" {
 
 resource "aws_db_subnet_group" "public" {
   name       = "public"
-  subnet_ids = module.vpc_prod.public_subnets
+  subnet_ids = data.terraform_remote_state.shared.outputs.prod_vpc.public_subnets
 
   tags = {
     Name = "primary db subnet"
@@ -16,17 +16,17 @@ resource "aws_db_subnet_group" "public" {
 # All of this security group stuff should go away once we migrate bastion to the
 # prod vpc (vs. the legacy vpc).
 data "aws_ssm_parameter" "allowed_ips" {
-  for_each = toset(local.allowed_users)
+  for_each = toset(data.terraform_remote_state.shared.outputs.allowed_users)
   name     = "/prod/bastion/allowed-ips/${each.value}"
 }
 
 resource "aws_security_group" "rust_prod_db" {
-  vpc_id      = module.vpc_prod.id
+  vpc_id      = data.terraform_remote_state.shared.outputs.prod_vpc.id
   name        = "rust-prod-database"
   description = "Access to the shared database from whitelisted networks"
 
   dynamic "ingress" {
-    for_each = toset(local.allowed_users)
+    for_each = toset(data.terraform_remote_state.shared.outputs.allowed_users)
     content {
       from_port   = 5432
       to_port     = 5432
@@ -40,7 +40,7 @@ resource "aws_security_group" "rust_prod_db" {
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
-    security_groups = [module.service_ecs_cluster.config.service_security_group_id]
+    security_groups = [data.terraform_remote_state.shared.outputs.ecs_cluster_config.service_security_group_id]
     description     = "Connections from ECS"
   }
 
@@ -49,7 +49,7 @@ resource "aws_security_group" "rust_prod_db" {
   }
 }
 
-resource "aws_db_instance" "primary" {
+resource "aws_db_instance" "shared" {
   allocated_storage    = 20
   storage_type         = "gp2"
   engine               = "postgres"
@@ -57,7 +57,7 @@ resource "aws_db_instance" "primary" {
   instance_class       = "db.t3.micro"
   identifier           = "shared"
   username             = "root"
-  password             = random_password.database.result
+  password             = random_password.shared_root.result
   db_subnet_group_name = aws_db_subnet_group.public.name
   apply_immediately    = true
 
@@ -65,15 +65,4 @@ resource "aws_db_instance" "primary" {
   publicly_accessible    = true
   vpc_security_group_ids = [aws_security_group.rust_prod_db.id]
   skip_final_snapshot    = true
-}
-
-provider "postgresql" {
-  host            = aws_db_instance.primary.address
-  port            = aws_db_instance.primary.port
-  database        = "postgres"
-  username        = aws_db_instance.primary.username
-  password        = aws_db_instance.primary.password
-  sslmode         = "require"
-  connect_timeout = 15
-  superuser       = false
 }
