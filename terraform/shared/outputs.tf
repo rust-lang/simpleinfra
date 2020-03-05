@@ -8,3 +8,20 @@ output "legacy_vpc" {
     common_security_group_id = aws_security_group.legacy_common.id
   }
 }
+
+output "prod_vpc" {
+  value = {
+    id                = module.vpc_prod.id
+    public_subnets    = module.vpc_prod.public_subnets
+    private_subnets   = module.vpc_prod.private_subnets
+    untrusted_subnets = module.vpc_prod.untrusted_subnets
+  }
+}
+
+output "allowed_users" {
+  value = local.allowed_users
+}
+
+output "ecs_cluster_config" {
+  value = module.service_ecs_cluster.config
+}
