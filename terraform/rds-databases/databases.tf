@@ -1,5 +1,6 @@
 locals {
   databases = [
+    "discord-mods-bot",
     "triagebot",
   ]
 }
