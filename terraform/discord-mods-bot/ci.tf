@@ -8,7 +8,8 @@ module "ecr" {
 }
 
 // IAM User used by CI to push images to the repository created above. The user
-// only has permissions to pull and push to the repository created earlier.
+// has permissions to pull and push to the repository created earlier, and to
+// redeploy the ECS service of the bot.
 //
 // The IAM Access Key is stored in AWS SSM Parameter Store under the key:
 //
