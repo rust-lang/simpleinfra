@@ -20,4 +20,6 @@ resource "aws_iam_user_group_membership" "users" {
   for_each = local.users
   user     = each.key
   groups   = each.value
+
+  depends_on = [aws_iam_user.users]
 }
