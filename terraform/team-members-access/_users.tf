@@ -6,8 +6,9 @@ locals {
     "acrichto"     = [aws_iam_group.infra_admins.name],
     "jynelson"     = [aws_iam_group.docs_rs.name],
     "pietroalbini" = [aws_iam_group.infra_admins.name],
+    "sgrif"        = [aws_iam_group.crates_io.name],
     "simulacrum"   = [aws_iam_group.infra_admins.name],
-    "sgrif"        = [aws_iam_group.crates_io.name]
+    "technetos"    = [aws_iam_group.mods_discord.name],
   }
 }
 
