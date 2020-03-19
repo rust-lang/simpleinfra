@@ -10,8 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.1.1",
-    "node-fetch": "^2.6.0",
-    "ps-list": "^6.3.0"
+    "node-fetch": "^2.6.0"
   },
   "devDependencies": {
     "@zeit/ncc": "^0.20.5"
