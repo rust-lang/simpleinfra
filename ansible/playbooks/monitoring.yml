@@ -109,6 +109,8 @@
             - alert: DocsRsDown
               expr: up{job="docsrs"} == 0
               for: 1m
+              labels:
+                dispatch: docsrs
               annotations:
                 summary: "docs.rs is down"
                 description: "Prometheus wasn't able to reach the docs.rs website for more than a minute."
