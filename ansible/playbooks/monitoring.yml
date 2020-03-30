@@ -106,6 +106,13 @@
 
         - name: docsrs
           rules:
+            - alert: DocsRsDown
+              expr: up{job="docsrs"} == 0
+              for: 1m
+              annotations:
+                summary: "docs.rs is down"
+                description: "Prometheus wasn't able to reach the docs.rs website for more than a minute."
+
             - alert: LongQueue
               expr: docsrs_queued_crates_count{job="docsrs"} >= 100
               for: 1h
