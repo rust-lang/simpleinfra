@@ -11,6 +11,7 @@ data "aws_ssm_parameter" "triagebot" {
     "webhook-secret",
     "zulip-token",
     "zulip-api-token",
+    "github-app-private-key",
   ])
   name = "/prod/ecs/triagebot/${each.value}"
 }
@@ -93,6 +94,10 @@ module "ecs_task" {
       {
         "name": "ZULIP_API_TOKEN",
         "valueFrom": "${data.aws_ssm_parameter.triagebot["zulip-api-token"].arn}"
+      },
+      {
+        "name": "GITHUB_APP_PRIVATE_KEY",
+        "valueFrom": "${data.aws_ssm_parameter.triagebot["github-app-private-key"].arn}"
       },
       {
         "name": "DATABASE_URL",
