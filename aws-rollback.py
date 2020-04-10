@@ -6,6 +6,8 @@ import sys
 
 DEFAULT_REPOSITORY_NAME = "rust-central-station"
 TARGET_TAG = 'latest'
+ECS_CLUSTER = 'rust-ecs-prod'
+ECS_SERVICE = 'TODO COMPLETE'
 
 def main():
     """CLI entrypoint of the program."""
@@ -27,6 +29,9 @@ def main():
     manifest = get_image_manifest(repository_name, image["imageTag"])
     retag_image(repository_name,manifest)
     eprint(f"image {image} retaged as '{TARGET_TAG}'")
+    redeployed = force_redeploy()
+    if redeployed:
+        eprint(f"successfully rollback and re-deploy")
 
 def let_user_pick_image(images):
     print("Please choosean image to rollback:")
@@ -80,9 +85,23 @@ def retag_image(repository_name, manifest):
             "--image-tag", TARGET_TAG
         ]).stdout)
     except subprocess.CalledProcessError as e:
-        err(f"failed to tag image as {TARGET_TAG}")
+        err(f"failed to re-tag image as {TARGET_TAG}")
 
     return True
+
+def force_redeploy():
+    """Force redeploy on ecs"""
+    try:
+        out = json.loads( run_command([
+            "aws", "ecs", "update-service",
+            "--cluster", ECS_CLUSTER,
+            "--service", ECS_SERVICE,
+            "--force-new-deployment"
+        ]).stdout)
+
+        return True
+    except subprocess.CalledProcessError as e:
+        err(f"failed to re-deploy service {ECS_SERVICE}")
 
 
 ###############
