@@ -18,7 +18,7 @@ def main():
         if selected_image_index == -1:
             exit(0)
 
-        if not ( selected_image_index is None ):
+        if selected_image_index is not None:
             break
 
     image = images[selected_image_index]
