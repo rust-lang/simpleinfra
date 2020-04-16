@@ -4,14 +4,14 @@ import json
 import subprocess
 import sys
 
-DEFAULT_REPOSITORY_NAME = "rust-central-station"
 TARGET_TAG = 'latest'
 ECS_CLUSTER = 'rust-ecs-prod'
-ECS_SERVICE = 'TODO COMPLETE'
 
 def main():
     """CLI entrypoint of the program."""
-    repository_name = DEFAULT_REPOSITORY_NAME if len(sys.argv) < 2 else sys.argv[1]
+    if len(sys.argv) < 2:
+        usage()
+    repository_name = sys.argv[1]
     images = get_images(repository_name)
     while True:
         selected_image_index = let_user_pick_image(images)
@@ -29,9 +29,10 @@ def main():
     manifest = get_image_manifest(repository_name, image["imageTag"])
     retag_image(repository_name,manifest)
     eprint(f"image {image} retaged as '{TARGET_TAG}'")
-    redeployed = force_redeploy()
-    if redeployed:
-        eprint(f"successfully rollback and re-deploy")
+    if can_redeploy(repository_name):
+        redeployed = force_redeploy()
+        if redeployed:
+            eprint(f"successfully rollback and re-deploy")
 
 def let_user_pick_image(images):
     print("Please choosean image to rollback:")
@@ -89,24 +90,49 @@ def retag_image(repository_name, manifest):
 
     return True
 
-def force_redeploy():
+def can_redeploy(repository_name):
+    """return True IFF there is a service with the same name of the repository."""
+    try:
+        out = json.loads( run_command([
+            "aws", "ecs", "list-services",
+            "--cluster", ECS_CLUSTER,
+            "--no-paginate"
+        ]).stdout)
+
+        services = out["serviceArns"]
+        for service in services:
+            # last part of arn is the service name.
+            if repository_name == service.split('/')[-1]:
+                return True
+
+        return False
+    except subprocess.CalledProcessError as e:
+        err(f"failed to list services in cluste {ECS_CLUSTER}")
+
+def force_redeploy(service_name):
     """Force redeploy on ecs"""
     try:
         out = json.loads( run_command([
             "aws", "ecs", "update-service",
             "--cluster", ECS_CLUSTER,
-            "--service", ECS_SERVICE,
+            "--service", service_name,
             "--force-new-deployment"
         ]).stdout)
 
         return True
     except subprocess.CalledProcessError as e:
-        err(f"failed to re-deploy service {ECS_SERVICE}")
+        err(f"failed to re-deploy service {service_name}")
 
 
 ###############
 #  Utilities  #
 ###############
+
+def usage():
+    """ print usage help and exit."""
+    print("error: missing argument, you need to pass the repository name to use. e.g:")
+    print("aws-rollback.py <repository name>")
+    exit(1)
 
 def eprint(*args, **kwargs):
     """Just like print(), but outputs on stderr."""
