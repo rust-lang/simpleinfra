@@ -35,7 +35,7 @@ def main():
             eprint(f"successfully rollback and re-deploy")
 
 def let_user_pick_image(images):
-    print("Please choosean image to rollback:")
+    print("Please choose an image to rollback:")
     for idx, image in enumerate(images):
         print("{}) {}".format(idx+1,image["imageTag"]))
     i = input("Enter image number(or 0 to exit): ")
