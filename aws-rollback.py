@@ -51,6 +51,7 @@ def let_user_pick_image(images, isRetry=None):
         print("")
     else:
         print(f"Invalid value, please check the list of possible values...\n")
+
     i = input("Enter image number(or 0 to exit): ")
     try:
         idx = int(i)
