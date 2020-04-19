@@ -3,6 +3,7 @@
 import json
 import subprocess
 import sys
+from datetime import datetime
 
 TARGET_TAG = 'latest'
 ECS_CLUSTER = 'rust-ecs-prod'
@@ -13,31 +14,43 @@ def main():
         usage()
     repository_name = sys.argv[1]
     images = get_images(repository_name)
+    isRetry = None
     while True:
-        selected_image_index = let_user_pick_image(images)
+        selected_image_index = let_user_pick_image(images, isRetry)
         if selected_image_index == -1:
             exit(0)
 
         if selected_image_index is not None:
             break
+        else:
+            isRetry = True
 
     image = images[selected_image_index]
-    if image["imageTag"] == TARGET_TAG:
+    imageTags = image.get("imageTags",[])
+    if TARGET_TAG in imageTags:
         err(f"selected image already tagged as {TARGET_TAG}")
 
-    eprint(f"selected option: {image}")
-    manifest = get_image_manifest(repository_name, image["imageTag"])
+    eprint(f"selected option: {image}\n")
+    manifest = get_image_manifest(repository_name, image["imageDigest"])
     retag_image(repository_name,manifest)
-    eprint(f"image {image} retaged as '{TARGET_TAG}'")
+    image_pushed_at = datetime.fromtimestamp(image["imagePushedAt"])
+    eprint(f"image pushed at {image_pushed_at} retaged as '{TARGET_TAG}'\n")
     if can_redeploy(repository_name):
         redeployed = force_redeploy()
-        if redeployed:
-            eprint(f"successfully rollback and re-deploy")
+        print("{}".format("successfully rollback and re-deploy" if redeployed else "Successfully rolled back the image, but redeploying the service with the same name failed"))
+    else:
+        eprint(f"Successfully rolled back the image, but no service with the same name to redeploy found")
 
-def let_user_pick_image(images):
-    print("Please choosean image to rollback:")
-    for idx, image in enumerate(images):
-        print("{}) {}".format(idx+1,image["imageTag"]))
+def let_user_pick_image(images, isRetry=None):
+    if isRetry is None:
+        print("Please choosean image to rollback:\n")
+        for idx, image in enumerate(images):
+            image_pushed_at = datetime.fromtimestamp(image["imagePushedAt"])
+            tags = ", ".join(image.get("imageTags", []))
+            print("{}) {} {}".format(idx+1,image_pushed_at,"("+tags+")" if tags != "" else ""))
+        print("")
+    else:
+        print(f"Invalid value, please check the list of possible values...\n")
     i = input("Enter image number(or 0 to exit): ")
     try:
         idx = int(i)
@@ -52,23 +65,22 @@ def get_images(repository_name):
     eprint("obtaining available images")
     try:
         out = json.loads( run_command([
-            "aws", "ecr", "list-images",
+            "aws", "ecr", "describe-images",
             "--repository-name", repository_name,
-            "--filter", "{\"tagStatus\": \"TAGGED\"}",
             "--no-paginate"
         ]).stdout)
     except subprocess.CalledProcessError as e:
         err(f"failed to get availabe images from repository: {e}" )
 
-    return out["imageIds"]
+    return out["imageDetails"]
 
-def get_image_manifest(repository_name, imageTag):
+def get_image_manifest(repository_name, imageDigest):
     """Call ecr batch-get-image to get the image manifest"""
     try:
         out = json.loads( run_command([
             "aws", "ecr", "batch-get-image",
             "--repository-name", repository_name,
-            "--image-ids", "imageTag={}".format(imageTag)
+            "--image-ids", "imageDigest={}".format(imageDigest)
         ]).stdout)
     except subprocess.CalledProcessError as e:
         err(f"failed to get availabe images from repository: {e}" )
