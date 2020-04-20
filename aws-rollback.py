@@ -73,7 +73,7 @@ def get_images(repository_name):
     except subprocess.CalledProcessError as e:
         err(f"failed to get availabe images from repository: {e}" )
 
-    return out["imageDetails"]
+    return list(sorted(out["imageDetails"], key=lambda image: image["imagePushedAt"], reverse=True))
 
 def get_image_manifest(repository_name, imageDigest):
     """Call ecr batch-get-image to get the image manifest"""
