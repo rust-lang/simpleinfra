@@ -52,6 +52,7 @@
               - "{{ inventory_hostname }}:9100"
               - crater-aws-1.infra.rust-lang.org:9100
               - crater-azure-1.infra.rust-lang.org:9100
+              - crater-azure-2.infra.rust-lang.org:9100
               - perf.rust-lang.org:9100
               - bots.infra.rust-lang.org:9100
               - rcs.infra.rust-lang.org:9100
