@@ -10,6 +10,7 @@ locals {
     "acrichto",
     "pietroalbini",
     "simulacrum",
+    "nellshamrell",
   ]
 }
 
