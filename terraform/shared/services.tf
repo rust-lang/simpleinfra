@@ -13,18 +13,30 @@ module "service_bastion" {
 
 module "service_rustc_ci" {
   source = "./services/rustc-ci"
+  providers = {
+    aws       = aws
+    aws.east1 = aws.east1
+  }
 
   iam_prefix       = "ci--rust-lang--rust"
   caches_bucket    = "rust-lang-ci-sccache2"
+  caches_domain    = "ci-caches.rust-lang.org"
   artifacts_bucket = "rust-lang-ci2"
+  artifacts_domain = "ci-artifacts.rust-lang.org"
 }
 
 module "service_rustc_ci_gha" {
   source = "./services/rustc-ci"
+  providers = {
+    aws       = aws
+    aws.east1 = aws.east1
+  }
 
   iam_prefix       = "gha"
   caches_bucket    = "rust-lang-gha-caches"
+  caches_domain    = "ci-caches-gha.rust-lang.org"
   artifacts_bucket = "rust-lang-gha"
+  artifacts_domain = "ci-artifacts-gha.rust-lang.org"
 }
 
 module "service_dev_releases_cdn" {

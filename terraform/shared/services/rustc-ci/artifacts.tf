@@ -105,3 +105,13 @@ resource "aws_iam_user_policy_attachment" "artifacts_write" {
   user       = aws_iam_user.artifacts.name
   policy_arn = aws_iam_policy.artifacts_write.arn
 }
+
+module "static_website_ci_artifacts" {
+  source = "../../modules/static-website"
+  providers = {
+    aws = aws.east1
+  }
+
+  domain_name        = var.artifacts_domain
+  origin_domain_name = aws_s3_bucket.artifacts.bucket_regional_domain_name
+}

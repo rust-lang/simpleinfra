@@ -98,3 +98,13 @@ resource "aws_iam_user_policy_attachment" "caches_write" {
   user       = aws_iam_user.caches.name
   policy_arn = aws_iam_policy.caches_write.arn
 }
+
+module "static_website_ci_caches" {
+  source = "../../modules/static-website"
+  providers = {
+    aws = aws.east1
+  }
+
+  domain_name        = var.caches_domain
+  origin_domain_name = aws_s3_bucket.caches.bucket_regional_domain_name
+}
