@@ -4,11 +4,12 @@
 // same application.
 
 resource "aws_lb" "lb" {
-  name               = var.cluster_name
-  load_balancer_type = "application"
-  subnets            = var.load_balancer_subnet_ids
-  security_groups    = [aws_security_group.lb.id]
-  ip_address_type    = "dualstack"
+  name                       = var.cluster_name
+  load_balancer_type         = "application"
+  subnets                    = var.load_balancer_subnet_ids
+  security_groups            = [aws_security_group.lb.id]
+  ip_address_type            = "dualstack"
+  drop_invalid_header_fields = true
 
   tags = {
     Name = var.cluster_name

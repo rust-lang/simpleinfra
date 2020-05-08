@@ -93,7 +93,6 @@ resource "aws_s3_bucket_inventory" "rust_lang_ci_mirrors" {
 
 resource "aws_s3_bucket" "temp_logs_cratesio" {
   bucket = "rust-temp-cratesio-logs"
-  acl    = "private"
 
   lifecycle_rule {
     id      = "clean logs"
@@ -106,6 +105,19 @@ resource "aws_s3_bucket" "temp_logs_cratesio" {
     noncurrent_version_expiration {
       days = 7
     }
+  }
+
+  grant {
+    id          = data.aws_canonical_user_id.current.id
+    type        = "CanonicalUser"
+    permissions = ["FULL_CONTROL"]
+  }
+
+  # CloudFront access for log storage
+  grant {
+    id          = "c4c1ede66af53448b93c283ce9448c4ba468c9432aa01d700d3878632f77d2d0"
+    type        = "CanonicalUser"
+    permissions = ["FULL_CONTROL"]
   }
 }
 
