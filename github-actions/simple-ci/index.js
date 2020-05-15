@@ -10,11 +10,7 @@ const checkFmt = actions.getInput('check_fmt') || false
 async function main () {
   try {
     if (checkFmt) {
-      try {
-        await exec.exec('which', 'rustfmt')
-      } catch {
-        await exec.exec('rustup', ['component', 'add', 'rustfmt'])
-      }
+      await exec.exec('rustup', ['component', 'add', 'rustfmt'])
       await exec.exec('cargo', ['fmt', '--', '--check'])
     }
 
