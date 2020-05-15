@@ -15,7 +15,7 @@ async function main () {
       } catch {
         await exec.exec('rustup', ['component', 'add', 'rustfmt'])
       }
-      await exec.exec('cargo', ['fmt', '--check'])
+      await exec.exec('cargo', ['fmt', '--', '--check'])
     }
 
     await exec.exec('cargo', ['build', '--workspace'])
