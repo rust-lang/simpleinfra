@@ -18,7 +18,7 @@ data "aws_ssm_parameter" "crates_io_ops_bot" {
       "github_repo",
       "github_token"
   ])
-  name     = "prod/ecs/crates_io_ops_bot/${each.value}"
+  name     = "/prod/ecs/crates_io_ops_bot/${each.value}"
 }
 
 module "ecs_task" {
