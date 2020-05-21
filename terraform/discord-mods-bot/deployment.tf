@@ -71,6 +71,10 @@ module "ecs_task" {
       {
         "name": "TALK_ID",
         "value": "531929276086484992"
+      },
+      {
+        "name": "WG_AND_TEAMS",
+        "value": "590248810127818752"
       }
     ],
     "secrets": [
