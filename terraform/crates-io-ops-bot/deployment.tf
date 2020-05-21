@@ -11,23 +11,23 @@ module "ecr" {
 // The values are added to ASM manually
 data "aws_ssm_parameter" "crates_io_ops_bot" {
   for_each = toset([
-      "discord_token",
-      "heroku_api_key",
-      "build_check_interval",
-      "github_org",
-      "github_repo",
-      "github_token"
+    "discord_token",
+    "heroku_api_key",
+    "build_check_interval",
+    "github_org",
+    "github_repo",
+    "github_token"
   ])
-  name     = "/prod/ecs/crates_io_ops_bot/${each.value}"
+  name = "/prod/ecs/crates_io_ops_bot/${each.value}"
 }
 
 module "ecs_task" {
-    source = "../shared/modules/ecs-task"
+  source = "../shared/modules/ecs-task"
 
-    name   = "crates_io_ops"
-    cpu    = 256
-    memory = 512
-      log_retention_days = 7
+  name               = "crates_io_ops"
+  cpu                = 256
+  memory             = 512
+  log_retention_days = 7
   ecr_repositories_arns = [
     module.ecr.arn,
   ]
