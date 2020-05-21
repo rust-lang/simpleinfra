@@ -73,7 +73,7 @@ module "ecs_task" {
         "value": "531929276086484992"
       },
       {
-        "name": "WG_AND_TEAMS",
+        "name": "WG_AND_TEAMS_ID",
         "value": "590248810127818752"
       }
     ],
