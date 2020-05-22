@@ -21,6 +21,12 @@ variable "containers" {
   EOD
 }
 
+variable "volume" {
+  type        = object({ file_system_id = string, root_directory = string })
+  description = "optional efs volume"
+  default     = null
+}
+
 variable "log_retention_days" {
   type        = number
   description = "After how many days should CloudWatch purge the logs"

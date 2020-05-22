@@ -1,9 +1,10 @@
 resource "aws_ecs_service" "service" {
-  name            = var.name
-  cluster         = var.cluster_config.cluster_id
-  task_definition = var.task_arn
-  desired_count   = var.tasks_count
-  launch_type     = "FARGATE"
+  name             = var.name
+  cluster          = var.cluster_config.cluster_id
+  task_definition  = var.task_arn
+  desired_count    = var.tasks_count
+  launch_type      = "FARGATE"
+  platform_version = "1.4.0"
 
   enable_ecs_managed_tags = true
 
