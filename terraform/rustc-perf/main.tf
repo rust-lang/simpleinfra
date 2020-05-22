@@ -51,6 +51,13 @@ module "ecs_task" {
         "awslogs-stream-prefix": "rustc-perf"
       }
     },
+    "mountPoints": [
+      {
+        "sourceVolume": "service-storage",
+        "containerPath": "/opt/database",
+        "readOnly": false
+      }
+    ],
     "environment": [
       {
         "name": "RUST_LOG",
