@@ -8,23 +8,23 @@ module "ecr" {
 }
 
 // This just loads the data for each of these secrets
-// The values are added to ASM manually
-data "aws_ssm_parameter" "crates_io_ops_bot" {
+// The values are added to SSM parameter store manually
+data "aws_ssm_parameter" "crates-io-ops-bot" {
   for_each = toset([
-    "discord_token",
-    "heroku_api_key",
-    "build_check_interval",
-    "github_org",
-    "github_repo",
-    "github_token"
+    "discord-token",
+    "heroku-api-key",
+    "build-check-interval",
+    "github-org",
+    "github-repo",
+    "github-token"
   ])
-  name = "/prod/ecs/crates_io_ops_bot/${each.value}"
+  name = "/prod/ecs/crates-io-ops-bot/${each.value}"
 }
 
 module "ecs_task" {
   source = "../shared/modules/ecs-task"
 
-  name               = "crates_io_ops"
+  name               = "crates-io-ops-bot"
   cpu                = 256
   memory             = 512
   log_retention_days = 7
@@ -49,33 +49,33 @@ module "ecs_task" {
       "options": {
         "awslogs-group": "/ecscratesioops",
         "awslogs-region": "us-west-1",
-        "awslogs-stream-prefix": "cratesioops"
+        "awslogs-stream-prefix": "crates-io-ops-bot"
       }
     },
     "secrets": [
       {
         "name": "DISCORD_TOKEN",
-        "valueFrom": "${data.aws_ssm_parameter.crates_io_ops_bot["discord_token"].arn}"
+        "valueFrom": "${data.aws_ssm_parameter.crates-io-ops-bot["discord-token"].arn}"
       },
       {
         "name": "HEROKU_API_KEY",
-        "valueFrom": "${data.aws_ssm_parameter.crates_io_ops_bot["heroku_api_key"].arn}"
+        "valueFrom": "${data.aws_ssm_parameter.crates-io-ops-bot["heroku-api-key"].arn}"
       },
       {
         "name": "BUILD_CHECK_INTERVAL",
-        "valueFrom": "${data.aws_ssm_parameter.crates_io_ops_bot["build_check_interval"].arn}"
+        "valueFrom": "${data.aws_ssm_parameter.crates-io-ops-bot["build-check-interval"].arn}"
       },
       {
         "name": "GITHUB_ORG",
-        "valueFrom": "${data.aws_ssm_parameter.crates_io_ops_bot["github_org"].arn}"
+        "valueFrom": "${data.aws_ssm_parameter.crates-io-ops-bot["github-org"].arn}"
       },
       {
         "name": "GITHUB_REPO",
-        "valueFrom": "${data.aws_ssm_parameter.crates_io_ops_bot["github_repo"].arn}"
+        "valueFrom": "${data.aws_ssm_parameter.crates-io-ops-bot["github-repo"].arn}"
       },
       {
         "name": "GITHUB_TOKEN",
-        "valueFrom": "${data.aws_ssm_parameter.crates_io_ops_bot["github_token"].arn}"
+        "valueFrom": "${data.aws_ssm_parameter.crates-io-ops-bot["github-token"].arn}"
       }
     ]
   }
