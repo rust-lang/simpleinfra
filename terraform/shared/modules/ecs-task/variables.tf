@@ -22,7 +22,7 @@ variable "containers" {
 }
 
 variable "volume" {
-  type        = object({ file_system_id = string, root_directory = string })
+  type        = object({ dns_name = string })
   description = "optional efs volume"
   default     = null
 }

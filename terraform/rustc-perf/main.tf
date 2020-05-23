@@ -17,6 +17,7 @@ data "aws_ssm_parameter" "rustc_perf" {
 module "ecs_task" {
   source = "../shared/modules/ecs-task"
 
+
   name   = "rustc-perf"
   cpu    = 256
   memory = 512
@@ -27,8 +28,7 @@ module "ecs_task" {
   ]
 
   volume = {
-    file_system_id = aws_efs_file_system.rustc_perf.id
-    root_directory = "/opt/database"
+    dns_name = aws_efs_file_system.rustc_perf.id
   }
 
   containers = <<EOF
@@ -88,8 +88,9 @@ EOF
 }
 
 module "ecs_service" {
-  source         = "../shared/modules/ecs-service"
-  cluster_config = data.terraform_remote_state.shared.outputs.ecs_cluster_config
+  source           = "../shared/modules/ecs-service"
+  cluster_config   = data.terraform_remote_state.shared.outputs.ecs_cluster_config
+  platform_version = "1.4.0"
 
   name        = "rustc-perf"
   task_arn    = module.ecs_task.arn
@@ -108,5 +109,46 @@ resource "aws_efs_file_system" "rustc_perf" {
 
   tags = {
     Name = "rustc-perf"
+  }
+}
+
+resource "aws_efs_access_point" "rustc_perf" {
+  file_system_id = aws_efs_file_system.rustc_perf.id
+}
+
+
+locals {
+  private_subnets = { for v in data.terraform_remote_state.shared.outputs.prod_vpc.private_subnets : v => v }
+}
+
+resource "aws_efs_mount_target" "rustc_perf" {
+  for_each        = local.private_subnets
+  file_system_id  = aws_efs_file_system.rustc_perf.id
+  subnet_id       = each.key
+  security_groups = [aws_security_group.rustc_perf_efs.id]
+}
+
+resource "aws_security_group" "rustc_perf_efs" {
+  name        = "rustc_perf_efs"
+  description = "Allow rustc-perf ECS task communication"
+  vpc_id      = data.terraform_remote_state.shared.outputs.prod_vpc.id
+
+  ingress {
+    description     = "rustc-perf"
+    from_port       = 2049
+    to_port         = 2049
+    protocol        = "tcp"
+    security_groups = [data.terraform_remote_state.shared.outputs.ecs_cluster_config.service_security_group_id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "rustc_perf_efs"
   }
 }
