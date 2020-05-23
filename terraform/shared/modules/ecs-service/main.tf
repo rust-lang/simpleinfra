@@ -4,7 +4,7 @@ resource "aws_ecs_service" "service" {
   task_definition  = var.task_arn
   desired_count    = var.tasks_count
   launch_type      = "FARGATE"
-  platform_version = "1.4.0"
+  platform_version = var.platform_version
 
   enable_ecs_managed_tags = true
 

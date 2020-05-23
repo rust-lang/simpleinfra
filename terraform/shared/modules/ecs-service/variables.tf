@@ -3,6 +3,12 @@ variable "name" {
   description = "Name of the service to create"
 }
 
+variable "platform_version" {
+  type        = string
+  default     = "LATEST"
+  description = "The fargate version to use"
+}
+
 variable "task_arn" {
   type        = string
   description = "ARN of the task to spawn in the service"
