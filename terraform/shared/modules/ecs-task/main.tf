@@ -25,11 +25,11 @@ resource "aws_ecs_task_definition" "task" {
   dynamic "volume" {
     for_each = var.volume == null ? toset([]) : toset([1])
     content {
-      name = "service-storage"
       efs_volume_configuration {
-        file_system_id = var.volume.file_system_id
-        root_directory = var.volume.root_directory
+        file_system_id = var.volume.dns_name
+        root_directory = "/"
       }
+      name = "service-storage"
     }
   }
 }
