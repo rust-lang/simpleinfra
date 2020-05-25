@@ -66,6 +66,10 @@ module "ecs_task" {
       {
         "name": "PORT",
         "value": "80"
+      },
+      {
+        "name": "PERSISTENT_PATH",
+        "value": "/opt/database/persistent.json"
       }
     ],
     "secrets": [
