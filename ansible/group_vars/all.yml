@@ -7,8 +7,13 @@ global_collect_metrics_from:
 # instances. The checksum is the hash of the downloadable tarball for the
 # specified architecture, found in the GitHub releases.
 node_exporter_version: 0.18.1
-node_exporter_arch: amd64
-node_exporter_checksum: sha256:b2503fd932f85f4e5baf161268854bf5d22001869b84f00fd2d1f57b51b72424
+node_exporter_archs:
+  x86_64:
+    name: amd64
+    checksum: sha256:b2503fd932f85f4e5baf161268854bf5d22001869b84f00fd2d1f57b51b72424
+  aarch64:
+    name: arm64
+    checksum: sha256:d5a28c46e74f45b9f2158f793a6064fd9fe8fd8da6e0d1e548835ceb7beb1982
 
 # Version of https://github.com/prometheus/prometheus to install on our
 # instances. The checksum is the hash of the downloadable tarball for the

@@ -9,10 +9,10 @@
 
 - block:
 
-    - name: "download node_exporter {{ node_exporter_version }}"
+    - name: "download node_exporter {{ node_exporter_version }} for {{ ansible_architecture }}"
       get_url:
-        url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-{{ node_exporter_arch }}.tar.gz"
-        checksum: "{{ node_exporter_checksum }}"
+        url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-{{ node_exporter_archs[ansible_architecture].name }}.tar.gz"
+        checksum: "{{ node_exporter_archs[ansible_architecture].checksum }}"
         dest: /tmp/ansible-install-node_exporter.tar.gz
         mode: 0400
 
@@ -23,7 +23,7 @@
         remote_src: true
         extra_opts:
           - --strip=1
-          - "node_exporter-{{ node_exporter_version }}.linux-{{ node_exporter_arch }}/node_exporter"
+          - "node_exporter-{{ node_exporter_version }}.linux-{{ node_exporter_archs[ansible_architecture].name }}/node_exporter"
       notify:
         - restart-node_exporter
 
