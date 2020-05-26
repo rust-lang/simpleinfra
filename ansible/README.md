@@ -6,8 +6,8 @@ managed by the Rust Infrastructure team.
 ## Executing a playbook
 
 To execute a playbook you'll need to have Python 3 installed on the local
-machine and, if the environment requires it, the [1password CLI][op]. Then you
-can execute this command:
+machine and, if the environment requires it, AWS credentials. Then you can
+execute this command:
 
 ```
 ./apply <environment> <playbook>
@@ -38,8 +38,7 @@ the `./apply` script followed by the username you want to use:
 Making changes directly on production is not a great idea: to ease local
 development the `./apply` script supports "environments". An environment is a
 subdirectory inside `envs/` that contains an `hosts` file and optionally some
-variables inside `group_vars`. If the `1password-subdomain` file the `./apply`
-script will also authenticate with 1password.
+variables inside `group_vars`.
 
 At the moment the only working environment present in the repository is `prod`,
 which points to our production servers. To run a playbook on it you'll have to

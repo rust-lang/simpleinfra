@@ -9,7 +9,6 @@ import os
 
 BASE_PATH = pathlib.Path(__file__).resolve().parent
 VENV_PATH = BASE_PATH / ".venv"
-OP_DOWNLOAD_URL = "https://app-updates.agilebits.com/product_history/CLI"
 
 # Ansible changes a lot between releases and deprecates a lot of stuff each of
 # them. Using a pinned ansible identical between all team members should
@@ -46,25 +45,6 @@ def run_playbook(args):
         (tempdir / "env").symlink_to(env_dir)
         (tempdir / "ansible.cfg").symlink_to(BASE_PATH / "ansible.cfg")
 
-        # Try to load 1password credentials
-        env = dict(os.environ)
-        if (env_dir / "1password-subdomain").exists():
-            if shutil.which("op") is None:
-                print("this environment requires 1password, but `op` is missing")
-                print("download it here:", OP_DOWNLOAD_URL)
-                exit(1)
-            subdomain = (env_dir / "1password-subdomain").read_text().strip()
-            var = f"OP_SESSION_{subdomain}"
-            if var in os.environ:
-                print("found an existing 1password session, reusing it")
-            else:
-                print("this environment requires a 1password session, asking to log in...")
-                res = subprocess.run(
-                    ["op", "signin", subdomain, "--output=raw"],
-                    stdout=subprocess.PIPE, check=True,
-                )
-                env[var] = res.stdout.strip()
-
         # Finally invoke the ansible binary installed in the virtualenv
         ansible_args = [
             str(VENV_PATH / "bin" / "ansible-playbook"),
@@ -75,7 +55,7 @@ def run_playbook(args):
             ansible_args += ["-u", args.user]
         if args.start_at_task is not None:
             ansible_args += ["--start-at-task", args.start_at_task]
-        res = subprocess.run(ansible_args, cwd=str(tempdir), env=env)
+        res = subprocess.run(ansible_args, cwd=str(tempdir))
         if res.returncode != 0:
             exit(1)
     finally:

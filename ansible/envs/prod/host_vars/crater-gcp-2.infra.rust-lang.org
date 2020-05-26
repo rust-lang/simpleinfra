@@ -1,8 +1,0 @@
----
-
-vars_aws_credentials:
-  role_arn: arn:aws:iam::890664054962:role/crater-agent
-  access_key_id: "{{ lookup('onepassword', 'ansible:crater-gcp-2', field='AWS_ACCESS_KEY_ID') }}"
-  secret_access_key: "{{ lookup('onepassword', 'ansible:crater-gcp-2', field='AWS_SECRET_ACCESS_KEY') }}"
-vars_crater_token: "{{ lookup('onepassword', 'ansible:crater-gcp-2', field='vars_crater_token') }}"
-vars_crater_threads: 10

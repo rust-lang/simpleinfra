@@ -1,15 +1,18 @@
 ---
 
-vars_backup_password: "{{ lookup('onepassword', 'ansible:monitoring', field='vars_backup_password') }}"
+# Fetch all the group params from AWS SSM
+ssm_monitoring: "{{ lookup('aws_ssm', '/prod/ansible/monitoring/', region='us-west-1', shortnames=true, bypath=true, recursive=true) }}"
+
+vars_backup_password: "{{ ssm_monitoring['backup-password'] }}"
 vars_backup_env:
-  AWS_ACCESS_KEY_ID: "{{ lookup('onepassword', 'ansible:monitoring', field='AWS_ACCESS_KEY_ID') }}"
-  AWS_SECRET_ACCESS_KEY: "{{ lookup('onepassword', 'ansible:monitoring', field='AWS_SECRET_ACCESS_KEY') }}"
-vars_postgresql_grafana_password: "{{ lookup('onepassword', 'ansible:monitoring', field='vars_postgresql_grafana_password') }}"
-vars_grafana_github_oauth_id: "{{ lookup('onepassword', 'ansible:monitoring', field='vars_grafana_github_oauth_id') }}"
-vars_grafana_github_oauth_secret: "{{ lookup('onepassword', 'ansible:monitoring', field='vars_grafana_github_oauth_secret') }}"
-vars_alertmanager_receiver_discord_infra: "{{ lookup('onepassword', 'ansible:monitoring', field='vars_alertmanager_receiver_discord_infra') }}"
-vars_alertmanager_receiver_discord_docsrs: "{{ lookup('onepassword', 'ansible:monitoring', field='vars_alertmanager_receiver_discord_docsrs') }}"
-vars_grafana_admin_password: "{{ lookup('onepassword', 'Grafana', vault='Infrastructure team') }}"
+  AWS_ACCESS_KEY_ID: "{{ ssm_monitoring['aws-access-key-id'] }}"
+  AWS_SECRET_ACCESS_KEY: "{{ ssm_monitoring['aws-secret-access-key'] }}"
+vars_postgresql_grafana_password: "{{ ssm_monitoring['postgresql-grafana-password'] }}"
+vars_grafana_github_oauth_id: "{{ ssm_monitoring['grafana-github-oauth-id'] }}"
+vars_grafana_github_oauth_secret: "{{ ssm_monitoring['grafana-github-oauth-secret'] }}"
+vars_alertmanager_receiver_discord_infra: "{{ ssm_monitoring['alertmanager-receiver-discord-infra'] }}"
+vars_alertmanager_receiver_discord_docsrs: "{{ ssm_monitoring['alertmanager-receiver-discord-docsrs'] }}"
+vars_grafana_admin_password: "{{ ssm_monitoring['grafana-admin-password'] }}"
 
 vars_backup_repository: s3:s3.amazonaws.com/rust-backups/monitoring
 vars_grafana_domain: grafana.rust-lang.org

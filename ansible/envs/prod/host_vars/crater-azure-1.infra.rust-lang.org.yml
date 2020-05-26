@@ -1,8 +1,7 @@
 ---
 
-vars_aws_credentials:
-  role_arn: arn:aws:iam::890664054962:role/crater-agent
-  access_key_id: "{{ lookup('onepassword', 'ansible:crater-azure-1', field='AWS_ACCESS_KEY_ID') }}"
-  secret_access_key: "{{ lookup('onepassword', 'ansible:crater-azure-1', field='AWS_SECRET_ACCESS_KEY') }}"
-vars_crater_token: "{{ lookup('onepassword', 'ansible:crater-azure-1', field='vars_crater_token') }}"
+# Fetch all the group params from AWS SSM
+ssm_crater_azure_1: "{{ lookup('aws_ssm', '/prod/ansible/crater-azure-1/', region='us-west-1', shortnames=true, bypath=true, recursive=true) }}"
+
+vars_crater_token: "{{ ssm_crater_azure_1['crater-token'] }}"
 vars_crater_threads: 15
