@@ -1,12 +1,5 @@
 // Deploys the bot to the production ECS cluster
 
-// The ECR repository is used by CI to store the container image, which will
-// then be fetched by the ECS service.
-module "ecr" {
-  source = "../shared/modules/ecr-repo"
-  name   = "crates-io-ops-bot"
-}
-
 // This just loads the data for each of these secrets
 // The values are added to SSM parameter store manually
 data "aws_ssm_parameter" "crates-io-ops-bot" {
