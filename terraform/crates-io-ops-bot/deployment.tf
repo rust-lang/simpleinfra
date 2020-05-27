@@ -2,7 +2,7 @@
 
 // This just loads the data for each of these secrets
 // The values are added to SSM parameter store manually
-data "aws_ssm_parameter" "crates-io-ops-bot" {
+data "aws_ssm_parameter" "crates_io_ops_bot" {
   for_each = toset([
     "discord-token",
     "heroku-api-key",
@@ -40,7 +40,7 @@ module "ecs_task" {
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
-        "awslogs-group": "/ecscratesioops",
+        "awslogs-group": "/ecs/crates-io-ops-bot",
         "awslogs-region": "us-west-1",
         "awslogs-stream-prefix": "crates-io-ops-bot"
       }
@@ -48,27 +48,27 @@ module "ecs_task" {
     "secrets": [
       {
         "name": "DISCORD_TOKEN",
-        "valueFrom": "${data.aws_ssm_parameter.crates-io-ops-bot["discord-token"].arn}"
+        "valueFrom": "${data.aws_ssm_parameter.crates_io_ops_bot["discord-token"].arn}"
       },
       {
         "name": "HEROKU_API_KEY",
-        "valueFrom": "${data.aws_ssm_parameter.crates-io-ops-bot["heroku-api-key"].arn}"
+        "valueFrom": "${data.aws_ssm_parameter.crates_io_ops_bot["heroku-api-key"].arn}"
       },
       {
         "name": "BUILD_CHECK_INTERVAL",
-        "valueFrom": "${data.aws_ssm_parameter.crates-io-ops-bot["build-check-interval"].arn}"
+        "valueFrom": "${data.aws_ssm_parameter.crates_io_ops_bot["build-check-interval"].arn}"
       },
       {
         "name": "GITHUB_ORG",
-        "valueFrom": "${data.aws_ssm_parameter.crates-io-ops-bot["github-org"].arn}"
+        "valueFrom": "${data.aws_ssm_parameter.crates_io_ops_bot["github-org"].arn}"
       },
       {
         "name": "GITHUB_REPO",
-        "valueFrom": "${data.aws_ssm_parameter.crates-io-ops-bot["github-repo"].arn}"
+        "valueFrom": "${data.aws_ssm_parameter.crates_io_ops_bot["github-repo"].arn}"
       },
       {
         "name": "GITHUB_TOKEN",
-        "valueFrom": "${data.aws_ssm_parameter.crates-io-ops-bot["github-token"].arn}"
+        "valueFrom": "${data.aws_ssm_parameter.crates_io_ops_bot["github-token"].arn}"
       }
     ]
   }
