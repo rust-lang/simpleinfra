@@ -50,19 +50,23 @@ resource "aws_security_group" "rust_prod_db" {
 }
 
 resource "aws_db_instance" "shared" {
-  allocated_storage    = 20
-  storage_type         = "gp2"
-  engine               = "postgres"
-  engine_version       = "11.5"
-  instance_class       = "db.t3.micro"
-  identifier           = "shared"
-  username             = "root"
-  password             = random_password.shared_root.result
-  db_subnet_group_name = aws_db_subnet_group.public.name
-  apply_immediately    = true
+  allocated_storage            = 20
+  max_allocated_storage        = 100
+  backup_retention_period      = 3
+  storage_type                 = "gp2"
+  engine                       = "postgres"
+  engine_version               = "11.5"
+  instance_class               = "db.t3.micro"
+  identifier                   = "shared"
+  username                     = "root"
+  password                     = random_password.shared_root.result
+  db_subnet_group_name         = aws_db_subnet_group.public.name
+  apply_immediately            = true
+  final_snapshot_identifier    = "final-snapshot"
+  deletion_protection          = true
+  performance_insights_enabled = true
 
   # temporary, needed until bastion is in prod VPC and can be used for access
   publicly_accessible    = true
   vpc_security_group_ids = [aws_security_group.rust_prod_db.id]
-  skip_final_snapshot    = true
 }
