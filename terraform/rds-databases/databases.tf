@@ -2,6 +2,7 @@ locals {
   databases = [
     "discord-mods-bot",
     "triagebot",
+    "rustc-perf",
   ]
 }
 
