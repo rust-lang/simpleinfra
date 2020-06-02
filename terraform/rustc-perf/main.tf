@@ -14,9 +14,33 @@ data "aws_ssm_parameter" "rustc_perf" {
   name = "/prod/ecs/rustc-perf/${each.value}"
 }
 
+data "aws_ssm_parameter" "database_url" {
+  name = "/prod/rds/shared/connection-urls/rustc-perf"
+}
+
+resource "aws_iam_policy" "read_database_url" {
+  name = "ecs--rustc-perf"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "AllowReadingConnectionUrl"
+        Effect   = "Allow"
+        Action   = "ssm:GetParameters"
+        Resource = data.aws_ssm_parameter.database_url.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "read_database_url" {
+  role       = module.ecs_task.execution_role_name
+  policy_arn = aws_iam_policy.read_database_url.arn
+}
+
+
 module "ecs_task" {
   source = "../shared/modules/ecs-task"
-
 
   name   = "rustc-perf"
   cpu    = 256
@@ -26,10 +50,6 @@ module "ecs_task" {
   ecr_repositories_arns = [
     module.ecr.arn,
   ]
-
-  volume = {
-    dns_name = aws_efs_file_system.rustc_perf.id
-  }
 
   containers = <<EOF
 [
@@ -51,25 +71,14 @@ module "ecs_task" {
         "awslogs-stream-prefix": "rustc-perf"
       }
     },
-    "mountPoints": [
-      {
-        "sourceVolume": "service-storage",
-        "containerPath": "/opt/database",
-        "readOnly": false
-      }
-    ],
     "environment": [
       {
         "name": "RUST_LOG",
-        "value": "site=trace"
+        "value": "site=trace,database=trace"
       },
       {
         "name": "PORT",
         "value": "80"
-      },
-      {
-        "name": "PERSISTENT_PATH",
-        "value": "/opt/database/persistent.json"
       }
     ],
     "secrets": [
@@ -84,6 +93,10 @@ module "ecs_task" {
       {
         "name": "COLLECTOR_SECRET",
         "valueFrom": "${data.aws_ssm_parameter.rustc_perf["collector-secret"].arn}"
+      },
+      {
+        "name": "DATABASE_URL",
+        "valueFrom": "${data.aws_ssm_parameter.database_url.arn}"
       }
     ]
   }
@@ -92,9 +105,8 @@ EOF
 }
 
 module "ecs_service" {
-  source           = "../shared/modules/ecs-service"
-  cluster_config   = data.terraform_remote_state.shared.outputs.ecs_cluster_config
-  platform_version = "1.4.0"
+  source         = "../shared/modules/ecs-service"
+  cluster_config = data.terraform_remote_state.shared.outputs.ecs_cluster_config
 
   name        = "rustc-perf"
   task_arn    = module.ecs_task.arn
@@ -106,53 +118,4 @@ module "ecs_service" {
   domains = [
     "perf-new.rust-lang.org"
   ]
-}
-
-resource "aws_efs_file_system" "rustc_perf" {
-  creation_token = "rustc-perf"
-
-  tags = {
-    Name = "rustc-perf"
-  }
-}
-
-resource "aws_efs_access_point" "rustc_perf" {
-  file_system_id = aws_efs_file_system.rustc_perf.id
-}
-
-
-locals {
-  private_subnets = { for v in data.terraform_remote_state.shared.outputs.prod_vpc.private_subnets : v => v }
-}
-
-resource "aws_efs_mount_target" "rustc_perf" {
-  for_each        = local.private_subnets
-  file_system_id  = aws_efs_file_system.rustc_perf.id
-  subnet_id       = each.key
-  security_groups = [aws_security_group.rustc_perf_efs.id]
-}
-
-resource "aws_security_group" "rustc_perf_efs" {
-  name        = "rustc_perf_efs"
-  description = "Allow rustc-perf ECS task communication"
-  vpc_id      = data.terraform_remote_state.shared.outputs.prod_vpc.id
-
-  ingress {
-    description     = "rustc-perf"
-    from_port       = 2049
-    to_port         = 2049
-    protocol        = "tcp"
-    security_groups = [data.terraform_remote_state.shared.outputs.ecs_cluster_config.service_security_group_id]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "rustc_perf_efs"
-  }
 }
