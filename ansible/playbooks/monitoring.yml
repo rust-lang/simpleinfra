@@ -60,7 +60,6 @@
               - docsrs.infra.rust-lang.org:9100
               - bastion.infra.rust-lang.org:9100
               - play.infra.rust-lang.org:9100
-              - puppeteer.infra.rust-lang.org:9100
 
         - job_name: docsrs
           metrics_path: /about/metrics
