@@ -15,7 +15,6 @@
         - simulacrum
         - pietro
       unprivileged_users:
-        - guillaumegomez  # puppeteer.infra.rust-lang.org
         - onur  # docsrs.infra.rust-lang.org
         - joshua  # docsrs.infra.rust-lang.org
         - shep  # play.rust-lang.org
