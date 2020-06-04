@@ -55,7 +55,7 @@ resource "aws_db_instance" "shared" {
   backup_retention_period      = 3
   storage_type                 = "gp2"
   engine                       = "postgres"
-  engine_version               = "11.6"
+  engine_version               = "12.2"
   instance_class               = "db.t3.micro"
   identifier                   = "shared"
   username                     = "root"
@@ -65,6 +65,7 @@ resource "aws_db_instance" "shared" {
   final_snapshot_identifier    = "final-snapshot"
   deletion_protection          = true
   performance_insights_enabled = true
+  allow_major_version_upgrade  = true
 
   # temporary, needed until bastion is in prod VPC and can be used for access
   publicly_accessible    = true
