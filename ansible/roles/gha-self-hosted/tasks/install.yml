@@ -1,0 +1,46 @@
+---
+
+- name: install APT packages required for self-hosted agents
+  apt:
+    name:
+      - genisoimage
+      - git
+      - make
+      - qemu-system
+      - qemu-utils
+      - unzip
+    state: present
+
+- name: check which version of packer is installed
+  command: packer --version
+  ignore_errors: yes
+  changed_when: false
+  failed_when: false
+  register: packer_capture
+
+- block:
+
+    - name: "download packer {{ packer_version }} for {{ ansible_architecture }}"
+      get_url:
+        url: "https://releases.hashicorp.com/packer/{{ packer_version }}/packer_{{ packer_version }}_linux_{{ packer_archs[ansible_architecture].name }}.zip"
+        checksum: "{{ packer_archs[ansible_architecture].checksum }}"
+        dest: /tmp/ansible-install-packer.zip
+        mode: 0400
+
+    - name: extract packer
+      unarchive:
+        src: /tmp/ansible-install-packer.zip
+        dest: /usr/local/bin
+        remote_src: true
+
+    - name: cleanup packer installation files
+      file:
+        path: /tmp/ansible-install-packer.zip
+        state: absent
+
+  when: packer_capture.rc != 0 or packer_capture.stdout.strip() != packer_version
+
+- name: set the correct permissions for packer
+  file:
+    path: /usr/local/bin/packer
+    mode: 0755

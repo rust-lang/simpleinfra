@@ -1,0 +1,12 @@
+#
+# {{ ansible_managed }}
+#
+
+[Unit]
+Description=Update the source code of gha-self-hosted
+
+[Service]
+Type=oneshot
+ExecStart=/opt/gha-self-hosted/bin/update-source
+User=gha-self-hosted
+Group=gha-self-hosted

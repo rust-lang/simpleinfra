@@ -1,0 +1,27 @@
+---
+
+- hosts: gha-self-hosted
+  become: yes
+  become_user: root
+
+  roles:
+
+    - role: common
+      papertrail_url: "{{ vars_papertrail_url }}"
+      collect_metrics_from: "{{ global_collect_metrics_from }}"
+      sudo_users:
+        - aidanhs
+        - simulacrum
+        - pietro
+
+    - role: gha-self-hosted
+      source_repo: https://github.com/rust-lang/gha-self-hosted
+
+      # Defined in `envs/prod/host_vars/{hostname}.yml`
+      cpu_cores: "{{ vars_cpu_cores }}"
+      ram: "{{ vars_ram }}"
+      root_disk: "{{ vars_root_disk }}"
+      timeout_seconds: "{{ vars_timeout_seconds }}"
+      ci_repo: "{{ vars_ci_repo }}"
+      github_token: "{{ vars_github_token }}"
+      instances: "{{ vars_instances }}"

@@ -1,0 +1,21 @@
+---
+
+- name: upload instances configuration
+  template:
+    src: instances.json
+    dest: /opt/gha-self-hosted/instances.json
+
+- name: upload the instances systemd services
+  template:
+    src: systemd/gha-vm.service
+    dest: "/etc/systemd/system/gha-vm-{{ item.name }}.service"
+  loop: "{{ instances }}"
+  notify:
+    - reload-systemd
+
+- name: start and enable the systemd services
+  service:
+    name: "gha-vm-{{ item.name }}.service"
+    enabled: true
+    state: started
+  loop: "{{ instances }}"

@@ -56,3 +56,14 @@ lego_checksum: sha256:6fb29df71eb920196459a4a8b5803c3e31639c26fb45967650a247a36f
 restic_version: 0.9.5
 restic_arch: amd64
 restic_checksum: sha256:08cd75e56a67161e9b16885816f04b2bf1fb5b03bc0677b0ccf3812781c1a2ec
+
+# Version of https://www.packer.io to install on our instances. The checksum is
+# available in a dedicated SHA256SUMS file.
+packer_version: 1.5.6
+packer_archs:
+  x86_64:
+    name: amd64
+    checksum: sha256:2abb95dc3a5fcfb9bf10ced8e0dd51d2a9e6582a1de1cab8ccec650101c1f9df
+  aarch64:
+    name: arm64
+    checksum: sha256:8942f3ae887a761befd9fa29da6f689050ce46b886910a6a439d6b49b5e463ae

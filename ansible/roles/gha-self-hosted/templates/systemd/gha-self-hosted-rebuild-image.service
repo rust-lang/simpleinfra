@@ -1,0 +1,11 @@
+#
+# {{ ansible_managed }}
+#
+
+[Unit]
+Description=Rebuild the image used in gha-self-hosted
+
+[Service]
+ExecStart=/opt/gha-self-hosted/bin/build-image
+User=gha-self-hosted
+Group=gha-self-hosted

@@ -1,0 +1,20 @@
+[
+    {% for instance in instances %}
+        {
+            "name": "{{ instance.name }}",
+            "image": "/opt/gha-self-hosted/rootfs/{{ instance.image }}.qcow2",
+            "arch": "{{ ansible_architecture }}",
+            "cpu-cores": {{ cpu_cores }},
+            "ram": "{{ ram }}",
+            "root-disk": "{{ root_disk }}",
+            "timeout-seconds": {{ timeout_seconds }},
+            "ssh-port": {{ 2200 + loop.index }},
+            "config": {
+                "repo": "{{ ci_repo }}",
+                "token": "{{ "${{ gha-install-token:" + ci_repo + " }}" }}",
+                "whitelisted-event": "push"
+            }
+        }
+        {% if not loop.last %},{% endif %}
+    {% endfor %}
+]

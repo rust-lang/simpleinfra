@@ -1,0 +1,20 @@
+---
+
+# Fetch all the group params from AWS SSM
+ssm_ci_arm_1: "{{ lookup('aws_ssm', '/prod/ansible/ci-arm-1/', region='us-west-1', shortnames=true, bypath=true, recursive=true) }}"
+
+vars_github_token: "{{ ssm_ci_arm_1['github-token'] }}"
+
+vars_cpu_cores: 14
+vars_ram: 16G
+vars_root_disk: 100G
+vars_timeout_seconds: 14400
+vars_ci_repo: rust-lang-ci/rust
+
+vars_instances:
+
+  - name: arm-1-1
+    image: ubuntu
+
+  - name: arm-1-2
+    image: ubuntu

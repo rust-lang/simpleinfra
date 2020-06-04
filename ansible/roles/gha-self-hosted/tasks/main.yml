@@ -1,0 +1,5 @@
+---
+
+- include: install.yml
+- include: host.yml
+- include: instances.yml
