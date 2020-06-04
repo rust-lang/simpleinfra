@@ -40,3 +40,9 @@ resource "aws_ssm_parameter" "connection_urls" {
   type  = "SecureString"
   value = "postgres://${each.value}:${random_password.users[each.value].result}@${aws_db_instance.shared.address}/${each.value}"
 }
+
+resource "aws_ssm_parameter" "connection_url_root" {
+  name  = "/prod/rds/shared/connection-urls/root"
+  type  = "SecureString"
+  value = "postgres://root:${random_password.shared_root.result}@${aws_db_instance.shared.address}"
+}
