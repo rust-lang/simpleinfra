@@ -44,6 +44,22 @@ resource "aws_security_group" "rust_prod_db" {
     description     = "Connections from ECS"
   }
 
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["54.215.238.238/32"]
+    description = "Connections from rust-bots ec2, used for archive generation"
+  }
+
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["159.69.58.186/32"]
+    description = "Connections from rustc-perf collection server"
+  }
+
   tags = {
     Name = "rust-prod-database"
   }
