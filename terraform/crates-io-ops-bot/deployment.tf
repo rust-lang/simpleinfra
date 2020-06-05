@@ -6,9 +6,6 @@ data "aws_ssm_parameter" "crates_io_ops_bot" {
   for_each = toset([
     "discord-token",
     "heroku-api-key",
-    "build-check-interval",
-    "github-org",
-    "github-repo",
     "github-token"
   ])
   name = "/prod/ecs/crates-io-ops-bot/${each.value}"
@@ -45,6 +42,20 @@ module "ecs_task" {
         "awslogs-stream-prefix": "crates-io-ops-bot"
       }
     },
+    "environment": [
+      {
+        "name": "BUILD_CHECK_INTERVAL",
+        "value": "180"
+      },
+      {
+        "name": "GITHUB_ORG",
+        "value": "rust-lang"
+      },
+      {
+        "name": "GITHUB_REPO",
+        "value": "crates.io"
+      }
+    ]
     "secrets": [
       {
         "name": "DISCORD_TOKEN",
@@ -53,18 +64,6 @@ module "ecs_task" {
       {
         "name": "HEROKU_API_KEY",
         "valueFrom": "${data.aws_ssm_parameter.crates_io_ops_bot["heroku-api-key"].arn}"
-      },
-      {
-        "name": "BUILD_CHECK_INTERVAL",
-        "valueFrom": "${data.aws_ssm_parameter.crates_io_ops_bot["build-check-interval"].arn}"
-      },
-      {
-        "name": "GITHUB_ORG",
-        "valueFrom": "${data.aws_ssm_parameter.crates_io_ops_bot["github-org"].arn}"
-      },
-      {
-        "name": "GITHUB_REPO",
-        "valueFrom": "${data.aws_ssm_parameter.crates_io_ops_bot["github-repo"].arn}"
       },
       {
         "name": "GITHUB_TOKEN",
