@@ -6,3 +6,6 @@
 
 [crater]
 # crater-agent.local
+
+[gha_self_hosted]
+# gha-self-hosted.local

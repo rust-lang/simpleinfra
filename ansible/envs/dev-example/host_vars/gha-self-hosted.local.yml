@@ -1,0 +1,14 @@
+---
+
+vars_github_token: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
+vars_cpu_cores: 2
+vars_ram: 2G
+vars_root_disk: 10G
+vars_timeout_seconds: 14400
+vars_ci_repo: ghost/test-repo
+
+vars_instances:
+
+  - name: instance-1
+    image: ubuntu
