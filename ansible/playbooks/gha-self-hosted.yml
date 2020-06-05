@@ -1,6 +1,6 @@
 ---
 
-- hosts: gha-self-hosted
+- hosts: gha_self_hosted
   become: yes
   become_user: root
 

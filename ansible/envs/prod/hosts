@@ -10,5 +10,5 @@ crater-azure-2.infra.rust-lang.org
 crater-gcp-1.infra.rust-lang.org
 crater-gcp-2.infra.rust-lang.org
 
-[gha-self-hosted]
+[gha_self_hosted]
 ci-arm-1.infra.rust-lang.org
