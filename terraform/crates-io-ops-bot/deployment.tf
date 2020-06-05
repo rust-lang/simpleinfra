@@ -55,7 +55,7 @@ module "ecs_task" {
         "name": "GITHUB_REPO",
         "value": "crates.io"
       }
-    ]
+    ],
     "secrets": [
       {
         "name": "DISCORD_TOKEN",
