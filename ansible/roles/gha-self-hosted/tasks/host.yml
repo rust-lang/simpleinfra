@@ -16,6 +16,11 @@
     create_home: false
     state: present
 
+- name: upload sudoers configuration for gha-self-hosted
+  template:
+    src: sudoers
+    dest: /etc/sudoers.d/gha-self-hosted
+
 - name: create the required directories
   file:
     path: "{{ item }}"

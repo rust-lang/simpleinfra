@@ -1,0 +1,5 @@
+#
+# {{ ansible_managed }}
+#
+
+gha-self-hosted ALL= NOPASSWD: /bin/systemctl start gha-self-hosted-rebuild-image.service
