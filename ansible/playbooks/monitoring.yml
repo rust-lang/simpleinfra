@@ -140,7 +140,7 @@
         group_by: ['alertname']
         group_wait: 30s
         group_interval: 5m
-        receiver: discord-infra
+        receiver: zulip-infra
 
         routes:
           - receiver: discord-docsrs
@@ -165,11 +165,12 @@
               instance: ^crater-[^\.]+\.infra\.rust-lang\.org:9100$
 
       alertmanager_receivers:
-        - name: discord-infra
+        - name: zulip-infra
           slack_configs:
-            - api_url: "{{ vars_alertmanager_receiver_discord_infra }}/slack"
-              channel: doesnt-matter
+            - api_url: "{{ vars_alertmanager_receiver_zulip_infra }}"
+              channel: alertmanager
               title: "{{ '{{ .Alerts.Firing | len }} alerts fired, {{ .Alerts.Resolved | len }} alerts resolved!' }}"
+              title_link: "https://grafana.rust-lang.org"
               text: "{{ '{{ range .Alerts }}**{{ if eq .Status \"firing\" }}Fired{{ else }}Resolved{{ end }}: {{ .Annotations.summary }}**\n{{ .Annotations.description }}\n{{ end }}' }}"
               send_resolved: true
 
@@ -178,6 +179,7 @@
             - api_url: "{{ vars_alertmanager_receiver_discord_docsrs }}/slack"
               channel: doesnt-matter
               title: "{{ '{{ .Alerts.Firing | len }} alerts fired, {{ .Alerts.Resolved | len }} alerts resolved!' }}"
+              title_link: "https://grafana.rust-lang.org"
               text: "{{ '{{ range .Alerts }}**{{ if eq .Status \"firing\" }}Fired{{ else }}Resolved{{ end }}: {{ .Annotations.summary }}**\n{{ .Annotations.description }}\n{{ end }}' }}"
               send_resolved: true
 
