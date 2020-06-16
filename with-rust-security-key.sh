@@ -20,12 +20,12 @@ export GNUPGHOME="/dev/shm/rust-gpg"
 
 # 1password UUIDs to import into the temporary gpg environment
 IMPORT_KEYS=(
-    "5thx2ppcijgt5m2ed4nv7usaba" # public.asc
-    "74qcodtth5cxxiozl5ksuwil6y" # secret.asc
+    "e2rq3jfyb35tmtfuofhcm7bo6q" # public.asc
+    "mn7kdu6hnramxkmxd7a2wrdhlu" # secret.asc
 )
 
 # 1password UUID of the secret key's password
-SECRET_KEY_PASSWORD_UUID="kypsfadfjo6mnpytm6ekaxyhpa"
+SECRET_KEY_PASSWORD_UUID="6a6doblupfhkjr7wt24li2jpk4"
 
 # ID of the key used to sign Rust releases
 SIGNING_KEY_ID="EFB9860AE7520DAC"
