@@ -1,7 +1,7 @@
 /target
 /ansible/.venv
 /ansible/envs/dev
-/terraform/modules/lambda/packages
+/terraform/shared/modules/lambda/packages
 .terraform
 node_modules
 __pycache__
