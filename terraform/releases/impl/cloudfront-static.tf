@@ -1,11 +1,11 @@
 module "lambda_static" {
-  source = "../../modules/lambda"
+  source = "../../shared/modules/lambda"
   providers = {
     aws = aws.east1
   }
 
   name       = "${var.bucket}--static-router"
-  source_dir = "services/releases-cdn/lambdas/static-router"
+  source_dir = "impl/lambdas/static-router"
   handler    = "index.handler"
   runtime    = "nodejs10.x"
   role_arn   = data.aws_iam_role.cloudfront_lambda.arn

@@ -8,7 +8,7 @@ data "aws_iam_role" "cloudfront_lambda" {
 }
 
 module "certificate" {
-  source = "../../modules/acm-certificate"
+  source = "../../shared/modules/acm-certificate"
   providers = {
     aws = aws.east1
   }

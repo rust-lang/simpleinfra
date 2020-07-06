@@ -1,24 +1,24 @@
 module "lambda_doc_router" {
-  source = "../../modules/lambda"
+  source = "../../shared/modules/lambda"
   providers = {
     aws = aws.east1
   }
 
   name       = "${var.bucket}--doc-router"
-  source_dir = "services/releases-cdn/lambdas/doc-router"
+  source_dir = "impl/lambdas/doc-router"
   handler    = "index.handler"
   runtime    = "nodejs10.x"
   role_arn   = data.aws_iam_role.cloudfront_lambda.arn
 }
 
 module "lambda_doc_response" {
-  source = "../../modules/lambda"
+  source = "../../shared/modules/lambda"
   providers = {
     aws = aws.east1
   }
 
   name       = "${var.bucket}--doc-response"
-  source_dir = "services/releases-cdn/lambdas/doc-response"
+  source_dir = "impl/lambdas/doc-response"
   handler    = "index.handler"
   runtime    = "nodejs10.x"
   role_arn   = data.aws_iam_role.cloudfront_lambda.arn
