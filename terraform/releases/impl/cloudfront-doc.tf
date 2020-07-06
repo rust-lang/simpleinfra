@@ -7,7 +7,7 @@ module "lambda_doc_router" {
   name       = "${var.bucket}--doc-router"
   source_dir = "impl/lambdas/doc-router"
   handler    = "index.handler"
-  runtime    = "nodejs10.x"
+  runtime    = "nodejs12.x"
   role_arn   = data.aws_iam_role.cloudfront_lambda.arn
 }
 
@@ -20,7 +20,7 @@ module "lambda_doc_response" {
   name       = "${var.bucket}--doc-response"
   source_dir = "impl/lambdas/doc-response"
   handler    = "index.handler"
-  runtime    = "nodejs10.x"
+  runtime    = "nodejs12.x"
   role_arn   = data.aws_iam_role.cloudfront_lambda.arn
 }
 
