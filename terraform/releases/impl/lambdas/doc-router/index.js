@@ -117,8 +117,7 @@ exports.handler = (event, context, callback) => {
 
     // Special files that are located at `/doc/$file`, they aren't published
     // with all the releases
-    if (request.uri === '/robots.txt' ||
-        request.uri === '/favicon.ico' ||
+    if (request.uri === '/favicon.ico' ||
         request.uri === '/google49c5ce1b6ff59509.html') {
         return callback(null, request);
     }
