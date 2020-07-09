@@ -11,19 +11,6 @@ module "lambda_doc_router" {
   role_arn   = data.aws_iam_role.cloudfront_lambda.arn
 }
 
-module "lambda_doc_response" {
-  source = "../../shared/modules/lambda"
-  providers = {
-    aws = aws.east1
-  }
-
-  name       = "${var.bucket}--doc-response"
-  source_dir = "impl/lambdas/doc-response"
-  handler    = "index.handler"
-  runtime    = "nodejs12.x"
-  role_arn   = data.aws_iam_role.cloudfront_lambda.arn
-}
-
 resource "aws_cloudfront_distribution" "doc" {
   comment = var.doc_domain_name
 
@@ -58,12 +45,6 @@ resource "aws_cloudfront_distribution" "doc" {
     lambda_function_association {
       event_type   = "origin-request"
       lambda_arn   = module.lambda_doc_router.version_arn
-      include_body = false
-    }
-
-    lambda_function_association {
-      event_type   = "origin-response"
-      lambda_arn   = module.lambda_doc_response.version_arn
       include_body = false
     }
   }
