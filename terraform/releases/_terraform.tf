@@ -21,6 +21,10 @@ data "terraform_remote_state" "shared" {
   }
 }
 
+provider "external" {
+  version = "~> 1.2"
+}
+
 provider "aws" {
   version = "~> 2.44"
 

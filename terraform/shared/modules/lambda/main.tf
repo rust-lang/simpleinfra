@@ -1,5 +1,3 @@
-provider "external" {}
-
 data "aws_region" "current" {}
 
 data "external" "source_zip" {
