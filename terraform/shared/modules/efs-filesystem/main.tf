@@ -67,7 +67,7 @@ resource "aws_efs_file_system_policy" "efs" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid = "RequireTLS"
+        Sid    = "RequireTLS"
         Effect = "Deny"
         Principal = {
           AWS = "*"
@@ -86,14 +86,14 @@ resource "aws_efs_file_system_policy" "efs" {
 // Create a policy allowed to access the filesystem with root privileges.
 //
 resource "aws_iam_policy" "efs_root" {
-  name = "efs--${var.name}--root"
+  name        = "efs--${var.name}--root"
   description = "Allow root access to the ${var.name} EFS filesystem."
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Sid = "AllowRootAccess"
+        Sid    = "AllowRootAccess"
         Effect = "Allow"
         Action = [
           "elasticfilesystem:ClientMount",
