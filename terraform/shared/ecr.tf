@@ -7,8 +7,3 @@ module "ecr_rust_central_station" {
   source = "./modules/ecr-repo"
   name   = "rust-central-station"
 }
-
-module "ecr_rust_log_analyzer" {
-  source = "./modules/ecr-repo"
-  name   = "rust-log-analyzer"
-}
