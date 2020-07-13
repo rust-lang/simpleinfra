@@ -24,3 +24,4 @@
   template:
     src: after-ssl-renew.sh
     dest: /etc/ssl/letsencrypt/after-renew.d
+    mode: 0750
