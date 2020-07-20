@@ -18,18 +18,24 @@ resource "aws_ecs_task_definition" "task" {
   memory       = var.memory
   network_mode = "awsvpc"
 
+  task_role_arn            = var.task_role_arn
   execution_role_arn       = aws_iam_role.task_execution.arn
   requires_compatibilities = ["FARGATE"]
 
   container_definitions = var.containers
   dynamic "volume" {
-    for_each = var.volume == null ? toset([]) : toset([1])
+    for_each = toset(var.volumes)
     content {
+      name = volume.value.name
       efs_volume_configuration {
-        file_system_id = var.volume.dns_name
-        root_directory = "/"
+        file_system_id     = volume.value.file_system_id
+        root_directory     = "/"
+        transit_encryption = "ENABLED"
+
+        authorization_config {
+          iam = volume.value.iam ? "ENABLED" : "DISABLED"
+        }
       }
-      name = "service-storage"
     }
   }
 }

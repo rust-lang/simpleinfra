@@ -21,9 +21,14 @@ variable "containers" {
   EOD
 }
 
-variable "volume" {
-  type        = object({ dns_name = string })
-  description = "optional efs volume"
+variable "volumes" {
+  type = list(object({
+    name           = string
+    file_system_id = string
+    iam            = bool
+  }))
+
+  description = "Optional EFS volumes"
   default     = null
 }
 
@@ -35,4 +40,10 @@ variable "log_retention_days" {
 variable "ecr_repositories_arns" {
   type        = list(string)
   description = "List of ECR repository ARNs this task is allowed to pull"
+}
+
+variable "task_role_arn" {
+  type        = string
+  default     = null
+  description = "The ARN of the task role"
 }
