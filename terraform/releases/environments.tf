@@ -16,3 +16,17 @@ module "dev" {
 
   inventories_bucket_arn = data.terraform_remote_state.shared.outputs.inventories_bucket_arn
 }
+
+module "prod" {
+  source = "./impl"
+  providers = {
+    aws       = aws
+    aws.east1 = aws.east1
+  }
+
+  bucket             = "static-rust-lang-org"
+  static_domain_name = "static.rust-lang.org"
+  doc_domain_name    = "doc.rust-lang.org"
+
+  inventories_bucket_arn = data.terraform_remote_state.shared.outputs.inventories_bucket_arn
+}
