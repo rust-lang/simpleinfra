@@ -84,7 +84,7 @@ module "ecs_task" {
         },
         {
           name  = "EXTRA_ARGS"
-          value = "--secondary-repo rust-lang-ci/rust --query-builds-from-primary-repo"
+          value = "--secondary-repo rust-lang-ci/rust"
         },
         {
           name  = "GITHUB_USER"
