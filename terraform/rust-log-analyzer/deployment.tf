@@ -88,7 +88,7 @@ module "ecs_task" {
         },
         {
           name  = "GITHUB_USER"
-          value = "rust-highfive"
+          value = "rust-log-analyzer"
         },
         {
           name  = "INDEX_FILE"
