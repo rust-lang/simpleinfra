@@ -11,7 +11,7 @@ data "aws_ssm_parameter" "crates_io_ops_bot" {
     "github-repo",
     "github-token",
     "heroku-api-key",
-    
+
   ])
   name = "/prod/ecs/crates-io-ops-bot/${each.value}"
 }
