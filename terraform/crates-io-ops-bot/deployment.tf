@@ -4,9 +4,14 @@
 // The values are added to SSM parameter store manually
 data "aws_ssm_parameter" "crates_io_ops_bot" {
   for_each = toset([
+    "build-check-interval",
+    "build-message-display-interval",
     "discord-token",
+    "github-org",
+    "github-repo",
+    "github-token",
     "heroku-api-key",
-    "github-token"
+    
   ])
   name = "/prod/ecs/crates-io-ops-bot/${each.value}"
 }
@@ -45,15 +50,19 @@ module "ecs_task" {
     "environment": [
       {
         "name": "BUILD_CHECK_INTERVAL",
-        "value": "180"
+        "valueFrom": "${data.aws_ssm_parameter.crates_io_ops_bot["build-check-interval"].arn}"
+      },
+      {
+        "name": "BUILD_MESSAGE_DISPLAY_INTERVAL",
+        "valueFrom": "${data.aws_ssm_parameter.crates_io_ops_bot["build-message-display-interval"].arn}"
       },
       {
         "name": "GITHUB_ORG",
-        "value": "rust-lang"
+        "valueFrom": "${data.aws_ssm_parameter.crates_io_ops_bot["github-org"].arn}"
       },
       {
         "name": "GITHUB_REPO",
-        "value": "crates.io"
+        "valueFrom": "${data.aws_ssm_parameter.crates_io_ops_bot["github-repo"].arn}"
       }
     ],
     "secrets": [
