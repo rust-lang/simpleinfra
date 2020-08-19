@@ -75,6 +75,14 @@ module "ecs_task" {
       {
         "name": "WG_AND_TEAMS_ID",
         "value": "590248810127818752"
+      },
+      {
+        "name": "CRATES",
+        "value": "true",
+      },
+      {
+        "name": "TAGS",
+        "value": "true",
       }
     ],
     "secrets": [
