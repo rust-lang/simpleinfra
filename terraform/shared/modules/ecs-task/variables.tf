@@ -29,7 +29,7 @@ variable "volumes" {
   }))
 
   description = "Optional EFS volumes"
-  default     = null
+  default     = []
 }
 
 variable "log_retention_days" {
