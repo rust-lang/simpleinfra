@@ -78,11 +78,11 @@ module "ecs_task" {
       },
       {
         "name": "CRATES",
-        "value": "true",
+        "value": "true"
       },
       {
         "name": "TAGS",
-        "value": "true",
+        "value": "true"
       }
     ],
     "secrets": [
