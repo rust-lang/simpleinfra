@@ -48,6 +48,10 @@ module "ecs_task" {
         "value": "180"
       },
       {
+         "name": "BUILD_MESSAGE_DISPLAY_INTERVAL",
+          "value": "600"
+      },
+      {
         "name": "GITHUB_ORG",
         "value": "rust-lang"
       },
