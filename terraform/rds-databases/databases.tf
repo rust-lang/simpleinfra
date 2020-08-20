@@ -1,7 +1,6 @@
 locals {
   databases = [
     "discord-mods-bot",
-    "discord-mods-bot-rustconf-2020",
     "triagebot",
     "rustc-perf",
   ]
@@ -21,6 +20,10 @@ resource "postgresql_role" "users" {
   name     = each.value
   login    = true
   password = random_password.users[each.value].result
+
+  # The role doesn't have the permission to do this, and we don't really need
+  # this functionality. If this is set to `false`, deleting the role will fail.
+  skip_reassign_owned = true
 }
 
 resource "postgresql_database" "databases" {
