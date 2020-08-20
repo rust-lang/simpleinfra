@@ -2,6 +2,7 @@
 /ansible/.venv
 /ansible/envs/dev
 /terraform/shared/modules/lambda/packages
+/terraform/rds-databases/.forward-ports-cache-*.json
 .terraform
 node_modules
 __pycache__
