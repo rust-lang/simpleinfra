@@ -1,16 +1,6 @@
 // This terraform module imports all the services from the services/ directory,
 // and configures them.
 
-module "service_bastion" {
-  source                   = "./services/bastion"
-  ami_id                   = data.aws_ami.ubuntu_bionic.id
-  vpc_id                   = aws_vpc.legacy.id
-  subnet_id                = aws_subnet.legacy.id
-  common_security_group_id = aws_security_group.legacy_common.id
-  key_pair                 = aws_key_pair.buildbot_west_slave_key.key_name
-  allowed_users            = local.allowed_users
-}
-
 module "service_rustc_ci" {
   source = "./services/rustc-ci"
   providers = {

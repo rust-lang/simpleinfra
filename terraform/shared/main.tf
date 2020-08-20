@@ -10,14 +10,22 @@ terraform {
 }
 
 provider "aws" {
+  version = "~> 2.44"
+
   profile = "default"
   region  = "us-west-1"
 }
 
 provider "aws" {
+  version = "~> 2.44"
+
   profile = "default"
   region  = "us-east-1"
   alias   = "east1"
+}
+
+provider "dns" {
+  version = "~> 2.2"
 }
 
 locals {
