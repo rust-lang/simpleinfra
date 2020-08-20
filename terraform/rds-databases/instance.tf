@@ -67,12 +67,12 @@ resource "aws_security_group" "rust_prod_db" {
 
 resource "aws_db_instance" "shared" {
   allocated_storage            = 20
-  max_allocated_storage        = 100
+  max_allocated_storage        = 200
   backup_retention_period      = 3
   storage_type                 = "gp2"
   engine                       = "postgres"
   engine_version               = "12.2"
-  instance_class               = "db.t3.micro"
+  instance_class               = "db.t3.small"
   identifier                   = "shared"
   username                     = "root"
   password                     = random_password.shared_root.result
