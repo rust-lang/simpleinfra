@@ -28,15 +28,31 @@ provider "aws" {
   region  = "us-west-1"
 }
 
+provider "external" {
+  version = "~> 1.2"
+}
+
 provider "random" {
   version = "~> 2.2"
+}
+
+// Setup port forwarding to access the database through the bastion.
+data "external" "port_forwarding" {
+  program = ["${path.module}/forward-ports.py"]
+  query = {
+    bastion    = "bastion.infra.rust-lang.org"
+    cache-name = "shared"
+    timeout    = 600 // 10 minutes
+    address    = aws_db_instance.shared.address
+    port       = aws_db_instance.shared.port
+  }
 }
 
 provider "postgresql" {
   version = "~> 1.5"
 
-  host            = aws_db_instance.shared.address
-  port            = aws_db_instance.shared.port
+  host            = data.external.port_forwarding.result.host
+  port            = data.external.port_forwarding.result.port
   database        = "postgres"
   username        = aws_db_instance.shared.username
   password        = aws_db_instance.shared.password
