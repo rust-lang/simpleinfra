@@ -20,6 +20,11 @@ data "aws_ssm_parameter" "allowed_ips" {
   name     = "/prod/bastion/allowed-ips/${each.value}"
 }
 
+data "aws_security_group" "bastion" {
+  vpc_id = data.terraform_remote_state.shared.outputs.prod_vpc.id
+  name   = "rust-prod-bastion"
+}
+
 resource "aws_security_group" "rust_prod_db" {
   vpc_id      = data.terraform_remote_state.shared.outputs.prod_vpc.id
   name        = "rust-prod-database"
@@ -34,6 +39,14 @@ resource "aws_security_group" "rust_prod_db" {
       cidr_blocks = [data.aws_ssm_parameter.allowed_ips[ingress.value].value]
       description = ingress.value
     }
+  }
+
+  ingress {
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [data.aws_security_group.bastion.id]
+    description     = "Connections from the bastion"
   }
 
   ingress {

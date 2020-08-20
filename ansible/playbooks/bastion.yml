@@ -18,3 +18,5 @@
         - onur  # docsrs.infra.rust-lang.org
         - joshua  # docsrs.infra.rust-lang.org
         - shep  # play.rust-lang.org
+
+    - role: bastion
