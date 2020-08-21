@@ -8,13 +8,8 @@ locals {
   //     /prod/bastion/allowed-ips/${user}
   //
   allowed_users = [
-    "acrichto",
     "aidanhs",
-    "guillaumegomez",
     "joshua",
-    "mozilla-mountain-view",
-    "mozilla-portland",
-    "mozilla-san-francisco",
     "onur",
     "pietro",
     "shep",
