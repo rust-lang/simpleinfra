@@ -28,27 +28,5 @@ provider "dns" {
   version = "~> 2.2"
 }
 
-locals {
-  // Users allowed to connect to the bastion through SSH. Each user needs to
-  // have the CIDR of the static IP they want to connect from stored in AWS SSM
-  // Parameter Store (us-west-1), in a string key named:
-  //
-  //     /prod/bastion/allowed-ips/${user}
-  //
-  allowed_users = [
-    "acrichto",
-    "aidanhs",
-    "guillaumegomez",
-    "joshua",
-    "mozilla-mountain-view",
-    "mozilla-portland",
-    "mozilla-san-francisco",
-    "onur",
-    "pietro",
-    "shep",
-    "simulacrum",
-  ]
-}
-
 data "aws_caller_identity" "current" {}
 data "aws_canonical_user_id" "current" {}
