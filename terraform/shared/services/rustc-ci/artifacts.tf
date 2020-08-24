@@ -11,11 +11,11 @@ resource "aws_s3_bucket" "artifacts" {
       prefix = lifecycle_rule.value
 
       expiration {
-        days = 168
+        days = var.delete_artifacts_after_days
       }
 
       noncurrent_version_expiration {
-        days = 168
+        days = var.delete_artifacts_after_days
       }
 
       abort_incomplete_multipart_upload_days = 1

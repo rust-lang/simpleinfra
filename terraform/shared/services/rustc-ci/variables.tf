@@ -22,3 +22,8 @@ variable "iam_prefix" {
   description = "Prefix for all IAM resources (users, policies, roles...)"
   type        = string
 }
+
+variable "delete_artifacts_after_days" {
+  description = "Number of days to delete CI artifacts after"
+  type        = number
+}

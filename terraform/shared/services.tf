@@ -13,6 +13,8 @@ module "service_rustc_ci" {
   caches_domain    = "ci-caches.rust-lang.org"
   artifacts_bucket = "rust-lang-ci2"
   artifacts_domain = "ci-artifacts.rust-lang.org"
+
+  delete_artifacts_after_days = 168
 }
 
 module "service_rustc_ci_gha" {
@@ -27,6 +29,8 @@ module "service_rustc_ci_gha" {
   caches_domain    = "ci-caches-gha.rust-lang.org"
   artifacts_bucket = "rust-lang-gha"
   artifacts_domain = "ci-artifacts-gha.rust-lang.org"
+
+  delete_artifacts_after_days = 3
 }
 
 module "service_promote_release" {
