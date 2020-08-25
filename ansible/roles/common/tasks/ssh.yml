@@ -4,6 +4,12 @@
 # This prevents users without sudo access from changing the keys without
 # committing the changes into ansible.
 
+- name: create the /etc/ssh/sshd_config.d directory
+  file:
+    path: /etc/ssh/sshd_config.d
+    state: directory
+    mode: 0700
+
 - name: upload sshd configuration
   template:
     src: ssh/sshd_config

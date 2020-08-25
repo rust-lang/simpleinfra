@@ -4,3 +4,12 @@
   apt:
     name: postgresql-client
     state: present
+
+- name: allow forwarding the PGPASSWORD environment variable with ssh
+  template:
+    src: sshd_config
+    dest: /etc/ssh/sshd_config.d/bastion
+    mode: 0700
+
+  notify:
+    - reload-ssh

@@ -35,3 +35,5 @@ AcceptEnv LANG LC_*
 Subsystem sftp /usr/lib/openssh/sftp-server
 
 AllowGroups allow-ssh
+
+Include /etc/ssh/sshd_config.d/*

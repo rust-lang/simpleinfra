@@ -1,0 +1,7 @@
+#
+# {{ ansible_managed }}
+#
+
+# Allow our tooling to forward the database password used by psql inside the
+# bastion instance. This prevents leaking the password to other users.
+AcceptEnv PGPASSWORD
