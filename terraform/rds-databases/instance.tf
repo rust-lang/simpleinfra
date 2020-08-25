@@ -15,10 +15,6 @@ resource "aws_db_subnet_group" "public" {
 
 # All of this security group stuff should go away once we migrate bastion to the
 # prod vpc (vs. the legacy vpc).
-data "aws_ssm_parameter" "allowed_ips" {
-  for_each = toset(data.terraform_remote_state.shared.outputs.allowed_users)
-  name     = "/prod/bastion/allowed-ips/${each.value}"
-}
 
 data "aws_security_group" "bastion" {
   vpc_id = data.terraform_remote_state.shared.outputs.prod_vpc.id
@@ -29,17 +25,6 @@ resource "aws_security_group" "rust_prod_db" {
   vpc_id      = data.terraform_remote_state.shared.outputs.prod_vpc.id
   name        = "rust-prod-database"
   description = "Access to the shared database from whitelisted networks"
-
-  dynamic "ingress" {
-    for_each = toset(data.terraform_remote_state.shared.outputs.allowed_users)
-    content {
-      from_port   = 5432
-      to_port     = 5432
-      protocol    = "tcp"
-      cidr_blocks = [data.aws_ssm_parameter.allowed_ips[ingress.value].value]
-      description = ingress.value
-    }
-  }
 
   ingress {
     from_port       = 5432

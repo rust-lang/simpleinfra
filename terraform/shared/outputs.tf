@@ -18,10 +18,6 @@ output "prod_vpc" {
   }
 }
 
-output "allowed_users" {
-  value = local.allowed_users
-}
-
 output "ecs_cluster_config" {
   value = module.service_ecs_cluster.config
 }
