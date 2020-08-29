@@ -7,7 +7,7 @@ over time.
 
 ## Applying the configuration
 
-To apply the configuration you'll need to have [Terraform 0.12
+To apply the configuration you'll need to have [Terraform 0.13
 installed][tf-install] and AWS credentials configured on the local machine.
 The first time you apply the configuration (or every time you add a new module)
 you'll need to initialize Terraform locally:
