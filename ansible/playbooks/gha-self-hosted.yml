@@ -14,6 +14,10 @@
         - simulacrum
         - pietro
 
+      # Useful to access the root account through the serial port.
+      root_password: "{{ vars_root_password }}"
+      root_password_salt: "{{ vars_root_password_salt }}"
+
     - role: gha-self-hosted
       source_repo: https://github.com/rust-lang/gha-self-hosted
 

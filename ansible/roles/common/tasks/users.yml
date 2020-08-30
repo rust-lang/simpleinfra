@@ -1,5 +1,11 @@
 ---
 
+- name: set root password
+  user:
+    name: root
+    password: "{{ root_password | password_hash('sha512', root_password_salt) }}"
+  when: root_password is defined
+
 - name: create default groups
   group:
     name: "{{ item }}"
