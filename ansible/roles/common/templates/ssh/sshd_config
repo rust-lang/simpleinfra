@@ -36,4 +36,7 @@ Subsystem sftp /usr/lib/openssh/sftp-server
 
 AllowGroups allow-ssh
 
+{# The `Include` directive is not supported on older Ubuntu versions #}
+{% if ansible_distribution_release not in ["xenial", "bionic"] %}
 Include /etc/ssh/sshd_config.d/*
+{% endif %}
