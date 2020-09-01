@@ -5,7 +5,6 @@ variable "name" {
 
 variable "platform_version" {
   type        = string
-  default     = "LATEST"
   description = "The fargate version to use"
 }
 
