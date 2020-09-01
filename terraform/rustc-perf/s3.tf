@@ -3,8 +3,10 @@ module "static_website" {
   providers = {
     aws = aws.east1
   }
-  domain_name        = "perf-data.rust-lang.org"
-  origin_domain_name = aws_s3_bucket.bucket.bucket_regional_domain_name
+
+  domain_name            = "perf-data.rust-lang.org"
+  origin_domain_name     = aws_s3_bucket.bucket.bucket_regional_domain_name
+  origin_access_identity = aws_cloudfront_origin_access_identity.bucket.cloudfront_access_identity_path
 }
 
 resource "aws_iam_user" "s3" {
@@ -67,12 +69,49 @@ resource "aws_s3_bucket" "bucket" {
   // We keep some level of backup, but not too much -- the primary data store
   // is the postgres db, and that's already backed up.
   lifecycle_rule {
-    id      = "remove-old"
+    id      = "delete old dbs"
+    prefix  = "export.db.sz"
     enabled = true
 
     abort_incomplete_multipart_upload_days = 2
     noncurrent_version_expiration {
       days = 7
     }
+
+    expiration {
+      days                         = 0
+      expired_object_delete_marker = true
+    }
   }
+}
+
+resource "aws_s3_bucket_policy" "bucket" {
+  bucket = aws_s3_bucket.bucket.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "AllowCloudfront"
+        Effect   = "Allow"
+        Action   = "s3:GetObject"
+        Resource = "${aws_s3_bucket.bucket.arn}/*"
+        Principal = {
+          AWS = aws_cloudfront_origin_access_identity.bucket.iam_arn
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_s3_bucket_public_access_block" "bucket" {
+  bucket = aws_s3_bucket.bucket.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_cloudfront_origin_access_identity" "bucket" {
+  comment = "perf-data.rust-lang.org"
 }

@@ -40,6 +40,10 @@ resource "aws_cloudfront_distribution" "website" {
   origin {
     origin_id   = "main"
     domain_name = var.origin_domain_name
+
+    s3_origin_config {
+      origin_access_identity = var.origin_access_identity
+    }
   }
 
   restrictions {
