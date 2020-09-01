@@ -1,7 +1,26 @@
 // Configuration for Terraform itself.
 
 terraform {
-  required_version = ">= 0.12"
+  required_version = "~> 0.13"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 2.70"
+    }
+    external = {
+      source  = "hashicorp/external"
+      version = "~> 1.2.0"
+    }
+    postgresql = {
+      source  = "terraform-providers/postgresql"
+      version = "~> 1.7.1"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 2.3.0"
+    }
+  }
 
   backend "s3" {
     bucket         = "rust-terraform"
@@ -28,14 +47,6 @@ provider "aws" {
   region  = "us-west-1"
 }
 
-provider "external" {
-  version = "~> 1.2"
-}
-
-provider "random" {
-  version = "~> 2.2"
-}
-
 // Setup port forwarding to access the database through the bastion.
 data "external" "port_forwarding" {
   program = ["${path.module}/forward-ports.py"]
@@ -49,8 +60,6 @@ data "external" "port_forwarding" {
 }
 
 provider "postgresql" {
-  version = "~> 1.5"
-
   host            = data.external.port_forwarding.result.host
   port            = data.external.port_forwarding.result.port
   database        = "postgres"
