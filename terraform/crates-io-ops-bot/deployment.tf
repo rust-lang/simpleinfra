@@ -85,11 +85,12 @@ EOF
 // any HTTP port and doesn't need a load balancer.
 
 resource "aws_ecs_service" "service" {
-  name            = "crates-io-ops-bot"
-  cluster         = data.terraform_remote_state.shared.outputs.ecs_cluster_config.cluster_id
-  task_definition = module.ecs_task.arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
+  name             = "crates-io-ops-bot"
+  cluster          = data.terraform_remote_state.shared.outputs.ecs_cluster_config.cluster_id
+  task_definition  = module.ecs_task.arn
+  desired_count    = 1
+  launch_type      = "FARGATE"
+  platform_version = "1.4.0"
 
   enable_ecs_managed_tags = true
 
