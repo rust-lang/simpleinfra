@@ -37,12 +37,22 @@ resource "aws_cloudfront_distribution" "website" {
     }
   }
 
-  origin {
-    origin_id   = "main"
-    domain_name = var.origin_domain_name
+  dynamic "origin" {
+    for_each = var.origin_access_identity == null ? toset([true]) : toset([])
+    content {
+      origin_id   = "main"
+      domain_name = var.origin_domain_name
+    }
+  }
+  dynamic "origin" {
+    for_each = var.origin_access_identity != null ? toset([true]) : toset([])
+    content {
+      origin_id   = "main"
+      domain_name = var.origin_domain_name
 
-    s3_origin_config {
-      origin_access_identity = var.origin_access_identity
+      s3_origin_config {
+        origin_access_identity = var.origin_access_identity
+      }
     }
   }
 
