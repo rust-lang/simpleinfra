@@ -105,8 +105,9 @@ EOF
 }
 
 module "ecs_service" {
-  source         = "../shared/modules/ecs-service"
-  cluster_config = data.terraform_remote_state.shared.outputs.ecs_cluster_config
+  source           = "../shared/modules/ecs-service"
+  cluster_config   = data.terraform_remote_state.shared.outputs.ecs_cluster_config
+  platform_version = "1.4.0"
 
   name        = "rustc-perf"
   task_arn    = module.ecs_task.arn
