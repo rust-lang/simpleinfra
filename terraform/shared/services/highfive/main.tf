@@ -61,8 +61,9 @@ EOF
 }
 
 module "ecs_service" {
-  source         = "../../modules/ecs-service"
-  cluster_config = var.cluster_config
+  source           = "../../modules/ecs-service"
+  cluster_config   = var.cluster_config
+  platform_version = "1.4.0"
 
   name        = "highfive"
   task_arn    = module.ecs_task.arn
