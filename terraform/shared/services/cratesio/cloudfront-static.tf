@@ -7,7 +7,7 @@ resource "aws_cloudfront_distribution" "static" {
   wait_for_deployment = false
   is_ipv6_enabled     = true
   default_root_object = "index.html"
-  price_class         = "PriceClass_All"
+  price_class         = "PriceClass_100"
 
   aliases = [var.static_domain_name]
   viewer_certificate {
