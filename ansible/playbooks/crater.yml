@@ -11,7 +11,6 @@
       collect_metrics_from: "{{ global_collect_metrics_from }}"
       sudo_users:
         - aidanhs
-        - acrichto
         - simulacrum
         - pietro
 

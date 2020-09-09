@@ -12,7 +12,6 @@
         - 127.0.0.1
       sudo_users:
         - aidanhs
-        - acrichto
         - simulacrum
         - pietro
 
