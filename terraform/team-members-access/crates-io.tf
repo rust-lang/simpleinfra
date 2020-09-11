@@ -92,6 +92,17 @@ resource "aws_iam_group_policy" "crates_io" {
           [for _, bucket in data.aws_s3_bucket.crates_io_buckets : "${bucket.arn}/*"],
         )
       },
+
+      // Support access
+      //
+      // The following rules allow crates-io team members to reach out to AWS
+      // Support without involving someone from the infrastructure team.
+      {
+        Sid      = "SupportAccess"
+        Effect   = "Allow"
+        Action   = ["support:*"]
+        Resource = "*"
+      },
     ]
   })
 }
