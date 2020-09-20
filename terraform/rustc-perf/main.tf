@@ -116,8 +116,5 @@ module "ecs_service" {
   http_container = "app"
   http_port      = 80
 
-  domains = [
-    "perf-new.rust-lang.org",
-    "perf.rust-lang.org"
-  ]
+  domains = ["perf.rust-lang.org"]
 }
