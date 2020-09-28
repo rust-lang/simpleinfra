@@ -42,3 +42,5 @@ provider "aws" {
   region  = "us-east-1"
   alias   = "east1"
 }
+
+data "aws_caller_identity" "current" {}
