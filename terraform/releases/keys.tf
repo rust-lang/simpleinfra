@@ -63,7 +63,11 @@ resource "aws_s3_bucket_policy" "rust_terraform" {
         Condition = {
           StringNotLike = {
             "aws:userId" = concat(
-              [data.aws_caller_identity.current.account_id],
+              [
+                data.aws_caller_identity.current.account_id,
+                "${module.dev.promote_release_role_id}:*",
+                "${module.prod.promote_release_role_id}:*",
+              ],
               [for name, user in data.aws_iam_user.release_keys_bucket_users : user.user_id],
             )
           }

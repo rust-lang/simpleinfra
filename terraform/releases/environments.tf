@@ -10,11 +10,15 @@ module "dev" {
     aws.east1 = aws.east1
   }
 
+  name = "dev"
+
   bucket             = "dev-static-rust-lang-org"
   static_domain_name = "dev-static.rust-lang.org"
   doc_domain_name    = "dev-doc.rust-lang.org"
 
-  inventories_bucket_arn = data.terraform_remote_state.shared.outputs.inventories_bucket_arn
+  inventories_bucket_arn   = data.terraform_remote_state.shared.outputs.inventories_bucket_arn
+  promote_release_ecr_repo = module.promote_release_ecr
+  release_keys_bucket_arn  = aws_s3_bucket.release_keys.arn
 }
 
 module "prod" {
@@ -24,9 +28,13 @@ module "prod" {
     aws.east1 = aws.east1
   }
 
+  name = "prod"
+
   bucket             = "static-rust-lang-org"
   static_domain_name = "static.rust-lang.org"
   doc_domain_name    = "doc.rust-lang.org"
 
-  inventories_bucket_arn = data.terraform_remote_state.shared.outputs.inventories_bucket_arn
+  inventories_bucket_arn   = data.terraform_remote_state.shared.outputs.inventories_bucket_arn
+  promote_release_ecr_repo = module.promote_release_ecr
+  release_keys_bucket_arn  = aws_s3_bucket.release_keys.arn
 }
