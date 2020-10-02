@@ -192,3 +192,81 @@ resource "aws_iam_role_policy" "promote_release" {
     ]
   })
 }
+
+// Lambda function that will start a build
+
+data "aws_ssm_parameter" "lambda_github_token" {
+  name = "/prod/promote-release/lambda-github-token"
+}
+
+resource "aws_iam_role" "lambda_promote_release" {
+  name = "lambda-promote-release--${var.name}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "sts:AssumeRole"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "lambda_promote_release" {
+  role = aws_iam_role.lambda_promote_release.name
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "AllowReadingGitHubToken"
+        Effect   = "Allow"
+        Action   = "ssm:GetParameter"
+        Resource = data.aws_ssm_parameter.lambda_github_token.arn
+      },
+      {
+        Sid      = "AllowDownloadingManifests"
+        Effect   = "Allow"
+        Action   = "s3:GetObject"
+        Resource = aws_s3_bucket.static.arn
+      },
+      {
+        Sid      = "AllowStartingReleases"
+        Effect   = "Allow"
+        Action   = "codebuild:StartBuild"
+        Resource = aws_codebuild_project.promote_release.arn
+      },
+      {
+        Sid    = "UploadLogs"
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+        ]
+        Resource = "arn:aws:logs:*:*:*"
+      },
+    ]
+  })
+}
+
+module "lambda_promote_release" {
+  source = "../../shared/modules/lambda"
+
+  name       = "promote-release--${var.name}"
+  source_dir = "impl/lambdas/promote-release"
+  handler    = "lambda_function.handler"
+  runtime    = "python3.8"
+  role_arn   = aws_iam_role.lambda_promote_release.arn
+
+  timeout_seconds = 30
+
+  environment = {
+    "CODEBUILD_PROJECT" = aws_codebuild_project.promote_release.name
+    "STATIC_BUCKET"     = aws_s3_bucket.static.bucket
+    "STATIC_DIR"        = "dist"
+  }
+}

@@ -14,7 +14,15 @@ resource "aws_lambda_function" "lambda" {
   handler       = var.handler
   role          = var.role_arn
   runtime       = var.runtime
+  timeout       = var.timeout_seconds
   publish       = true
 
   source_code_hash = data.external.source_zip.result.base64sha256
+
+  dynamic "environment" {
+    for_each = length(var.environment) == 0 ? toset([]) : toset([true])
+    content {
+      variables = var.environment
+    }
+  }
 }

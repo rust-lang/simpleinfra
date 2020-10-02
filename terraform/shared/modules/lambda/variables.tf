@@ -17,3 +17,13 @@ variable "runtime" {
 variable "role_arn" {
   type = string
 }
+
+variable "environment" {
+  type    = map(string)
+  default = {}
+}
+
+variable "timeout_seconds" {
+  type    = number
+  default = 3
+}
