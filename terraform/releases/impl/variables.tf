@@ -30,3 +30,7 @@ variable "promote_release_ecr_repo" {
     policy_pull_arn = string
   })
 }
+
+variable "promote_release_cron" {
+  type = map(string)
+}

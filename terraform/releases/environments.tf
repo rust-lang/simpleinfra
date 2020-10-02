@@ -19,6 +19,10 @@ module "dev" {
   inventories_bucket_arn   = data.terraform_remote_state.shared.outputs.inventories_bucket_arn
   promote_release_ecr_repo = module.promote_release_ecr
   release_keys_bucket_arn  = aws_s3_bucket.release_keys.arn
+
+  promote_release_cron = {
+    "nightly" = "cron(0 0 * * ? *)"
+  }
 }
 
 module "prod" {
@@ -37,4 +41,6 @@ module "prod" {
   inventories_bucket_arn   = data.terraform_remote_state.shared.outputs.inventories_bucket_arn
   promote_release_ecr_repo = module.promote_release_ecr
   release_keys_bucket_arn  = aws_s3_bucket.release_keys.arn
+
+  promote_release_cron = {}
 }

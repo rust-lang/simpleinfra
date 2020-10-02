@@ -270,3 +270,56 @@ module "lambda_promote_release" {
     "STATIC_DIR"        = "dist"
   }
 }
+
+// CloudWatch Rule that will execute the release process periodically.
+
+resource "aws_cloudwatch_event_rule" "cron_promote_release" {
+  for_each = var.promote_release_cron
+
+  name                = "promote-release--${var.name}--${each.key}"
+  description         = "Periodically promote channel ${each.key} in the ${var.name} environment"
+  role_arn            = aws_iam_role.cron_promote_release.arn
+  schedule_expression = each.value
+}
+
+resource "aws_cloudwatch_event_target" "cron_promote_release" {
+  for_each = var.promote_release_cron
+
+  rule = aws_cloudwatch_event_rule.cron_promote_release[each.key].name
+  arn  = module.lambda_promote_release.arn
+
+  input = jsonencode({
+    channel = each.key
+  })
+}
+
+resource "aws_iam_role" "cron_promote_release" {
+  name = "cron-promote-release--${var.name}"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "sts:AssumeRole"
+        Principal = {
+          Service = "events.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "cron_promote_release" {
+  role = aws_iam_role.cron_promote_release.name
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "AllowCallLambda"
+        Effect   = "Allow"
+        Action   = "lambda:InvokeFunction"
+        Resource = module.lambda_promote_release.arn
+      }
+    ]
+  })
+}
