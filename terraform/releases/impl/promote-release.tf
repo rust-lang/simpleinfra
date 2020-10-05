@@ -278,7 +278,6 @@ resource "aws_cloudwatch_event_rule" "cron_promote_release" {
 
   name                = "promote-release--${var.name}--${each.key}"
   description         = "Periodically promote channel ${each.key} in the ${var.name} environment"
-  role_arn            = aws_iam_role.cron_promote_release.arn
   schedule_expression = each.value
 }
 
@@ -293,33 +292,12 @@ resource "aws_cloudwatch_event_target" "cron_promote_release" {
   })
 }
 
-resource "aws_iam_role" "cron_promote_release" {
-  name = "cron-promote-release--${var.name}"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = "sts:AssumeRole"
-        Principal = {
-          Service = "events.amazonaws.com"
-        }
-      },
-    ]
-  })
-}
+resource "aws_lambda_permission" "cron_promote_release" {
+  for_each = var.promote_release_cron
 
-resource "aws_iam_role_policy" "cron_promote_release" {
-  role = aws_iam_role.cron_promote_release.name
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid      = "AllowCallLambda"
-        Effect   = "Allow"
-        Action   = "lambda:InvokeFunction"
-        Resource = module.lambda_promote_release.arn
-      }
-    ]
-  })
+  statement_id  = "cron--${var.name}--${each.key}"
+  action        = "lambda:InvokeFunction"
+  principal     = "events.amazonaws.com"
+  function_name = module.lambda_promote_release.name
+  source_arn    = aws_cloudwatch_event_rule.cron_promote_release[each.key].arn
 }
