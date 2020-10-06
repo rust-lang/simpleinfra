@@ -83,6 +83,10 @@ module "ecs_task" {
       {
         "name": "TAGS",
         "value": "true"
+      },
+      {
+        "name": "EVAL",
+        "value": "true"
       }
     ],
     "secrets": [
