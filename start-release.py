@@ -19,29 +19,23 @@ def main(env, channel, override_branch):
         print(f"       allowed channels: {ALLOWED_CHANNELS}")
         exit(1)
 
-    with tempfile.NamedTemporaryFile() as f:
-        payload = {}
-        payload["channel"] = channel
-        if override_branch is not None:
-            payload["branch"] = override_branch
+    vars = {}
+    vars["PROMOTE_RELEASE_CHANNEL"] = channel
+    if override_branch is not None:
+        vars["PROMOTE_RELEASE_OVERRIDE_CHANNEL"] = override_channel
 
-        output = subprocess.run([
-            "aws", "lambda", "invoke",
-            "--function-name", f"promote-release--{env}",
-            "--payload", json.dumps(payload),
-            f.name
-        ], check=True)
-        res = json.load(f)
-
-        if "errorMessage" in res:
-            print(res["errorMessage"])
-            if "stackTrace" in res:
-                print("\nStack trace:")
-                for line in res["stackTrace"]:
-                    print(line, end="")
-            exit(1)
-        else:
-            print(res["message"])
+    subprocess.run([
+        "aws", "codebuild", "start-build",
+        "--project-name", f"promote-release--{env}",
+        "--environment-variables-override", json.dumps([
+            {
+                "name": name,
+                "value": value,
+                "type": "PLAINTEXT",
+            }
+            for name, value in vars.items()
+        ]),
+    ], check=True)
 
 
 if __name__ == "__main__":
