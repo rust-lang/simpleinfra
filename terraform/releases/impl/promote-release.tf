@@ -193,84 +193,6 @@ resource "aws_iam_role_policy" "promote_release" {
   })
 }
 
-// Lambda function that will start a build
-
-data "aws_ssm_parameter" "lambda_github_token" {
-  name = "/prod/promote-release/lambda-github-token"
-}
-
-resource "aws_iam_role" "lambda_promote_release" {
-  name = "lambda-promote-release--${var.name}"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = "sts:AssumeRole"
-        Principal = {
-          Service = "lambda.amazonaws.com"
-        }
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy" "lambda_promote_release" {
-  role = aws_iam_role.lambda_promote_release.name
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid      = "AllowReadingGitHubToken"
-        Effect   = "Allow"
-        Action   = "ssm:GetParameter"
-        Resource = data.aws_ssm_parameter.lambda_github_token.arn
-      },
-      {
-        Sid      = "AllowDownloadingManifests"
-        Effect   = "Allow"
-        Action   = "s3:GetObject"
-        Resource = aws_s3_bucket.static.arn
-      },
-      {
-        Sid      = "AllowStartingReleases"
-        Effect   = "Allow"
-        Action   = "codebuild:StartBuild"
-        Resource = aws_codebuild_project.promote_release.arn
-      },
-      {
-        Sid    = "UploadLogs"
-        Effect = "Allow"
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents",
-        ]
-        Resource = "arn:aws:logs:*:*:*"
-      },
-    ]
-  })
-}
-
-module "lambda_promote_release" {
-  source = "../../shared/modules/lambda"
-
-  name       = "promote-release--${var.name}"
-  source_dir = "impl/lambdas/promote-release"
-  handler    = "lambda_function.handler"
-  runtime    = "python3.8"
-  role_arn   = aws_iam_role.lambda_promote_release.arn
-
-  timeout_seconds = 30
-
-  environment = {
-    "CODEBUILD_PROJECT" = aws_codebuild_project.promote_release.name
-    "STATIC_BUCKET"     = aws_s3_bucket.static.bucket
-    "STATIC_DIR"        = "dist"
-  }
-}
-
 // CloudWatch Rule that will execute the release process periodically.
 
 resource "aws_cloudwatch_event_rule" "cron_promote_release" {
@@ -284,20 +206,48 @@ resource "aws_cloudwatch_event_rule" "cron_promote_release" {
 resource "aws_cloudwatch_event_target" "cron_promote_release" {
   for_each = var.promote_release_cron
 
-  rule = aws_cloudwatch_event_rule.cron_promote_release[each.key].name
-  arn  = module.lambda_promote_release.arn
+  rule     = aws_cloudwatch_event_rule.cron_promote_release[each.key].name
+  arn      = aws_codebuild_project.promote_release.arn
+  role_arn = aws_iam_role.start_promote_release.arn
 
   input = jsonencode({
-    channel = each.key
+    environmentVariablesOverride = [
+      {
+        name  = "PROMOTE_RELEASE_CHANNEL"
+        value = each.key
+        type  = "PLAINTEXT"
+      }
+    ]
   })
 }
 
-resource "aws_lambda_permission" "cron_promote_release" {
-  for_each = var.promote_release_cron
+resource "aws_iam_role" "start_promote_release" {
+  name = "start-promote-release--${var.name}"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "sts:AssumeRole"
+        Principal = {
+          Service = "events.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
 
-  statement_id  = "cron--${var.name}--${each.key}"
-  action        = "lambda:InvokeFunction"
-  principal     = "events.amazonaws.com"
-  function_name = module.lambda_promote_release.name
-  source_arn    = aws_cloudwatch_event_rule.cron_promote_release[each.key].arn
+resource "aws_iam_role_policy" "start_promote_release" {
+  role = aws_iam_role.start_promote_release.name
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "AllowStartBuild"
+        Effect   = "Allow"
+        Action   = "codebuild:StartBuild"
+        Resource = aws_codebuild_project.promote_release.arn
+      }
+    ]
+  })
 }
