@@ -57,6 +57,11 @@ resource "aws_codebuild_project" "promote_release" {
     }
 
     environment_variable {
+      name  = "PROMOTE_RELEASE_GPG_KEY_FILE"
+      value = "/tmp/gnupg/keys/secret.asc"
+    }
+
+    environment_variable {
       name  = "PROMOTE_RELEASE_GPG_PASSWORD_FILE"
       value = "/tmp/gnupg/key-password"
     }
