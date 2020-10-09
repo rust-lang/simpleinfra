@@ -22,7 +22,7 @@ def main(env, channel, override_branch):
     vars = {}
     vars["PROMOTE_RELEASE_CHANNEL"] = channel
     if override_branch is not None:
-        vars["PROMOTE_RELEASE_OVERRIDE_CHANNEL"] = override_channel
+        vars["PROMOTE_RELEASE_OVERRIDE_BRANCH"] = override_branch
 
     subprocess.run([
         "aws", "codebuild", "start-build",
