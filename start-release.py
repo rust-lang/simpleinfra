@@ -9,7 +9,7 @@ ALLOWED_ENVIRONMENTS = ["dev", "prod"]
 ALLOWED_CHANNELS = ["nightly", "beta", "stable"]
 
 
-def main(env, channel, override_branch):
+def main(env, channel, override_commit):
     if env not in ALLOWED_ENVIRONMENTS:
         print(f"error: unknown environment: {env}")
         print(f"       available environments: {ALLOWED_ENVIRONMENTS}")
@@ -21,8 +21,8 @@ def main(env, channel, override_branch):
 
     vars = {}
     vars["PROMOTE_RELEASE_CHANNEL"] = channel
-    if override_branch is not None:
-        vars["PROMOTE_RELEASE_OVERRIDE_BRANCH"] = override_branch
+    if override_commit is not None:
+        vars["PROMOTE_RELEASE_OVERRIDE_COMMIT"] = override_commit
 
     subprocess.run([
         "aws", "codebuild", "start-build",
@@ -40,7 +40,7 @@ def main(env, channel, override_branch):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2 or len(sys.argv) > 4:
-        print("usage: ./start-release.py <environment> <channel> [override-branch]")
+        print("usage: ./start-release.py <environment> <channel> [override-commit]")
         print()
         print("examples:")
         print("  ./start-release.py dev nightly")
@@ -49,8 +49,8 @@ if __name__ == "__main__":
 
     env = sys.argv[1]
     channel = sys.argv[2]
-    override_branch = None
+    override_commit = None
     if len(sys.argv) == 4:
-        override_branch = sys.argv[3]
+        override_commit = sys.argv[3]
 
-    main(env, channel, override_branch)
+    main(env, channel, override_commit)
