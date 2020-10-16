@@ -137,10 +137,6 @@ module "ecs_service" {
   task_arn    = module.ecs_task.arn
   tasks_count = 1
 
-  # Avoid creating multiple instances of bors at the same time
-  deployment_minimum_healty_percent = 0
-  deployment_maximum_percent        = 100
-
   http_container = "app"
   http_port      = 80
 
