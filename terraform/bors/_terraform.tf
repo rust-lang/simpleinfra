@@ -12,6 +12,10 @@ terraform {
       source  = "hashicorp/github"
       version = "~> 2.9.2"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0.0"
+    }
   }
 
   backend "s3" {
@@ -27,6 +31,10 @@ provider "aws" {
   region = "us-west-1"
 }
 
+provider "github" {
+  organization = var.github_org
+}
+
 data "terraform_remote_state" "shared" {
   backend = "s3"
   config = {
@@ -34,4 +42,16 @@ data "terraform_remote_state" "shared" {
     key    = "simpleinfra/shared.tfstate"
     region = "us-west-1"
   }
+}
+
+variable "domain_name" {
+  type = string
+}
+
+variable "github_org" {
+  type = string
+}
+
+variable "repositories" {
+  type = map(string)
 }
