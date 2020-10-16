@@ -44,3 +44,13 @@ variable "cluster_config" {
   })
   description = "Shared configuration of the ECS cluster"
 }
+
+variable "deployment_minimum_healty_percent" {
+  type    = number
+  default = 100
+}
+
+variable "deployment_maximum_percent" {
+  type    = number
+  default = 200
+}

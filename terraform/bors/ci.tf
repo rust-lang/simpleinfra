@@ -11,6 +11,23 @@ module "iam_ci" {
   repo   = "homu"
 }
 
+resource "aws_iam_user_policy" "update_service" {
+  name = "update-ecs-service"
+  user = module.iam_ci.user_name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "AllowUpdate"
+        Effect   = "Allow"
+        Action   = "ecs:UpdateService"
+        Resource = module.ecs_service.arn
+      }
+    ]
+  })
+}
+
 resource "aws_iam_user_policy_attachment" "ci_pull" {
   user       = module.iam_ci.user_name
   policy_arn = module.ecr.policy_pull_arn

@@ -6,6 +6,9 @@ resource "aws_ecs_service" "service" {
   launch_type      = "FARGATE"
   platform_version = var.platform_version
 
+  deployment_minimum_healthy_percent = var.deployment_minimum_healty_percent
+  deployment_maximum_percent         = var.deployment_maximum_percent
+
   enable_ecs_managed_tags = true
 
   load_balancer {
