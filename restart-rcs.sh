@@ -14,8 +14,8 @@ set -o xtrace
 
 TARGET_BOX=rcs.rust-lang.org
 
-ssh $TARGET_BOX $(aws ecr get-login --no-include-email --region us-west-1)
 ssh $TARGET_BOX '
+    $(aws ecr get-login --no-include-email --region us-west-1) &&
     set -o errexit &&
     set -o pipefail &&
     set -o nounset &&
