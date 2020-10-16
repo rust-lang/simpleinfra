@@ -21,7 +21,7 @@ resource "github_repository_webhook" "bors" {
   configuration {
     url          = "https://${var.domain_name}/github"
     secret       = random_password.webhook_secrets[each.key].result
-    content_type = "application/json"
+    content_type = "json"
     insecure_ssl = false
   }
 
