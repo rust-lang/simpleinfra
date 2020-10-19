@@ -35,6 +35,11 @@ provider "github" {
   organization = var.github_org
 }
 
+provider "github" {
+  alias        = "rust_lang_ci"
+  organization = "rust-lang-ci"
+}
+
 data "terraform_remote_state" "shared" {
   backend = "s3"
   config = {
