@@ -137,10 +137,9 @@ module "ecs_service" {
   task_arn    = module.ecs_task.arn
   tasks_count = 1
 
-  http_container = "app"
-  http_port      = 80
+  http_container    = "app"
+  http_port         = 80
+  health_check_path = "/health"
 
-  domains = [
-    var.domain_name,
-  ]
+  domains = concat([var.domain_name], var.legacy_domain_names)
 }

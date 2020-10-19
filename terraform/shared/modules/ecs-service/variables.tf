@@ -54,3 +54,8 @@ variable "deployment_maximum_percent" {
   type    = number
   default = 200
 }
+
+variable "health_check_path" {
+  type    = string
+  default = "/"
+}

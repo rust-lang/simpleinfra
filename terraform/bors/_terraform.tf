@@ -48,6 +48,10 @@ variable "domain_name" {
   type = string
 }
 
+variable "legacy_domain_names" {
+  type = list(string)
+}
+
 variable "github_org" {
   type = string
 }

@@ -36,6 +36,13 @@ resource "aws_lb_target_group" "service" {
   protocol = "HTTP"
 
   deregistration_delay = 30
+
+  health_check {
+    enabled             = true
+    path                = var.health_check_path
+    healthy_threshold   = 5
+    unhealthy_threshold = 2
+  }
 }
 
 data "aws_route53_zone" "zones" {
