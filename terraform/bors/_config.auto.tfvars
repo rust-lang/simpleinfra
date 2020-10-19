@@ -6,7 +6,6 @@ repositories = {
   cargo             = "cargo"
   chalk             = "chalk"
   clippy            = "rust-clippy"
-  compiler-builtins = "compiler-builtins"
   crater            = "crater"
   crates-io         = "crates.io"
   hashbrown         = "hashbrown"
@@ -14,7 +13,5 @@ repositories = {
   miri              = "miri"
   rls               = "rls"
   rust              = "rust"
-  rustlings         = "rustlings"
-  rustup            = "rustup"
   stdarch           = "stdarch"
 }
