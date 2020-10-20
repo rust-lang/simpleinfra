@@ -20,9 +20,7 @@ module "dev" {
   promote_release_ecr_repo = module.promote_release_ecr
   release_keys_bucket_arn  = aws_s3_bucket.release_keys.arn
 
-  promote_release_cron = {
-    "nightly" = "cron(0 0 * * ? *)"
-  }
+  promote_release_cron = {}
 }
 
 module "prod" {
@@ -42,5 +40,7 @@ module "prod" {
   promote_release_ecr_repo = module.promote_release_ecr
   release_keys_bucket_arn  = aws_s3_bucket.release_keys.arn
 
-  promote_release_cron = {}
+  promote_release_cron = {
+    "nightly" = "cron(0 0 * * ? *)"
+  }
 }
