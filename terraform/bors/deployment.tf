@@ -51,7 +51,7 @@ module "ecs_task" {
 
   name   = "bors"
   cpu    = 256
-  memory = 512
+  memory = 2048
 
   log_retention_days = 7
   ecr_repositories_arns = [
