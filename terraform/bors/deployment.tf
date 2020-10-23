@@ -50,7 +50,7 @@ module "ecs_task" {
   source = "../shared/modules/ecs-task"
 
   name   = "bors"
-  cpu    = 256
+  cpu    = 1024
   memory = 2048
 
   log_retention_days = 7
