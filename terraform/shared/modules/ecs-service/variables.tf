@@ -59,3 +59,13 @@ variable "health_check_path" {
   type    = string
   default = "/"
 }
+
+variable "health_check_interval" {
+  type    = string
+  default = 30
+}
+
+variable "health_check_timeout" {
+  type    = number
+  default = 5
+}
