@@ -42,5 +42,6 @@ module "prod" {
 
   promote_release_cron = {
     "nightly" = "cron(0 0 * * ? *)"
+    "beta"    = "cron(0 0 * * ? *)"
   }
 }
