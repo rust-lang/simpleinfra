@@ -14,5 +14,6 @@ repositories = {
   miri      = "miri"
   rls       = "rls"
   rust      = "rust"
+  semverver = "rust-semverver"
   stdarch   = "stdarch"
 }
