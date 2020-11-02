@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import json
 import os
 import subprocess
@@ -11,34 +12,30 @@ import time
 ALLOWED_ENVIRONMENTS = ["dev", "prod"]
 ALLOWED_CHANNELS = ["nightly", "beta", "stable"]
 
-# Environment variables to set in the CodeBuild runner if they're present in
-# the local system too.
-FORWARD_ENVIRONMENT_VARIABLES = [
-    "PROMOTE_RELEASE_ALLOW_MULTIPLE_TODAY",
-]
 
-
-def main(env, channel, override_commit):
-    if env not in ALLOWED_ENVIRONMENTS:
-        print(f"error: unknown environment: {env}")
+def main(args):
+    if args.env not in ALLOWED_ENVIRONMENTS:
+        print(f"error: unknown environment: {args.env}")
         print(f"       available environments: {ALLOWED_ENVIRONMENTS}")
         exit(1)
-    if channel not in ALLOWED_CHANNELS:
-        print(f"error: unknown channel: {channel}")
+    if args.channel not in ALLOWED_CHANNELS:
+        print(f"error: unknown channel: {args.channel}")
         print(f"       allowed channels: {ALLOWED_CHANNELS}")
         exit(1)
 
     vars = {}
-    vars["PROMOTE_RELEASE_CHANNEL"] = channel
-    if override_commit is not None:
-        vars["PROMOTE_RELEASE_OVERRIDE_COMMIT"] = override_commit
-    for key, value in os.environ.items():
-        if key in FORWARD_ENVIRONMENT_VARIABLES:
-            vars[key] = value
+    vars["PROMOTE_RELEASE_CHANNEL"] = args.channel
+    if args.override_commit is not None:
+        vars["PROMOTE_RELEASE_OVERRIDE_COMMIT"] = args.override_commit
+    if args.bypass_startup_checks:
+        vars["PROMOTE_RELEASE_BYPASS_STARTUP_CHECKS"] = "1"
+
+    print(vars)
+    exit()
 
     res = subprocess.run([
         "aws", "codebuild", "start-build",
-        "--project-name", f"promote-release--{env}",
+        "--project-name", f"promote-release--{args.env}",
         "--environment-variables-override", json.dumps([
             {
                 "name": name,
@@ -72,18 +69,20 @@ def main(env, channel, override_commit):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2 or len(sys.argv) > 4:
-        print("usage: ./start-release.py <environment> <channel> [override-commit]")
-        print()
-        print("examples:")
-        print("  ./start-release.py dev nightly")
-        print("  ./start-release.py prod stable")
-        exit(1)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("env", help="The environment to run the release on")
+    parser.add_argument("channel", help="The channel to release")
+    parser.add_argument(
+        "override_commit",
+        help="The commit hash to release",
+        nargs="?",
+    )
+    parser.add_argument(
+        "--bypass-startup-checks",
+        help="Bypass the checks that prevent unwanted releases",
+        action="store_true",
+        dest="bypass_startup_checks",
+    )
+    args = parser.parse_args()
 
-    env = sys.argv[1]
-    channel = sys.argv[2]
-    override_commit = None
-    if len(sys.argv) == 4:
-        override_commit = sys.argv[3]
-
-    main(env, channel, override_commit)
+    main(args)
