@@ -30,9 +30,6 @@ def main(args):
     if args.bypass_startup_checks:
         vars["PROMOTE_RELEASE_BYPASS_STARTUP_CHECKS"] = "1"
 
-    print(vars)
-    exit()
-
     res = subprocess.run([
         "aws", "codebuild", "start-build",
         "--project-name", f"promote-release--{args.env}",
