@@ -1,14 +1,18 @@
-// Resources used by the rust-lang/homu CI.
+// ECR repository which will store the Docker image powering the application.
 
 module "ecr" {
-  source = "../shared/modules/ecr-repo"
-  name   = "bors"
+  source = "../ecr-repo"
+  name   = var.name
 }
 
+// IAM User used by GitHub Actions to pull and push images to ECR, and to
+// restart the ECS service once the image is uploaded. The credentials will
+// be added automatically to the GitHub Actions secrets.
+
 module "iam_ci" {
-  source = "../shared/modules/gha-iam-user"
-  org    = "rust-lang"
-  repo   = "homu"
+  source = "../gha-iam-user"
+  org    = split("/", var.repo)[0]
+  repo   = split("/", var.repo)[1]
 }
 
 resource "aws_iam_user_policy" "update_service" {
