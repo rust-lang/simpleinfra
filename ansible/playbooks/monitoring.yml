@@ -72,6 +72,12 @@
             - targets:
               - crater.rust-lang.org:443
 
+        - job_name: monitorbot
+          scheme: https
+          static_configs:
+            - targets:
+              - monitorbot.infra.rust-lang.org:443
+
       prometheus_rule_groups:
         - name: node
           rules:
