@@ -18,6 +18,26 @@ resource "aws_iam_role" "task" {
   })
 }
 
+// Permissions for the IAM Role used during the startup of the application,
+// granting all permissions needed while creating the task.
+
+resource "aws_iam_role_policy" "task_execution" {
+  role = module.ecs_task.execution_role_name
+  name = "parameters"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "AllowParameterStore"
+        Effect   = "Allow"
+        Action   = "ssm:GetParameters"
+        Resource = values(data.aws_ssm_parameter.task).*.arn
+      }
+    ]
+  })
+}
+
 // EFS filesystem used for persistent storage across tasks. The filesystem is
 // created only if it's meant to be mounted inside the tasks.
 

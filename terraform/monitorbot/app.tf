@@ -18,7 +18,7 @@ module "monitorbot" {
   }
 
   secrets = {
-    MONITORBOT_RATE_LIMIT_TOKENS = "/prod/ecs/monitorbot/rate-limit-tokens"
+    MONITORBOT_RATE_LIMIT_TOKENS = "/prod/monitorbot/rate-limit-tokens"
   }
 
   expose_http = {
