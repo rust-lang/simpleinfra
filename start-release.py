@@ -45,8 +45,6 @@ def main(args):
     build = json.loads(res.stdout)["build"]
     print(f"Build started with ID '{build['id']}'")
 
-    build = {"id": "promote-release--dev:1dacf12e-1919-4ed6-9dfb-e357749eac6d", "logs": {}}
-
     # If the CloudWatch stream was not created yet poll the API
     while "streamName" not in build["logs"]:
         time.sleep(1)
