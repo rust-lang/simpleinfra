@@ -29,3 +29,16 @@ module "docs_rs" {
     "www.docsrs.com",
   ]
 }
+
+module "rustconf_com" {
+  source = "./impl"
+  providers = {
+    aws       = aws
+    aws.east1 = aws.east1
+  }
+
+  to = "https://rustconf.com"
+  from = [
+    "www.rustconf.com"
+  ]
+}
