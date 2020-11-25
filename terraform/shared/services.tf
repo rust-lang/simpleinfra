@@ -33,14 +33,6 @@ module "service_rustc_ci_gha" {
   delete_artifacts_after_days = 3
 }
 
-module "service_promote_release" {
-  source = "./services/promote-release"
-
-  static_bucket_arn     = "arn:aws:s3:::static-rust-lang-org"
-  dev_static_bucket_arn = "arn:aws:s3:::dev-static-rust-lang-org"
-  ci_bucket_arn         = module.service_rustc_ci.artifacts_bucket_arn
-}
-
 module "service_cratesio" {
   source = "./services/cratesio"
   providers = {
