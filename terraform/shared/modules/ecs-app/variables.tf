@@ -54,6 +54,19 @@ variable "environment" {
 variable "secrets" {
   type    = map(string)
   default = {}
+  validation {
+    condition     = !contains([for key, value in var.secrets : value if substr(value, 0, 4) != "arn:"], false)
+    error_message = "Computed secrets must not be ARNs."
+  }
+}
+
+variable "computed_secrets" {
+  type    = map(string)
+  default = {}
+  validation {
+    condition     = !contains([for key, value in var.computed_secrets : value if substr(value, 0, 4) == "arn:"], false)
+    error_message = "Computed secrets must be ARNs."
+  }
 }
 
 variable "cluster_config" {

@@ -29,10 +29,14 @@ resource "aws_iam_role_policy" "task_execution" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid      = "AllowParameterStore"
-        Effect   = "Allow"
-        Action   = "ssm:GetParameters"
-        Resource = values(data.aws_ssm_parameter.task).*.arn
+        Sid    = "AllowParameterStore"
+        Effect = "Allow"
+        Action = "ssm:GetParameters"
+
+        Resource = concat(
+          values(data.aws_ssm_parameter.task).*.arn,
+          values(var.computed_secrets),
+        )
       }
     ]
   })
@@ -98,13 +102,22 @@ module "ecs_task" {
         }
       ]
 
-      secrets = [
-        for name, param in var.secrets :
-        {
-          name      = name
-          valueFrom = data.aws_ssm_parameter.task[param].arn
-        }
-      ]
+      secrets = concat(
+        [
+          for name, param in var.secrets :
+          {
+            name      = name
+            valueFrom = data.aws_ssm_parameter.task[param].arn
+          }
+        ],
+        [
+          for name, param in var.computed_secrets :
+          {
+            name      = name
+            valueFrom = param
+          }
+        ],
+      )
 
       portMappings = var.expose_http == null ? [] : [
         {

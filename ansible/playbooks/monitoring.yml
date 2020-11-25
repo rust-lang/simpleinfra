@@ -74,6 +74,7 @@
 
         - job_name: monitorbot
           scheme: https
+          bearer_token: "{{ vars_prometheus_monitorbot_secret }}"
           static_configs:
             - targets:
               - monitorbot.infra.rust-lang.org:443

@@ -6,6 +6,8 @@ vars_postgresql_grafana_password: passw0rd
 vars_grafana_github_oauth_id: aaaaaaaaaaaaaaaaaaaa
 vars_grafana_github_oauth_secret: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
+vars_prometheus_monitorbot_secret: secret
+
 vars_grafana_domain: example.com
 vars_grafana_admin_password: passw0rd
 

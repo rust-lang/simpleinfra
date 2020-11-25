@@ -21,6 +21,10 @@ module "monitorbot" {
     MONITORBOT_RATE_LIMIT_TOKENS = "/prod/monitorbot/rate-limit-tokens"
   }
 
+  computed_secrets = {
+    MONITORBOT_SECRET = aws_ssm_parameter.secret.arn
+  }
+
   expose_http = {
     container_port = 80
     domains        = ["monitorbot.infra.rust-lang.org"]
@@ -29,4 +33,18 @@ module "monitorbot" {
     health_check_interval = 5
     health_check_timeout  = 2
   }
+}
+
+// Generate the secret key used to access the metrics and store it in AWS
+// Parameter Store. Prometheus will then fetch the credentials from it.
+
+resource "random_password" "secret" {
+  length  = 32
+  special = true
+}
+
+resource "aws_ssm_parameter" "secret" {
+  type  = "SecureString"
+  name  = "/prod/monitorbot/secret"
+  value = random_password.secret.result
 }

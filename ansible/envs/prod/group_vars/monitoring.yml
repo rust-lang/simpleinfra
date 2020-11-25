@@ -14,5 +14,7 @@ vars_alertmanager_receiver_zulip_infra: "{{ ssm_monitoring['alertmanager-receive
 vars_alertmanager_receiver_discord_docsrs: "{{ ssm_monitoring['alertmanager-receiver-discord-docsrs'] }}"
 vars_grafana_admin_password: "{{ ssm_monitoring['grafana-admin-password'] }}"
 
+vars_prometheus_monitorbot_secret: "{{ lookup('aws_ssm', '/prod/monitorbot/secret', region='us-west-1') }}"
+
 vars_backup_repository: s3:s3.amazonaws.com/rust-backups/monitoring
 vars_grafana_domain: grafana.rust-lang.org
