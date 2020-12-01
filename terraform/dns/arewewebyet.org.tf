@@ -12,6 +12,6 @@ module "arewewebyet_org" {
   }
 
   CNAME = {
-    "www"  = ["arewewebyet.org"],
+    "www" = ["rust-lang.github.io."],
   }
 }
