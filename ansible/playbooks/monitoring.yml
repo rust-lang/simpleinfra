@@ -122,13 +122,40 @@
                 description: "Prometheus wasn't able to reach the docs.rs website for more than a minute."
 
             - alert: LongQueue
-              expr: docsrs_queued_crates_count{job="docsrs"} >= 100
-              for: 1h
+              expr: docsrs_prioritized_crates_count{job="docsrs"} >= 50
+              for: 30m
               labels:
                 dispatch: docsrs
               annotations:
                 summary: "The docs.rs build queue is unreasonably long"
-                description: "There are more than 100 crates in the docs.rs queue, and the situation didn't resolve itself in the past hour. The build queue is available at https://docs.rs/releases/queue"
+                description: "There are more than 50 crates in the docs.rs queue, and the situation didn't resolve itself in the past 30 minutes. The build queue is available at https://docs.rs/releases/queue"
+
+            - alert: LongDeprioritizedQueue
+              expr: docsrs_queued_crates_count{job="docsrs"} - docsrs_prioritized_crates_count{job="docsrs"} >= 1000
+              for: 1h
+              labels:
+                dispatch: docsrs
+              annotations:
+                summary: "The docs.rs deprioritized queue is unreasonably long"
+                description: "There are more than 1000 deprioritized crates in the docs.rs queue, and the situation didn't resolve itself in the past hour. The build queue is available at https://docs.rs/releases/queue"
+
+            - alert: FailingBuilds
+              expr: increase(docsrs_failed_builds{job="docsrs"}[3h]) / increase(docsrs_total_builds{job="docsrs"}[3h]) > 0.75
+              for: 1m
+              labels:
+                dispatch: docsrs
+              annotations:
+                summary: "Most of the docs.rs builds are failing"
+                description: "More than 75% of the crate builds failed over the past 3 hours. Recent failures are available at https://docs.rs/releases/recent-failures."
+
+            - alert: BrokenDatabase
+              expr: increase(docsrs_failed_db_connections{job="docsrs"}[1m]) > 0
+              for: 1m
+              labels:
+                dispatch: docsrs
+              annotations:
+                summary: "Database connections are failing on docs.rs"
+                description: "In the past minute some database connections failed to be established!"
 
         - name: crater
           rules:
