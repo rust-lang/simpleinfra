@@ -129,3 +129,8 @@ resource "aws_s3_bucket_public_access_block" "temp_logs_cratesio" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
+
+resource "aws_s3_bucket" "rust_lang_crates_io_index" {
+  bucket = "tmp-cratesio-index"
+  acl    = "private"
+}
