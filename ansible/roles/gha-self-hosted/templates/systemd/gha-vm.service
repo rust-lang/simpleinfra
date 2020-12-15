@@ -10,6 +10,7 @@ Wants=gha-self-hosted-boot-time.service
 
 [Service]
 ExecStart=/opt/gha-self-hosted/source/executor/run.py {{ item.name }}
+ExecReload=/bin/kill -USR1 $MAINPID
 Restart=always
 
 WorkingDirectory=/opt/gha-self-hosted

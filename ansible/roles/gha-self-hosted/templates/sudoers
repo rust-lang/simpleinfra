@@ -2,4 +2,4 @@
 # {{ ansible_managed }}
 #
 
-gha-self-hosted ALL= NOPASSWD: /bin/systemctl start gha-self-hosted-rebuild-image.service
+gha-self-hosted ALL= NOPASSWD: /bin/systemctl start gha-self-hosted-rebuild-image.service{% for instance in instances %}, /bin/systemctl reload gha-vm-{{ instance.name }}.service{% endfor %}

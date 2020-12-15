@@ -21,3 +21,9 @@ for image in "$(ls "${SOURCE}/images")"; do
     make
     mv "${SOURCE}/images/${image}/build/${ARCH}/rootfs.qcow2" "${dest}"
 done
+
+# Restart all the VMs
+# This will *not* restart them if they're currently running a build!
+{% for instance in instances %}
+sudo systemctl reload gha-vm-{{ instance.name }}.service
+{% endfor %}
