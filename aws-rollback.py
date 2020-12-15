@@ -3,7 +3,6 @@
 import json
 import subprocess
 import sys
-from datetime import datetime
 
 TARGET_TAG = 'latest'
 ECS_CLUSTER = 'rust-ecs-prod'
@@ -33,7 +32,7 @@ def main():
     eprint(f"selected option: {image}\n")
     manifest = get_image_manifest(repository_name, image["imageDigest"])
     retag_image(repository_name,manifest)
-    image_pushed_at = datetime.fromtimestamp(image["imagePushedAt"])
+    image_pushed_at = format_time(image["imagePushedAt"])
     eprint(f"image pushed at {image_pushed_at} retaged as '{TARGET_TAG}'\n")
     if can_redeploy(repository_name):
         redeployed = force_redeploy()
@@ -45,14 +44,14 @@ def let_user_pick_image(images, isRetry=None):
     if isRetry is None:
         print("Please choosean image to rollback:\n")
         for idx, image in enumerate(images):
-            image_pushed_at = datetime.fromtimestamp(image["imagePushedAt"])
+            image_pushed_at = format_time(image["imagePushedAt"])
             tags = ", ".join(image.get("imageTags", []))
             print("{}) {} {}".format(idx+1,image_pushed_at,"("+tags+")" if tags != "" else ""))
         print("")
     else:
         print(f"Invalid value, please check the list of possible values...\n")
 
-    i = input("Enter image number(or 0 to exit): ")
+    i = input("Enter image number (or 0 to exit): ")
     try:
         idx = int(i)
         if -1 < idx <= len(images):
@@ -140,6 +139,9 @@ def force_redeploy(service_name):
 ###############
 #  Utilities  #
 ###############
+
+def format_time(time):
+    return time.replace("T", " ").replace("+", " +")
 
 def usage():
     """ print usage help and exit."""
