@@ -7,10 +7,6 @@ module "arewewebyet_org" {
   comment = "domain for rust-lang/arewewebyet"
   ttl     = 300
 
-  A = {
-    "@" = local.github_pages_ipv4, # Defined in _shared.tf
-  }
-
   CNAME = {
     "www" = ["rust-lang.github.io."],
   }

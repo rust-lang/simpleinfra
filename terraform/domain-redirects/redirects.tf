@@ -42,3 +42,16 @@ module "rustconf_com" {
     "www.rustconf.com"
   ]
 }
+
+module "arewewebyet_org" {
+  source = "./impl"
+  providers = {
+    aws       = aws
+    aws.east1 = aws.east1
+  }
+
+  to = "https://www.arewewebyet.org"
+  from = [
+    "arewewebyet.org"
+  ]
+}
