@@ -19,6 +19,10 @@ data "aws_cloudwatch_log_group" "ecs_discord_mods_bot" {
   name = "/ecs/discord-mods-bot"
 }
 
+data "aws_ssm_parameter" "rds_discord_mods_bot" {
+  name = "/prod/rds/shared/connection-urls/discord-mods-bot"
+}
+
 resource "aws_iam_group_policy" "mods_discord" {
   group = aws_iam_group.mods_discord.name
   name  = "prod-access"
@@ -50,6 +54,17 @@ resource "aws_iam_group_policy" "mods_discord" {
         ]
         Resource = data.aws_cloudwatch_log_group.ecs_discord_mods_bot.arn,
       },
+
+      // Access to the credentials to connect to the discord-mods-bot database
+      // on the shared RDS instance. This allows team members to run:
+      //
+      // ./aws-psql.py shared discord-mods-bot
+      {
+        Sid      = "AllowRDSCredentialsAccess"
+        Effect   = "Allow"
+        Action   = "ssm:GetParameter"
+        Resource = data.aws_ssm_parameter.rds_discord_mods_bot.arn
+      }
     ]
   })
 }

@@ -14,6 +14,7 @@ locals {
     "pietro",
     "shep",
     "simulacrum",
+    "technetos",
   ]
 }
 
