@@ -103,7 +103,7 @@ data "aws_ssm_parameter" "task" {
 }
 
 resource "aws_cloudwatch_log_group" "task" {
-  name              = "/prod/${var.name}"
+  name              = "/${var.env}/${var.name}"
   retention_in_days = 7
 }
 
