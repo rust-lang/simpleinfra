@@ -18,16 +18,34 @@ resource "aws_iam_role" "task" {
   })
 }
 
-// Permissions for the IAM Role used during the startup of the application,
-// granting all permissions needed while creating the task.
+// IAM Role used during the startup of the application, granting all
+// permissions needed while creating the task.
+
+resource "aws_iam_role" "task_execution" {
+  name = "ecs-task-execution--${var.name}"
+  assume_role_policy = jsonencode({
+    Version = "2008-10-17"
+    Statement = [
+      {
+        Sid    = "ECS"
+        Effect = "Allow"
+        Action = "sts:AssumeRole"
+        Principal = {
+          Service = "ecs-tasks.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
 
 resource "aws_iam_role_policy" "task_execution" {
-  role = module.ecs_task.execution_role_name
-  name = "parameters"
+  role = aws_iam_role.task_execution.name
+  name = "permissions"
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
+      // Access to SSM Parameter Store
       {
         Sid    = "AllowParameterStore"
         Effect = "Allow"
@@ -37,9 +55,25 @@ resource "aws_iam_role_policy" "task_execution" {
           values(data.aws_ssm_parameter.task).*.arn,
           values(var.computed_secrets),
         )
-      }
+      },
+
+      // Access to CloudWatch Logs
+      {
+        Sid    = "AllowLogs"
+        Effect = "Allow"
+        Action = [
+          "logs:PutLogEvents",
+          "logs:CreateLogStream",
+        ]
+        Resource = aws_cloudwatch_log_group.task.arn
+      },
     ]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "task_execution_ecr_pull" {
+  role       = aws_iam_role.task_execution.name
+  policy_arn = module.ecr.policy_pull_arn
 }
 
 // EFS filesystem used for persistent storage across tasks. The filesystem is
@@ -68,18 +102,22 @@ data "aws_ssm_parameter" "task" {
   name     = each.value
 }
 
-module "ecs_task" {
-  source = "../ecs-task"
+resource "aws_cloudwatch_log_group" "task" {
+  name              = "/prod/${var.name}"
+  retention_in_days = 7
+}
 
-  name   = var.name
-  cpu    = var.cpu
-  memory = var.memory
+resource "aws_ecs_task_definition" "task" {
+  family       = var.name
+  cpu          = var.cpu
+  memory       = var.memory
+  network_mode = "awsvpc"
 
-  log_retention_days    = 7
-  ecr_repositories_arns = [module.ecr.arn]
-  task_role_arn         = aws_iam_role.task.arn
+  task_role_arn            = aws_iam_role.task.arn
+  execution_role_arn       = aws_iam_role.task_execution.arn
+  requires_compatibilities = ["FARGATE"]
 
-  containers = jsonencode([
+  container_definitions = jsonencode([
     {
       name      = "app"
       image     = module.ecr.url
@@ -88,7 +126,7 @@ module "ecs_task" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          "awslogs-group"         = "/ecs/${var.name}"
+          "awslogs-group"         = aws_cloudwatch_log_group.task.name
           "awslogs-region"        = "us-west-1"
           "awslogs-stream-prefix" = "app"
         }
@@ -137,14 +175,25 @@ module "ecs_task" {
     }
   ])
 
-  volumes = var.mount_efs == null ? [] : [
-    {
-      name           = "efs"
-      file_system_id = module.efs[var.name].id
-      iam            = true
+  dynamic "volume" {
+    for_each = module.efs
+    content {
+      name = "efs"
+      efs_volume_configuration {
+        file_system_id     = volume.value.id
+        root_directory     = "/"
+        transit_encryption = "ENABLED"
+
+        authorization_config {
+          iam = "ENABLED"
+        }
+      }
     }
-  ]
+  }
 }
+
+// Service of the application, which schedules the application to run on the
+// cluster.
 
 module "ecs_service" {
   source           = "../ecs-service"
@@ -152,7 +201,7 @@ module "ecs_service" {
   platform_version = var.platform_version
 
   name        = var.name
-  task_arn    = module.ecs_task.arn
+  task_arn    = aws_ecs_task_definition.task.arn
   tasks_count = var.tasks_count
 
   http_container = "app"
