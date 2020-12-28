@@ -14,18 +14,17 @@ module "bors" {
   platform_version = "1.4.0"
   mount_efs        = "/efs"
 
-  secrets = merge(
-    {
-      GITHUB_TOKEN         = "/prod/ecs/bors/github-token"
-      GITHUB_CLIENT_ID     = "/prod/ecs/bors/github-client-id"
-      GITHUB_CLIENT_SECRET = "/prod/ecs/bors/github-client-secret"
-      HOMU_SSH_KEY         = "/prod/ecs/bors/ssh-key"
-    },
-    {
-      for repo in keys(var.repositories) :
-      "HOMU_WEBHOOK_SECRET_${upper(replace(repo, "-", "_"))}" => aws_ssm_parameter.webhook_secrets[repo].name
-    },
-  )
+  secrets = {
+    GITHUB_TOKEN         = "/prod/bors/github-token"
+    GITHUB_CLIENT_ID     = "/prod/bors/github-client-id"
+    GITHUB_CLIENT_SECRET = "/prod/bors/github-client-secret"
+    HOMU_SSH_KEY         = "/prod/bors/ssh-key"
+  }
+
+  computed_secrets = {
+    for repo in keys(var.repositories) :
+    "HOMU_WEBHOOK_SECRET_${upper(replace(repo, "-", "_"))}" => aws_ssm_parameter.webhook_secrets[repo].arn
+  }
 
   expose_http = {
     container_port = 80

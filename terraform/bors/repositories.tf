@@ -25,7 +25,7 @@ resource "random_password" "webhook_secrets" {
 resource "aws_ssm_parameter" "webhook_secrets" {
   for_each = var.repositories
 
-  name  = "/prod/ecs/bors/webhook-secrets/${each.key}"
+  name  = "/prod/bors/webhook-secrets/${each.key}"
   type  = "SecureString"
   value = random_password.webhook_secrets[each.key].result
 }
