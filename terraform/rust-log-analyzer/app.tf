@@ -24,8 +24,8 @@ module "rla" {
   }
 
   secrets = {
-    GITHUB_TOKEN          = "/prod/ecs/rust-log-analyzer/github-token"
-    GITHUB_WEBHOOK_SECRET = "/prod/ecs/rust-log-analyzer/webhook-secret"
+    GITHUB_TOKEN          = "/prod/rust-log-analyzer/github-token"
+    GITHUB_WEBHOOK_SECRET = "/prod/rust-log-analyzer/webhook-secret"
   }
 
   expose_http = {
