@@ -5,6 +5,7 @@ IFS=$'\n\t'
 deploy_dir="${GITHUB_WORKSPACE}/${INPUT_DEPLOY_DIR}"
 github_token="${INPUT_GITHUB_TOKEN}"
 cloudfront_distribution="${INPUT_CLOUDFRONT_DISTRIBUTION-}"
+custom_domain="${CUSTOM_DOMAIN-}"
 
 export AWS_ACCESS_KEY_ID="${INPUT_AWS_ACCESS_KEY_ID-}"
 export AWS_SECRET_ACCESS_KEY="${INPUT_AWS_SECRET_ACCESS_KEY-}"
@@ -16,6 +17,12 @@ touch "${deploy_dir}/.nojekyll"
 
 # Push the website to GitHub pages
 cd "${deploy_dir}"
+
+# Set custom domain if present.
+if [[ -n "${custom_domain}" ]]; then
+    echo "${custom_domain}" > ./CNAME
+fi
+
 rm -rf .git
 git init
 git config user.name "Deploy from CI"

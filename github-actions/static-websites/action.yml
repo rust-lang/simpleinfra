@@ -20,6 +20,10 @@ inputs:
     description: 'AWS IAM credentials used to invalidate Cloudfront'
     required: false
     default: ''
+  custom_domain:
+    description: 'The custom domain for GitHub Pages'
+    required: false
+    default: ''
 
 runs:
   using: docker
