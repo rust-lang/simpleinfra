@@ -41,6 +41,12 @@ resource "aws_codebuild_project" "sync_team" {
       name  = "MAILGUN_API_TOKEN"
       value = "/prod/sync-team/mailgun-api-token"
     }
+
+    environment_variable {
+      type  = "PARAMETER_STORE"
+      name  = "EMAIL_ENCRYPTION_KEY"
+      value = "/prod/sync-team/email-encryption-key"
+    }
   }
 
   logs_config {
