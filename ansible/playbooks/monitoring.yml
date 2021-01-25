@@ -166,6 +166,14 @@
                 summary: "Crater agent {{ '{{ $labels.agent }}' }} is stuck"
                 description: "The Crater agent {{ '{{ $labels.agent }}' }} has work to do, but it reported no results for the past 30 minutes."
 
+        - name: github
+          rules:
+            - alert: LowGitHubAPIQuota
+              expr: monitorbot_github_rate_limit_remaining{job="monitorbot"} / monitorbot_github_rate_limit_limit{job="monitorbot"} < 0.2
+              for: 1m
+              annotations:
+                summary: "GitHub user {{ '{{ $labels.username }}' }} has low API quota"
+                description: "The {{ '{{ $labels.product }}' }} API quota for GitHub user {{ '{{ $labels.username }}' }} is less than 20%."
 
       alertmanager_route:
         group_by: ['alertname']
