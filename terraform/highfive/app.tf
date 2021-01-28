@@ -14,7 +14,7 @@ module "highfive" {
   platform_version = "1.4.0"
 
   secrets = {
-    HIGHFIVE_GITHUB_TOKEN   = "/prod/highfive/github-token"
+    HIGHFIVE_GITHUB_TOKEN    = "/prod/highfive/github-token"
     HIGHFIVE_WEBHOOK_SECRETS = "/prod/highfive/webhook-secrets"
   }
 
