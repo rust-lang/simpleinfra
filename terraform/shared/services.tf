@@ -82,13 +82,6 @@ module "service_ecs_cluster" {
   subnet_ids               = module.vpc_prod.private_subnets
 }
 
-module "service_highfive" {
-  source = "./services/highfive"
-
-  domain_name    = "highfive.infra.rust-lang.org"
-  cluster_config = module.service_ecs_cluster.config
-}
-
 module "service_triagebot" {
   source = "./services/triagebot"
 

@@ -1,7 +1,7 @@
 // The ECR repository is used by CI to store the container image, which will
 // then be fetched by the ECS service.
 module "ecr" {
-  source = "../../modules/ecr-repo"
+  source = "../shared/modules/ecr-repo"
   name   = "rust-highfive"
 }
 
@@ -14,7 +14,7 @@ data "aws_ssm_parameter" "highfive" {
 }
 
 module "ecs_task" {
-  source = "../../modules/ecs-task"
+  source = "../shared/modules/ecs-task"
 
   name   = "highfive"
   cpu    = 256
@@ -61,8 +61,8 @@ EOF
 }
 
 module "ecs_service" {
-  source           = "../../modules/ecs-service"
-  cluster_config   = var.cluster_config
+  source           = "../shared/modules/ecs-service"
+  cluster_config   = data.terraform_remote_state.shared.outputs.ecs_cluster_config
   platform_version = "1.4.0"
 
   name        = "highfive"
@@ -72,7 +72,5 @@ module "ecs_service" {
   http_container = "app"
   http_port      = 80
 
-  domains = [
-    var.domain_name,
-  ]
+  domains = ["highfive.infra.rust-lang.org"]
 }
