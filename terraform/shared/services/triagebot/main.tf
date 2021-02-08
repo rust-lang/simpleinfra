@@ -75,7 +75,7 @@ module "ecs_task" {
     "environment": [
       {
         "name": "RUST_LOG",
-        "value": "parser=trace,triagebot=trace"
+        "value": "triagebot=info"
       }
     ],
     "secrets": [
