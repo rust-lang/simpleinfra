@@ -43,7 +43,8 @@ resource "aws_s3_bucket_policy" "rust_inventories" {
             "arn:aws:s3:::crates-io",
             "${module.service_cratesio_staging.static_bucket_arn}",
             "${aws_s3_bucket.rust_lang_ci_mirrors.arn}",
-            "arn:aws:s3:::rust-docs-rs"
+            "arn:aws:s3:::rust-docs-rs",
+            "arn:aws:s3:::rust-lang-ci2"
           ]
         }
       }
