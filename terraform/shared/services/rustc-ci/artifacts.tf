@@ -15,7 +15,9 @@ resource "aws_s3_bucket" "artifacts" {
       }
 
       noncurrent_version_expiration {
-        days = var.delete_artifacts_after_days
+        // This is *in addition* to the delete_artifacts_after_days above; we
+        // don't really need to keep CI artifacts around in an inaccessible state.
+        days = 1
       }
 
       abort_incomplete_multipart_upload_days = 1
