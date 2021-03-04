@@ -66,6 +66,13 @@
             - targets:
               - docs.rs:443
 
+        - job_name: perfrlo
+          metrics_path: /perf/metrics
+          scheme: https
+          static_configs:
+            - targets:
+              - perf.rust-lang.org:443
+
         - job_name: crater
           scheme: https
           static_configs:
