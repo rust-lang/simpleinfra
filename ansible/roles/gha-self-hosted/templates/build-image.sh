@@ -23,7 +23,10 @@ for image in "$(ls "${SOURCE}/images")"; do
 done
 
 # Restart all the VMs
-# This will *not* restart them if they're currently running a build!
-{% for instance in instances %}
-sudo systemctl reload gha-vm-{{ instance.name }}.service
-{% endfor %}
+# This will *not* restart them if they're currently running a build or if we're
+# running the script at boot time.
+if [[ "${BOOT_TIME-0}" != "1" ]]; then
+    {% for instance in instances %}
+    sudo systemctl reload gha-vm-{{ instance.name }}.service
+    {% endfor %}
+fi
