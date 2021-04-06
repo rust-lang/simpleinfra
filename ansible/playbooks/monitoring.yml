@@ -73,11 +73,12 @@
             - targets:
               - perf.rust-lang.org:443
 
-        # - job_name: crater
-        #   scheme: https
-        #   static_configs:
-        #     - targets:
-        #       - crater.rust-lang.org:443
+        - job_name: crater
+          scrape_interval: 1m # crater's metrics endpoint is relatively slow
+          scheme: https
+          static_configs:
+              - targets:
+                  - crater.rust-lang.org:443
 
         - job_name: monitorbot
           scheme: https
