@@ -2,26 +2,25 @@ resource "aws_s3_bucket" "artifacts" {
   bucket = var.artifacts_bucket
   acl    = "public-read"
 
-  dynamic "lifecycle_rule" {
-    for_each = toset(["rustc-builds", "rustc-builds-alt"])
-    content {
-      id      = "cleanup-${lifecycle_rule.value}"
-      enabled = true
+  lifecycle_rule {
+    id      = "cleanup-rustc-builds"
+    enabled = true
 
-      prefix = lifecycle_rule.value
+    // Note that this applies equally to rustc-builds and rustc-builds-alt, as
+    // it is a prefix.
+    prefix = "rustc-builds"
 
-      expiration {
-        days = var.delete_artifacts_after_days
-      }
-
-      noncurrent_version_expiration {
-        // This is *in addition* to the delete_artifacts_after_days above; we
-        // don't really need to keep CI artifacts around in an inaccessible state.
-        days = 1
-      }
-
-      abort_incomplete_multipart_upload_days = 1
+    expiration {
+      days = var.delete_artifacts_after_days
     }
+
+    noncurrent_version_expiration {
+      // This is *in addition* to the delete_artifacts_after_days above; we
+      // don't really need to keep CI artifacts around in an inaccessible state.
+      days = 1
+    }
+
+    abort_incomplete_multipart_upload_days = 1
   }
 }
 
