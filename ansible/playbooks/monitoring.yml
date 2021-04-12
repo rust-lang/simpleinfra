@@ -34,7 +34,7 @@
 
     - role: monitoring-server
       prometheus_scrape_interval: 5s
-      prometheus_retention: 7d
+      prometheus_retention: 30d
       alertmanager_resolve_timeout: 5m
 
       prometheus_scrape:
