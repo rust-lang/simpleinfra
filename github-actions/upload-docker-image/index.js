@@ -11,6 +11,8 @@ const main = async () => {
         let image = actions.getInput("image", { required: true });
         let repository = actions.getInput("repository", { required: true });
         let region = actions.getInput("region", { required: true });
+        // either a supplied tag, or latest.
+        let tag = actions.getInput("tag") || 'latest';
 
         let sts = new AWS.STS();
         let ecr = new AWS.ECR({ region: region });
@@ -25,7 +27,7 @@ const main = async () => {
         // Make sure the password is masked in the logs.
         actions.setSecret(password);
 
-        let ecr_image = account_id+".dkr.ecr."+region+".amazonaws.com/"+repository+":latest";
+        let ecr_image = account_id+".dkr.ecr."+region+".amazonaws.com/"+repository+":"+tag;
 
         await exec.exec("docker", ["login", "-u", username, "-p", password, auth["proxyEndpoint"]]);
         await exec.exec("docker", ["tag", image, ecr_image]);

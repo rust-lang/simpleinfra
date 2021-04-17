@@ -8,6 +8,9 @@ inputs:
   repository:
     description: The name of the ECR repository to upload to.
     required: true
+  tag:
+    description: The name of the docker image tag to use on ECR
+    required: false
   region:
     description: The name of the AWS region the repository was created into.
     required: true
