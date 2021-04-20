@@ -41,6 +41,9 @@ resource "aws_cloudfront_distribution" "webapp" {
         // may want to forward it along at this layer as well. This might be
         // helpful for debugging at some point.
         "X-Request-Id",
+        // Some authenticated API endpoints use the GET method, so we need to
+        // forward the Authorization header to allow token authentication.
+        "Authorization",
       ]
       query_string = true
       cookies {
