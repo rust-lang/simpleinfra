@@ -87,6 +87,21 @@
             - targets:
               - monitorbot.infra.rust-lang.org:443
 
+        - job_name: cratesio_service
+          scheme: https
+          bearer_token: "{{ vars_prometheus_cratesio_secret }}"
+          metrics_path: /api/private/metrics/service
+          static_configs:
+            - targets:
+                - staging-crates-io.herokuapp.com:443
+              labels:
+                env: staging
+            - targets:
+                - crates-io.herokuapp.com:443
+              labels:
+                env: prod
+
+
       prometheus_rule_groups:
         - name: node
           rules:
@@ -235,6 +250,7 @@
       grafana_github_teams:
         - 2357301  # rust-lang/infra
         - 3552538  # rust-lang/docs-rs
+        - 2948097  # rust-lang/crates-io
 
       grafana_domain: "{{ vars_grafana_domain }}"
       grafana_admin_password: "{{ vars_grafana_admin_password }}"

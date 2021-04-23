@@ -15,6 +15,7 @@ vars_alertmanager_receiver_discord_docsrs: "{{ ssm_monitoring['alertmanager-rece
 vars_grafana_admin_password: "{{ ssm_monitoring['grafana-admin-password'] }}"
 
 vars_prometheus_monitorbot_secret: "{{ lookup('aws_ssm', '/prod/monitorbot/secret', region='us-west-1') }}"
+vars_prometheus_cratesio_secret: "{{ ssm_monitoring['cratesio-scrape-secret'] }}"
 
 vars_backup_repository: s3:s3.amazonaws.com/rust-backups/monitoring
 vars_grafana_domain: grafana.rust-lang.org
