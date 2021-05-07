@@ -103,6 +103,13 @@
               labels:
                 env: prod
 
+        - job_name: playground
+          metrics_path: /metrics
+          scheme: https
+          static_configs:
+            - targets:
+              - play.rust-lang.org:443
+
 
       prometheus_rule_groups:
         - name: node
