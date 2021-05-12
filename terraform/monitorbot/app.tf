@@ -14,10 +14,12 @@ module "monitorbot" {
   platform_version = "1.4.0"
 
   environment = {
+    MONITORBOT_RUNNERS_REPOS = "rust-lang-ci/rust"
     MONITORBOT_GH_RATE_LIMIT_STATS_REFRESH = 60
   }
 
   secrets = {
+    MONITORBOT_GITHUB_TOKEN = "/prod/monitorbot/github-token"
     MONITORBOT_RATE_LIMIT_TOKENS = "/prod/monitorbot/rate-limit-tokens"
   }
 

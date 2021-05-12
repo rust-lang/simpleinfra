@@ -207,6 +207,13 @@
                 summary: "GitHub user {{ '{{ $labels.username }}' }} has low API quota"
                 description: "The {{ '{{ $labels.product }}' }} API quota for GitHub user {{ '{{ $labels.username }}' }} is less than 20%."
 
+            - alert: SelfHostedRunnerOffline
+              expr: monitorbot_gha_runner_online{job="monitorbot"} != 1
+              for: 5m
+              annotations:
+                summary: "Self-Hosted runner {{ '{{ $labels.runner }}' }} in repo {{ '{{ $labels.repo }}' }} is offline"
+                description: "GitHub is reporting that the self-hosted runner {{ '{{ $labels.runner }}' }} in the repo {{ '{{ $labels.repo }}' }} is offline. This could be caused by the machine hosting the runner having problems, or by the runner software being out of date."
+
       alertmanager_route:
         group_by: ['alertname']
         group_wait: 30s
