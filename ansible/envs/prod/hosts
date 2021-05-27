@@ -7,8 +7,9 @@ monitoring.infra.rust-lang.org
 [crater]
 crater-azure-1.infra.rust-lang.org
 crater-azure-2.infra.rust-lang.org
-crater-gcp-1.infra.rust-lang.org
-crater-gcp-2.infra.rust-lang.org
+#crater-gcp-1.infra.rust-lang.org
+#crater-gcp-2.infra.rust-lang.org
+crater-aws-1.infra.rust-lang.org
 
 [gha_self_hosted]
 ci-arm-1.infra.rust-lang.org
