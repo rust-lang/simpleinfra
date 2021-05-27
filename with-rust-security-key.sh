@@ -50,6 +50,10 @@ cleanup() {
 
     # Flush the gpg agent cache to remove the password
     echo RELOADAGENT | gpg-connect-agent
+
+    # Overwrite and unset `passphrase` variable
+    passphrase=$(printf '=%.0s' {1..1024})
+    unset passphrase
 }
 trap cleanup EXIT
 
