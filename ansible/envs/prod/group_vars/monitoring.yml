@@ -16,6 +16,7 @@ vars_grafana_admin_password: "{{ ssm_monitoring['grafana-admin-password'] }}"
 
 vars_prometheus_monitorbot_secret: "{{ lookup('aws_ssm', '/prod/monitorbot/secret', region='us-west-1') }}"
 vars_prometheus_cratesio_secret: "{{ ssm_monitoring['cratesio-scrape-secret'] }}"
+vars_prometheus_cratesio_heroku_metrics_secret: "{{ lookup('aws_ssm', '/prod/crates-io-heroku-metrics/password-metrics', region='us-west-1') }}"
 
 vars_backup_repository: s3:s3.amazonaws.com/rust-backups/monitoring
 vars_grafana_domain: grafana.rust-lang.org

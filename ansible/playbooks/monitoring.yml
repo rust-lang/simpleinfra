@@ -112,6 +112,15 @@
             - targets:
               - play.rust-lang.org:443
 
+        - job_name: cratesio_heroku_metrics
+          scheme: https
+          basic_auth:
+            username: metrics
+            password: "{{ vars_prometheus_cratesio_heroku_metrics_secret }}"
+          static_configs:
+            - targets:
+              - crates-io-heroku-metrics.infra.rust-lang.org:443
+
 
       prometheus_rule_groups:
         - name: node
