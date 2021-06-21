@@ -19,6 +19,7 @@ module "rustconf_com" {
     "2017" = ["tildeio.github.io"],
     "2018" = ["tildeio.github.io"],
     "2019" = ["tildeio.github.io"],
+    "2020" = ["tildeio.github.io"],
     "cfp"  = ["cfp.rustconf.com.herokudns.com"],
   }
 
