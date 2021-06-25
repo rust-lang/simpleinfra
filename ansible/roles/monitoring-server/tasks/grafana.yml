@@ -33,7 +33,7 @@
 
   when: |
     grafana_capture.rc != 0 or not grafana_capture.stdout.startswith(
-      "Grafana cli version " + grafana_version
+      "Grafana CLI version " + grafana_version
     )
 
 - name: check if a grafana secret key was generated

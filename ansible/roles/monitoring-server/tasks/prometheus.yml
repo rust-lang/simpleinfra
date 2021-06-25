@@ -34,7 +34,7 @@
         state: absent
 
   when: |
-    prometheus_capture.rc != 0 or not prometheus_capture.stderr.startswith(
+    prometheus_capture.rc != 0 or not prometheus_capture.stdout.startswith(
       "prometheus, version " + prometheus_version
     )
 

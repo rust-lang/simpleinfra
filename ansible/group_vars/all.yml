@@ -6,35 +6,35 @@ global_collect_metrics_from:
 # Version of https://github.com/prometheus/node_exporter to install on our
 # instances. The checksum is the hash of the downloadable tarball for the
 # specified architecture, found in the GitHub releases.
-node_exporter_version: 1.0.1
+node_exporter_version: 1.1.2
 node_exporter_archs:
   x86_64:
     name: amd64
-    checksum: sha256:3369b76cd2b0ba678b6d618deab320e565c3d93ccb5c2a0d5db51a53857768ae
+    checksum: sha256:8c1f6a317457a658e0ae68ad710f6b4098db2cad10204649b51e3c043aa3e70d
   aarch64:
     name: arm64
-    checksum: sha256:017514906922fcc4b7d727655690787faed0562bc7a17aa9f72b0651cb1b47fb
+    checksum: sha256:eb5e7d16f18bb3272d0d832986fc8ac6cb0b6c42d487c94e15dabb10feae8e04
 
 # Version of https://github.com/prometheus/prometheus to install on our
 # instances. The checksum is the hash of the downloadable tarball for the
 # specified architecture, found in the GitHub releases.
-prometheus_version: 2.12.0
+prometheus_version: 2.26.0
 prometheus_arch: amd64
-prometheus_checksum: sha256:b9f57b6e64fb3048742cfa7dbcc727e1df906d8020ef246a5e81b7959ae97e08
+prometheus_checksum: sha256:8dd6786c338dc62728e8891c13b62eda66c7f28a01398869f2b3712895b441b9
 
 # Version of https://github.com/prometheus/alertmanager to install on our
 # instances. The checksum is the hash of the downloadable tarball for the
 # specified architecture, found in the GitHub releases.
-alertmanager_version: 0.18.0
+alertmanager_version: 0.21.0
 alertmanager_arch: amd64
-alertmanager_checksum: sha256:5f17155d669a8d2243b0d179fa46e609e0566876afd0afb09311a8bc7987ab15
+alertmanager_checksum: sha256:9ccd863937436fd6bfe650e22521a7f2e6a727540988eef515dde208f9aef232
 
 # Version of https://grafana.com to install in our instances. The checksum is
 # the hash of the .deb for the specified architecture, found here:
 # https://grafana.com/grafana/download
-grafana_version: 6.3.3
+grafana_version: 7.5.5
 grafana_arch: amd64
-grafana_checksum: sha256:7e2c05fb8c2b2595b7230cb34c3cd761891a4c3346e6d45518669d3946755e2d
+grafana_checksum: sha256:a6342dc645da72a92ac50ff053f9a9ca591f8334797174b9c70521bdcd349fe9
 
 # Version of https://github.com/letsencrypt/pebble to install on our instances.
 # The checksum is the hash of the downloadable binary for the specific
