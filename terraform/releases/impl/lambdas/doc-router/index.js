@@ -64,6 +64,9 @@ exports.handler = (event, context, callback) => {
     // Redirect `/` to the rust-lang.org website
     if (request.uri === '/' || request.uri === '/index.html') {
         return temp_redirect('https://www.rust-lang.org/learn', callback);
+    // Redirect `/rustup` to the Rustup book
+    } else if (['/rustup', '/rustup/', '/rustup/index.html'].includes(request.uri)) {
+        return temp_redirect('https://rust-lang.github.io/rustup/', callback);
     }
 
     // Forward versioned documentation as-is.
