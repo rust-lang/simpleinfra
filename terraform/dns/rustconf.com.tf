@@ -11,7 +11,7 @@ module "rustconf_com" {
   ttl     = 300
 
   A = {
-    "@" = local.github_pages_ipv4,
+    "@" = ["75.2.60.5"],
   }
 
   CNAME = {
