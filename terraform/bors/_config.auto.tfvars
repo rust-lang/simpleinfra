@@ -11,6 +11,7 @@ repositories = {
   crates-io   = "crates.io"
   hashbrown   = "hashbrown"
   libc        = "libc"
+  measureme   = "measureme"
   miri        = "miri"
   rls         = "rls"
   rust        = "rust"
