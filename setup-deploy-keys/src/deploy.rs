@@ -28,7 +28,7 @@ fn main() {
         .stdin
         .take()
         .unwrap()
-        .write_all(&key.as_bytes())
+        .write_all(key.as_bytes())
         .unwrap();
     let mut key = Vec::new();
     decode.stdout.take().unwrap().read_to_end(&mut key).unwrap();
