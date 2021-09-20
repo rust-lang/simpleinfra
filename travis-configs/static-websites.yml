@@ -30,7 +30,12 @@ before_deploy:
 # Deploy the content of $RUSTINFRA_DEPLOY_DIR to GitHub Pages using deploy keys.
 deploy:
   provider: script
-  script: curl -LsSf https://raw.githubusercontent.com/rust-lang/simpleinfra/master/setup-deploy-keys/src/deploy.rs | rustc - -o /tmp/deploy && (cd $RUSTINFRA_DEPLOY_DIR && /tmp/deploy)
+  script: |
+    set -e
+    curl -LsSfO https://raw.githubusercontent.com/rust-lang/simpleinfra/master/setup-deploy-keys/src/deploy.rs
+    DEPLOY_SHA=bef09c1cac587271d0352b0ae59949d2cab93b3d1c9dc45366a42fbe51f6221a
+    echo "${DEPLOY_SHA}  deploy.rs" | sha256sum --check -
+    rustc - -o /tmp/deploy && (cd $RUSTINFRA_DEPLOY_DIR && /tmp/deploy)
   skip_cleanup: true
   on:
     branch: master

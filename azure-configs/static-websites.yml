@@ -26,7 +26,10 @@ steps:
       # be included in the pages.
       touch $DEPLOY_DIR/.nojekyll
       # Download, compile and run the deploy script
-      curl -LsSf https://raw.githubusercontent.com/rust-lang/simpleinfra/master/setup-deploy-keys/src/deploy.rs | rustc - -o /tmp/deploy
+      curl -LsSf -O https://raw.githubusercontent.com/rust-lang/simpleinfra/master/setup-deploy-keys/src/deploy.rs
+      DEPLOY_SHA=bef09c1cac587271d0352b0ae59949d2cab93b3d1c9dc45366a42fbe51f6221a
+      echo "${DEPLOY_SHA}  deploy.rs" | sha256sum --check -
+      rustc - -o /tmp/deploy
       (cd $DEPLOY_DIR && /tmp/deploy)
     env:
       DEPLOY_DIR: ${{ parameters.deploy_dir }}
