@@ -59,7 +59,7 @@ resource "aws_instance" "bastion" {
   monitoring              = false
 
   root_block_device {
-    volume_type           = "gp2"
+    volume_type           = "gp3"
     volume_size           = 8
     delete_on_termination = true
   }

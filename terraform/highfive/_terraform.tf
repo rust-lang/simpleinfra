@@ -9,8 +9,8 @@ terraform {
       version = "~> 2.70"
     }
     github = {
-      source  = "hashicorp/github"
-      version = "~> 2.9.2"
+      source  = "integrations/github"
+      version = "~> 4.14"
     }
   }
 

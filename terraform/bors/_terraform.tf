@@ -6,11 +6,11 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 2.70"
+      version = "~> 3.59"
     }
     github = {
-      source  = "hashicorp/github"
-      version = "~> 2.9.2"
+      source  = "integrations/github"
+      version = "~> 4.14"
     }
     random = {
       source  = "hashicorp/random"
@@ -32,12 +32,12 @@ provider "aws" {
 }
 
 provider "github" {
-  organization = var.github_org
+  owner = var.github_org
 }
 
 provider "github" {
-  alias        = "rust_lang_ci"
-  organization = "rust-lang-ci"
+  alias = "rust_lang_ci"
+  owner = "rust-lang-ci"
 }
 
 data "terraform_remote_state" "shared" {

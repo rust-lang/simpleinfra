@@ -1,5 +1,5 @@
 provider "github" {
-  organization = var.org
+  owner = var.org
 }
 
 resource "aws_iam_user" "ci" {
