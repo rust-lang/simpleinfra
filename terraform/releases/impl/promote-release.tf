@@ -132,7 +132,7 @@ resource "aws_iam_role_policy" "promote_release" {
           "logs:PutLogEvents",
           "logs:CreateLogStream",
         ]
-        Resource = aws_cloudwatch_log_group.promote_release.arn
+        Resource = "${aws_cloudwatch_log_group.promote_release.arn}:*"
       },
       {
         Sid    = "BucketsReadWrite"
@@ -179,7 +179,6 @@ resource "aws_iam_role_policy" "promote_release" {
         Sid    = "HeadBuckets"
         Effect = "Allow"
         Action = [
-          "s3:HeadBucket",
           "s3:GetBucketLocation",
         ]
         Resource = "*"

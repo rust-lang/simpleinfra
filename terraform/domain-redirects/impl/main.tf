@@ -22,15 +22,19 @@ locals {
   top_level_domains = { for domain in var.from : domain => join(".", reverse(slice(reverse(split(".", domain)), 0, 2))) }
 }
 
+terraform {
+  required_providers {
+    aws = {
+      source                = "hashicorp/aws"
+      version               = ">= 3.59.0"
+      configuration_aliases = [aws.east1]
+    }
+  }
+}
+
 // Terraform boilerplate to define two connections to AWS: one for our default
 // region (us-west-1) and one for the us-east-1 region. Users of the module
 // are going to then forward the already-configured providers to it.
-
-provider "aws" {}
-
-provider "aws" {
-  alias = "east1"
-}
 
 // S3 bucket used to perform the actual redirect when request comes in, thanks
 // to S3's static website hosting feature. The name of the bucket contains the

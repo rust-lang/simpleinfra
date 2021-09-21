@@ -1,6 +1,11 @@
-provider "aws" {}
-provider "aws" {
-  alias = "east1"
+terraform {
+  required_providers {
+    aws = {
+      source                = "hashicorp/aws"
+      version               = "~> 3.59"
+      configuration_aliases = [aws.east1]
+    }
+  }
 }
 
 data "aws_iam_role" "cloudfront_lambda" {

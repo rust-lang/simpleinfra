@@ -2,6 +2,15 @@ locals {
   top_level_domains = { for domain in var.domains : domain => join(".", reverse(slice(reverse(split(".", domain)), 0, 2))) }
 }
 
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.59"
+    }
+  }
+}
+
 data "aws_route53_zone" "zones" {
   for_each = toset(values(local.top_level_domains))
   name     = each.value

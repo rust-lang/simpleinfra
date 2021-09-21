@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.59"
+    }
+  }
+}
+
 data "aws_region" "current" {}
 
 data "external" "source_zip" {

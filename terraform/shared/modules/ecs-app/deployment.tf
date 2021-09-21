@@ -65,7 +65,7 @@ resource "aws_iam_role_policy" "task_execution" {
           "logs:PutLogEvents",
           "logs:CreateLogStream",
         ]
-        Resource = aws_cloudwatch_log_group.task.arn
+        Resource = "${aws_cloudwatch_log_group.task.arn}:*"
       },
     ]
   })

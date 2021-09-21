@@ -13,7 +13,7 @@ data "terraform_remote_state" "shared" {
 }
 
 terraform {
-  required_version = "~> 0.13"
+  required_version = "~> 1"
 
   required_providers {
     aws = {

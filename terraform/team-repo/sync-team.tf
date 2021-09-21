@@ -120,7 +120,7 @@ resource "aws_iam_role_policy" "sync_team" {
           "logs:PutLogEvents",
           "logs:CreateLogStream",
         ]
-        Resource = aws_cloudwatch_log_group.sync_team.arn
+        Resource = "${aws_cloudwatch_log_group.sync_team.arn}:*"
       }
     ]
   })

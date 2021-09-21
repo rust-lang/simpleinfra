@@ -52,7 +52,7 @@ resource "aws_iam_group_policy" "mods_discord" {
           "logs:FilterLogEvents",
           "logs:GetLogEvents",
         ]
-        Resource = data.aws_cloudwatch_log_group.ecs_discord_mods_bot.arn,
+        Resource = "${data.aws_cloudwatch_log_group.ecs_discord_mods_bot.arn}"
       },
 
       // Access to the credentials to connect to the discord-mods-bot database

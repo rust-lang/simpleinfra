@@ -8,6 +8,7 @@ locals {
 
 module "certificate" {
   source = "../shared/modules/acm-certificate"
+
   providers = {
     aws = aws.east1
   }

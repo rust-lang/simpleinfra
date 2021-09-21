@@ -65,7 +65,7 @@ resource "aws_s3_bucket_public_access_block" "rust_inventories" {
 
 resource "aws_s3_bucket" "rust_lang_ci_mirrors" {
   bucket = "rust-lang-ci-mirrors"
-  acl    = "public"
+  acl    = "public-read"
 
   versioning {
     enabled = true
