@@ -41,8 +41,6 @@ data "terraform_remote_state" "shared" {
 }
 
 provider "aws" {
-  version = "~> 2.44"
-
   profile = "default"
   region  = "us-west-1"
 }
