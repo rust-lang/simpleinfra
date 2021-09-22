@@ -43,8 +43,8 @@ module "ecs_task" {
   source = "../shared/modules/ecs-task"
 
   name   = "rustc-perf"
-  cpu    = 256
-  memory = 512
+  cpu    = 512
+  memory = 1024
 
   log_retention_days = 7
   ecr_repositories_arns = [
