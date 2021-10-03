@@ -9,7 +9,6 @@ locals {
   terraform_state_users = [
     "pietroalbini",
     "simulacrum",
-    "nellshamrell",
   ]
 }
 
