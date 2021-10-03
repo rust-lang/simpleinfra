@@ -17,22 +17,6 @@ module "service_rustc_ci" {
   delete_artifacts_after_days = 168
 }
 
-module "service_rustc_ci_gha" {
-  source = "./services/rustc-ci"
-  providers = {
-    aws       = aws
-    aws.east1 = aws.east1
-  }
-
-  iam_prefix       = "gha"
-  caches_bucket    = "rust-lang-gha-caches"
-  caches_domain    = "ci-caches-gha.rust-lang.org"
-  artifacts_bucket = "rust-lang-gha"
-  artifacts_domain = "ci-artifacts-gha.rust-lang.org"
-
-  delete_artifacts_after_days = 3
-}
-
 module "service_cratesio" {
   source = "./services/cratesio"
   providers = {
