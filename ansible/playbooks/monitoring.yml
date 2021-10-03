@@ -278,6 +278,7 @@
         - 2357301  # rust-lang/infra
         - 3552538  # rust-lang/docs-rs
         - 2948097  # rust-lang/crates-io
+        - 5083043  # rust-lang/crates-io-on-call
 
       grafana_domain: "{{ vars_grafana_domain }}"
       grafana_admin_password: "{{ vars_grafana_admin_password }}"
