@@ -1,0 +1,20 @@
+#
+# {{ ansible_managed }}
+#
+
+[Unit]
+Description=Update the playground
+
+[Service]
+Type=oneshot
+ExecStart={{ vars_playground_update_path }}
+
+WorkingDirectory={{ vars_playground_home_path }}
+
+{% if vars_playground_aws is defined %}
+Environment=AWS_ACCESS_KEY_ID={{ vars_playground_aws['access_key_id'] }}
+Environment=AWS_SECRET_ACCESS_KEY={{ vars_playground_aws['secret_access_key'] }}
+{% endif %}
+
+User={{ vars_playground_user }}
+Group={{ vars_playground_group }}

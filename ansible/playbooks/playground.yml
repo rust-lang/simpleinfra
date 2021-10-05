@@ -1,0 +1,28 @@
+---
+
+- hosts: playground
+  become: yes
+  become_user: root
+
+  roles:
+
+    - role: common
+      papertrail_url: "{{ vars_papertrail_url }}"
+      collect_metrics_from: "{{ global_collect_metrics_from }}"
+      sudo_users:
+        - pietro
+        - shep
+        - simulacrum
+
+    - role: letsencrypt
+      dummy_certs: "{{ vars_letsencrypt_dummy_certs }}"
+      email: admin@rust-lang.org
+      domains:
+        - "{{ vars_playground_domain }}"
+
+    - role: nginx
+      proxied:
+        - domain: "{{ vars_playground_domain }}"
+          to: "http://localhost:{{ vars_playground_env_ui_port }}"
+
+    - role: playground

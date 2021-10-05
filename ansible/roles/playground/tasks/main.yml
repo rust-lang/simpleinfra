@@ -1,0 +1,122 @@
+---
+
+- name: Add Docker APT repository GPG key
+  apt_key:
+    state: present
+    keyserver: "https://download.docker.com/linux/{{ ansible_distribution|lower }}/gpg"
+    id: 7EA0A9C3F273FCD8
+
+- name: Add Docker APT repository
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution|lower }} {{ ansible_distribution_release }} stable"
+    state: present
+    update_cache: true
+
+- name: Install Docker
+  apt:
+    name: docker-ce
+    state: present
+  notify: restart-docker
+
+- name: Configure Docker daemon
+  template:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+    mode: 0600
+  notify: restart-docker
+
+# --------------------
+
+# Set up a partition with limited space to avoid temporary
+# input/output files consuming all of the space on the primary
+# partition.
+
+- name: Check for mountpoint file
+  stat:
+    path: "{{ vars_playground_mountpoint_file_path }}"
+  register: mountpoint_stat
+
+- name: Create mountpoint file
+  block:
+    - name: Allocate file
+      command: "fallocate -l {{ vars_playground_mountpoint_size }} {{ vars_playground_mountpoint_file_path }}"
+
+    - name: Locate mountpoint loopback device
+      command: "losetup -f --show {{ vars_playground_mountpoint_file_path }}"
+      register: loopback
+
+    - name: Partition mountpoint
+      command: "mkfs -t ext3 -m 1 -v {{ loopback.stdout }}"
+  when: mountpoint_stat.stat.size is not defined or mountpoint_stat.stat.size != vars_playground_mountpoint_size
+
+- name: Create mountpoint
+  file:
+    path: "{{ vars_playground_mountpoint_path }}"
+    state: directory
+
+- name: Mount mountpoint
+  mount:
+    src: "{{ vars_playground_mountpoint_file_path }}"
+    name: "{{ vars_playground_mountpoint_path }}"
+    fstype: ext3
+    state: mounted
+
+# --------------------
+
+- name: Create playground user
+  user:
+    name: playground
+    groups: docker
+    append: true
+
+- name: Checkout repository
+  become: true
+  become_user: playground
+  git:
+    repo: "{{ vars_playground_repository_url }}"
+    dest: "{{ vars_playground_checkout_path }}"
+
+- name: Install awscli
+  apt:
+    name: awscli
+    state: present
+
+- name: Configure update script
+  template:
+    src: update.sh
+    dest: "{{ vars_playground_update_path }}"
+    mode: 0755
+  notify: start-playground-update
+
+- name: Configure update script service
+  template:
+    src: playground-update.service
+    dest: /etc/systemd/system/playground-update.service
+    mode: 0644
+  notify: start-playground-update
+
+- name: Configure update script service timer
+  template:
+    src: playground-update.timer
+    dest: /etc/systemd/system/playground-update.timer
+    mode: 0644
+  notify: restart-playground-update-timer
+
+- name: Start and enable update script service timer
+  systemd:
+    name: playground-update.timer
+    state: started
+    enabled: true
+
+- name: Configure playground service
+  template:
+    src: playground.service
+    dest: /etc/systemd/system/playground.service
+    mode: 0644
+  notify: restart-playground
+
+- name: Start and enable playground service
+  systemd:
+    name: playground
+    state: started
+    enabled: true
