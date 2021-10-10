@@ -70,7 +70,7 @@ resource "aws_db_instance" "shared" {
   storage_type                 = "gp2"
   engine                       = "postgres"
   engine_version               = "13.3"
-  instance_class               = "db.t3.small"
+  instance_class               = "db.t4g.micro"
   identifier                   = "shared"
   username                     = "root"
   password                     = random_password.shared_root.result
@@ -84,4 +84,10 @@ resource "aws_db_instance" "shared" {
   # temporary, needed until bastion is in prod VPC and can be used for access
   publicly_accessible    = true
   vpc_security_group_ids = [aws_security_group.rust_prod_db.id]
+
+  lifecycle {
+    ignore_changes = [
+      latest_restorable_time
+    ]
+  }
 }
