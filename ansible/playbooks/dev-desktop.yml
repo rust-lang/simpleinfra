@@ -1,0 +1,18 @@
+---
+
+- hosts: dev-desktop
+  become: yes
+  become_user: root
+
+  roles:
+
+    - role: common
+      papertrail_url: "{{ vars_papertrail_url }}"
+      collect_metrics_from: "{{ global_collect_metrics_from }}"
+      sudo_users:
+        - aidanhs
+        - simulacrum
+        - pietro
+        - oli-obk
+
+    - role: dev-desktop

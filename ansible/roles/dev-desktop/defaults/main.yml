@@ -1,0 +1,4 @@
+---
+
+vars_team_login_repository_url: "https://github.com/oli-obk/cloud_dev_desktop.git"
+vars_team_login_checkout_path: "/root/team_login"

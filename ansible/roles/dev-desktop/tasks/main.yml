@@ -1,0 +1,14 @@
+---
+
+- name: install Rust
+  apt:
+    name: cargo pkg-config libssl-dev
+    state: present
+
+- name: Checkout repository
+  git:
+    repo: "{{ vars_team_login_repository_url }}"
+    dest: "{{ vars_team_login_checkout_path }}"
+
+- name: Run setup script
+  command: "{{ vars_team_login_checkout_path }}/setup_login_scheme.sh"
