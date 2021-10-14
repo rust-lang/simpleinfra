@@ -5,10 +5,23 @@
     name: cargo pkg-config libssl-dev
     state: present
 
-- name: Checkout repository
-  git:
-    repo: "{{ vars_team_login_repository_url }}"
-    dest: "{{ vars_team_login_checkout_path }}"
+- name: Configure update script service
+  template:
+    src: team_login
+    dest: "{{ vars_team_login_path }}"
 
-- name: Run setup script
-  command: "{{ vars_team_login_checkout_path }}/setup_login_scheme.sh"
+- name: Build team login cron job
+  command: "cd {{ vars_team_login_path }} && cargo build"
+
+- name: Install the team login binary
+  command: "cp {{ vars_team_login_path }}/target/debug/team_login /etc/cron.team_login"
+
+- name: Set up the team login cron job
+  template:
+    src: crontab_append
+    dest: /etc/cron.d/team_login
+
+- name: Set up the files that initially appear in a user's home dir
+  template:
+    src: skel/*
+    dest: /etc/skel/

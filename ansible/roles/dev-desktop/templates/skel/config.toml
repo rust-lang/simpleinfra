@@ -1,0 +1,8 @@
+changelog-seen = 2
+
+# Change this to the profile of your choice
+profile = "compiler"
+
+[rust]
+# Build with debug assertions so we get useful RUSTC_LOG
+debug = "true"
