@@ -74,7 +74,7 @@ module "ecs_task" {
     "environment": [
       {
         "name": "RUST_LOG",
-        "value": "site=trace,database=trace"
+        "value": "site=debug,database=trace"
       },
       {
         "name": "PORT",
