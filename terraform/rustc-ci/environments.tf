@@ -18,3 +18,20 @@ module "public" {
   delete_caches_after_days    = 90
   delete_artifacts_after_days = 168
 }
+
+module "security" {
+  source = "./impl"
+  providers = {
+    aws       = aws
+    aws.east1 = aws.east1
+  }
+
+  iam_prefix = "ci--rust-lang-ci--rust-security"
+  repo       = "rust-lang-ci/rust-security"
+
+  caches_bucket    = "rust-lang-security-ci-caches"
+  artifacts_bucket = "rust-lang-security-ci-artifacts"
+
+  delete_caches_after_days    = 30
+  delete_artifacts_after_days = 90
+}
