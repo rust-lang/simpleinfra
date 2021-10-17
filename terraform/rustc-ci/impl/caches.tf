@@ -1,6 +1,6 @@
 resource "aws_s3_bucket" "caches" {
   bucket = var.caches_bucket
-  acl    = "public-read"
+  acl    = var.buckets_public_access ? "public-read" : "private"
 
   lifecycle_rule {
     id      = "delete-bucket-after-90-days"
@@ -21,8 +21,9 @@ resource "aws_s3_bucket" "caches" {
 }
 
 resource "aws_s3_bucket_policy" "caches" {
-  bucket = aws_s3_bucket.caches.id
+  for_each = toset(var.buckets_public_access ? ["true"] : [])
 
+  bucket = aws_s3_bucket.caches.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -37,6 +38,16 @@ resource "aws_s3_bucket_policy" "caches" {
       }
     ]
   })
+}
+
+resource "aws_s3_bucket_public_access_block" "caches" {
+  for_each = toset(var.buckets_public_access ? [] : ["true"])
+
+  bucket = aws_s3_bucket.caches.id
+
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 resource "aws_iam_user" "caches" {

@@ -25,6 +25,8 @@ resource "aws_s3_bucket" "artifacts" {
 }
 
 resource "aws_s3_bucket_policy" "artifacts" {
+  for_each = toset(var.buckets_public_access ? ["true"] : [])
+
   bucket = aws_s3_bucket.artifacts.id
 
   policy = jsonencode({
@@ -41,6 +43,16 @@ resource "aws_s3_bucket_policy" "artifacts" {
       },
     ]
   })
+}
+
+resource "aws_s3_bucket_public_access_block" "artifacts" {
+  for_each = toset(var.buckets_public_access ? [] : ["true"])
+
+  bucket = aws_s3_bucket.artifacts.id
+
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 resource "aws_iam_user" "artifacts" {

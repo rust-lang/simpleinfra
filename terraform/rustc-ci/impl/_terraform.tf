@@ -44,3 +44,9 @@ variable "delete_caches_after_days" {
   description = "Number of days to delete CI caches after"
   type        = number
 }
+
+variable "buckets_public_access" {
+  description = "Whether public access is allowed on buckets"
+  type        = bool
+  default     = false
+}
