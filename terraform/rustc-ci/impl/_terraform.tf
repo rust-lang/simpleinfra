@@ -11,6 +11,7 @@ terraform {
 variable "caches_domain" {
   description = "Name of the domain for the cloudfront cdn in front of caches"
   type        = string
+  default     = null
 }
 
 variable "caches_bucket" {
@@ -21,6 +22,7 @@ variable "caches_bucket" {
 variable "artifacts_domain" {
   description = "Name of the domain for the cloudfront cdn in front of artifacts"
   type        = string
+  default     = null
 }
 
 variable "artifacts_bucket" {

@@ -95,7 +95,9 @@ resource "aws_iam_user_policy" "artifacts_write" {
   })
 }
 
-module "static_website_ci_artifacts" {
+module "artifacts_cdn" {
+  for_each = toset(var.artifacts_domain == null ? [] : ["true"])
+
   source = "../../shared/modules/static-website"
   providers = {
     aws = aws.east1

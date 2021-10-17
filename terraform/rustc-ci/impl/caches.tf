@@ -89,7 +89,9 @@ resource "aws_iam_user_policy" "caches_write" {
   })
 }
 
-module "static_website_ci_caches" {
+module "caches_cdn" {
+  for_each = toset(var.caches_domain == null ? [] : ["true"])
+
   source = "../../shared/modules/static-website"
   providers = {
     aws = aws.east1
