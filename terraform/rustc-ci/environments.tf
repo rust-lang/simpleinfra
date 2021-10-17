@@ -26,8 +26,8 @@ module "security" {
     aws.east1 = aws.east1
   }
 
-  iam_prefix = "ci--rust-lang-ci--rust-security"
-  repo       = "rust-lang-ci/rust-security"
+  iam_prefix = "ci--rust-lang-ci--rsec"
+  repo       = "rust-lang-ci/rsec"
 
   caches_bucket    = "rust-lang-security-ci-caches"
   artifacts_bucket = "rust-lang-security-ci-artifacts"
