@@ -47,7 +47,7 @@ resource "aws_iam_user" "artifacts" {
   name = "${var.iam_prefix}--artifacts"
 }
 
-resource "aws_iam_access_key" "artifacts" {
+resource "aws_iam_access_key" "artifacts_legacy" {
   user = aws_iam_user.artifacts.name
 }
 

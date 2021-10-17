@@ -43,7 +43,7 @@ resource "aws_iam_user" "caches" {
   name = "${var.iam_prefix}--caches"
 }
 
-resource "aws_iam_access_key" "caches" {
+resource "aws_iam_access_key" "caches_legacy" {
   user = aws_iam_user.caches.name
 }
 
