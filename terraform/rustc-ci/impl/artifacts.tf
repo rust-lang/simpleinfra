@@ -108,7 +108,7 @@ resource "aws_iam_user_policy_attachment" "artifacts_write" {
 }
 
 module "static_website_ci_artifacts" {
-  source = "../../modules/static-website"
+  source = "../../shared/modules/static-website"
   providers = {
     aws = aws.east1
   }

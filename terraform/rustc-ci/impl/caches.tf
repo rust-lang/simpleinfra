@@ -100,7 +100,7 @@ resource "aws_iam_user_policy_attachment" "caches_write" {
 }
 
 module "static_website_ci_caches" {
-  source = "../../modules/static-website"
+  source = "../../shared/modules/static-website"
   providers = {
     aws = aws.east1
   }
