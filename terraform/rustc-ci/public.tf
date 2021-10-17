@@ -11,5 +11,6 @@ module "public" {
   artifacts_bucket = "rust-lang-ci2"
   artifacts_domain = "ci-artifacts.rust-lang.org"
 
+  delete_caches_after_days    = 90
   delete_artifacts_after_days = 168
 }

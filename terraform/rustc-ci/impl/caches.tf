@@ -7,11 +7,13 @@ resource "aws_s3_bucket" "caches" {
     enabled = true
 
     expiration {
-      days = 90
+      days = var.delete_caches_after_days
     }
 
     noncurrent_version_expiration {
-      days = 90
+      // This is *in addition* to the delete_caches_after_days above; we don't
+      // really need to keep CI caches around in an inaccessible state.
+      days = 1
     }
 
     abort_incomplete_multipart_upload_days = 1

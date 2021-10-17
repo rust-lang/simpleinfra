@@ -37,3 +37,8 @@ variable "delete_artifacts_after_days" {
   description = "Number of days to delete CI artifacts after"
   type        = number
 }
+
+variable "delete_caches_after_days" {
+  description = "Number of days to delete CI caches after"
+  type        = number
+}
