@@ -5,7 +5,9 @@ module "public" {
     aws.east1 = aws.east1
   }
 
-  iam_prefix       = "ci--rust-lang--rust"
+  iam_prefix = "ci--rust-lang--rust"
+  repo       = "rust-lang-ci/rust"
+
   caches_bucket    = "rust-lang-ci-sccache2"
   caches_domain    = "ci-caches.rust-lang.org"
   artifacts_bucket = "rust-lang-ci2"

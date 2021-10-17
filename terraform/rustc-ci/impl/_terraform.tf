@@ -50,3 +50,8 @@ variable "buckets_public_access" {
   type        = bool
   default     = false
 }
+
+variable "repo" {
+  description = "GitHub repository to authorize"
+  type        = string
+}

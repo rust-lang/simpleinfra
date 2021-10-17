@@ -50,17 +50,23 @@ resource "aws_s3_bucket_public_access_block" "caches" {
   restrict_public_buckets = true
 }
 
-resource "aws_iam_user" "caches" {
-  name = "${var.iam_prefix}--caches"
+module "caches_user" {
+  source = "../../shared/modules/gha-iam-user"
+
+  org  = split("/", var.repo)[0]
+  repo = split("/", var.repo)[1]
+
+  user_name  = "${var.iam_prefix}--caches"
+  env_prefix = "CACHES"
 }
 
 resource "aws_iam_access_key" "caches_legacy" {
-  user = aws_iam_user.caches.name
+  user = module.caches_user.user_name
 }
 
 resource "aws_iam_user_policy" "caches_write" {
   name = "caches-write"
-  user = aws_iam_user.caches.name
+  user = module.caches_user.user_name
 
   policy = jsonencode({
     Version = "2012-10-17"

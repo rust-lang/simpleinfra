@@ -55,17 +55,23 @@ resource "aws_s3_bucket_public_access_block" "artifacts" {
   restrict_public_buckets = true
 }
 
-resource "aws_iam_user" "artifacts" {
-  name = "${var.iam_prefix}--artifacts"
+module "artifacts_user" {
+  source = "../../shared/modules/gha-iam-user"
+
+  org  = split("/", var.repo)[0]
+  repo = split("/", var.repo)[1]
+
+  user_name  = "${var.iam_prefix}--artifacts"
+  env_prefix = "ARTIFACTS"
 }
 
 resource "aws_iam_access_key" "artifacts_legacy" {
-  user = aws_iam_user.artifacts.name
+  user = module.artifacts_user.user_name
 }
 
 resource "aws_iam_user_policy" "artifacts_write" {
   name = "artifacts-write"
-  user = aws_iam_user.artifacts.name
+  user = module.artifacts_user.user_name
 
   policy = jsonencode({
     Version = "2012-10-17"

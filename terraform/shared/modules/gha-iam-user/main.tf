@@ -12,7 +12,7 @@ provider "github" {
 }
 
 resource "aws_iam_user" "ci" {
-  name = "ci--${var.org}--${var.repo}"
+  name = var.user_name != null ? var.user_name : "ci--${var.org}--${var.repo}"
 }
 
 resource "aws_iam_access_key" "ci" {
@@ -21,12 +21,12 @@ resource "aws_iam_access_key" "ci" {
 
 resource "github_actions_secret" "aws_access_key_id" {
   repository      = var.repo
-  secret_name     = "AWS_ACCESS_KEY_ID"
+  secret_name     = "${var.env_prefix != null ? "${var.env_prefix}_" : ""}AWS_ACCESS_KEY_ID"
   plaintext_value = aws_iam_access_key.ci.id
 }
 
 resource "github_actions_secret" "aws_secret_access_key" {
   repository      = var.repo
-  secret_name     = "AWS_SECRET_ACCESS_KEY"
+  secret_name     = "${var.env_prefix != null ? "${var.env_prefix}_" : ""}AWS_SECRET_ACCESS_KEY"
   plaintext_value = aws_iam_access_key.ci.secret
 }
