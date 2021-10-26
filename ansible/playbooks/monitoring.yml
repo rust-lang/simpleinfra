@@ -163,21 +163,21 @@
 
             - alert: LongQueue
               expr: docsrs_prioritized_crates_count{job="docsrs"} >= 50
-              for: 30m
+              for: 12h
               labels:
                 dispatch: docsrs
               annotations:
                 summary: "The docs.rs build queue is unreasonably long"
-                description: "There are more than 50 crates in the docs.rs queue, and the situation didn't resolve itself in the past 30 minutes. The build queue is available at https://docs.rs/releases/queue"
+                description: "There are more than 50 crates in the docs.rs queue, and the situation didn't resolve itself in the past 12 hours. The build queue is available at https://docs.rs/releases/queue"
 
             - alert: LongDeprioritizedQueue
               expr: docsrs_queued_crates_count{job="docsrs"} - docsrs_prioritized_crates_count{job="docsrs"} >= 1000
-              for: 1h
+              for: 24h
               labels:
                 dispatch: docsrs
               annotations:
                 summary: "The docs.rs deprioritized queue is unreasonably long"
-                description: "There are more than 1000 deprioritized crates in the docs.rs queue, and the situation didn't resolve itself in the past hour. The build queue is available at https://docs.rs/releases/queue"
+                description: "There are more than 1000 deprioritized crates in the docs.rs queue, and the situation didn't resolve itself in the 24 hours. The build queue is available at https://docs.rs/releases/queue"
 
             - alert: FailingBuilds
               expr: increase(docsrs_failed_builds{job="docsrs"}[3h]) / increase(docsrs_total_builds{job="docsrs"}[3h]) > 0.75
