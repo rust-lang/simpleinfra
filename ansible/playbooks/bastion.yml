@@ -14,8 +14,9 @@
         - simulacrum
         - pietro
       unprivileged_users:
-        - onur  # docsrs.infra.rust-lang.org
         - joshua  # docsrs.infra.rust-lang.org
+        - syphar  # docsrs.infra.rust-lang.org
+        - nemo157  # docsrs.infra.rust-lang.org
         - shep  # play.rust-lang.org
         - technetos  # RDS access to the discord-mods-bot database
 
