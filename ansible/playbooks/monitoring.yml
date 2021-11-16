@@ -161,6 +161,15 @@
                 summary: "docs.rs is down"
                 description: "Prometheus wasn't able to reach the docs.rs website for more than a minute."
 
+            - alert: DocsRsQueueLocked
+              expr: docsrs_queue_is_locked{job="docsrs"} == 1
+              for: 1m
+              labels:
+                dispatch: docsrs
+              annotations:
+                summary: "docs.rs queue is locked"
+                description: "the build queue is marked as locked for more than a minute."
+
             - alert: LongQueue
               expr: docsrs_prioritized_crates_count{job="docsrs"} >= 50
               for: 12h
