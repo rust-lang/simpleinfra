@@ -4,6 +4,7 @@ use serde::Deserialize;
 use eyre::*;
 use std::process::Command;
 use std::process::Output;
+use std::collections::HashSet;
 
 #[derive(Deserialize)]
 struct All {
@@ -21,17 +22,21 @@ fn cmd(cmd: &str, args: &[&str]) -> std::io::Result<Output> {
         .output()
 }
 
+const KEY_DIR: &str = "/etc/ssh/authorized_keys/";
+
 fn main() -> Result<()> {
-    let all = reqwest::blocking::get(TEAM_URL)?.json::<All>()?;
+    let all = reqwest::blocking::get(TEAM_URL)?.json::<All>().wrap_err("failed to fetch team repository")?;
+    let mut users = HashSet::new();
     for person in all.members {
+        users.insert(person.github.clone());
         // Get the keys the user added to their github account.
         // Do this every time the cronjob runs so that they get their new keys if necessary.
         let keys =
-            reqwest::blocking::get(format!("https://github.com/{}.keys", person.github))?.text()?;
-        std::fs::write(format!("/etc/ssh/authorized_keys/{}", person.github), keys)?;
+            reqwest::blocking::get(format!("https://github.com/{}.keys", person.github)).wrap_err("failed to download user's keys")?.text()?;
+        std::fs::write(format!("{}{}", KEY_DIR, person.github), keys).wrap_err("Failed to create key file")?;
 
         // Check if user exists
-        let id = cmd("id", &[&person.github])?;
+        let id = cmd("id", &[&person.github]).wrap_err("failed to run `id` command")?;
         if id.status.success() {
             continue;
         }
@@ -48,5 +53,23 @@ fn main() -> Result<()> {
             "failed to give user ssh access"
         );
     }
-    bail!("user not found");
+    // Delete all keys for users that weren't on the list
+    for entry in std::fs::read_dir(KEY_DIR)? {
+        let entry = entry?;
+        let path = entry.path();
+        if path.is_file() {
+            if let Some(extension) = path.extension() {
+                if extension == "keys" {
+                    if let Some(stem) = path.file_stem() {
+                        if let Some(stem) = stem.to_str() {
+                            if !users.contains(stem) {
+                                std::fs::remove_file(path)?;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    Ok(())
 }

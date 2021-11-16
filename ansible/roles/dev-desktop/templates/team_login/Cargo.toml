@@ -14,3 +14,5 @@ version = "0.11"
 [dependencies.serde]
 features = ["derive"]
 version = "1.0"
+
+[workspace]
