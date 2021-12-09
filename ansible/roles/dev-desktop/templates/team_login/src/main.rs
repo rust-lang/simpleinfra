@@ -1,7 +1,6 @@
 const TEAM_URL: &str = "https://team-api.infra.rust-lang.org/v1/teams/all.json";
 
-use eyre::*;
-use serde::Deserialize;
+use miniserde::Deserialize;
 use std::collections::HashSet;
 use std::process::Command;
 use std::process::Output;
@@ -22,29 +21,54 @@ fn cmd(cmd: &str, args: &[&str]) -> std::io::Result<Output> {
 
 const KEY_DIR: &str = "/etc/ssh/authorized_keys/";
 
-fn main() -> Result<()> {
-    let all = reqwest::blocking::get(TEAM_URL)?
-        .json::<All>()
-        .wrap_err("failed to fetch team repository")?;
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let mut handle = curl::easy::Easy::new();
+    handle.url(TEAM_URL).unwrap();
+    let mut data = Vec::new();
+    {
+        let mut transfer = handle.transfer();
+        transfer
+            .write_function(|new_data| {
+                data.extend_from_slice(new_data);
+                Ok(new_data.len())
+            })
+            .unwrap();
+        transfer.perform().unwrap();
+    }
+
+    let data = String::from_utf8(data).unwrap();
+    let all: All = miniserde::json::from_str(&data).unwrap();
     let mut users = HashSet::new();
     for person in all.members {
         users.insert(person.github.clone());
         // Get the keys the user added to their github account.
         // Do this every time the cronjob runs so that they get their new keys if necessary.
-        let keys = reqwest::blocking::get(format!("https://github.com/{}.keys", person.github))
-            .wrap_err("failed to download user's keys")?
-            .text()?;
+        let mut keys = Vec::new();
+        handle
+            .url(&format!("https://github.com/{}.keys", person.github))
+            .unwrap();
+        {
+            let mut transfer = handle.transfer();
+            transfer
+                .write_function(|new_data| {
+                    keys.extend_from_slice(new_data);
+                    Ok(new_data.len())
+                })
+                .unwrap();
+            transfer.perform().expect("failed to download user's keys");
+        }
+        let keys = String::from_utf8(keys).unwrap();
         std::fs::write(format!("{}{}", KEY_DIR, person.github), keys)
-            .wrap_err("Failed to create key file")?;
+            .expect("Failed to create key file");
 
         // Check if user exists
-        let id = cmd("id", &[&person.github]).wrap_err("failed to run `id` command")?;
+        let id = cmd("id", &[&person.github]).expect("failed to run `id` command");
         if id.status.success() {
             continue;
         }
 
         // If user does not exist, create it
-        ensure!(
+        assert!(
             cmd("useradd", &["--create-home", &person.github])?
                 .status
                 .success(),
@@ -52,7 +76,7 @@ fn main() -> Result<()> {
         );
 
         // Get them ssh access
-        ensure!(
+        assert!(
             cmd("usermod", &["-a", "-G", "allow-ssh", &person.github])?
                 .status
                 .success(),
