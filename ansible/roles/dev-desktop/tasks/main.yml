@@ -2,19 +2,22 @@
 
 - name: install Rust
   apt:
-    name: cargo pkg-config libssl-dev
+    name:
+      - cargo
+      - pkg-config
+      - libssl-dev
     state: present
 
 - name: Configure update script service
-  template:
-    src: team_login
+  copy:
+    src: team_login/
     dest: "{{ vars_team_login_path }}"
 
 - name: Build team login cron job
-  command: "cd {{ vars_team_login_path }} && cargo build"
+  shell: "cd {{ vars_team_login_path }} && cargo build"
 
 - name: Install the team login binary
-  command: "cp {{ vars_team_login_path }}/target/debug/team_login /etc/cron.team_login"
+  shell: "cp {{ vars_team_login_path }}/target/debug/team_login /etc/cron.team_login"
 
 - name: Set up the team login cron job
   template:
@@ -22,6 +25,6 @@
     dest: /etc/cron.d/team_login
 
 - name: Set up the files that initially appear in a user's home dir
-  template:
-    src: skel/*
+  copy:
+    src: skel/
     dest: /etc/skel/
