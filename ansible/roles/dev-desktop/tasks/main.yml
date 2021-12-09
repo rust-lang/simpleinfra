@@ -37,7 +37,6 @@
       - python3
       - python-is-python3
       - clang
-      - lld
       - llvm
       - valgrind
       - ninja-build
