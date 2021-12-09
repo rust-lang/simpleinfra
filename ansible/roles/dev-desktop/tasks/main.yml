@@ -28,3 +28,17 @@
   copy:
     src: skel/
     dest: /etc/skel/
+
+- name: install common tooling
+  apt:
+    name:
+      - build-essential
+      - cmake
+      - python3
+      - python-is-python3
+      - clang
+      - lld
+      - llvm
+      - valgrind
+      - ninja-build
+    state: present
