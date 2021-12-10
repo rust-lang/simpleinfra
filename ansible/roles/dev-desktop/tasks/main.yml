@@ -1,12 +1,14 @@
 ---
 
-- name: install Rust
+- name: install Rust deps
   apt:
     name:
-      - cargo
       - pkg-config
       - libssl-dev
     state: present
+
+- name: install rustup in userspace for root
+  shell: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 - name: Configure update script service
   copy:
