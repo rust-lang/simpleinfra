@@ -8,7 +8,7 @@
     state: present
 
 - name: install rustup in userspace for root
-  shell: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+  shell: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
 
 - name: Configure update script service
   copy:
