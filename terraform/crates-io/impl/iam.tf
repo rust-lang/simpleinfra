@@ -50,3 +50,53 @@ resource "aws_iam_user_policy_attachment" "heroku_static_write" {
   user       = aws_iam_user.heroku.name
   policy_arn = aws_iam_policy.static_write.arn
 }
+
+resource "aws_iam_role" "s3_replication" {
+  name = "${var.iam_prefix}--s3-replication"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "s3.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+            "aws:SourceArn"     = aws_s3_bucket.static.arn
+          }
+        }
+      }
+    ]
+  })
+
+  inline_policy {
+    name = "replication"
+    policy = jsonencode({
+      Version = "2012-10-17"
+      Statement = [
+        {
+          Effect = "Allow"
+          Action = [
+            "s3:GetObjectVersionForReplication",
+            "s3:GetObjectVersionAcl",
+            "s3:GetObjectVersionTagging",
+          ]
+          Resource = "${aws_s3_bucket.static.arn}/*"
+        },
+        {
+          Effect = "Allow"
+          Action = [
+            "s3:ReplicateObject",
+            "s3:ReplicateDelete",
+            "s3:ReplicateTags",
+          ]
+          Resource = "${aws_s3_bucket.fallback.arn}/*"
+        },
+      ]
+    })
+  }
+}

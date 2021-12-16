@@ -26,6 +26,49 @@ resource "aws_s3_bucket" "static" {
       days = 1
     }
   }
+
+  lifecycle {
+    ignore_changes = [
+      replication_configuration,
+    ]
+  }
+}
+
+resource "aws_s3_bucket_replication_configuration" "static" {
+  role   = aws_iam_role.s3_replication.arn
+  bucket = aws_s3_bucket.static.id
+
+  rule {
+    id     = "crates"
+    status = "Enabled"
+
+    filter {
+      prefix = "crates/"
+    }
+
+    destination {
+      bucket        = aws_s3_bucket.fallback.arn
+      storage_class = "INTELLIGENT_TIERING"
+
+      metrics {
+        status = "Enabled"
+        event_threshold {
+          minutes = 15
+        }
+      }
+
+      replication_time {
+        status = "Enabled"
+        time {
+          minutes = 15
+        }
+      }
+    }
+
+    delete_marker_replication {
+      status = "Enabled"
+    }
+  }
 }
 
 resource "aws_s3_bucket_policy" "static" {
@@ -65,4 +108,35 @@ resource "aws_s3_bucket_inventory" "static" {
       format     = "CSV"
     }
   }
+}
+
+resource "aws_s3_bucket" "fallback" {
+  provider = aws.eu-west-1
+
+  bucket = "${var.static_bucket_name}-fallback"
+
+  versioning {
+    enabled = true
+  }
+}
+
+resource "aws_s3_bucket_policy" "fallback" {
+  provider = aws.eu-west-1
+
+  bucket = aws_s3_bucket.fallback.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "PublicReadGetObject",
+        Effect = "Allow"
+        Principal = {
+          AWS = "*"
+        }
+        Action   = "s3:GetObject"
+        Resource = "${aws_s3_bucket.fallback.arn}/*"
+      }
+    ]
+  })
 }

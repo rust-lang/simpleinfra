@@ -8,6 +8,8 @@ terraform {
   }
 }
 
+data "aws_caller_identity" "current" {}
+
 module "certificate" {
   source = "../../shared/modules/acm-certificate"
   providers = {
