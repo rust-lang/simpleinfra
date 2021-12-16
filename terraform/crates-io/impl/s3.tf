@@ -31,22 +31,20 @@ resource "aws_s3_bucket" "static" {
 resource "aws_s3_bucket_policy" "static" {
   bucket = aws_s3_bucket.static.id
 
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "PublicReadGetObject",
-      "Effect": "Allow",
-      "Principal": {
-        "AWS": "*"
-      },
-      "Action": "s3:GetObject",
-      "Resource": "${aws_s3_bucket.static.arn}/*"
-    }
-  ]
-}
-EOF
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "PublicReadGetObject",
+        Effect = "Allow"
+        Principal = {
+          AWS = "*"
+        }
+        Action   = "s3:GetObject"
+        Resource = "${aws_s3_bucket.static.arn}/*"
+      }
+    ]
+  })
 }
 
 resource "aws_s3_bucket_inventory" "static" {

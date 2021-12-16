@@ -12,48 +12,38 @@ resource "aws_iam_policy" "static_write" {
   name        = "${var.iam_prefix}--static-write"
   description = "Write access to the ${var.static_bucket_name} S3 bucket"
 
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "StaticBucketWrite",
-      "Action": [
-        "s3:AbortMultipartUpload",
-        "s3:GetObject",
-        "s3:GetObjectAcl",
-        "s3:PutObject",
-        "s3:PutObjectAcl"
-      ],
-      "Effect": "Allow",
-      "Resource": [
-        "${aws_s3_bucket.static.arn}/*"
-      ]
-    },
-    {
-      "Sid": "StaticBucketList",
-      "Effect": "Allow",
-      "Action": [
-        "s3:ListBucket"
-      ],
-      "Resource": [
-        "${aws_s3_bucket.static.arn}"
-      ]
-    },
-    {
-      "Sid": "HeadBuckets",
-      "Effect": "Allow",
-      "Action": [
-        "s3:HeadBucket",
-        "s3:GetBucketLocation"
-      ],
-      "Resource": [
-        "*"
-      ]
-    }
-  ]
-}
-EOF
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "StaticBucketWrite"
+        Effect = "Allow"
+        Action = [
+          "s3:AbortMultipartUpload",
+          "s3:GetObject",
+          "s3:GetObjectAcl",
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+        ]
+        Resource = "${aws_s3_bucket.static.arn}/*"
+      },
+      {
+        Sid      = "StaticBucketList"
+        Effect   = "Allow"
+        Action   = "s3:ListBucket"
+        Resource = aws_s3_bucket.static.arn
+      },
+      {
+        Sid    = "HeadBuckets"
+        Effect = "Allow"
+        Action = [
+          "s3:HeadBucket",
+          "s3:GetBucketLocation",
+        ]
+        Resource = "*"
+      },
+    ]
+  })
 }
 
 resource "aws_iam_user_policy_attachment" "heroku_static_write" {

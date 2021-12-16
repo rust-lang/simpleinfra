@@ -6,6 +6,7 @@ module "prod" {
   providers = {
     aws           = aws
     aws.us-east-1 = aws.us-east-1
+    aws.eu-west-1 = aws.eu-west-1
   }
 
   webapp_domain_name = "crates.io"
@@ -25,6 +26,7 @@ module "staging" {
   providers = {
     aws           = aws
     aws.us-east-1 = aws.us-east-1
+    aws.eu-west-1 = aws.eu-west-1
   }
 
   webapp_domain_name = "staging.crates.io"
