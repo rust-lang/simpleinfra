@@ -74,6 +74,10 @@ module "ecs_task" {
     },
     "environment": [
       {
+        "name": "DISABLE_COLOR",
+        "value": "yes"
+      },
+      {
         "name": "RUST_LOG",
         "value": "triagebot=info"
       }
