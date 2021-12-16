@@ -18,8 +18,6 @@ module "service_cratesio" {
   webapp_origin_domain = "crates-io.herokuapp.com"
 
   iam_prefix = "crates-io"
-
-  logs_bucket = aws_s3_bucket.temp_logs_cratesio.bucket_domain_name
 }
 
 module "service_cratesio_staging" {

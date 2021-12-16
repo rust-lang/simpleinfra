@@ -92,15 +92,6 @@ resource "aws_cloudfront_distribution" "webapp" {
     }
   }
 
-  dynamic "logging_config" {
-    for_each = var.logs_bucket != null ? toset([var.logs_bucket]) : toset([])
-    content {
-      bucket          = logging_config.value
-      prefix          = "webapp/"
-      include_cookies = false
-    }
-  }
-
   tags = {
     TeamAccess = "crates-io"
   }
