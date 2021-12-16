@@ -3,15 +3,15 @@ terraform {
     aws = {
       source                = "hashicorp/aws"
       version               = "~> 3.59"
-      configuration_aliases = [aws.east1]
+      configuration_aliases = [aws.us-east-1]
     }
   }
 }
 
 module "certificate" {
-  source = "../../modules/acm-certificate"
+  source = "../../shared/modules/acm-certificate"
   providers = {
-    aws = aws.east1
+    aws = aws.us-east-1
   }
 
   domains = [
