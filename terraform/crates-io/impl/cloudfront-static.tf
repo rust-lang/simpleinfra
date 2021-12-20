@@ -16,7 +16,7 @@ resource "aws_cloudfront_distribution" "static" {
   }
 
   default_cache_behavior {
-    target_origin_id       = "main"
+    target_origin_id       = "main-with-fallback"
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
     compress               = true
@@ -40,6 +40,27 @@ resource "aws_cloudfront_distribution" "static" {
   origin {
     origin_id   = "main"
     domain_name = aws_s3_bucket.static.bucket_regional_domain_name
+  }
+
+  origin {
+    origin_id   = "fallback"
+    domain_name = aws_s3_bucket.fallback.bucket_regional_domain_name
+  }
+
+  origin_group {
+    origin_id = "main-with-fallback"
+
+    failover_criteria {
+      status_codes = [500, 502, 503]
+    }
+
+    member {
+      origin_id = "main"
+    }
+
+    member {
+      origin_id = "fallback"
+    }
   }
 
   restrictions {
