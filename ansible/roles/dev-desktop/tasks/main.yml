@@ -8,7 +8,14 @@
     state: present
 
 - name: install rustup in userspace for root
-  shell: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
+  shell: |
+    set -eu
+    RUSTUP_VERSION=1.24.3
+    RUSTUP_SHA="a3cb081f88a6789d104518b30d4aa410009cd08c3822a1226991d6cf0442a0f8"
+    curl --proto '=https' --tlsv1.2 -sSf -O \
+      https://raw.githubusercontent.com/rust-lang/rustup/${RUSTUP_VERSION}/rustup-init.sh
+    echo "${RUSTUP_SHA}  rustup-init.sh" | sha256sum --check --
+    sh rustup-init.sh --default-toolchain nightly -y --component rust-src
 
 - name: Configure update script service
   copy:
