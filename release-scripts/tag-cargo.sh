@@ -7,7 +7,7 @@ if [ ! -e x.py ]; then
     exit 1
 fi
 
-SIMPLEINFRA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && basename `pwd` )/.."
+SIMPLEINFRA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
 
 git fetch git@github.com:rust-lang/rust
 CURRENT_STABLE=`git ls-remote -q git@github.com:rust-lang/rust stable | awk '{ print $1 }'`
