@@ -1,0 +1,22 @@
+#
+# {{ ansible_managed }}
+#
+
+[Unit]
+Description=The Rust Playground
+
+[Service]
+Environment=TMPDIR={{ vars_playground_mountpoint_path }}
+Environment=RUST_LOG=info
+Environment=PLAYGROUND_CORS_ENABLED={{ vars_playground_env_cors_enabled }}
+Environment=PLAYGROUND_GITHUB_TOKEN={{ vars_playground_env_github_token }}
+Environment=PLAYGROUND_UI_ADDRESS={{ vars_playground_env_ui_address }}
+Environment=PLAYGROUND_UI_PORT={{ vars_playground_env_ui_port }}
+Environment=PLAYGROUND_UI_ROOT={{ vars_playground_env_ui_root_path }}
+
+WorkingDirectory={{ vars_playground_artifacts_path }}
+
+ExecStart={{ vars_playground_executable_path }}
+
+[Install]
+WantedBy=multi-user.target
