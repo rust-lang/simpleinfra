@@ -10,6 +10,10 @@ terraform {
       source  = "hashicorp/dns"
       version = "~> 2.2.0"
     }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "3.1.0"
+    }
   }
 
   backend "s3" {
