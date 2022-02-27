@@ -25,3 +25,7 @@ output "ecs_cluster_config" {
 output "inventories_bucket_arn" {
   value = aws_s3_bucket.rust_inventories.arn
 }
+
+output "gha_oidc_arn" {
+  value = aws_iam_openid_connect_provider.github_actions.arn
+}

@@ -32,19 +32,19 @@ resource "aws_security_group" "playground" {
   }
 
   ingress {
-    from_port   = 0
-    to_port     = 22
-    protocol    = "tcp"
+    from_port       = 0
+    to_port         = 22
+    protocol        = "tcp"
     security_groups = [data.aws_security_group.bastion.id]
-    description = "SSH access from bastion"
+    description     = "SSH access from bastion"
   }
 
   ingress {
-    from_port   = 8
-    to_port     = -1
-    protocol    = "icmp"
+    from_port       = 8
+    to_port         = -1
+    protocol        = "icmp"
     security_groups = [data.aws_security_group.bastion.id]
-    description = "Ping access from bastion"
+    description     = "Ping access from bastion"
   }
 
   ingress {
@@ -108,6 +108,44 @@ resource "aws_route53_record" "playground" {
   ttl     = 60
 }
 
+// Create the IAM role used by the playground.
+
+resource "aws_iam_role" "playground" {
+  name = "playground"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "sts:AssumeRole"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+
+  inline_policy {
+    name = "policy"
+    policy = jsonencode({
+      Version = "2012-10-17"
+      Statement = [
+        {
+          Effect   = "Allow"
+          Action   = "s3:ListBucket"
+          Resource = aws_s3_bucket.artifacts.arn
+        },
+        {
+          Effect   = "Allow"
+          Action   = "s3:GetObject"
+          Resource = "${aws_s3_bucket.artifacts.arn}/*"
+        },
+      ]
+    })
+  }
+}
+
 // Create the EC2 instance itself.
 
 data "aws_ami" "ubuntu_bionic" {
@@ -125,10 +163,16 @@ data "aws_ami" "ubuntu_bionic" {
   }
 }
 
+resource "aws_iam_instance_profile" "playground" {
+  name = "playground"
+  role = aws_iam_role.playground.name
+}
+
 resource "aws_instance" "playground" {
   ami                     = data.aws_ami.ubuntu_bionic.id
   instance_type           = "t3a.nano"
   key_name                = data.terraform_remote_state.shared.outputs.master_ec2_key_pair
+  iam_instance_profile    = aws_iam_instance_profile.playground.name
   ebs_optimized           = true
   disable_api_termination = true
   monitoring              = false
