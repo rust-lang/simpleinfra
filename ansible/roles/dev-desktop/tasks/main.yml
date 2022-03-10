@@ -49,4 +49,5 @@
       - llvm
       - valgrind
       - ninja-build
+      - gcc-multilib # for 32 bit cross compiles of libstd and tests
     state: present
