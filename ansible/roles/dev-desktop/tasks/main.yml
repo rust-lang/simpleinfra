@@ -25,6 +25,16 @@
 - name: Build team login cron job
   shell: "cd {{ vars_team_login_path }} && cargo build"
 
+- name: Enable message of the day
+  template:
+    src: motd_sshd_config
+    dest: /etc/ssh/sshd_config.d/motd
+
+- name: Set up message of the day
+  template:
+    src: motd_rules.sh
+    dest: /etc/update-motd.d/99-rules
+
 - name: Install the team login binary
   shell: "cp {{ vars_team_login_path }}/target/debug/team_login /etc/cron.team_login"
 
