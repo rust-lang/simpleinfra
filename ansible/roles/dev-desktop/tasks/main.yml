@@ -23,7 +23,7 @@
     dest: "{{ vars_team_login_path }}"
 
 - name: Build team login cron job
-  shell: "cd {{ vars_team_login_path }} && cargo build"
+  shell: "cd {{ vars_team_login_path }} && bash -c \"cargo build\""
 
 - name: Enable message of the day
   template:
