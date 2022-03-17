@@ -58,6 +58,7 @@
 # remove them.
 - name: remove old group memberships
   command: "gpasswd -d {{ item.member | quote }} {{ item.group | quote }}"
+  when: "{{ keep_old_user_permissions_on_redeploy }}" != "true"
   loop: "{{ to_remove }}"
   vars:
     # Configure the groups to check and their expected members list

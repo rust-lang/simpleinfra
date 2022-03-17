@@ -14,5 +14,6 @@
         - simulacrum
         - pietro
         - oli-obk
+      keep_old_user_permissions_on_redeploy: true
 
     - role: dev-desktop
