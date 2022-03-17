@@ -31,10 +31,13 @@
     src: motd_sshd_config
     dest: /etc/ssh/sshd_config.d/motd
 
+- name: Clean out existing message of the day
+  shell: "rm /etc/update-motd.d/*"
+
 - name: Set up message of the day
   template:
     src: motd_rules.sh
-    dest: /etc/update-motd.d/99-rules
+    dest: /etc/update-motd.d/01-rules
 
 - name: Install the team login binary
   shell: "cp {{ vars_team_login_path }}/target/debug/team_login /etc/cron.team_login"
