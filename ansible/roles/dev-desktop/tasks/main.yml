@@ -45,7 +45,7 @@
     dest: /etc/cron.d/team_login
   # if the cron job is running right now, keep retrying until it finishes
   register: task_result
-  until: task_result.rc == 0
+  until: task_result is not failed
   retries: 10
   delay: 5
 
