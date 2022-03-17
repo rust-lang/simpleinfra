@@ -43,6 +43,11 @@
   template:
     src: crontab_append
     dest: /etc/cron.d/team_login
+  # if the cron job is running right now, keep retrying until it finishes
+  register: task_result
+  until: task_result.rc == 0
+  retries: 10
+  delay: 5
 
 - name: Set up the files that initially appear in a user's home dir
   copy:
