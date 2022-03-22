@@ -13,6 +13,7 @@ struct All {
 #[derive(Deserialize)]
 struct Person {
     github: String,
+    dev_desktop: bool,
 }
 
 fn cmd(cmd: &str, args: &[&str]) -> std::io::Result<Output> {
@@ -40,6 +41,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let all: All = miniserde::json::from_str(&data).unwrap();
     let mut users = HashSet::new();
     for person in all.members {
+        if !person.dev_desktop {
+            continue;
+        }
         // Pick a user name that won't conflict with system users
         let username = format!("gh-{}", person.github);
 
