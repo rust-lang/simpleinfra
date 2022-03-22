@@ -49,10 +49,10 @@
   retries: 10
   delay: 5
 
-- name: Set up the files that initially appear in a user's home dir
+- name: Set up the convenience files for managing worktrees
   copy:
-    src: skel/
-    dest: /etc/skel/
+    src: scripts/
+    dest: /usr/local/bin/
 
 - name: install common tooling
   apt:
