@@ -40,12 +40,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let all: All = miniserde::json::from_str(&data).unwrap();
     let mut users = HashSet::new();
     for person in all.members {
-        users.insert(person.github.clone());
+        // Pick a user name that won't conflict with system users
+        let username = format!("gh-{}", person.github);
+
+        users.insert(username.clone());
         // Get the keys the user added to their github account.
         // Do this every time the cronjob runs so that they get their new keys if necessary.
         let mut keys = Vec::new();
         handle
-            .url(&format!("https://github.com/{}.keys", person.github))
+            .url(&format!("https://github.com/{}.keys", username))
             .unwrap();
         {
             let mut transfer = handle.transfer();
@@ -58,18 +61,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             transfer.perform().expect("failed to download user's keys");
         }
         let keys = String::from_utf8(keys).unwrap();
-        std::fs::write(format!("{}{}", KEY_DIR, person.github), keys)
+        std::fs::write(format!("{}{}", KEY_DIR, username), keys)
             .expect("Failed to create key file");
 
         // Check if user exists
-        let id = cmd("id", &[&person.github]).expect("failed to run `id` command");
+        let id = cmd("id", &[&username]).expect("failed to run `id` command");
         if id.status.success() {
             continue;
         }
 
         // If user does not exist, create it
         assert!(
-            cmd("useradd", &["--create-home", &person.github])?
+            cmd("useradd", &["--create-home", &username])?
                 .status
                 .success(),
             "failed to create user"
@@ -77,7 +80,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         // Get them ssh access
         assert!(
-            cmd("usermod", &["-a", "-G", "allow-ssh", &person.github])?
+            cmd("usermod", &["-a", "-G", "allow-ssh", &username])?
                 .status
                 .success(),
             "failed to give user ssh access"
@@ -87,13 +90,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     for entry in std::fs::read_dir(KEY_DIR)? {
         let entry = entry?;
         let path = entry.path();
-        if path.is_file() {
+        if !path.is_file() {
             if let Some(extension) = path.extension() {
                 if extension == "keys" {
                     if let Some(stem) = path.file_stem() {
                         if let Some(stem) = stem.to_str() {
-                            if !users.contains(stem) {
-                                std::fs::remove_file(path)?;
+                            if stem.starts_with("gh-") {
+                                if !users.contains(stem) {
+                                    std::fs::remove_file(path)?;
+                                }
                             }
                         }
                     }
