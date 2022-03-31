@@ -72,8 +72,8 @@ resource "aws_iam_group_policy" "crates_io" {
         Resource = "*"
       },
       {
-        Effect = "Allow"
-        Action = "s3:ListBucket"
+        Effect   = "Allow"
+        Action   = "s3:ListBucket"
         Resource = [for _, bucket in data.aws_s3_bucket.crates_io_buckets : bucket.arn]
       },
       {
