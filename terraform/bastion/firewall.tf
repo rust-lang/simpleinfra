@@ -16,6 +16,7 @@ locals {
     "technetos",
     "nemo157",
     "syphar",
+    "rylev",
   ]
 }
 
