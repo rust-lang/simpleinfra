@@ -30,7 +30,7 @@ resource "aws_iam_group_policy" "rustc_perf" {
         Sid    = "RDSAccess"
         Effect = "Allow"
         Action = [
-          "ssm:GetParameters",
+          "ssm:GetParameter",
         ]
         Resource = [
           "${data.aws_ssm_parameter.rustc_perf_credentials.arn}"
