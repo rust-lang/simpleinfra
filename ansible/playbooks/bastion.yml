@@ -19,5 +19,6 @@
         - nemo157  # docsrs.infra.rust-lang.org
         - shep  # play.rust-lang.org
         - technetos  # RDS access to the discord-mods-bot database
+        - rylev # RDS access to rustc-perf
 
     - role: bastion
