@@ -27,15 +27,11 @@ resource "aws_iam_group_policy" "rustc_perf" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "RDSAccess"
-        Effect = "Allow"
-        Action = [
-          "ssm:GetParameter",
-        ]
-        Resource = [
-          "${data.aws_ssm_parameter.rustc_perf_credentials.arn}"
-        ]
-      },
+        Sid      = "AllowRDSCredentialsAccess"
+        Effect   = "Allow"
+        Action   = "ssm:GetParameter"
+        Resource = data.aws_ssm_parameter.rustc_perf_credentials.arn
+      }
     ]
   })
 }
