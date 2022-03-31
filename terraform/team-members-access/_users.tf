@@ -10,6 +10,7 @@ locals {
     "carols10cents" = [aws_iam_group.crates_io.name],
     "jtgeibel"      = [aws_iam_group.crates_io.name],
     "Turbo87"       = [aws_iam_group.crates_io.name],
+    "rylev"         = [aws_iam_group.rustc_perf.name],
   }
 }
 
