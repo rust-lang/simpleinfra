@@ -9,15 +9,38 @@ data "dns_a_record_set" "monitoring" {
   host = "monitoring.infra.rust-lang.org"
 }
 
-data "aws_security_group" "bastion" {
-  vpc_id = data.terraform_remote_state.shared.outputs.prod_vpc.id
-  name   = "rust-prod-bastion"
+data "dns_a_record_set" "bastion" {
+  host = "bastion.infra.rust-lang.org"
 }
 
 resource "aws_security_group" "playground" {
   vpc_id      = data.terraform_remote_state.shared.outputs.prod_vpc.id
   name        = "rust-prod-playground"
   description = "Access rules for the production playground instance."
+
+  // SSH access from the bastion (on the public interface)
+
+  dynamic "ingress" {
+    for_each = toset(data.dns_a_record_set.bastion.addrs)
+    content {
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = ["${ingress.value}/32"]
+      description = "SSH from the bastion"
+    }
+  }
+
+  dynamic "ingress" {
+    for_each = toset(data.dns_a_record_set.bastion.addrs)
+    content {
+      from_port   = -1
+      to_port     = -1
+      protocol    = "icmp"
+      cidr_blocks = ["${ingress.value}/32"]
+      description = "ICMP from the bastion"
+    }
+  }
 
   // node_exporter access from the monitoring instance
   dynamic "ingress" {
@@ -29,22 +52,6 @@ resource "aws_security_group" "playground" {
       cidr_blocks = ["${ingress.value}/32"]
       description = "node_exporter from monitoring.infra.rust-lang.org"
     }
-  }
-
-  ingress {
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    security_groups = [data.aws_security_group.bastion.id]
-    description     = "SSH access from bastion"
-  }
-
-  ingress {
-    from_port       = 8
-    to_port         = -1
-    protocol        = "icmp"
-    security_groups = [data.aws_security_group.bastion.id]
-    description     = "Ping access from bastion"
   }
 
   ingress {
