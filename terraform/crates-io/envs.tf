@@ -14,6 +14,7 @@ module "prod" {
   dns_apex           = true
 
   static_bucket_name     = "crates-io"
+  index_bucket_name      = "crates-io-index"
   inventories_bucket_arn = data.terraform_remote_state.shared.outputs.inventories_bucket_arn
 
   webapp_origin_domain = "crates-io.herokuapp.com"
@@ -33,6 +34,7 @@ module "staging" {
   static_domain_name = "static.staging.crates.io"
 
   static_bucket_name     = "staging-crates-io"
+  index_bucket_name      = "staging-crates-io-index"
   inventories_bucket_arn = data.terraform_remote_state.shared.outputs.inventories_bucket_arn
 
   webapp_origin_domain = "staging-crates-io.herokuapp.com"

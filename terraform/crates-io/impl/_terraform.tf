@@ -34,6 +34,10 @@ variable "static_bucket_name" {
   type = string
 }
 
+variable "index_bucket_name" {
+  type = string
+}
+
 variable "inventories_bucket_arn" {
   type = string
 }
