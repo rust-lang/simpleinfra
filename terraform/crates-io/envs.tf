@@ -11,6 +11,7 @@ module "prod" {
 
   webapp_domain_name = "crates.io"
   static_domain_name = "static.crates.io"
+  index_domain_name  = "index.crates.io"
   dns_apex           = true
 
   static_bucket_name     = "crates-io"
@@ -32,6 +33,7 @@ module "staging" {
 
   webapp_domain_name = "staging.crates.io"
   static_domain_name = "static.staging.crates.io"
+  index_domain_name  = "index.staging.crates.io"
 
   static_bucket_name     = "staging-crates-io"
   index_bucket_name      = "staging-crates-io-index"

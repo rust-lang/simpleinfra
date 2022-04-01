@@ -19,6 +19,7 @@ module "certificate" {
   domains = [
     var.webapp_domain_name,
     var.static_domain_name,
+    var.index_domain_name,
   ]
 }
 
@@ -27,6 +28,10 @@ variable "webapp_domain_name" {
 }
 
 variable "static_domain_name" {
+  type = string
+}
+
+variable "index_domain_name" {
   type = string
 }
 
