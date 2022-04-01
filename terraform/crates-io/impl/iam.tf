@@ -25,13 +25,16 @@ resource "aws_iam_policy" "static_write" {
           "s3:PutObject",
           "s3:PutObjectAcl",
         ]
-        Resource = "${aws_s3_bucket.static.arn}/*"
+        Resource = [
+          "${aws_s3_bucket.static.arn}/*",
+          "${aws_s3_bucket.index.arn}/*",
+        ]
       },
       {
         Sid      = "StaticBucketList"
         Effect   = "Allow"
         Action   = "s3:ListBucket"
-        Resource = aws_s3_bucket.static.arn
+        Resource = [aws_s3_bucket.static.arn, aws_s3_bucket.index.arn]
       },
       {
         Sid    = "HeadBuckets"
