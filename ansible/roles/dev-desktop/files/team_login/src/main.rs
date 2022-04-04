@@ -1,4 +1,4 @@
-const TEAM_URL: &str = "https://team-api.infra.rust-lang.org/v1/teams/all.json";
+const TEAM_URL: &str = "https://team-api.infra.rust-lang.org/v1/permissions/dev_desktop.json";
 
 use miniserde::Deserialize;
 use std::collections::HashSet;
@@ -7,13 +7,7 @@ use std::process::Output;
 
 #[derive(Deserialize)]
 struct All {
-    members: Vec<Person>,
-}
-
-#[derive(Deserialize)]
-struct Person {
-    github: String,
-    dev_desktop: bool,
+    github_users: Vec<String>,
 }
 
 fn cmd(cmd: &str, args: &[&str]) -> std::io::Result<Output> {
@@ -40,12 +34,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let data = String::from_utf8(data).unwrap();
     let all: All = miniserde::json::from_str(&data).unwrap();
     let mut users = HashSet::new();
-    for person in all.members {
-        if !person.dev_desktop {
-            continue;
-        }
+    for username in all.github_users {
         // Pick a user name that won't conflict with system users
-        let username = format!("gh-{}", person.github);
+        let username = format!("gh-{}", username);
 
         users.insert(username.clone());
         // Get the keys the user added to their github account.
