@@ -17,7 +17,11 @@
     state: present
 
 - name: install python libs
-  shell: "pip3 install PyGithub requests cryptography"
+  pip: 
+    name:
+      - PyGithub
+      - requests
+      - cryptography
 
 - name: install rustup in userspace for root
   shell: |
