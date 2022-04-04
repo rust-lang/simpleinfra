@@ -18,6 +18,7 @@ const KEY_DIR: &str = "/etc/ssh/authorized_keys/";
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut handle = curl::easy::Easy::new();
+    handle.useragent("rust-lang/simpleinfra (infra@rust-lang.org)").unwrap();
     handle.url(TEAM_URL).unwrap();
     let mut data = Vec::new();
     {
