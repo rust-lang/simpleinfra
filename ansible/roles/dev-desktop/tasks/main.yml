@@ -1,12 +1,23 @@
 ---
 
-- name: install Rust deps
+- name: remove preinstalled things
+  apt:
+    name:
+      - python3-cryptography
+    state: absent
+
+- name: install deps
   apt:
     name:
       - pkg-config
       - build-essential
       - libssl-dev
+      - python3-pip
+
     state: present
+
+- name: install python libs
+  shell: "pip3 install PyGithub requests cryptography"
 
 - name: install rustup in userspace for root
   shell: |
