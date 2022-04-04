@@ -5,4 +5,5 @@ profile = "compiler"
 
 [rust]
 # Build with debug assertions so we get useful RUSTC_LOG
+# and notice debug assertions failing.
 debug = "true"

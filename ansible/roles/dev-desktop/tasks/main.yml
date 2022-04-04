@@ -52,6 +52,11 @@
   retries: 10
   delay: 5
 
+- name: Set up the files that initially appear in a user's home dir
+  copy:
+    src: skel/
+    dest: /etc/skel/
+
 - name: Set up the convenience files for managing worktrees
   copy:
     src: scripts/
