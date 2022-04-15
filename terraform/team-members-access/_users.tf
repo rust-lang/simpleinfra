@@ -11,6 +11,7 @@ locals {
     "jtgeibel"      = [aws_iam_group.crates_io.name],
     "Turbo87"       = [aws_iam_group.crates_io.name],
     "rylev"         = [aws_iam_group.rustc_perf.name],
+    "JoelMarcey"    = [aws_iam_group.foundation.name],
   }
 }
 
