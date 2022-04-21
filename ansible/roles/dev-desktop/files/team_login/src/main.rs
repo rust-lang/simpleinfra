@@ -18,7 +18,9 @@ const KEY_DIR: &str = "/etc/ssh/authorized_keys/";
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut handle = curl::easy::Easy::new();
-    handle.useragent("rust-lang/simpleinfra (infra@rust-lang.org)").unwrap();
+    handle
+        .useragent("rust-lang/simpleinfra (infra@rust-lang.org)")
+        .unwrap();
     handle.url(TEAM_URL).unwrap();
     let mut data = Vec::new();
     {
@@ -36,6 +38,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let all: All = miniserde::json::from_str(&data).unwrap();
     let mut users = HashSet::new();
     for username in all.github_users {
+        let url = format!("https://github.com/{}.keys", username);
         // Pick a user name that won't conflict with system users
         let username = format!("gh-{}", username);
 
@@ -43,9 +46,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // Get the keys the user added to their github account.
         // Do this every time the cronjob runs so that they get their new keys if necessary.
         let mut keys = Vec::new();
-        handle
-            .url(&format!("https://github.com/{}.keys", username))
-            .unwrap();
+        handle.url(&url).unwrap();
         {
             let mut transfer = handle.transfer();
             transfer
