@@ -40,6 +40,6 @@ chmod +x "${binary_path}"
 
 # Restart to get new server binary
 if [[ -z "${previous_binary_hash}" ]] || ! md5sum -c <(echo "${previous_binary_hash}") --status; then
-    sudo service playground stop || true
-    sudo service playground start
+    sudo /bin/systemctl stop playground.service || true
+    sudo /bin/systemctl start playground.service
 fi
