@@ -177,7 +177,7 @@ resource "aws_iam_instance_profile" "playground" {
 
 resource "aws_instance" "playground" {
   ami                     = data.aws_ami.ubuntu_bionic.id
-  instance_type           = "t3a.nano"
+  instance_type           = "t3a.small"
   key_name                = data.terraform_remote_state.shared.outputs.master_ec2_key_pair
   iam_instance_profile    = aws_iam_instance_profile.playground.name
   ebs_optimized           = true
