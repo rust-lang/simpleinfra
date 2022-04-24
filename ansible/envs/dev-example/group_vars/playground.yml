@@ -2,6 +2,8 @@
 
 vars_playground_domain: example.com
 
+vars_playground_s3_bucket: playground-artifacts-i32
+
 vars_playground_aws:
   access_key_id: THIS_IS_NOT_A_VALID_TOKEN
   secret_access_key: THIS_IS_NOT_A_VALID_TOKEN
