@@ -76,6 +76,7 @@
   copy:
     src: scripts/
     dest: /usr/local/bin/
+    mode: a+x
 
 - name: install common tooling
   apt:
