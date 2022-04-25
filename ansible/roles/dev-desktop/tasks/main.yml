@@ -47,7 +47,7 @@
     dest: /etc/ssh/sshd_config.d/motd
 
 - name: Disable automatically generated message of the day
-  shell: "sed -i -e 's/^session    optional     pam_motd/#session    optional     pam_motd/' /etc/pam.d/sshd"
+  shell: "rm -r /etc/update-motd.d/*"
 
 - name: Set up message of the day
   template:
