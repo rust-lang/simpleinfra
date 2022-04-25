@@ -24,7 +24,7 @@ if [[ -f "${binary_path}" ]]; then
 fi
 
 # Get new artifacts
-aws s3 sync --region=us-east-2 s3://playground-artifacts-i32 "${artifacts_path}"
+aws s3 sync --region=us-east-2 "s3://{{ vars_playground_s3_bucket }}" "${artifacts_path}"
 # These artifacts don't change names and might stay the same size
 # https://github.com/aws/aws-cli/issues/1074
 aws s3 sync \
@@ -35,11 +35,11 @@ aws s3 sync \
     --include=build/index.html.gz \
     --include=build/robots.txt \
     --exact-timestamps \
-    s3://playground-artifacts-i32 "${artifacts_path}"
+    "s3://{{ vars_playground_s3_bucket }}" "${artifacts_path}"
 chmod +x "${binary_path}"
 
 # Restart to get new server binary
 if [[ -z "${previous_binary_hash}" ]] || ! md5sum -c <(echo "${previous_binary_hash}") --status; then
-    sudo service playground stop || true
-    sudo service playground start
+    sudo /bin/systemctl stop playground.service || true
+    sudo /bin/systemctl start playground.service
 fi

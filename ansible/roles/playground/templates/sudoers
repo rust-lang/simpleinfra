@@ -1,0 +1,6 @@
+#
+# {{ ansible_managed }}
+#
+
+playground ALL= NOPASSWD: /bin/systemctl stop playground.service
+playground ALL= NOPASSWD: /bin/systemctl start playground.service

@@ -81,6 +81,12 @@
     name: awscli
     state: present
 
+- name: Allow update script to restart playground
+  template:
+    src: sudoers
+    dest: /etc/sudoers.d/playground
+    mode: 0440
+
 - name: Configure update script
   template:
     src: update.sh

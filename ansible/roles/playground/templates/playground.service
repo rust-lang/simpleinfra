@@ -13,6 +13,7 @@ Environment=PLAYGROUND_GITHUB_TOKEN={{ vars_playground_env_github_token }}
 Environment=PLAYGROUND_UI_ADDRESS={{ vars_playground_env_ui_address }}
 Environment=PLAYGROUND_UI_PORT={{ vars_playground_env_ui_port }}
 Environment=PLAYGROUND_UI_ROOT={{ vars_playground_env_ui_root_path }}
+Environment=PLAYGROUND_SERVER_AXUM=1
 
 WorkingDirectory={{ vars_playground_artifacts_path }}
 
