@@ -23,7 +23,7 @@ resource "aws_iam_group_policy" "infra_deploy_playground" {
       // Parameters read by Ansible during deployment.
       {
         Effect   = "Allow"
-        Action   = "ssm:GetParameters"
+        Action   = ["ssm:GetParameters", "ssm:GetParametersByPath"]
         Resource = "arn:aws:ssm:us-west-1:890664054962:parameter/prod/ansible/playground/*"
       },
     ]
