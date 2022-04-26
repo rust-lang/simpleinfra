@@ -46,8 +46,17 @@
     src: motd_sshd_config
     dest: /etc/ssh/sshd_config.d/motd
 
+- name: Find all existing motd scripts
+  find:
+    paths: /etc/update-motd.d/
+    patterns: "*"
+  register: files_to_delete
+
 - name: Disable automatically generated message of the day
-  shell: "rm -r /etc/update-motd.d/*"
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ files_to_delete.files }}"
 
 - name: Set up message of the day
   template:
