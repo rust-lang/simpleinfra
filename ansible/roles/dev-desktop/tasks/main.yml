@@ -58,6 +58,11 @@
     state: absent
   with_items: "{{ files_to_delete.files }}"
 
+- name: stop and disable a news service
+  service:
+    name: "motd-news"
+    state: stopped
+
 - name: Set up message of the day
   template:
     src: motd_rules
