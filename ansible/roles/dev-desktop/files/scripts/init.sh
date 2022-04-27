@@ -10,3 +10,5 @@ git remote add upstream https://github.com/rust-lang/rust.git
 git fetch upstream
 git checkout upstream/master
 popd
+
+./setup_rustup.sh
