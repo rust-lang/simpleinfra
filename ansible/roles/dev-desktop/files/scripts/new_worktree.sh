@@ -1,10 +1,10 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 set -ex
 
 N=$(ls | grep -E -e "rust[0-9]+" | wc -l)
 echo $N
-pushd rust0
+pushd rust
 git worktree add --detach ../rust$N
 popd
 pushd rust$N
