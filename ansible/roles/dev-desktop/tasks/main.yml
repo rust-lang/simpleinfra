@@ -58,10 +58,16 @@
     state: absent
   with_items: "{{ files_to_delete.files }}"
 
-- name: stop and disable a news service
+- name: stop and disable news service
   service:
     name: "motd-news"
     state: stopped
+
+- name: Stop and disable news service timer
+  ansible.builtin.systemd:
+    name: motd-news.timer
+    state: stopped
+    enabled: no
 
 - name: Set up message of the day
   template:
