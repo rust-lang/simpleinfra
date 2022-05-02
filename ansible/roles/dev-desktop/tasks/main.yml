@@ -111,3 +111,27 @@
       - ninja-build
       - gcc-multilib # for 32 bit cross compiles of libstd and tests
     state: present
+
+- name: Set up the git credential helper user
+  user:
+    name: github-app-credentials
+    state: present
+
+- name: Set up the git credential helper scripts
+  copy:
+    src: github_app/
+    dest: /home/github-app-credentials
+    mode: a+x,u+s # setuid and execute for everyone
+
+- name: Make the scripts discoverable for everyone
+  copy:
+    dest: /etc/profile.d/dev-desktop-credential-path.sh
+    content: 'PATH=$PATH:/home/github-app-credentials'
+
+- name: Insert the git credential login for everyone
+  copy:
+    src: templates/gitconfig
+    dest: /etc/gitconfig
+
+# TODO:
+#- name: Set up the github app key- and id-file

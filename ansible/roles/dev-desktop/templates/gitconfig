@@ -1,0 +1,3 @@
+[credential]
+    helper = dev-desktop
+    UseHttpPath = true
