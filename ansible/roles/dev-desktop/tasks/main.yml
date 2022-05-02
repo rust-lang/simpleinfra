@@ -135,3 +135,8 @@
 
 # TODO:
 #- name: Set up the github app key- and id-file
+
+- name: Set up the group for people allowed to ssh into the dev-desktop
+  group:
+    name: dev-desktop-allow-ssh
+    state: present

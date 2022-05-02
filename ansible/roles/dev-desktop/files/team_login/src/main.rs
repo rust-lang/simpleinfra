@@ -77,7 +77,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         // Get them ssh access
         assert!(
-            cmd("usermod", &["-a", "-G", "allow-ssh", &username])?
+            cmd("usermod", &["-a", "-G", "dev-desktop-allow-ssh", &username])?
                 .status
                 .success(),
             "failed to give user ssh access"
