@@ -1,3 +1,7 @@
+These instructions are for server-side setup and debugging.
+The user only needs to be directed to the app installation URL
+and everything should just work for them.
+
 # How to setup an App
 
 1. Go to https://github.com/settings/apps
