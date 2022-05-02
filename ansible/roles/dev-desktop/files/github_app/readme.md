@@ -11,6 +11,7 @@ and everything should just work for them.
 5. Set `Contents - Repository contents, commits, branches, downloads, releases, and merges.` to read/write
 6. Set to "enable on any account"
 7. Create App
+8. Go to https://github.com/settings/apps/{your_app_name_here} and copy the `App ID` into `app_id.txt` (same folder as `gen_temp_access_token.py`)
 
 # How to generate a .pem file for your App
 
@@ -22,10 +23,6 @@ and everything should just work for them.
 
 1. direct the user to https://github.com/settings/apps/{your_app_name_here}/installations
 2. let them install it on the org/user they want to and restrict to the repositories they want to use
-
-# How to setup the app
-
-1. Go to https://github.com/settings/apps/{your_app_name_here} and copy the `App ID` into `app_id.txt`
 
 # How to generate a temporary access token for a specific user
 
