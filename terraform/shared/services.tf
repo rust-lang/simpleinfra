@@ -1,45 +1,6 @@
 // This terraform module imports all the services from the services/ directory,
 // and configures them.
 
-module "service_cratesio" {
-  source = "./services/cratesio"
-  providers = {
-    aws       = aws
-    aws.east1 = aws.east1
-  }
-
-  webapp_domain_name = "crates.io"
-  static_domain_name = "static.crates.io"
-  dns_apex           = true
-
-  static_bucket_name     = "crates-io"
-  inventories_bucket_arn = aws_s3_bucket.rust_inventories.arn
-
-  webapp_origin_domain = "crates-io.herokuapp.com"
-
-  iam_prefix = "crates-io"
-
-  logs_bucket = aws_s3_bucket.temp_logs_cratesio.bucket_domain_name
-}
-
-module "service_cratesio_staging" {
-  source = "./services/cratesio"
-  providers = {
-    aws       = aws
-    aws.east1 = aws.east1
-  }
-
-  webapp_domain_name = "staging.crates.io"
-  static_domain_name = "static.staging.crates.io"
-
-  static_bucket_name     = "staging-crates-io"
-  inventories_bucket_arn = aws_s3_bucket.rust_inventories.arn
-
-  webapp_origin_domain = "staging-crates-io.herokuapp.com"
-
-  iam_prefix = "staging-crates-io"
-}
-
 module "service_ecs_cluster" {
   source = "./services/ecs-cluster"
 

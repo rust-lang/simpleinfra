@@ -46,14 +46,6 @@ resource "aws_security_group" "rust_prod_db" {
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    cidr_blocks = ["54.215.238.238/32"]
-    description = "Connections from rust-bots ec2, used for archive generation"
-  }
-
-  ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
     cidr_blocks = ["159.69.58.186/32"]
     description = "Connections from rustc-perf collection server"
   }
@@ -65,11 +57,11 @@ resource "aws_security_group" "rust_prod_db" {
 
 resource "aws_db_instance" "shared" {
   allocated_storage            = 20
-  max_allocated_storage        = 200
+  max_allocated_storage        = 500
   backup_retention_period      = 3
   storage_type                 = "gp2"
   engine                       = "postgres"
-  engine_version               = "13.3"
+  engine_version               = "13.4"
   instance_class               = "db.t4g.micro"
   identifier                   = "shared"
   username                     = "root"
@@ -81,7 +73,6 @@ resource "aws_db_instance" "shared" {
   performance_insights_enabled = true
   allow_major_version_upgrade  = true
 
-  # temporary, needed until bastion is in prod VPC and can be used for access
   publicly_accessible    = true
   vpc_security_group_ids = [aws_security_group.rust_prod_db.id]
 

@@ -1,0 +1,13 @@
+#
+# {{ ansible_managed }}
+#
+
+[Unit]
+Description = Update the playground every hour
+
+[Timer]
+OnBootSec = 10min
+OnUnitActiveSec = 1h
+
+[Install]
+WantedBy = timers.target

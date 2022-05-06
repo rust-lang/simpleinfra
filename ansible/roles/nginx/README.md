@@ -1,8 +1,8 @@
 # `nginx` role
 
 This role installs and configures the nginx web server on the instance. It
-requires the [letsencrypt](../letsencrypt/README.md) role to be present as
-well.
+requires the [letsencrypt](../letsencrypt/README.md) role to be listed before
+this role as well.
 
 ## Configuration
 

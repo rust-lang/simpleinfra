@@ -10,11 +10,13 @@ locals {
   allowed_users = [
     "aidanhs",
     "joshua",
-    "onur",
     "pietro",
     "shep",
     "simulacrum",
     "technetos",
+    "nemo157",
+    "syphar",
+    "rylev",
   ]
 }
 

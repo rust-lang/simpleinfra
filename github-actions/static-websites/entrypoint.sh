@@ -17,6 +17,7 @@ touch "${deploy_dir}/.nojekyll"
 # Push the website to GitHub pages
 cd "${deploy_dir}"
 rm -rf .git
+git config --global --add safe.directory `pwd`
 git init
 git config user.name "Deploy from CI"
 git config user.email ""

@@ -1,0 +1,10 @@
+---
+
+vars_playground_domain: example.com
+
+vars_playground_s3_bucket: bucket-name
+
+vars_playground_aws:
+  access_key_id: THIS_IS_NOT_A_VALID_TOKEN
+  secret_access_key: THIS_IS_NOT_A_VALID_TOKEN
+vars_playground_env_github_token: THIS_IS_NOT_A_VALID_TOKEN

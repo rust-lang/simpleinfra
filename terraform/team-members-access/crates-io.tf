@@ -16,7 +16,7 @@ resource "aws_iam_group_policy_attachment" "crates_io_enforce_mfa" {
 }
 
 data "aws_s3_bucket" "crates_io_buckets" {
-  for_each = toset(["crates-io", "staging-crates-io", "rust-temp-cratesio-logs"])
+  for_each = toset(["crates-io", "staging-crates-io"])
   bucket   = each.value
 }
 
@@ -32,7 +32,6 @@ resource "aws_iam_group_policy" "crates_io" {
       // CloudFront distributions, see the configuration of the crates.io
       // distributions, and to create invalidations on them.
       {
-        Sid    = "CloudFrontListAllDistributions"
         Effect = "Allow"
         Action = [
           "cloudfront:ListDistributions",
@@ -41,10 +40,9 @@ resource "aws_iam_group_policy" "crates_io" {
         Resource = "*"
       },
       {
-        Sid    = "CloudFrontInvalidateCache"
         Effect = "Allow"
         Action = [
-          // Allow navigating in the distribution's console
+          // Allow navigating in the distribution':"s console
           "cloudfront:GetDistribution",
           "cloudfront:GetDistributionConfig",
           // Allow creating invalidations
@@ -65,7 +63,6 @@ resource "aws_iam_group_policy" "crates_io" {
       // The following rules allow crates-io team members to list all S3 buckets
       // and to have full access to the crates.io buckets.
       {
-        Sid    = "S3ListAllBuckets"
         Effect = "Allow"
         Action = [
           "s3:HeadBucket",
@@ -75,22 +72,21 @@ resource "aws_iam_group_policy" "crates_io" {
         Resource = "*"
       },
       {
-        Sid    = "S3BucketAccess"
+        Effect   = "Allow"
+        Action   = "s3:ListBucket"
+        Resource = [for _, bucket in data.aws_s3_bucket.crates_io_buckets : bucket.arn]
+      },
+      {
         Effect = "Allow"
         Action = [
-          // List files in the bucket
-          "s3:ListBucket",
-          // Interact with the objects
           "s3:AbortMultipartUpload",
           "s3:GetObject",
           "s3:GetObjectAcl",
           "s3:PutObject",
           "s3:PutObjectAcl",
+          "s3:DeleteObject",
         ]
-        Resource = concat(
-          [for _, bucket in data.aws_s3_bucket.crates_io_buckets : bucket.arn],
-          [for _, bucket in data.aws_s3_bucket.crates_io_buckets : "${bucket.arn}/*"],
-        )
+        Resource = [for _, bucket in data.aws_s3_bucket.crates_io_buckets : "${bucket.arn}/*"]
       },
 
       // Support access

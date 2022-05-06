@@ -47,6 +47,18 @@ resource "aws_codebuild_project" "sync_team" {
       name  = "EMAIL_ENCRYPTION_KEY"
       value = "/prod/sync-team/email-encryption-key"
     }
+
+    environment_variable {
+      type  = "PARAMETER_STORE"
+      name  = "ZULIP_USERNAME"
+      value = "/prod/sync-team/zulip-username"
+    }
+
+    environment_variable {
+      type  = "PARAMETER_STORE"
+      name  = "ZULIP_API_TOKEN"
+      value = "/prod/sync-team/zulip-api-token"
+    }
   }
 
   logs_config {
