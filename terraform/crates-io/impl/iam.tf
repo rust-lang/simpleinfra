@@ -4,10 +4,6 @@ resource "aws_iam_user" "heroku" {
   name = "${var.iam_prefix}--heroku"
 }
 
-resource "aws_iam_access_key" "heroku" {
-  user = aws_iam_user.heroku.name
-}
-
 resource "aws_iam_policy" "static_write" {
   name        = "${var.iam_prefix}--static-write"
   description = "Write access to the ${var.static_bucket_name} S3 bucket"
