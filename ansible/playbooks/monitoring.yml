@@ -161,6 +161,15 @@
                 summary: "docs.rs is down"
                 description: "Prometheus wasn't able to reach the docs.rs website for more than a minute."
 
+            - alert: NoSuccessfulBuilds 
+              expr: max_over_time(docsrs_queued_crates_count{job="docsrs"}[1h]) > 0 and increase(docsrs_successful_builds{job="docsrs"}[1h]) < 1
+              for: 1m
+              labels:
+                dispatch: docsrs
+              annotations:
+                summary: "No successful docs.rs builds in the last hour" 
+                description: "no documentation builds were successful in the last hour." 
+
             - alert: DocsRsQueueLocked
               expr: docsrs_queue_is_locked{job="docsrs"} == 1
               for: 1m
