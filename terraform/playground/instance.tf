@@ -109,7 +109,7 @@ data "aws_route53_zone" "rust_lang_org" {
 
 resource "aws_route53_record" "playground" {
   zone_id = data.aws_route53_zone.rust_lang_org.id
-  name    = "play-next.infra.rust-lang.org"
+  name    = "play-1.infra.rust-lang.org"
   type    = "A"
   records = [aws_eip.playground.public_ip]
   ttl     = 60
@@ -155,7 +155,7 @@ resource "aws_iam_role" "playground" {
 
 // Create the EC2 instance itself.
 
-data "aws_ami" "ubuntu_bionic" {
+data "aws_ami" "ubuntu" {
   most_recent = true
   owners      = ["099720109477"] # Canonical
 
@@ -176,8 +176,8 @@ resource "aws_iam_instance_profile" "playground" {
 }
 
 resource "aws_instance" "playground" {
-  ami                     = data.aws_ami.ubuntu_bionic.id
-  instance_type           = "t3a.small"
+  ami                     = data.aws_ami.ubuntu.id
+  instance_type           = "c5a.large"
   key_name                = data.terraform_remote_state.shared.outputs.master_ec2_key_pair
   iam_instance_profile    = aws_iam_instance_profile.playground.name
   ebs_optimized           = true
@@ -196,7 +196,7 @@ resource "aws_instance" "playground" {
   }
 
   tags = {
-    Name = "play-next"
+    Name = "play-1"
   }
 
   lifecycle {

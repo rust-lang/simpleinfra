@@ -28,7 +28,7 @@ resource "aws_cloudfront_distribution" "playground" {
 
   default_cache_behavior {
     target_origin_id       = "main"
-    allowed_methods        = ["GET", "HEAD"]
+    allowed_methods        = ["GET", "HEAD", "DELETE", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods         = ["GET", "HEAD"]
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
