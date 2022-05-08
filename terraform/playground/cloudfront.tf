@@ -44,7 +44,7 @@ resource "aws_cloudfront_distribution" "playground" {
 
   origin {
     origin_id   = "main"
-    domain_name = "play-old.infra.rust-lang.org"
+    domain_name = "play-1.infra.rust-lang.org"
 
     custom_origin_config {
       http_port              = 80
