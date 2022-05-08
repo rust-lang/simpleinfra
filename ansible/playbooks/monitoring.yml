@@ -56,6 +56,7 @@
               - docsrs.infra.rust-lang.org:9100
               - bastion.infra.rust-lang.org:9100
               - play.infra.rust-lang.org:9100
+              - play-1.infra.rust-lang.org:9100
               - dev-desktop.infra.rust-lang.org:9100
 
         - job_name: docsrs
