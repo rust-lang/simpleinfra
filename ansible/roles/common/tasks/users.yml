@@ -65,7 +65,7 @@
       infra: "{{ unprivileged_users + sudo_users }}"
       allow-ssh: "{{ unprivileged_users + sudo_users }}"
       passwordless-sudo: "{{ sudo_users }}"
-      docker: "{{ sudo_users }}"
+      docker: "{{ avoid_removing_docker_users + sudo_users }}"
     # I tried everything but (without resorting to a custom module) the only
     # way to properly generate this list is to first generate a JSON
     # representation of the data with a Jinja2 template and then parse it.

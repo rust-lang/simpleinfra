@@ -13,6 +13,8 @@
         - pietro
         - shep
         - simulacrum
+      avoid_removing_docker_users:
+        - playground
 
     - role: letsencrypt
       dummy_certs: "{{ vars_letsencrypt_dummy_certs }}"
