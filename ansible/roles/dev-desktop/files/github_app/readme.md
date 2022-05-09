@@ -12,9 +12,10 @@ You can find the docs at https://pygithub.readthedocs.io/en/latest/introduction.
 3. Fill out metadata (name and url)
 4. disable WebHook checkbox
 5. Set `Contents - Repository contents, commits, branches, downloads, releases, and merges.` to read/write
-6. Set to "enable on any account"
-7. Create App
-8. Go to https://github.com/settings/apps/{your_app_name_here} and copy the `App ID` into `app_id.txt` (same folder as `gen_temp_access_token.py`)
+6. Set `Workflows - Update GitHub Action workflow files.` to read/write
+7. Set to "enable on any account"
+8. Create App
+9. Go to https://github.com/settings/apps/{your_app_name_here} and copy the `App ID` into `app_id.txt` (same folder as `gen_temp_access_token.py`)
 
 ## How to generate a .pem file for your App
 
