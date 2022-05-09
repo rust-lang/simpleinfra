@@ -34,7 +34,7 @@ AcceptEnv LANG LC_*
 
 Subsystem sftp /usr/lib/openssh/sftp-server
 
-AllowGroups allow-ssh dev-desktop-allow-ssh
+AllowGroups allow-ssh {{ allow_ssh_extra_groups }}
 
 {# The `Include` directive is not supported on older Ubuntu versions #}
 {% if ansible_distribution_release not in ["xenial", "bionic"] %}
