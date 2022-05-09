@@ -70,6 +70,21 @@ resource "aws_s3_bucket" "rust_lang_ci_mirrors" {
   versioning {
     enabled = true
   }
+
+  lifecycle_rule {
+    abort_incomplete_multipart_upload_days = 1
+    enabled                                = true
+    id                                     = "expire partial uploads"
+
+    expiration {
+      days                         = 0
+      expired_object_delete_marker = true
+    }
+
+    noncurrent_version_expiration {
+      days = 7
+    }
+  }
 }
 
 resource "aws_s3_bucket_inventory" "rust_lang_ci_mirrors" {
