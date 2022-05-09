@@ -10,10 +10,10 @@ resource "aws_s3_bucket" "rust_inventories" {
 
     abort_incomplete_multipart_upload_days = 7
     expiration {
-      days = 7
+      days = 28
     }
     noncurrent_version_expiration {
-      days = 7
+      days = 28
     }
   }
 }
