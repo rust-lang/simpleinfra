@@ -12,7 +12,6 @@ module "crates_io" {
 
   CNAME = {
     "status" = ["pvbm341xnpgm.stspg-customer.com"],
-    "ping"   = ["status.ping.apex.sh"],
     "doc"    = ["rust-lang.github.io"], # https://github.com/rust-lang/cargo/tree/gh-pages
   }
 

@@ -20,6 +20,7 @@ module "rustconf_com" {
     "2018" = ["tildeio.github.io"],
     "2019" = ["tildeio.github.io"],
     "2020" = ["tildeio.github.io"],
+    "2021" = ["rustconf-2021.netlify.app"],
     "cfp"  = ["cfp.rustconf.com.herokudns.com"],
   }
 
