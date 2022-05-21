@@ -14,5 +14,6 @@
         - simulacrum
         - pietro
         - oli-obk
+      allow_ssh_extra_groups: dev-desktop-allow-ssh
 
     - role: dev-desktop
