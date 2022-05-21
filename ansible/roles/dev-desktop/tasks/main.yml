@@ -117,50 +117,48 @@
     name: github-app-credentials
     state: present
 
-- name: Create git credential helper bin directory
-  file:
-    path: /home/github-app-credentials/bin
-    state: directory
-
 - name: Upload git-credential-dev-desktop-inner
   copy:
     src: git-credential-dev-desktop-inner
-    dest: /home/github-app-credentials/bin/git-credential-dev-desktop-inner
-    owner: github-app-credentials
+    dest: /usr/local/bin/git-credential-dev-desktop-inner
+    owner: root
     group: github-app-credentials
-    mode: 0700
+    mode: 0750
 
 - name: Upload git-credential-dev-desktop
   copy:
     src: git-credential-dev-desktop
-    dest: /home/github-app-credentials/bin/git-credential-dev-desktop
+    dest: /usr/local/bin/git-credential-dev-desktop
     mode: 0755
-
-- name: Make the scripts discoverable for everyone
-  copy:
-    dest: /etc/profile.d/dev-desktop-credential-path.sh
-    content: 'PATH=$PATH:/home/github-app-credentials/bin'
 
 - name: Insert the git credential login for everyone
   copy:
     src: templates/gitconfig
     dest: /etc/gitconfig
 
+- name: Create GitHub App configuration directory
+  file:
+    path: /etc/github-app-credentials
+    owner: root
+    group: github-app-credentials
+    mode: 0750
+    state: directory
+
 - name: Copy GitHub App ID
   copy:
     content: "{{ vars_github_app_id }}"
-    dest: /home/github-app-credentials/app_id.txt
-    owner: github-app-credentials
+    dest: /etc/github-app-credentials/app_id.txt
+    owner: root
     group: github-app-credentials
-    mode: 0600
+    mode: 0640
 
 - name: Copy GitHub App private key
   copy:
     content: "{{ vars_github_app_private_key }}"
-    dest: /home/github-app-credentials/app_private_key.pem
-    owner: github-app-credentials
+    dest: /etc/github-app-credentials/app_private_key.pem
+    owner: root
     group: github-app-credentials
-    mode: 0600
+    mode: 0640
 
 - name: Set up the group for people allowed to ssh into the dev-desktop
   group:

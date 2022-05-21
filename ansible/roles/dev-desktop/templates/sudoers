@@ -2,4 +2,4 @@
 # {{ ansible_managed }}
 #
 
-ALL ALL=(github-app-credentials:github-app-credentials) NOPASSWD: /home/github-app-credentials/bin/git-credential-dev-desktop-inner
+ALL ALL=(github-app-credentials:github-app-credentials) NOPASSWD: /usr/local/bin/git-credential-dev-desktop-inner
