@@ -16,6 +16,7 @@ locals {
     "abibroom"      = [aws_iam_group.foundation.name],
     "paullenz"      = [aws_iam_group.foundation.name],
     "shepmaster"    = [aws_iam_group.infra_deploy_playground.name],
+    "oli-obk"       = [aws_iam_group.infra_deploy_staging_dev_desktop.name],
   }
 }
 
