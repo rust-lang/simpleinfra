@@ -1,0 +1,8 @@
+---
+
+# Do not log to Papertrail in the staging environment.
+vars_papertrail_url: null
+
+# Staging instances have access to the internet, so we can generate
+# certificates from them without any problem.
+vars_letsencrypt_dummy_certs: false
