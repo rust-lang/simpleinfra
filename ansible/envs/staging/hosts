@@ -1,2 +1,2 @@
 [dev-desktop]
-dev-desktop-staging.infra.rust-lang.org ansible_user=ubuntu
+dev-desktop-staging.infra.rust-lang.org
