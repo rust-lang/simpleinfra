@@ -133,8 +133,17 @@
     src: templates/gitconfig
     dest: /etc/gitconfig
 
-# TODO:
-#- name: Set up the github app key- and id-file
+- name: Copy GitHub App ID
+  copy:
+    content: "{{ vars_github_app_id }}"
+    dest: /home/github-app-credentials/app_id.txt
+    mode: 0600
+
+- name: Copy GitHub App private key
+  copy:
+    content: "{{ vars_github_app_private_key }}"
+    dest: /home/github-app-credentials/dev_desktop.private_key.pem
+    mode: 0600
 
 - name: Set up the group for people allowed to ssh into the dev-desktop
   group:
