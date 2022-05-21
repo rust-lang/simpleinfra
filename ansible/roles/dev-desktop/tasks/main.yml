@@ -117,16 +117,29 @@
     name: github-app-credentials
     state: present
 
-- name: Set up the git credential helper scripts
+- name: Create git credential helper bin directory
+  file:
+    path: /home/github-app-credentials/bin
+    state: directory
+
+- name: Upload git-credential-dev-desktop-inner
   copy:
-    src: github_app/
-    dest: /home/github-app-credentials
-    mode: a+x,u+s # setuid and execute for everyone
+    src: git-credential-dev-desktop-inner
+    dest: /home/github-app-credentials/bin/git-credential-dev-desktop-inner
+    owner: github-app-credentials
+    group: github-app-credentials
+    mode: 0700
+
+- name: Upload git-credential-dev-desktop
+  copy:
+    src: git-credential-dev-desktop
+    dest: /home/github-app-credentials/bin/git-credential-dev-desktop
+    mode: 0755
 
 - name: Make the scripts discoverable for everyone
   copy:
     dest: /etc/profile.d/dev-desktop-credential-path.sh
-    content: 'PATH=$PATH:/home/github-app-credentials'
+    content: 'PATH=$PATH:/home/github-app-credentials/bin'
 
 - name: Insert the git credential login for everyone
   copy:
@@ -144,7 +157,7 @@
 - name: Copy GitHub App private key
   copy:
     content: "{{ vars_github_app_private_key }}"
-    dest: /home/github-app-credentials/dev_desktop.private_key.pem
+    dest: /home/github-app-credentials/app_private_key.pem
     owner: github-app-credentials
     group: github-app-credentials
     mode: 0600
@@ -153,3 +166,9 @@
   group:
     name: dev-desktop-allow-ssh
     state: present
+
+- name: Upload sudo configuration
+  template:
+    src: sudoers
+    dest: /etc/sudoers.d/dev-desktop
+    mode: 0440
