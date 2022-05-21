@@ -1,0 +1,11 @@
+[package]
+authors = ["Oli Scherer <github35764891676564198441@oli-obk.de>"]
+edition = "2018"
+name = "team_login"
+version = "0.1.0"
+
+[dependencies]
+miniserde = "0.1"
+curl = "0.4"
+
+[workspace]

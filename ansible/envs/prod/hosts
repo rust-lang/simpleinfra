@@ -13,3 +13,6 @@ ci-arm-1.infra.rust-lang.org
 
 [playground]
 play-1.infra.rust-lang.org
+
+[dev-desktop]
+dev-desktop.infra.rust-lang.org

@@ -1,0 +1,142 @@
+---
+
+- name: remove preinstalled things
+  apt:
+    name:
+      - python3-cryptography
+    state: absent
+
+- name: install deps
+  apt:
+    name:
+      - pkg-config
+      - build-essential
+      - libssl-dev
+      - python3-pip
+
+    state: present
+
+- name: install python libs
+  pip: 
+    name:
+      - PyGithub
+      - requests
+      - cryptography
+
+- name: install rustup in userspace for root
+  shell: |
+    set -eu
+    RUSTUP_VERSION=1.24.3
+    RUSTUP_SHA="a3cb081f88a6789d104518b30d4aa410009cd08c3822a1226991d6cf0442a0f8"
+    curl --proto '=https' --tlsv1.2 -sSf -O \
+      https://raw.githubusercontent.com/rust-lang/rustup/${RUSTUP_VERSION}/rustup-init.sh
+    echo "${RUSTUP_SHA}  rustup-init.sh" | sha256sum --check --
+    sh rustup-init.sh --default-toolchain nightly -y --component rust-src
+
+- name: Configure update script service
+  copy:
+    src: team_login/
+    dest: "{{ vars_team_login_path }}"
+
+- name: Build team login cron job
+  shell: "cd {{ vars_team_login_path }} && PATH=$PATH:$HOME/.cargo/bin cargo build"
+
+- name: Enable message of the day
+  template:
+    src: motd_sshd_config
+    dest: /etc/ssh/sshd_config.d/motd
+
+- name: Find all existing motd scripts
+  find:
+    paths: /etc/update-motd.d/
+    patterns: "*"
+  register: files_to_delete
+
+- name: Disable automatically generated message of the day
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ files_to_delete.files }}"
+
+- name: stop and disable news service
+  service:
+    name: "motd-news"
+    state: stopped
+
+- name: Stop and disable news service timer
+  ansible.builtin.systemd:
+    name: motd-news.timer
+    state: stopped
+    enabled: no
+
+- name: Set up message of the day
+  template:
+    src: motd_rules
+    dest: /etc/motd
+
+- name: Install the team login binary
+  shell: "cp {{ vars_team_login_path }}/target/debug/team_login /etc/cron.team_login"
+
+- name: Set up the team login cron job
+  template:
+    src: crontab_append
+    dest: /etc/cron.d/team_login
+  # if the cron job is running right now, keep retrying until it finishes
+  register: task_result
+  until: task_result is not failed
+  retries: 10
+  delay: 5
+
+- name: Set up the files that initially appear in a user's home dir
+  copy:
+    src: skel/
+    dest: /etc/skel/
+
+- name: Set up the convenience files for managing worktrees
+  copy:
+    src: scripts/
+    dest: /usr/local/bin/
+    mode: a+x
+
+- name: install common tooling
+  apt:
+    name:
+      - build-essential
+      - cmake
+      - python3
+      - python-is-python3
+      - clang
+      - llvm
+      - valgrind
+      - ninja-build
+      - gcc-multilib # for 32 bit cross compiles of libstd and tests
+    state: present
+
+- name: Set up the git credential helper user
+  user:
+    name: github-app-credentials
+    state: present
+
+- name: Set up the git credential helper scripts
+  copy:
+    src: github_app/
+    dest: /home/github-app-credentials
+    mode: a+x,u+s # setuid and execute for everyone
+
+- name: Make the scripts discoverable for everyone
+  copy:
+    dest: /etc/profile.d/dev-desktop-credential-path.sh
+    content: 'PATH=$PATH:/home/github-app-credentials'
+
+- name: Insert the git credential login for everyone
+  copy:
+    src: templates/gitconfig
+    dest: /etc/gitconfig
+
+# TODO:
+#- name: Set up the github app key- and id-file
+
+- name: Set up the group for people allowed to ssh into the dev-desktop
+  group:
+    name: dev-desktop-allow-ssh
+    state: present

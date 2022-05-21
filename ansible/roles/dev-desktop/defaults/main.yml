@@ -1,0 +1,4 @@
+---
+
+vars_team_login_path: "/root/team_login"
+allow_ssh_extra_groups: "dev-desktop-allow-ssh"

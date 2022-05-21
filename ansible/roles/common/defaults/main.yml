@@ -6,3 +6,4 @@ sudo_users: []
 collect_metrics_from: []
 avoid_removing_docker_users: []
 papertrail_url: null
+allow_ssh_extra_groups: ""
