@@ -1,0 +1,6 @@
+---
+
+vars_sudo_users:
+  - aidanhs
+  - simulacrum
+  - pietro
