@@ -1,11 +1,5 @@
 ---
 
-- name: remove preinstalled things
-  apt:
-    name:
-      - python3-cryptography
-    state: absent
-
 - name: install deps
   apt:
     name:
@@ -13,15 +7,9 @@
       - build-essential
       - libssl-dev
       - python3-pip
-
+      - python3-jwt
+      - python3-cryptography
     state: present
-
-- name: install python libs
-  pip: 
-    name:
-      - PyGithub
-      - requests
-      - cryptography
 
 - name: install rustup in userspace for root
   shell: |
