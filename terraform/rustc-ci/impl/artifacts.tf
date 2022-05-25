@@ -22,6 +22,16 @@ resource "aws_s3_bucket" "artifacts" {
 
     abort_incomplete_multipart_upload_days = 1
   }
+
+  lifecycle_rule {
+    id      = "move to intelligent"
+    enabled = true
+
+    transition {
+      days          = 0
+      storage_class = "INTELLIGENT_TIERING"
+    }
+  }
 }
 
 resource "aws_s3_bucket_policy" "artifacts" {
@@ -123,4 +133,24 @@ module "artifacts_cdn" {
 
   domain_name        = var.artifacts_domain
   origin_domain_name = aws_s3_bucket.artifacts.bucket_regional_domain_name
+}
+
+resource "aws_s3_bucket_inventory" "artifacts" {
+  name    = "all-objects-csv"
+  bucket  = aws_s3_bucket.artifacts.id
+  enabled = true
+
+  included_object_versions = "Current"
+  optional_fields          = ["ETag", "Size", "IntelligentTieringAccessTier"]
+
+  schedule {
+    frequency = "Weekly"
+  }
+  destination {
+    bucket {
+      bucket_arn = aws_s3_bucket.artifacts.arn
+      prefix     = aws_s3_bucket.artifacts.id
+      format     = "CSV"
+    }
+  }
 }
