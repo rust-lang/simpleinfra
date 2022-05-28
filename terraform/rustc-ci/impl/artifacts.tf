@@ -22,16 +22,6 @@ resource "aws_s3_bucket" "artifacts" {
 
     abort_incomplete_multipart_upload_days = 1
   }
-
-  lifecycle_rule {
-    id      = "move to intelligent"
-    enabled = true
-
-    transition {
-      days          = 0
-      storage_class = "INTELLIGENT_TIERING"
-    }
-  }
 }
 
 resource "aws_s3_bucket_policy" "artifacts" {
