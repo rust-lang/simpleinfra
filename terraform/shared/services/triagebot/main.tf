@@ -47,7 +47,7 @@ module "ecs_task" {
   cpu    = 256
   memory = 512
 
-  log_retention_days = 7
+  log_retention_days = 3
   ecr_repositories_arns = [
     module.ecr.arn,
   ]
@@ -79,7 +79,7 @@ module "ecs_task" {
       },
       {
         "name": "RUST_LOG",
-        "value": "triagebot=info"
+        "value": "triagebot=trace"
       }
     ],
     "secrets": [
