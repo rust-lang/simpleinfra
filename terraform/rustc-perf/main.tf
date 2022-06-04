@@ -15,7 +15,7 @@ data "aws_ssm_parameter" "rustc_perf" {
 }
 
 data "aws_ssm_parameter" "database_url" {
-  name = "/prod/rds/shared/connection-urls/rustc-perf"
+  name = "/prod/rds/shared/connection-urls/rustc_perf"
 }
 
 resource "aws_iam_policy" "read_database_url" {

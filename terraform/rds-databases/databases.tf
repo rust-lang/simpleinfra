@@ -2,7 +2,7 @@ locals {
   databases = [
     "discord-mods-bot",
     "triagebot",
-    "rustc-perf",
+    "rustc_perf",
   ]
 }
 
@@ -24,6 +24,38 @@ resource "postgresql_role" "users" {
   # The role doesn't have the permission to do this, and we don't really need
   # this functionality. If this is set to `false`, deleting the role will fail.
   skip_reassign_owned = true
+}
+
+resource "postgresql_grant" "rw_self_tables" {
+  for_each = toset(local.databases)
+
+  database    = each.value
+  role        = each.value
+  schema      = "public"
+  object_type = "table"
+  privileges = toset([
+    "INSERT",
+    "DELETE",
+    "REFERENCES",
+    "SELECT",
+    "TRIGGER",
+    "TRUNCATE",
+    "UPDATE",
+  ])
+}
+
+resource "postgresql_grant" "rw_self_sequence" {
+  for_each = toset(local.databases)
+
+  database    = each.value
+  role        = each.value
+  schema      = "public"
+  object_type = "sequence"
+  privileges = toset([
+    "SELECT",
+    "UPDATE",
+    "USAGE",
+  ])
 }
 
 resource "postgresql_database" "databases" {
@@ -48,5 +80,5 @@ resource "aws_ssm_parameter" "connection_urls" {
 resource "aws_ssm_parameter" "connection_url_root" {
   name  = "/prod/rds/shared/connection-urls/root"
   type  = "SecureString"
-  value = "postgres://root:${random_password.shared_root.result}@${aws_db_instance.shared.address}"
+  value = "postgres://root:${random_password.shared_root.result}@${aws_db_instance.shared.address}/postgres"
 }

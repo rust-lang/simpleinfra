@@ -16,7 +16,7 @@ resource "aws_iam_group_policy_attachment" "rustc_perf_enforce_mfa" {
 }
 
 data "aws_ssm_parameter" "rustc_perf_credentials" {
-  name            = "/prod/rds/shared/connection-urls/rustc-perf"
+  name            = "/prod/rds/shared/connection-urls/rustc_perf"
   with_decryption = false
 }
 
