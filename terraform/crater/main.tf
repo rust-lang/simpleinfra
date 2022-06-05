@@ -20,6 +20,11 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 3.59"
     }
+
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 4.23"
+    }
   }
 
   backend "s3" {
@@ -34,4 +39,9 @@ terraform {
 provider "aws" {
   profile = "default"
   region  = "us-west-1"
+}
+
+provider "google" {
+  project = "rust-crater"
+  region  = "us-central1"
 }
