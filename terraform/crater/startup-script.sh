@@ -47,4 +47,4 @@ systemd-run \
         ${docker_url} \
         agent https://crater.rust-lang.org \
         $AGENT_TOKEN \
-        --threads 5
+        --threads 8
