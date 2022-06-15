@@ -135,7 +135,7 @@ resource "aws_s3_bucket_inventory" "artifacts" {
   enabled = true
 
   included_object_versions = "Current"
-  optional_fields          = ["ETag", "Size", "IntelligentTieringAccessTier"]
+  optional_fields          = ["ETag", "Size", "StorageClass", "IntelligentTieringAccessTier"]
 
   schedule {
     frequency = "Weekly"
