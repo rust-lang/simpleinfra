@@ -54,8 +54,8 @@ resource "aws_iam_role_policy_attachment" "agent_pull_ecr" {
 }
 
 data "aws_ssm_parameter" "token" {
-    name = "/prod/ansible/crater-gcp-2/crater-token"
-    with_decryption = false
+  name            = "/prod/ansible/crater-gcp-2/crater-token"
+  with_decryption = false
 }
 
 resource "aws_iam_policy" "read_crater_token" {

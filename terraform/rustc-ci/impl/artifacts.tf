@@ -126,7 +126,7 @@ module "artifacts_cdn" {
 }
 
 data "aws_s3_bucket" "inventories" {
-    bucket = "rust-inventories"
+  bucket = "rust-inventories"
 }
 
 resource "aws_s3_bucket_inventory" "artifacts" {
