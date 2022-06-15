@@ -125,6 +125,10 @@ module "artifacts_cdn" {
   origin_domain_name = aws_s3_bucket.artifacts.bucket_regional_domain_name
 }
 
+data "aws_s3_bucket" "inventories" {
+    bucket = "rust-inventories"
+}
+
 resource "aws_s3_bucket_inventory" "artifacts" {
   name    = "all-objects-csv"
   bucket  = aws_s3_bucket.artifacts.id
@@ -138,7 +142,7 @@ resource "aws_s3_bucket_inventory" "artifacts" {
   }
   destination {
     bucket {
-      bucket_arn = aws_s3_bucket.artifacts.arn
+      bucket_arn = data.aws_s3_bucket.inventories.arn
       prefix     = aws_s3_bucket.artifacts.id
       format     = "CSV"
     }
