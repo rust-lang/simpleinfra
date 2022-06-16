@@ -41,6 +41,14 @@ resource "aws_cloudfront_distribution" "index" {
     }
   }
 
+  // Rewrite 403 (access denied) to 404 (not found). S3 returns 403 when an
+  // object is not found, which leads to confusing errors in Cargo if a 
+  // crate does not exist.
+  custom_error_response {
+    error_code    = 403
+    response_code = 404
+  }
+
   origin {
     origin_id   = "main"
     domain_name = aws_s3_bucket.index.bucket_regional_domain_name
