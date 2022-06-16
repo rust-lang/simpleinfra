@@ -1,5 +1,9 @@
 // This file configures index.crates.io
 
+resource "aws_cloudfront_origin_access_identity" "index" {
+  comment = "index.crates.io access"
+}
+
 resource "aws_cloudfront_distribution" "index" {
   comment = var.index_domain_name
 
@@ -44,6 +48,9 @@ resource "aws_cloudfront_distribution" "index" {
   origin {
     origin_id   = "main"
     domain_name = aws_s3_bucket.index.bucket_regional_domain_name
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity.index.cloudfront_access_identity_path
+    }
   }
 
   restrictions {
