@@ -159,6 +159,10 @@ resource "google_compute_instance_template" "agent" {
       role       = aws_iam_role.agent.arn,
       docker_url = module.ecr.url
     })
+    update-script = templatefile("update.sh", {
+      role       = aws_iam_role.agent.arn,
+      docker_url = module.ecr.url
+    })
   }
 
   service_account {
@@ -171,6 +175,23 @@ resource "google_compute_instance_template" "agent" {
   }
 }
 
+resource "google_compute_region_autoscaler" "agents" {
+  name   = "crater-autoscaler"
+  target = google_compute_region_instance_group_manager.agents.id
+
+  autoscaling_policy {
+    max_replicas    = 3
+    min_replicas    = 1
+    cooldown_period = 120
+    // This is pretty low, but in practice we want to scale out to the max
+    // unless we're entirely idle: crater is either all up or all down.
+    cpu_utilization {
+      target = 0.1
+    }
+  }
+}
+
+
 resource "google_compute_region_instance_group_manager" "agents" {
   name = "crater-agents"
 
@@ -179,8 +200,6 @@ resource "google_compute_region_instance_group_manager" "agents" {
   version {
     instance_template = google_compute_instance_template.agent.id
   }
-
-  target_size = 1
 
   auto_healing_policies {
     health_check      = google_compute_health_check.tcp_health.id

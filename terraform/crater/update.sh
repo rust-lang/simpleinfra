@@ -2,14 +2,6 @@
 
 set -euo pipefail
 
-mkdir -p /opt
-cd /opt
-sudo apt update
-sudo apt install -y vim jq docker.io awscli
-
-sudo systemctl unmask docker.service
-sudo systemctl start docker.service
-
 aws sts assume-role-with-web-identity \
     --role-arn ${role} \
     --role-session-name $(hostname) \
@@ -33,27 +25,11 @@ AGENT_TOKEN=$(aws --region us-west-1 \
 
 eval $(aws ecr get-login --no-include-email --region us-west-1)
 
-docker pull ${docker_url}
+old_id="$(docker images --format "{{.ID}}" "${docker_url}")"
+docker pull "${docker_url}"
+new_id="$(docker images --format "{{.ID}}" "${docker_url}")"
 
-mkdir -p /var/lib/crater-agent-workspace
-
-curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/update-script \
-    -o /opt/update.sh \
-    -H "Metadata-Flavor: Google"
-
-chmod +x /opt/update.sh
-
-# Run update task every 5 minutes
-sudo systemd-run --unit crater-agent-update --on-calendar='*:0/5' /opt/update.sh
-
-systemd-run \
-    --unit crater-agent \
-    docker run --init --rm --name crater-agent \
-        -v /var/lib/crater-agent-workspace:/workspace \
-        -v /var/run/docker.sock:/var/run/docker.sock \
-        -e RUST_LOG=crater=trace,rustwide=info \
-        -p 4343:4343 \
-        ${docker_url} \
-        agent https://crater.rust-lang.org \
-        $AGENT_TOKEN \
-        --threads 8
+if [[ "$old_id" != "$new_id" ]]; then
+    echo "restarting container..."
+    sudo systemctl restart crater-agent
+fi
