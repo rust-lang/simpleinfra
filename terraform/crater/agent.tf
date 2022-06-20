@@ -180,7 +180,7 @@ resource "google_compute_region_autoscaler" "agents" {
   target = google_compute_region_instance_group_manager.agents.id
 
   autoscaling_policy {
-    max_replicas    = 6
+    max_replicas    = 22
     min_replicas    = 1
     cooldown_period = 120
     // This is pretty low, but in practice we want to scale out to the max
