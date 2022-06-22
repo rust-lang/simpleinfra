@@ -28,7 +28,7 @@ resource "aws_cloudfront_distribution" "index" {
 
     default_ttl = 60
     min_ttl     = 1
-    max_ttl     = 31536000
+    max_ttl     = 60
 
     forwarded_values {
       headers = [
