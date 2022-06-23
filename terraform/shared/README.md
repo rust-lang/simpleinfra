@@ -7,7 +7,7 @@ over time.
 
 ## Applying the configuration
 
-To apply the configuration you'll need to have [Terraform 0.13
+To apply the configuration you'll need to have [Terraform 1.0+
 installed][tf-install] and AWS credentials configured on the local machine.
 The first time you apply the configuration (or every time you add a new module)
 you'll need to initialize Terraform locally:
@@ -50,6 +50,6 @@ the `terraform-state-lock` DynamoDB table (in the `us-west-1` region) is used.
 * [Terraform documentation][tf-docs]
 * [AWS Terraform provider][tf-aws-provider]
 
-[tf-install]: https://www.terraform.io/downloads.html
+[tf-install]: https://www.terraform.io/downloads
 [tf-docs]: https://www.terraform.io/docs/cli-index.html
 [tf-aws-provider]: https://www.terraform.io/docs/providers/aws/index.html
