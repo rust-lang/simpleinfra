@@ -11,6 +11,26 @@ module "lambda_doc_router" {
   role_arn   = data.aws_iam_role.cloudfront_lambda.arn
 }
 
+resource "aws_cloudfront_response_headers_policy" "cache_immutable" {
+  name = format("immutable-for-%s-releases", var.name)
+
+  custom_headers_config {
+    items {
+      header   = "Cache-Control"
+      override = true
+      value = format(
+        "immutable, max-age=%d, stale-while-revalidate=%d",
+        data.aws_cloudfront_cache_policy.caching.default_ttl,
+        data.aws_cloudfront_cache_policy.caching.default_ttl,
+      )
+    }
+  }
+}
+
+data "aws_cloudfront_cache_policy" "caching" {
+  name = "Managed-CachingOptimized"
+}
+
 resource "aws_cloudfront_distribution" "doc" {
   comment = var.doc_domain_name
 
@@ -51,25 +71,21 @@ resource "aws_cloudfront_distribution" "doc" {
 
   ordered_cache_behavior {
     path_pattern     = "*.woff2"
-    cache_policy_id  = "cache-immutable"
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
     target_origin_id = "main"
 
-    forwarded_values {
-      headers      = []
-      query_string = false
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.cache_immutable.id
+    cache_policy_id            = data.aws_cloudfront_cache_policy.caching.id
 
-      cookies {
-        forward = "none"
-      }
-    }
-
-    min_ttl                = 0
-    default_ttl            = 86400
-    max_ttl                = 31536000
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
+
+    lambda_function_association {
+      event_type   = "origin-request"
+      lambda_arn   = module.lambda_doc_router.version_arn
+      include_body = false
+    }
   }
 
   origin {
