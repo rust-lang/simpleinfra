@@ -1,33 +1,56 @@
 resource "aws_s3_bucket" "static" {
   bucket = var.bucket
-  acl    = "public-read"
+}
 
-  versioning {
-    enabled = true
+resource "aws_s3_bucket_versioning" "static" {
+  bucket = aws_s3_bucket.static.bucket
+
+  versioning_configuration {
+    status = "Enabled"
   }
+}
 
+resource "aws_s3_bucket_acl" "static" {
+  bucket = aws_s3_bucket.static.id
+  acl    = "public-read"
+}
+
+resource "aws_s3_bucket_cors_configuration" "static" {
+  bucket = aws_s3_bucket.static.id
   cors_rule {
     allowed_origins = ["*"]
     allowed_methods = ["GET"]
     max_age_seconds = 3000
     allowed_headers = ["Authorization"]
   }
+}
 
-  website {
-    index_document = "index.html"
-    error_document = "doc/nightly/not_found.html"
+
+resource "aws_s3_bucket_website_configuration" "static" {
+  bucket = aws_s3_bucket.static.id
+  index_document {
+    suffix = "index.html"
   }
+  error_document {
+    key = "doc/nightly/not_found.html"
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "static" {
+  bucket = aws_s3_bucket.static.id
 
   // Some files (such as the nightly tarballs) are overridden daily, creating
   // a bunch of old versions nobody cares about. This cleans up those files,
   // while keeping the past 3 months archived in case we need to rollback.
-  lifecycle_rule {
-    id      = "remove-old-versions"
-    enabled = true
+  rule {
+    id     = "remove-old-versions"
+    status = "Enabled"
 
-    abort_incomplete_multipart_upload_days = 2
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 2
+    }
     noncurrent_version_expiration {
-      days = 90
+      noncurrent_days = 90
     }
   }
 }
