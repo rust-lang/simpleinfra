@@ -59,7 +59,10 @@ resource "aws_s3_bucket_inventory" "static" {
   enabled = true
 
   included_object_versions = "Current"
-  optional_fields          = ["ETag", "ReplicationStatus", "Size", "IntelligentTieringAccessTier"]
+  optional_fields = [
+    "ETag", "ReplicationStatus", "Size", "IntelligentTieringAccessTier",
+    "StorageClass",
+  ]
 
   schedule {
     frequency = "Weekly"
