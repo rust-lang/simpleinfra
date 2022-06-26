@@ -15,6 +15,20 @@ resource "aws_iam_group_policy_attachment" "foundation_enforce_mfa" {
   policy_arn = aws_iam_policy.enforce_mfa.arn
 }
 
+data "aws_route53_zone" "allowed_zones" {
+  for_each = toset([
+    "rust.foundation",
+    "rustfoundation.com",
+    "rust-foundation.com",
+    "rust-foundation.org",
+    "rustfoundation.net",
+    "rust-foundation.net",
+    "therustfoundation.com",
+    "therustfoundation.org",
+  ])
+  name = each.value
+}
+
 resource "aws_iam_group_policy" "foundation" {
   group = aws_iam_group.foundation.name
   name  = "prod-access"
@@ -55,6 +69,24 @@ resource "aws_iam_group_policy" "foundation" {
           "aws-portal:*Account",
         ]
         Resource = "*"
+      },
+      // Access to the Route 53 console
+      {
+        Effect = "Allow"
+        Action = [
+          "route53:GetHostedZoneCount",
+          "route53:ListHostedZonesByName",
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "route53:GetHostedZone",
+          "route53:ListResourceRecordSets",
+          "route53:ChangeResourceRecordSets",
+        ]
+        Resource = [for zone in data.aws_route53_zone.allowed_zones : zone.arn]
       }
     ]
   })
