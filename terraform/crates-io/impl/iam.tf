@@ -20,6 +20,7 @@ resource "aws_iam_policy" "static_write" {
           "s3:GetObjectAcl",
           "s3:PutObject",
           "s3:PutObjectAcl",
+          "s3:DeleteObject",
         ]
         Resource = [
           "${aws_s3_bucket.static.arn}/*",
