@@ -11,4 +11,4 @@ git fetch upstream
 git checkout upstream/master
 popd
 
-./setup_rustup.sh
+setup_rustup.sh
