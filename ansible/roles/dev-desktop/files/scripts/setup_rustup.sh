@@ -4,6 +4,8 @@ set -x
 
 rustup --version || curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
+source "$HOME/.cargo/env"
+
 for D in rust*; do
     if [ -d "${D}" ]; then
         rustup toolchain link "$D"_stage1 "$D/build/x86_64-unknown-linux-gnu/stage1"
