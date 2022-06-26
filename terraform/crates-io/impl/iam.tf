@@ -4,6 +4,25 @@ resource "aws_iam_user" "heroku" {
   name = "${var.iam_prefix}--heroku"
 }
 
+resource "aws_iam_user_policy" "heroku" {
+  name = "inline"
+  user = aws_iam_user.heroku.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "cloudfront:CreateInvalidation"
+        Resource = [
+          aws_cloudfront_distribution.index.arn,
+          aws_cloudfront_distribution.static.arn,
+        ]
+      }
+    ]
+  })
+}
+
 resource "aws_iam_policy" "static_write" {
   name        = "${var.iam_prefix}--static-write"
   description = "Write access to the ${var.static_bucket_name} S3 bucket"
