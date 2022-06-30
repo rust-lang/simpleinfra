@@ -15,7 +15,7 @@ module "monitorbot" {
 
   environment = {
     MONITORBOT_RUNNERS_REPOS               = "rust-lang-ci/rust"
-    MONITORBOT_GH_RATE_LIMIT_STATS_REFRESH = 60
+    MONITORBOT_GH_RATE_LIMIT_STATS_REFRESH = 40
   }
 
   secrets = {
