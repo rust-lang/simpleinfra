@@ -85,6 +85,7 @@ resource "aws_iam_group_policy" "crates_io" {
           "s3:PutObject",
           "s3:PutObjectAcl",
           "s3:DeleteObject",
+          "s3:ListObjectsV2",
         ]
         Resource = [for _, bucket in data.aws_s3_bucket.crates_io_buckets : "${bucket.arn}/*"]
       },
