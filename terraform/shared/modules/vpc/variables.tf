@@ -22,3 +22,9 @@ variable "untrusted_subnets" {
   type        = map(string)
   description = "Map of untrusted subnet numbers and the associated AZ IDs"
 }
+
+variable "peering" {
+  type        = map(string)
+  default     = {}
+  description = "Map of CIDR blocks to peering connection IDs"
+}

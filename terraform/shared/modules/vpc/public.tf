@@ -38,6 +38,14 @@ resource "aws_route_table" "public" {
     gateway_id      = aws_internet_gateway.igw.id
   }
 
+  dynamic "route" {
+    for_each = var.peering
+    content {
+      cidr_block                = route.key
+      vpc_peering_connection_id = route.value
+    }
+  }
+
   tags = {
     Name = "${var.name}--public"
   }

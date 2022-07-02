@@ -40,6 +40,14 @@ resource "aws_route_table" "private" {
     egress_only_gateway_id = aws_egress_only_internet_gateway.eigw.id
   }
 
+  dynamic "route" {
+    for_each = var.peering
+    content {
+      cidr_block                = route.key
+      vpc_peering_connection_id = route.value
+    }
+  }
+
   tags = {
     Name = "${var.name}--private-${each.value}"
   }

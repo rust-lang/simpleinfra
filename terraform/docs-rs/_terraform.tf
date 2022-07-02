@@ -6,7 +6,11 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.59"
+      version = "~> 4.20"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.3"
     }
   }
 
@@ -29,12 +33,10 @@ data "terraform_remote_state" "shared" {
 }
 
 provider "aws" {
-  profile = "default"
-  region  = "us-west-1"
+  region = "us-west-1"
 }
 
 provider "aws" {
-  profile = "default"
-  region  = "us-east-1"
-  alias   = "east1"
+  region = "us-east-1"
+  alias  = "east1"
 }

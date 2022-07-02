@@ -3,6 +3,11 @@ output "id" {
   description = "ID of the VPC"
 }
 
+output "cidr" {
+  value       = var.ipv4_cidr
+  description = "CIDR of the VPC"
+}
+
 output "public_subnets" {
   value       = [for count, subnet in aws_subnet.public : subnet.id]
   description = "IDs of the public subnets inside the VPC"

@@ -4,6 +4,7 @@ output "master_ec2_key_pair" {
 
 output "legacy_vpc" {
   value = {
+    id                       = aws_vpc.legacy.id
     subnet_id                = aws_subnet.legacy.id
     common_security_group_id = aws_security_group.legacy_common.id
   }

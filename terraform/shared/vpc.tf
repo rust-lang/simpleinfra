@@ -16,6 +16,10 @@ module "vpc_prod" {
     4 = "usw1-az1",
     5 = "usw1-az3",
   }
+
+  peering = {
+    (aws_vpc.legacy.cidr_block) = aws_vpc_peering_connection.legacy_with_prod.id
+  }
 }
 
 // This defines the legacy VPC, used before we switched to Terraform. Old
@@ -38,4 +42,32 @@ resource "aws_subnet" "legacy" {
   tags = {
     Name = "rust-legacy"
   }
+}
+
+resource "aws_internet_gateway" "legacy" {
+  vpc_id = aws_vpc.legacy.id
+}
+
+resource "aws_route_table" "legacy" {
+  vpc_id = aws_vpc.legacy.id
+
+  route {
+    cidr_block                = module.vpc_prod.cidr
+    vpc_peering_connection_id = aws_vpc_peering_connection.legacy_with_prod.id
+  }
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.legacy.id
+  }
+}
+
+// Setup peering between the legacy vpc and the prod vpc. This is needed so
+// that the legacy docs.rs instance can conect to the database inside the prod
+// instance.
+
+resource "aws_vpc_peering_connection" "legacy_with_prod" {
+  vpc_id      = aws_vpc.legacy.id
+  peer_vpc_id = module.vpc_prod.id
+  auto_accept = true
 }
