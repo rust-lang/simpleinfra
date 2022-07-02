@@ -129,7 +129,7 @@ resource "google_service_account" "service_account" {
 
 resource "google_compute_instance_template" "agent" {
   name_prefix      = "crater-agent-"
-  machine_type     = "n2d-standard-16"
+  machine_type     = "n2d-highcpu-16"
   min_cpu_platform = "AMD Milan"
 
   disk {
@@ -180,8 +180,8 @@ resource "google_compute_region_autoscaler" "agents" {
   target = google_compute_region_instance_group_manager.agents.id
 
   autoscaling_policy {
-    max_replicas    = 22
-    min_replicas    = 1
+    max_replicas    = 19
+    min_replicas    = 19 // temporarily set to not autoscale, we want to get a cost assessment
     cooldown_period = 120
     // This is pretty low, but in practice we want to scale out to the max
     // unless we're entirely idle: crater is either all up or all down.
