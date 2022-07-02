@@ -79,7 +79,7 @@ module "ecs_task" {
       },
       {
         "name": "RUST_LOG",
-        "value": "triagebot=trace"
+        "value": "triagebot=info"
       }
     ],
     "secrets": [
