@@ -7,6 +7,16 @@
   loop: "{{ containers.keys()|list }}"
   register: containers_config_upload
 
+
+- name: upload firewall configuration for containers
+  template:
+    src: firewall.sh
+    dest: "/etc/firewall/docker-{{ item }}.sh"
+    mode: 0750
+  notify:
+    - restart-firewall
+  loop: "{{ containers.keys()|list }}"
+
 # The following two tasks should've been implemented as handlers, but
 # unfortunately Ansible doesn't support calling handlers just on a few items of
 # a loop. If we didn't do this after a single container configuration changed

@@ -1,0 +1,32 @@
+---
+
+- hosts: crater-server
+  become: yes
+  become_user: root
+
+  roles:
+
+    - role: common
+      collect_metrics_from: "{{ global_collect_metrics_from }}"
+      sudo_users:
+        - aidanhs
+        - simulacrum
+        - pietro
+    - role: docker
+      images:
+        region: us-west-1
+        update_every: 5min
+      containers:
+        crater-agent:
+          image: 890664054962.dkr.ecr.us-west-1.amazonaws.com/crater:latest
+          exec: "server --bind 0.0.0.0:8000"
+          working_dir: "/crater-persist"
+          mounts:
+            "/var/lib/crater": "/crater-persist"
+          env:
+            CRATER_WORK_DIR: /crater-persist
+            CRATER_CONFIG: /crater/config.toml
+            RUST_LOG: crater=debug,warp=debug
+            RUST_BACKTRACE: 1
+          expose:
+            80: 8000

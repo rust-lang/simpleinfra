@@ -18,12 +18,17 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.59"
+      version = "~> 4.20"
     }
 
     google = {
       source  = "hashicorp/google"
       version = "~> 4.23"
+    }
+
+    dns = {
+      source  = "hashicorp/dns"
+      version = "~> 3.2.3"
     }
   }
 
@@ -37,8 +42,7 @@ terraform {
 }
 
 provider "aws" {
-  profile = "default"
-  region  = "us-west-1"
+  region = "us-west-1"
 }
 
 provider "google" {

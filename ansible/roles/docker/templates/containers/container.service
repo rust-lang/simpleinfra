@@ -19,6 +19,7 @@ ExecStart=/usr/bin/docker run --init --rm --name {{ item }} \
     {% for host, inside in mounts.items() %} -v {{ host }}:{{ inside }}{% endfor %} \
     {% for key in env.keys() %} -e {{ key }}{% endfor %} \
     {% for host, inside in expose.items() %} -p {{ host }}:{{ inside }}{% endfor %} \
+    -w {{ container.working_dir }} \
     {{ container.image }} {{ container.exec }}
 ExecStop=/usr/bin/docker stop {{ item }}
 {% for key, value in env.items() %}

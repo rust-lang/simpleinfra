@@ -30,6 +30,11 @@ update_image() {
     container="$1"
     image="$2"
 
+    aws ecr get-login-password --region "{{ images.region }}" | docker login \
+        --username AWS \
+        --password-stdin \
+        "$image"
+
     old_id="$(docker images --format "{{ '{{.ID}}' }}" "${image}")"
     retry docker pull "${image}"
     new_id="$(docker images --format "{{ '{{.ID}}' }}" "${image}")"
@@ -39,8 +44,6 @@ update_image() {
         sudo systemctl restart "container-${container}.service"
     fi
 }
-
-eval $(aws ecr get-login --no-include-email --region "{{ images.region }}")
 
 {% for name, options in containers.items() %}
 update_image "{{ name }}" "{{ options.image }}"

@@ -2,3 +2,8 @@
 
 - name: reload-systemd
   shell: systemctl daemon-reload
+
+- name: restart-firewall
+  service:
+    name: firewall
+    state: restarted

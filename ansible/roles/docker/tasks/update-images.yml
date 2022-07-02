@@ -6,20 +6,6 @@
     group: docker
     state: present
 
-- name: create the .aws directory for the docker-update-images user
-  file:
-    path: /home/docker-update-images/.aws
-    mode: 0700
-    state: directory
-    owner: docker-update-images
-
-- name: upload the aws credentials file
-  template:
-    src: update-images/aws-credentials
-    dest: /home/docker-update-images/.aws/credentials
-    mode: 0400
-    owner: docker-update-images
-
 - name: create the .docker directory for the docker-update-images user
   file:
     path: /home/docker-update-images/.docker

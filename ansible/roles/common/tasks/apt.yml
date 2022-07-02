@@ -14,7 +14,6 @@
       - iptables
       - openssh-server
       - python3
-      - python-apt
       - python3-apt
       - vim
       - rsyslog-gnutls  # needed for papertrail

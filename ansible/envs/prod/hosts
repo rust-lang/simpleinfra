@@ -16,3 +16,6 @@ play-1.infra.rust-lang.org
 
 [dev-desktop]
 dev-desktop.infra.rust-lang.org
+
+[crater-server]
+crater.infra.rust-lang.org
