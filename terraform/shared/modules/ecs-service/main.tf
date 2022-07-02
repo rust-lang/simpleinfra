@@ -18,8 +18,11 @@ resource "aws_ecs_service" "service" {
   }
 
   network_configuration {
-    subnets          = var.cluster_config.subnet_ids
-    security_groups  = [var.cluster_config.service_security_group_id]
+    subnets = var.cluster_config.subnet_ids
+    security_groups = concat(
+      [var.cluster_config.service_security_group_id],
+      var.additional_security_group_ids,
+    )
     assign_public_ip = false
   }
 }

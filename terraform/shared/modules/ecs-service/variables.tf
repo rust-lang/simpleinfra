@@ -33,6 +33,12 @@ variable "domains" {
   description = "List of domain names the load balancer will forward to the container"
 }
 
+variable "additional_security_group_ids" {
+  type        = list(string)
+  default     = []
+  description = "List of additional security groups to add to the service"
+}
+
 variable "cluster_config" {
   type = object({
     cluster_id                = string,

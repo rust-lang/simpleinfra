@@ -211,4 +211,6 @@ module "ecs_service" {
   health_check_path     = var.expose_http.health_check_path
   health_check_interval = var.expose_http.health_check_interval
   health_check_timeout  = var.expose_http.health_check_timeout
+
+  additional_security_group_ids = var.additional_security_group_ids
 }

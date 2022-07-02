@@ -35,6 +35,14 @@ resource "aws_security_group" "db" {
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
+    description     = "Connections from the docs.rs web servers on ECS"
+    security_groups = [aws_security_group.web.id]
+  }
+
+  ingress {
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
     description     = "Connections from the bastion"
     security_groups = [data.aws_security_group.bastion.id]
   }
@@ -80,7 +88,7 @@ resource "aws_db_instance" "db" {
 }
 
 resource "aws_ssm_parameter" "connection_url" {
-  name  = "/prod/rds/docs-rs/connection-url"
+  name  = "/prod/docs-rs/database-url"
   type  = "SecureString"
   value = "postgres://docsrs:${random_password.db.result}@${aws_db_instance.db.address}/docsrs"
 }
