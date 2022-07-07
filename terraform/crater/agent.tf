@@ -181,7 +181,7 @@ resource "google_compute_region_autoscaler" "agents" {
 
   autoscaling_policy {
     max_replicas    = 19
-    min_replicas    = 19 // temporarily set to not autoscale, we want to get a cost assessment
+    min_replicas    = 1
     cooldown_period = 120
     // This is pretty low, but in practice we want to scale out to the max
     // unless we're entirely idle: crater is either all up or all down.

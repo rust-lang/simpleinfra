@@ -220,7 +220,7 @@ resource "aws_instance" "crater" {
   }
 
   tags = {
-    Name = "crater-new"
+    Name = "crater"
   }
 
   lifecycle {
