@@ -38,6 +38,7 @@ variable "mount_efs" {
 variable "expose_http" {
   type = object({
     container_port = number
+    prometheus     = string
     domains        = list(string)
 
     health_check_path     = string

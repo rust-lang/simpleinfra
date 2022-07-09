@@ -172,6 +172,12 @@ resource "aws_ecs_task_definition" "task" {
           readOnly      = false
         }
       ]
+
+      dockerLabels = var.expose_http == null || var.expose_http.prometheus == null ? {} : {
+        PROMETHEUS_EXPORTER_PORT     = 80
+        PROMETHEUS_EXPORTER_PATH     = var.expose_http.prometheus
+        PROMETHEUS_EXPORTER_JOB_NAME = "ecs-${var.name}"
+      }
     }
   ])
 

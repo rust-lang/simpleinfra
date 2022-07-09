@@ -33,6 +33,7 @@ module "web" {
 
   expose_http = {
     container_port = 80
+    prometheus     = "/about/metrics"
     domains        = ["docs-rs-web-prod.infra.rust-lang.org"]
 
     health_check_path     = "/"
