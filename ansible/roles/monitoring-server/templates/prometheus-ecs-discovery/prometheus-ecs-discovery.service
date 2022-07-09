@@ -1,0 +1,17 @@
+#
+# {{ ansible_managed }}
+#
+
+[Unit]
+Description=discover list of hosts for Prometheus on AWS ECS
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/prometheus-ecs-discovery --config.write-to /var/lib/prometheus-ecs-discovery/ecs_file_sd.yml
+User=prometheus-ecs-discovery
+Group=prometheus-ecs-discovery
+Environment=AWS_REGION=us-west-1
+
+[Install]
+WantedBy=multi-user.target
+

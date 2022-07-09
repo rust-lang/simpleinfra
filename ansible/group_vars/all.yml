@@ -67,3 +67,9 @@ packer_archs:
   aarch64:
     name: arm64
     checksum: sha256:8942f3ae887a761befd9fa29da6f689050ce46b886910a6a439d6b49b5e463ae
+
+# Version of https://github.com/teralytics/prometheus-ecs-discovery to install
+# in our instances. The checksum can be calculated by downloading the binary
+# and checksumming it.
+prometheus_ecs_discovery_version: 1.4.1
+prometheus_ecs_discovery_checksum: 510cce227572739b6b545abdd31e259333081bd8606022948390278406008700

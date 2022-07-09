@@ -58,6 +58,12 @@
               - play-1.infra.rust-lang.org:9100
               - dev-desktop.infra.rust-lang.org:9100
 
+        # Metrics scraped from apps hosted in our ECS clusters
+        - job_name: ecs-sd  # Will be overridden by each job
+          file_sd_configs:
+            - files:
+              - /var/lib/prometheus-ecs-discovery/ecs_file_sd.yml
+
         - job_name: docsrs
           metrics_path: /about/metrics
           scheme: https

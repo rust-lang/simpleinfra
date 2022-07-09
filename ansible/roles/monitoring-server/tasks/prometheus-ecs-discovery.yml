@@ -1,0 +1,59 @@
+---
+
+- name: check which version of prometheus-ecs-discovery is installed
+  stat:
+    path: /usr/local/bin/prometheus-ecs-discovery
+    checksum_algorithm: sha256
+    get_checksum: true
+  register: prometheus_ecs_discovery_stat
+
+- name: "download prometheus-ecs-discovery {{ prometheus_ecs_discovery_version }}"
+  get_url:
+    url: "https://github.com/teralytics/prometheus-ecs-discovery/releases/download/v{{ prometheus_ecs_discovery_version }}/prometheus-ecs-discovery-linux-amd64"
+    checksum: "{{ 'sha256:' + prometheus_ecs_discovery_checksum }}"
+    dest: /usr/local/bin/prometheus-ecs-discovery
+    mode: 0755
+  notify:
+    - restart-prometheus-ecs-discovery
+  when: not prometheus_ecs_discovery_stat.stat.exists or prometheus_ecs_discovery_stat.stat.checksum != prometheus_ecs_discovery_checksum
+
+- name: set the correct permissions for prometheus-ecs-discovery
+  file:
+    path: /usr/local/bin/prometheus-ecs-discovery
+    mode: 0755
+
+- name: create prometheus-ecs-discovery group
+  group:
+    name: prometheus-ecs-discovery
+    system: true
+    state: present
+
+- name: create prometheus-ecs-discovery user
+  user:
+    name: prometheus-ecs-discovery
+    group: prometheus-ecs-discovery
+    system: true
+    create_home: false
+    state: present
+
+- name: create /var/lib/prometheus-ecs-discovery
+  file:
+    path: /var/lib/prometheus-ecs-discovery
+    owner: prometheus-ecs-discovery
+    group: prometheus-ecs-discovery
+    mode: 0755
+    state: directory
+
+- name: upload prometheus-ecs-discovery systemd service
+  template:
+    src: prometheus-ecs-discovery/prometheus-ecs-discovery.service
+    dest: /etc/systemd/system/prometheus-ecs-discovery.service
+  notify:
+    - reload-systemd
+    - restart-prometheus-ecs-discovery
+
+- name: enable the prometheus-ecs-discovery systemd service
+  service:
+    name: prometheus-ecs-discovery
+    state: started
+    enabled: true

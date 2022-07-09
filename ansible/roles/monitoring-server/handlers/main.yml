@@ -1,5 +1,10 @@
 ---
 
+- name: restart-prometheus-ecs-discovery
+  service:
+    name: prometheus-ecs-discovery
+    state: restarted
+
 - name: restart-prometheus
   service:
     name: prometheus
