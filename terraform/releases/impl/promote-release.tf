@@ -1,5 +1,15 @@
 // Produce releases using the promote-release tool, running on AWS CodeBuild.
 
+// Provides extra environment variables to set when running the builder.
+variable "extra_environment_variables" {
+  type = set(object({
+    name  = string
+    value = string
+    type  = string
+  }))
+  default = []
+}
+
 data "aws_s3_bucket" "artifacts" {
   bucket = "rust-lang-ci2"
 }
@@ -80,6 +90,26 @@ resource "aws_codebuild_project" "promote_release" {
       name  = "PROMOTE_RELEASE_UPLOAD_DIR"
       value = "dist"
     }
+
+    environment_variable {
+      name  = "PROMOTE_RELEASE_GITHUB_APP_ID"
+      value = "217112"
+    }
+
+    environment_variable {
+      name  = "PROMOTE_RELEASE_GITHUB_APP_KEY"
+      value = data.aws_ssm_parameter.github_app_key.name
+      type  = "PARAMETER_STORE"
+    }
+
+    dynamic "environment_variable" {
+      for_each = var.extra_environment_variables
+      content {
+        name  = environment_variable.value["name"]
+        value = environment_variable.value["value"]
+        type  = environment_variable.value["type"]
+      }
+    }
   }
 
   logs_config {
@@ -112,6 +142,10 @@ resource "aws_iam_role" "promote_release" {
       }
     ]
   })
+}
+
+output "codebuild_role_name" {
+  value = aws_iam_role.promote_release.name
 }
 
 resource "aws_iam_role_policy_attachment" "promote_release_pull_ecr" {
@@ -183,7 +217,6 @@ resource "aws_iam_role_policy" "promote_release" {
         ]
         Resource = "*"
       },
-
       {
         Sid    = "InvalidateCloudfront"
         Effect = "Allow"
@@ -193,8 +226,21 @@ resource "aws_iam_role_policy" "promote_release" {
           aws_cloudfront_distribution.static.arn,
         ]
       },
+      {
+        Sid    = "AllowParameters"
+        Effect = "Allow"
+        Action = ["ssm:GetParameters"]
+        Resource = [
+          "${data.aws_ssm_parameter.github_app_key.arn}"
+        ]
+      }
     ]
   })
+}
+
+data "aws_ssm_parameter" "github_app_key" {
+  name            = "/prod/promote-release/github-app-key"
+  with_decryption = false
 }
 
 // CloudWatch Rule that will execute the release process periodically.
