@@ -76,6 +76,27 @@ resource "aws_iam_role_policy_attachment" "task_execution_ecr_pull" {
   policy_arn = module.ecr.policy_pull_arn
 }
 
+// Security group to allow the monitoring instance to scrape metrics
+
+data "aws_security_group" "monitoring" {
+  name = "monitoring-instance-on-legacy-vpc"
+}
+
+resource "aws_security_group" "allow_monitoring" {
+  for_each = var.expose_http != null && var.expose_http.prometheus != null ? toset([var.name]) : toset([])
+
+  vpc_id      = var.cluster_config.vpc_id
+  name        = "ecs-${var.name}-monitoring"
+  description = "Allow monitoring to scrape the ${var.name} ECS service"
+
+  ingress {
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [data.aws_security_group.monitoring.id]
+  }
+}
+
 // EFS filesystem used for persistent storage across tasks. The filesystem is
 // created only if it's meant to be mounted inside the tasks.
 
@@ -218,5 +239,8 @@ module "ecs_service" {
   health_check_interval = var.expose_http.health_check_interval
   health_check_timeout  = var.expose_http.health_check_timeout
 
-  additional_security_group_ids = var.additional_security_group_ids
+  additional_security_group_ids = concat(
+    var.additional_security_group_ids,
+    [for _, group in aws_security_group.allow_monitoring : group.id], # Either 0 or 1 items
+  )
 }
