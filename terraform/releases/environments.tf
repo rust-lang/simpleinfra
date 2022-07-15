@@ -20,6 +20,19 @@ module "dev" {
   promote_release_ecr_repo = module.promote_release_ecr
   release_keys_bucket_arn  = aws_s3_bucket.release_keys.arn
 
+  extra_environment_variables = toset([
+    {
+      name  = "PROMOTE_RELEASE_DISCOURSE_API_USER"
+      value = "system"
+      type  = "PLAINTEXT"
+    },
+    {
+      name  = "PROMOTE_RELEASE_DISCOURSE_API_KEY"
+      value = "/prod/promote-release/discourse-api-key"
+      type  = "PARAMETER_STORE"
+    }
+  ])
+
   promote_release_cron = {}
 }
 
