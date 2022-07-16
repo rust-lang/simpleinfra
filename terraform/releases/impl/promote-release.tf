@@ -231,7 +231,8 @@ resource "aws_iam_role_policy" "promote_release" {
         Effect = "Allow"
         Action = ["ssm:GetParameters"]
         Resource = [
-          "${data.aws_ssm_parameter.github_app_key.arn}"
+          "${data.aws_ssm_parameter.github_app_key.arn}",
+          "${data.aws_ssm_parameter.discourse.arn}"
         ]
       }
     ]
@@ -240,6 +241,11 @@ resource "aws_iam_role_policy" "promote_release" {
 
 data "aws_ssm_parameter" "github_app_key" {
   name            = "/prod/promote-release/github-app-key"
+  with_decryption = false
+}
+
+data "aws_ssm_parameter" "discourse" {
+  name            = "/prod/promote-release/discourse-api-key"
   with_decryption = false
 }
 
