@@ -111,7 +111,7 @@ if __name__ == "__main__":
         print(f"       allowed channels: {ALLOWED_ACTIONS}")
         exit(1)
 
-    if args.action == "promote-release":
+    if args.action == "release":
         promote_release(args)
-    elif args.action == "promote-branches":
+    elif args.action == "branches":
         promote_branches()
