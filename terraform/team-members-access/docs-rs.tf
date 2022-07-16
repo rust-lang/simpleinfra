@@ -20,6 +20,10 @@ data "aws_s3_bucket" "docs_rs_buckets" {
   bucket   = each.value
 }
 
+data "aws_cloudwatch_log_group" "docs_rs_web" {
+  name = "/prod/docs-rs-web"
+}
+
 resource "aws_iam_group_policy" "docs_rs" {
   group = aws_iam_group.docs_rs.name
   name  = "prod-access"
@@ -119,6 +123,16 @@ resource "aws_iam_group_policy" "docs_rs" {
           [for _, bucket in data.aws_s3_bucket.docs_rs_buckets : bucket.arn],
           [for _, bucket in data.aws_s3_bucket.docs_rs_buckets : "${bucket.arn}/*"],
         )
+      },
+
+      // CloudWatch logs access
+      //
+      // The following rules allow docs-rs team members to access the logs for
+      // the docs.rs app on ECS.
+      {
+        Effect   = "Allow"
+        Action   = "logs:GetLogEvents"
+        Resource = data.aws_cloudwatch_log_group.docs_rs_web.arn
       },
     ]
   })
