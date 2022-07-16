@@ -35,6 +35,11 @@ variable "mount_efs" {
   default = null
 }
 
+variable "ephemeral_storage_gb" {
+  type = number
+  default = 20
+}
+
 variable "expose_http" {
   type = object({
     container_port = number

@@ -202,6 +202,10 @@ resource "aws_ecs_task_definition" "task" {
     }
   ])
 
+  ephemeral_storage {
+    size_in_gib = var.ephemeral_storage_gb
+  }
+
   dynamic "volume" {
     for_each = module.efs
     content {

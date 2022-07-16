@@ -11,10 +11,11 @@ module "web" {
   name = "docs-rs-web"
   repo = "rust-lang/docs.rs"
 
-  cpu              = 256
-  memory           = 512
-  tasks_count      = 1
-  platform_version = "1.4.0"
+  cpu                  = 256
+  memory               = 512
+  tasks_count          = 1
+  platform_version     = "1.4.0"
+  ephemeral_storage_gb = 40
 
   environment = {
     DOCSRS_PREFIX          = "/tmp"
