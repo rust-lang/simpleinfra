@@ -20,6 +20,7 @@ data "aws_route53_zone" "allowed_zones" {
     "rust.foundation",
     "rustfoundation.com",
     "rust-foundation.com",
+    "rustfoundation.org",
     "rust-foundation.org",
     "rustfoundation.net",
     "rust-foundation.net",
