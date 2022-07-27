@@ -17,6 +17,7 @@ locals {
     "nemo157",
     "syphar",
     "rylev",
+    "rylev-ip-2",
   ]
 }
 
