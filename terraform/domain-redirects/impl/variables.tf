@@ -5,7 +5,19 @@ variable "from" {
   type        = list(string)
 }
 
-variable "to" {
-  description = "Destination of the redirect"
+variable "to_host" {
+  description = "Destination host of the redirect"
   type        = string
+}
+
+variable "to_path" {
+  description = "Destination path of the redirect"
+  type        = string
+  default     = ""
+}
+
+variable "permanent" {
+  description = "Whether this redirect is permanent"
+  type        = bool
+  default     = false
 }

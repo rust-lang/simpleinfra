@@ -7,12 +7,13 @@ module "crates_io" {
     aws.east1 = aws.east1
   }
 
-  to = "https://crates.io"
+  to_host = "crates.io"
   from = [
     "cratesio.com",
     "www.crates.io",
     "www.cratesio.com",
   ]
+  permanent = true
 }
 
 module "docs_rs" {
@@ -22,12 +23,13 @@ module "docs_rs" {
     aws.east1 = aws.east1
   }
 
-  to = "https://docs.rs"
+  to_host = "docs.rs"
   from = [
     "docsrs.com",
     "www.docs.rs",
     "www.docsrs.com",
   ]
+  permanent = true
 }
 
 module "rustconf_com" {
@@ -37,10 +39,11 @@ module "rustconf_com" {
     aws.east1 = aws.east1
   }
 
-  to = "https://rustconf.com"
+  to_host = "rustconf.com"
   from = [
     "www.rustconf.com"
   ]
+  permanent = true
 }
 
 module "arewewebyet_org" {
@@ -50,10 +53,11 @@ module "arewewebyet_org" {
     aws.east1 = aws.east1
   }
 
-  to = "https://www.arewewebyet.org"
+  to_host = "www.arewewebyet.org"
   from = [
     "arewewebyet.org"
   ]
+  permanent = true
 }
 
 // https://github.com/rust-lang/docs.rs/issues/1210
@@ -64,8 +68,10 @@ module "docs_rs_metadata" {
     aws.east1 = aws.east1
   }
 
-  to = "https://docs.rs/about/metadata"
+  to_host = "docs.rs"
+  to_path = "about/metadata"
   from = [
     "package.metadata.docs.rs",
   ]
+  permanent = true
 }

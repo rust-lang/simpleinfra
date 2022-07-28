@@ -26,7 +26,7 @@ terraform {
   required_providers {
     aws = {
       source                = "hashicorp/aws"
-      version               = ">= 3.59.0"
+      version               = "~> 4.20"
       configuration_aliases = [aws.east1]
     }
   }
@@ -41,11 +41,28 @@ terraform {
 // URL hash, to avoid collisions.
 
 resource "aws_s3_bucket" "redirect" {
-  bucket = "rust-http-redirect-${substr(sha1(var.to), 0, 7)}"
+  bucket = "rust-http-redirect-${substr(sha1("${var.to_host}|${var.to_path}"), 0, 7)}"
   acl    = "public-read"
 
   website {
-    redirect_all_requests_to = var.to
+    # If redirect_all_requests_to (which conflicts with routing_rules and
+    # doesn't allow choosing the response code) is not present AWS requires
+    # index_document to be present unfortunately.
+    #
+    # This object is missing from the bucket, but it shouldn't matter as the
+    # routing_rules below unconditionally redirects all requests
+    index_document = "missing-object-but-this-field-is-required-by-s3"
+
+    routing_rules = jsonencode([
+      {
+        Redirect = {
+          HostName             = var.to_host
+          ReplaceKeyPrefixWith = var.to_path
+          Protocol             = "https"
+          HttpRedirectCode     = var.permanent ? "301" : "302"
+        }
+      }
+    ])
   }
 }
 
@@ -62,7 +79,7 @@ module "certificate" {
 }
 
 resource "aws_cloudfront_distribution" "redirect" {
-  comment = "redirect to ${var.to}"
+  comment = "redirect to https://${var.to_host}/${var.to_path}"
 
   enabled         = true
   is_ipv6_enabled = true
