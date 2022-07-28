@@ -20,6 +20,10 @@ data "aws_ssm_parameter" "rustc_perf_credentials" {
   with_decryption = false
 }
 
+data "aws_cloudwatch_log_group" "rustc_perf_web" {
+  name = "/ecs/rustc-perf"
+}
+
 resource "aws_iam_group_policy" "rustc_perf" {
   group = aws_iam_group.rustc_perf.name
   name  = "prod-access"
@@ -31,7 +35,14 @@ resource "aws_iam_group_policy" "rustc_perf" {
         Effect   = "Allow"
         Action   = "ssm:GetParameter"
         Resource = data.aws_ssm_parameter.rustc_perf_credentials.arn
+      },
+      {
+        Sid      = "AllowLogs"
+        Effect   = "Allow"
+        Action   = "logs:GetLogEvents"
+        Resource = data.aws_cloudwatch_log_group.rustc_perf_web.arn
       }
     ]
   })
 }
+
