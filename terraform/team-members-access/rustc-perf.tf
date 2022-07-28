@@ -37,11 +37,21 @@ resource "aws_iam_group_policy" "rustc_perf" {
         Resource = data.aws_ssm_parameter.rustc_perf_credentials.arn
       },
       {
-        Sid      = "AllowLogs"
-        Effect   = "Allow"
-        Action   = "logs:GetLogEvents"
-        Resource = data.aws_cloudwatch_log_group.rustc_perf_web.arn
-      }
+        Sid    = "AllowLogs"
+        Effect = "Allow"
+        Action = [
+          "logs:GetLogEvents",
+          "logs:FilterLogEvents",
+          "logs:StartQuery",
+          "logs:StopQuery",
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams",
+        ]
+        Resource = [
+          data.aws_cloudwatch_log_group.rustc_perf_web.arn,
+          "${data.aws_cloudwatch_log_group.rustc_perf_web.arn}:log-stream:*",
+        ]
+      },
     ]
   })
 }

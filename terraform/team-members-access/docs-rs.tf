@@ -130,9 +130,20 @@ resource "aws_iam_group_policy" "docs_rs" {
       // The following rules allow docs-rs team members to access the logs for
       // the docs.rs app on ECS.
       {
-        Effect   = "Allow"
-        Action   = "logs:GetLogEvents"
-        Resource = data.aws_cloudwatch_log_group.docs_rs_web.arn
+        Sid    = "AllowLogs"
+        Effect = "Allow"
+        Action = [
+          "logs:GetLogEvents",
+          "logs:FilterLogEvents",
+          "logs:StartQuery",
+          "logs:StopQuery",
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams",
+        ]
+        Resource = [
+          data.aws_cloudwatch_log_group.docs_rs_web.arn,
+          "${data.aws_cloudwatch_log_group.docs_rs_web.arn}:log-stream:*",
+        ]
       },
     ]
   })
