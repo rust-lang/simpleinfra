@@ -47,5 +47,11 @@ provider "aws" {
 
 provider "google" {
   project = "rust-crater"
-  region  = "us-central1"
+}
+
+locals {
+  regions = {
+    "us-central1" = 15, // max capacity: 24 instances (384 cores)
+    "us-east5" = 4, // max capacity: 8 instances (128 cores)
+  }
 }

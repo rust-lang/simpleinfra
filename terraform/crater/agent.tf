@@ -1,4 +1,4 @@
-// This file contains the configuration for Crater agents.
+// This file contains the configuration for Crater agents
 
 resource "aws_iam_user" "agent_outside_aws" {
   name = "crater-agent--outside-aws"
@@ -150,7 +150,6 @@ resource "google_compute_instance_template" "agent" {
   network_interface {
     network = google_compute_network.crater.name
     access_config {
-      network_tier = "STANDARD"
     }
   }
 
@@ -176,11 +175,14 @@ resource "google_compute_instance_template" "agent" {
 }
 
 resource "google_compute_region_autoscaler" "agents" {
-  name   = "crater-autoscaler"
-  target = google_compute_region_instance_group_manager.agents.id
+  for_each = local.regions
+  region = each.key
+
+  name   = "crater-autoscaler-${each.key}"
+  target = google_compute_region_instance_group_manager.agents["${each.key}"].id
 
   autoscaling_policy {
-    max_replicas    = 19
+    max_replicas    = each.value
     min_replicas    = 1
     cooldown_period = 120
     // This is pretty low, but in practice we want to scale out to the max
@@ -191,9 +193,10 @@ resource "google_compute_region_autoscaler" "agents" {
   }
 }
 
-
 resource "google_compute_region_instance_group_manager" "agents" {
-  name = "crater-agents"
+  name = "crater-agents-${each.key}"
+  for_each = local.regions
+  region = each.key
 
   base_instance_name = "crater-agent"
 
