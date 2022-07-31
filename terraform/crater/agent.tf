@@ -176,7 +176,7 @@ resource "google_compute_instance_template" "agent" {
 
 resource "google_compute_region_autoscaler" "agents" {
   for_each = local.regions
-  region = each.key
+  region   = each.key
 
   name   = "crater-autoscaler-${each.key}"
   target = google_compute_region_instance_group_manager.agents["${each.key}"].id
@@ -194,9 +194,9 @@ resource "google_compute_region_autoscaler" "agents" {
 }
 
 resource "google_compute_region_instance_group_manager" "agents" {
-  name = "crater-agents-${each.key}"
+  name     = "crater-agents-${each.key}"
   for_each = local.regions
-  region = each.key
+  region   = each.key
 
   base_instance_name = "crater-agent"
 
