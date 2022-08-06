@@ -128,8 +128,9 @@ resource "google_service_account" "service_account" {
 }
 
 resource "google_compute_instance_template" "agent" {
+  for_each         = toset(["n2d-highcpu-16", "c2d-highcpu-8"])
   name_prefix      = "crater-agent-"
-  machine_type     = "n2d-highcpu-16"
+  machine_type     = each.value
   min_cpu_platform = "AMD Milan"
 
   disk {
@@ -175,14 +176,14 @@ resource "google_compute_instance_template" "agent" {
 }
 
 resource "google_compute_region_autoscaler" "agents" {
-  for_each = local.regions
-  region   = each.key
+  for_each = local.groups
+  region   = each.value.region
 
   name   = "crater-autoscaler-${each.key}"
   target = google_compute_region_instance_group_manager.agents["${each.key}"].id
 
   autoscaling_policy {
-    max_replicas    = each.value
+    max_replicas    = each.value.count
     min_replicas    = 1
     cooldown_period = 120
     // This is pretty low, but in practice we want to scale out to the max
@@ -194,14 +195,14 @@ resource "google_compute_region_autoscaler" "agents" {
 }
 
 resource "google_compute_region_instance_group_manager" "agents" {
+  for_each = local.groups
   name     = "crater-agents-${each.key}"
-  for_each = local.regions
-  region   = each.key
+  region   = each.value.region
 
   base_instance_name = "crater-agent"
 
   version {
-    instance_template = google_compute_instance_template.agent.id
+    instance_template = google_compute_instance_template.agent["${each.value.instance_type}"].id
   }
 
   auto_healing_policies {
@@ -212,7 +213,7 @@ resource "google_compute_region_instance_group_manager" "agents" {
   update_policy {
     type                           = "PROACTIVE"
     max_surge_fixed                = 0
-    max_unavailable_fixed          = 3
+    max_unavailable_fixed          = 8
     most_disruptive_allowed_action = "REPLACE"
     minimal_action                 = "REPLACE"
     replacement_method             = "RECREATE"
