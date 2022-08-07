@@ -18,9 +18,9 @@ node_exporter_archs:
 # Version of https://github.com/prometheus/prometheus to install on our
 # instances. The checksum is the hash of the downloadable tarball for the
 # specified architecture, found in the GitHub releases.
-prometheus_version: 2.26.0
+prometheus_version: 2.37.0
 prometheus_arch: amd64
-prometheus_checksum: sha256:8dd6786c338dc62728e8891c13b62eda66c7f28a01398869f2b3712895b441b9
+prometheus_checksum: sha256:ca70f5a261fd545da0b9893c42a73547a94ebd5111ef2b6b9f8742c5dbb73522
 
 # Version of https://github.com/prometheus/alertmanager to install on our
 # instances. The checksum is the hash of the downloadable tarball for the
