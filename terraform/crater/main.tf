@@ -66,7 +66,7 @@ locals {
     "us-central1-c2d" = {
       region        = "us-central1",
       instance_type = "c2d-highcpu-8",
-      count         = 7,
+      count         = 16,
     },
   }
 }
