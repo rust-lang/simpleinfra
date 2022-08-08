@@ -44,6 +44,9 @@ def promote_release(args):
 def promote_branches():
     vars = {}
     vars["PROMOTE_RELEASE_ACTION"] = "promote-branches"
+    # Not actually used, but needed by the configuration parsing code. We set it
+    # to nightly which is 'safer' to get wrong.
+    vars["PROMOTE_RELEASE_CHANNEL"] = "nightly"
     run_build('prod', vars)
 
 def run_build(env, vars):
