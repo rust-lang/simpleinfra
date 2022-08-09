@@ -201,7 +201,7 @@ resource "aws_iam_instance_profile" "crater" {
 
 resource "aws_instance" "crater" {
   ami                     = data.aws_ami.ubuntu.id
-  instance_type           = "t3a.small"
+  instance_type           = "c5a.large"
   key_name                = data.terraform_remote_state.shared.outputs.master_ec2_key_pair
   iam_instance_profile    = aws_iam_instance_profile.crater.name
   ebs_optimized           = true

@@ -54,19 +54,18 @@ locals {
     "us-central1-n2d" = {
       region        = "us-central1",
       instance_type = "n2d-highcpu-16",
-      // Current max capacity - 24 instances, 384 cores
-      count = 20,
+      count = 24,
     },
     "us-east1-n2d" = {
       region        = "us-east5",
       instance_type = "n2d-highcpu-16",
       // Current max capacity - 5 instances, 80 cores
-      count = 5,
+      count = 1,
     },
     "us-central1-c2d" = {
       region        = "us-central1",
       instance_type = "c2d-highcpu-8",
-      count         = 16,
+      count         = 20,
     },
   }
 }

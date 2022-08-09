@@ -221,5 +221,7 @@ resource "google_compute_region_instance_group_manager" "agents" {
 
   lifecycle {
     create_before_destroy = true
+    // Managed by autoscaler
+    ignore_changes = [target_size]
   }
 }
