@@ -36,7 +36,7 @@ variable "mount_efs" {
 }
 
 variable "ephemeral_storage_gb" {
-  type = number
+  type    = number
   default = 20
 }
 

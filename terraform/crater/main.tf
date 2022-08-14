@@ -54,7 +54,7 @@ locals {
     "us-central1-n2d" = {
       region        = "us-central1",
       instance_type = "n2d-highcpu-16",
-      count = 24,
+      count         = 24,
     },
     "us-east1-n2d" = {
       region        = "us-east5",
