@@ -6,7 +6,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.59"
+      version = "~> 4.20"
     }
     external = {
       source  = "hashicorp/external"
@@ -28,7 +28,6 @@ terraform {
 }
 
 provider "aws" {
-  profile = "default"
   region  = "us-west-1"
 }
 

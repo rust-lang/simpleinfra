@@ -59,6 +59,6 @@ module "lambda_start_sync_team" {
   name       = "start-sync-team"
   source_dir = "lambdas/start-sync-team"
   handler    = "index.handler"
-  runtime    = "nodejs12.x"
+  runtime    = "nodejs16.x"
   role_arn   = aws_iam_role.start_execution.arn
 }
