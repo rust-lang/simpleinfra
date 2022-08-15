@@ -123,7 +123,7 @@ resource "aws_instance" "dev_desktop" {
 
   root_block_device {
     volume_type           = "gp3"
-    volume_size           = 500
+    volume_size           = 1000
     delete_on_termination = true
   }
 
