@@ -188,8 +188,10 @@ resource "google_compute_region_autoscaler" "agents" {
     cooldown_period = 120
     // This is pretty low, but in practice we want to scale out to the max
     // unless we're entirely idle: crater is either all up or all down.
+    // We also want to set it high enough that we're not spuriously scaling up.
+    // For now, this value seems to accomplish that.
     cpu_utilization {
-      target = 0.1
+      target = 0.2
     }
   }
 }
