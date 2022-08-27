@@ -27,13 +27,13 @@ resource "aws_cloudfront_distribution" "website" {
   is_ipv6_enabled     = true
   default_root_object = "index.html"
   price_class         = "PriceClass_All"
-  http_version = "http2and3"
+  http_version        = "http2and3"
 
   aliases = [var.domain_name]
   viewer_certificate {
-    acm_certificate_arn = module.certificate.arn
+    acm_certificate_arn      = module.certificate.arn
     minimum_protocol_version = "TLSv1.2_2021"
-    ssl_support_method  = "sni-only"
+    ssl_support_method       = "sni-only"
   }
 
   default_cache_behavior {
