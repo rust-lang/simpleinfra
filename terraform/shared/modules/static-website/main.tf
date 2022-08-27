@@ -15,6 +15,10 @@ module "certificate" {
   ]
 }
 
+data "aws_cloudfront_cache_policy" "cache" {
+  name = "Managed-CachingOptimized"
+}
+
 resource "aws_cloudfront_distribution" "website" {
   comment = "static website ${var.domain_name}"
 
@@ -23,10 +27,12 @@ resource "aws_cloudfront_distribution" "website" {
   is_ipv6_enabled     = true
   default_root_object = "index.html"
   price_class         = "PriceClass_All"
+  http_version = "http2and3"
 
   aliases = [var.domain_name]
   viewer_certificate {
     acm_certificate_arn = module.certificate.arn
+    minimum_protocol_version = "TLSv1.2_2021"
     ssl_support_method  = "sni-only"
   }
 
@@ -37,13 +43,8 @@ resource "aws_cloudfront_distribution" "website" {
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
 
-    forwarded_values {
-      headers      = []
-      query_string = false
-      cookies {
-        forward = "none"
-      }
-    }
+    cache_policy_id            = data.aws_cloudfront_cache_policy.cache.id
+    response_headers_policy_id = var.response_policy_id
   }
 
   dynamic "origin" {
@@ -51,6 +52,13 @@ resource "aws_cloudfront_distribution" "website" {
     content {
       origin_id   = "main"
       domain_name = var.origin_domain_name
+      origin_path = var.origin_path
+      custom_origin_config {
+        http_port              = 80
+        https_port             = 443
+        origin_ssl_protocols   = ["TLSv1.2"]
+        origin_protocol_policy = "https-only"
+      }
     }
   }
   dynamic "origin" {
@@ -83,4 +91,8 @@ resource "aws_route53_record" "website" {
   type    = "CNAME"
   ttl     = 300
   records = [aws_cloudfront_distribution.website.domain_name]
+}
+
+output "distribution_arn" {
+  value = aws_cloudfront_distribution.website.arn
 }

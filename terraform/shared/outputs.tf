@@ -30,3 +30,7 @@ output "inventories_bucket_arn" {
 output "gha_oidc_arn" {
   value = aws_iam_openid_connect_provider.github_actions.arn
 }
+
+output "mdbook_response_policy" {
+  value = aws_cloudfront_response_headers_policy.mdbook.id
+}
