@@ -7,39 +7,42 @@ module "ecr" {
   name   = "sync-team"
 }
 
-// IAM User used rust-lang/sync-team's CI to push the built images on ECR.
+// IAM role used by rust-lang/sync-team's CI to push the built images on ECR.
 
-module "iam_ci_sync_team" {
-  source = "../shared/modules/gha-iam-user"
+module "ci_sync_team" {
+  source = "../shared/modules/gha-oidc-role"
   org    = "rust-lang"
   repo   = "sync-team"
+  branch = "master"
 }
 
-resource "aws_iam_user_policy_attachment" "ci_sync_team_pull" {
-  user       = module.iam_ci_sync_team.user_name
+resource "aws_iam_role_policy_attachment" "ci_sync_team_pull" {
+  role       = module.ci_sync_team.role.id
   policy_arn = module.ecr.policy_pull_arn
 }
 
-resource "aws_iam_user_policy_attachment" "ci_sync_team_push" {
-  user       = module.iam_ci_sync_team.user_name
+resource "aws_iam_role_policy_attachment" "ci_sync_team_push" {
+  role       = module.ci_sync_team.role.id
   policy_arn = module.ecr.policy_push_arn
 }
 
-// IAM User and Lambda function used by rust-lang/team CI to start the sync.
+// IAM role and Lambda function used by rust-lang/team CI to start the sync.
 //
 // The CI needs to call the intermediate Lambda function to start the CodeBuild
 // for security reasons, as CodeBuild's StartBuild API call allows to override
 // pretty much any build parameter, including the executed commands. That could
 // allow an attacker to (for example) leak secrets.
 
-module "iam_ci_team" {
-  source = "../shared/modules/gha-iam-user"
+module "ci_team" {
+  source = "../shared/modules/gha-oidc-role"
   org    = "rust-lang"
   repo   = "team"
+  branch = "master"
 }
 
-resource "aws_iam_user_policy" "ci_team" {
-  user = module.iam_ci_team.user_name
+resource "aws_iam_role_policy" "ci_sync_team_lambda" {
+  name = "start-sync-team"
+  role = module.ci_team.role.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
