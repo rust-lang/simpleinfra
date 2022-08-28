@@ -7,7 +7,7 @@ module "lambda_doc_router" {
   name       = "${var.bucket}--doc-router"
   source_dir = "impl/lambdas/doc-router"
   handler    = "index.handler"
-  runtime    = "nodejs12.x"
+  runtime    = "nodejs16.x"
   role_arn   = data.aws_iam_role.cloudfront_lambda.arn
 }
 
