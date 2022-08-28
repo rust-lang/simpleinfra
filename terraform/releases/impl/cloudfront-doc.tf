@@ -35,6 +35,7 @@ resource "aws_cloudfront_distribution" "doc" {
   comment = var.doc_domain_name
 
   enabled             = true
+  http_version        = "http2and3"
   wait_for_deployment = false
   is_ipv6_enabled     = true
   default_root_object = "index.html"
