@@ -3,13 +3,23 @@
 
 resource "aws_s3_bucket" "artifacts" {
   bucket = "rust-playground-artifacts"
+}
+
+resource "aws_s3_bucket_acl" "artifacts" {
+  bucket = aws_s3_bucket.artifacts.id
   acl    = "private"
+}
 
-  lifecycle_rule {
-    id      = "incomplete-uploads"
-    enabled = true
+resource "aws_s3_bucket_lifecycle_configuration" "artifacts" {
+  bucket = aws_s3_bucket.artifacts.id
 
-    abort_incomplete_multipart_upload_days = 1
+  rule {
+    id     = "incomplete-uploads"
+    status = "Enabled"
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 1
+    }
   }
 }
 
