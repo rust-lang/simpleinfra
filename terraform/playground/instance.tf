@@ -204,3 +204,26 @@ resource "aws_instance" "playground" {
     ignore_changes = [ami]
   }
 }
+
+resource "aws_cloudwatch_metric_alarm" "reboot" {
+  alarm_name        = "playground-status-check"
+  alarm_description = "Alarms when playground instance is down"
+
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 3
+  metric_name         = "StatusCheckFailed"
+  namespace           = "AWS/EC2"
+  period              = "60"
+  statistic           = "Minimum"
+  threshold           = "1"
+  treat_missing_data  = "ignore"
+
+  dimensions = {
+    InstanceId = aws_instance.playground.id
+  }
+
+  actions_enabled = true
+  alarm_actions   = ["arn:aws:automate:${data.aws_region.current.name}:ec2:reboot"]
+}
+
+data "aws_region" "current" {}
