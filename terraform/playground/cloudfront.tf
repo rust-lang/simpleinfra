@@ -14,6 +14,7 @@ module "certificate" {
 resource "aws_cloudfront_distribution" "playground" {
   comment = local.domain_name
 
+  http_version        = "http2and3"
   enabled             = true
   wait_for_deployment = false
   is_ipv6_enabled     = true
