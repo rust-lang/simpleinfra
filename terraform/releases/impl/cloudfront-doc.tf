@@ -114,10 +114,26 @@ data "aws_route53_zone" "doc" {
   name = join(".", reverse(slice(reverse(split(".", var.doc_domain_name)), 0, 2)))
 }
 
-resource "aws_route53_record" "doc" {
+resource "aws_route53_record" "doc_ipv4" {
   zone_id = data.aws_route53_zone.doc.id
   name    = var.doc_domain_name
-  type    = "CNAME"
-  ttl     = 300
-  records = [aws_cloudfront_distribution.doc.domain_name]
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.doc.domain_name
+    zone_id                = aws_cloudfront_distribution.doc.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "doc_ipv6" {
+  zone_id = data.aws_route53_zone.doc.id
+  name    = var.doc_domain_name
+  type    = "AAAA"
+
+  alias {
+    name                   = aws_cloudfront_distribution.doc.domain_name
+    zone_id                = aws_cloudfront_distribution.doc.hosted_zone_id
+    evaluate_target_health = false
+  }
 }
