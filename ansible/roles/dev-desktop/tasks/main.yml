@@ -98,6 +98,20 @@
     dest: /usr/local/bin/
     mode: a+x
 
+- name: Install mosh
+  apt:
+    name:
+      - mosh
+    state: present
+
+- name: Upload firewall rules for mosh
+  template:
+    src: firewall.sh
+    dest: /etc/firewall/mosh.sh
+    mode: 0750
+  notify:
+    - restart-firewall
+
 - name: install common tooling
   apt:
     name:
