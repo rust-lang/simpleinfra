@@ -33,3 +33,13 @@ provider "aws" {
 
 data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
+
+data "terraform_remote_state" "shared" {
+  backend = "s3"
+  config = {
+    bucket = "rust-terraform"
+    key    = "simpleinfra/shared.tfstate"
+    region = "us-west-1"
+  }
+}
+
