@@ -1,11 +1,5 @@
 ---
 
-- name: remove preinstalled things
-  apt:
-    name:
-      - python3-cryptography
-    state: absent
-
 - name: install deps
   apt:
     name:
@@ -13,15 +7,9 @@
       - build-essential
       - libssl-dev
       - python3-pip
-
+      - python3-jwt
+      - python3-cryptography
     state: present
-
-- name: install python libs
-  pip: 
-    name:
-      - PyGithub
-      - requests
-      - cryptography
 
 - name: install rustup in userspace for root
   shell: |
@@ -131,35 +119,56 @@
     name: github-app-credentials
     state: present
 
-- name: Set up the git credential helper scripts
+- name: Upload git-credential-dev-desktop-inner
   copy:
-    src: github_app/
-    dest: /home/github-app-credentials
-    mode: a+x,u+s # setuid and execute for everyone
+    src: git-credential-dev-desktop-inner
+    dest: /usr/local/bin/git-credential-dev-desktop-inner
+    owner: root
+    group: github-app-credentials
+    mode: 0750
 
-- name: Make the scripts discoverable for everyone
+- name: Upload git-credential-dev-desktop
   copy:
-    dest: /etc/profile.d/dev-desktop-credential-path.sh
-    content: 'PATH=$PATH:/home/github-app-credentials'
+    src: git-credential-dev-desktop
+    dest: /usr/local/bin/git-credential-dev-desktop
+    mode: 0755
 
 - name: Insert the git credential login for everyone
   copy:
     src: templates/gitconfig
     dest: /etc/gitconfig
 
+- name: Create GitHub App configuration directory
+  file:
+    path: /etc/github-app-credentials
+    owner: root
+    group: github-app-credentials
+    mode: 0750
+    state: directory
+
 - name: Copy GitHub App ID
   copy:
     content: "{{ vars_github_app_id }}"
-    dest: /home/github-app-credentials/app_id.txt
-    mode: 0600
+    dest: /etc/github-app-credentials/app_id.txt
+    owner: root
+    group: github-app-credentials
+    mode: 0640
 
 - name: Copy GitHub App private key
   copy:
     content: "{{ vars_github_app_private_key }}"
-    dest: /home/github-app-credentials/dev_desktop.private_key.pem
-    mode: 0600
+    dest: /etc/github-app-credentials/app_private_key.pem
+    owner: root
+    group: github-app-credentials
+    mode: 0640
 
 - name: Set up the group for people allowed to ssh into the dev-desktop
   group:
     name: dev-desktop-allow-ssh
     state: present
+
+- name: Upload sudo configuration
+  template:
+    src: sudoers
+    dest: /etc/sudoers.d/dev-desktop
+    mode: 0440
