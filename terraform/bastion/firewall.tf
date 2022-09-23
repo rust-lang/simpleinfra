@@ -18,6 +18,7 @@ locals {
     "syphar",
     "rylev",
     "rylev-ip-2",
+    "jdn",
   ]
 }
 

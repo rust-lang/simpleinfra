@@ -13,6 +13,7 @@
         - aidanhs
         - simulacrum
         - pietro
+        - jdn
       unprivileged_users:
         - joshua  # docsrs.infra.rust-lang.org
         - syphar  # docsrs.infra.rust-lang.org

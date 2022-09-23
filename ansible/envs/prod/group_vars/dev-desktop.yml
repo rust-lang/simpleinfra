@@ -7,6 +7,7 @@ vars_sudo_users:
   - aidanhs
   - simulacrum
   - pietro
+  - jdn
 
 vars_github_app_id: 196781
 vars_github_app_private_key: "{{ ssm_dev_desktop['github-app-private-key'] }}"
