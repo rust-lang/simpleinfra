@@ -90,6 +90,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .success(),
             "failed to set the default shell"
         );
+
+        // Set a user quota
+        assert!(
+            cmd("setquota", &["-u", &username, "50G", "51G", "0", "0", "/"])?
+                .status
+                .success(),
+            "failed to set a user quota"
+        );
     }
     // Delete all keys for users that weren't on the list
     for entry in std::fs::read_dir(KEY_DIR)? {

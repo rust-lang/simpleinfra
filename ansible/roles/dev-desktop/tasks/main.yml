@@ -9,6 +9,8 @@
       - python3-pip
       - python3-jwt
       - python3-cryptography
+      - quota
+      - linux-image-extra-virtual
     state: present
 
 - name: install rustup in userspace for root
@@ -28,6 +30,37 @@
     replace: 'kernel.yama.ptrace_scope = 0'
   notify:
     - reboot-machine
+
+- name: Enable kernel modules for quota
+  command: "{{ item }}"
+  with_items:
+    - "modprobe quota_v1"
+    - "modprobe quota_v2"
+
+- name: Determine name of root volume
+  shell:
+    cmd: cat /etc/fstab | grep -E '\s+/\s+' | awk -F ' ' '{ print $1 }'
+  register: fstab_root_volume_name
+
+- name: Enable quotas for the root volume
+  mount:
+    path: "/"
+    src: "{{ fstab_root_volume_name.stdout }}"
+    fstype: ext4
+    opts: "usrquota"
+    state: mounted
+
+- name: Check if quota system is already enabled
+  command: "quotaon -up /"
+  register: user_quota_check
+  failed_when: user_quota_check.rc != 0 and user_quota_check.rc != 1
+
+- name: Enable the quota system for users
+  command: "{{ item }}"
+  with_items:
+    - "quotacheck -um /"
+    - "quotaon -uv /"
+  when: user_quota_check.rc == 0
 
 - name: Configure update script service
   copy:
