@@ -18,7 +18,7 @@ resource "aws_s3_bucket_policy" "static_access" {
         Resource = "${aws_s3_bucket.storage.arn}/*",
         Condition = {
           StringEquals = {
-            "aws:ResourceTag/static-cloudfront-access" = "allow"
+            "s3:ExistingObjectTag/static-cloudfront-access" = "allow"
           }
           StringLike = {
             "AWS:SourceArn" = "${aws_cloudfront_distribution.static.arn}"

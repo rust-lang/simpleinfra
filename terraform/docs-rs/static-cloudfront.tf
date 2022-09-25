@@ -23,18 +23,6 @@ data "aws_cloudfront_origin_request_policy" "s3cors" {
   name = "Managed-CORS-S3Origin"
 }
 
-resource "aws_cloudfront_public_key" "signer" {
-  comment     = "static.docs.rs signing key"
-  encoded_key = file("public_key.pem")
-  name        = "static_docs_rs_key"
-}
-
-resource "aws_cloudfront_key_group" "signer" {
-  comment = "static.docs.rs key group"
-  items   = [aws_cloudfront_public_key.signer.id]
-  name    = "static_docs_rs_keys"
-}
-
 resource "aws_cloudfront_origin_access_control" "static" {
   name                              = "static_docs_rs"
   description                       = "static.docs.rs"
@@ -46,7 +34,7 @@ resource "aws_cloudfront_origin_access_control" "static" {
 resource "aws_cloudfront_distribution" "static" {
   comment = "static.docs.rs"
 
-  enabled             = false
+  enabled             = true
   wait_for_deployment = true
   is_ipv6_enabled     = true
   price_class         = "PriceClass_All"
