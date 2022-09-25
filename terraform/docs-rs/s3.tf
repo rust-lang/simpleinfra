@@ -1,6 +1,5 @@
 resource "aws_s3_bucket" "storage" {
   bucket = "rust-docs-rs"
-  acl    = "private"
 }
 
 resource "aws_s3_bucket_policy" "static_access" {
