@@ -3,6 +3,32 @@ resource "aws_s3_bucket" "storage" {
   acl    = "private"
 }
 
+resource "aws_s3_bucket_policy" "static_access" {
+  bucket = aws_s3_bucket.storage.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowStaticDocsRsAccess",
+        Effect = "Allow",
+        Action = "s3:GetObject",
+        Principal = {
+          Service = "cloudfront.amazonaws.com"
+        },
+        Resource = "${aws_s3_bucket.storage.arn}/*",
+        Condition = {
+          StringEquals = {
+            "aws:ResourceTag/static-cloudfront-access" = "allow"
+          }
+          StringLike = {
+            "AWS:SourceArn" = "${aws_cloudfront_distribution.static.arn}"
+          }
+        }
+      }
+    ]
+  })
+}
+
 resource "aws_s3_bucket_inventory" "storage" {
   name    = "all-objects-csv"
   bucket  = aws_s3_bucket.storage.id
