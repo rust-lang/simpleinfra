@@ -1,2 +1,2 @@
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-*/5 * * * * root /etc/cron.team_login --user-quota={{ user_quota }}
+*/5 * * * * root /etc/cron.team_login --user-quota={{ vars_user_quota }}

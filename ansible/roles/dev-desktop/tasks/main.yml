@@ -10,7 +10,7 @@
       - python3-jwt
       - python3-cryptography
       - quota
-      - linux-image-extra-virtual
+      - "{{ vars_user_quota_linux_package }}"
     state: present
 
 - name: install rustup in userspace for root
