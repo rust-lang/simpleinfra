@@ -1,5 +1,6 @@
 const TEAM_URL: &str = "https://team-api.infra.rust-lang.org/v1/permissions/dev_desktop.json";
 
+use clap::Parser;
 use miniserde::Deserialize;
 use std::collections::HashSet;
 use std::process::Command;
@@ -16,7 +17,15 @@ fn cmd(cmd: &str, args: &[&str]) -> std::io::Result<Output> {
 
 const KEY_DIR: &str = "/etc/ssh/authorized_keys/";
 
+#[derive(Parser)]
+struct Args {
+    #[clap(long, value_parser)]
+    user_quota: u32,
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let args = Args::parse();
+
     let mut handle = curl::easy::Easy::new();
     handle
         .useragent("rust-lang/simpleinfra (infra@rust-lang.org)")
@@ -92,23 +101,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         );
 
         // Set a user quota
-        if let Ok(user_quota_var) = std::env::var("USER_QUOTA") {
-            if let Ok(soft_limit) = user_quota_var.parse::<u32>() {
-                let hard_limit = format!("{}G", soft_limit + 1);
-                let soft_limit = format!("{}G", soft_limit);
+        let hard_limit = format!("{}G", args.user_quota + 1);
+        let soft_limit = format!("{}G", args.user_quota);
 
-                assert!(
-                    cmd(
-                        "setquota",
-                        &["-u", &username, &soft_limit, &hard_limit, "0", "0", "/"]
-                    )?
-                    .status
-                    .success(),
-                    "failed to set a user quota"
-                );
-            }
-        }
+        assert!(
+            cmd(
+                "setquota",
+                &["-u", &username, &soft_limit, &hard_limit, "0", "0", "/"]
+            )?
+            .status
+            .success(),
+            "failed to set a user quota"
+        );
     }
+
     // Delete all keys for users that weren't on the list
     for entry in std::fs::read_dir(KEY_DIR)? {
         let entry = entry?;
