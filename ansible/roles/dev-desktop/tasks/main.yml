@@ -26,7 +26,8 @@
     path: /etc/sysctl.d/10-ptrace.conf
     regexp: '^kernel.yama.ptrace_scope = [\d]$'
     replace: 'kernel.yama.ptrace_scope = 0'
-  register: ptrace_scope
+  notify:
+    - reboot-machine
 
 - name: Configure update script service
   copy:
@@ -179,18 +180,3 @@
     src: sudoers
     dest: /etc/sudoers.d/dev-desktop
     mode: 0440
-
-- name: Reboot to apply sysctl changes
-  command: reboot now
-  async: true
-  poll: false
-  when: ptrace_scope is changed
-
-- name: Wait for server to start again
-  wait_for_connection:
-    connect_timeout: 20
-    sleep: 5
-    delay: 5
-    timeout: 300
-  when: ptrace_scope is changed
-
