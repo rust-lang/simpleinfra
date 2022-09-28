@@ -2,3 +2,6 @@
 
 vars_team_login_path: "/root/team_login"
 allow_ssh_extra_groups: "dev-desktop-allow-ssh"
+
+# Filesystem quota per user in GB
+user_quota: 50

@@ -92,12 +92,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         );
 
         // Set a user quota
-        assert!(
-            cmd("setquota", &["-u", &username, "50G", "51G", "0", "0", "/"])?
-                .status
-                .success(),
-            "failed to set a user quota"
-        );
+        if let Ok(user_quota_var) = std::env::var("USER_QUOTA") {
+            if let Ok(soft_limit) = user_quota_var.parse::<u32>() {
+                let hard_limit = format!("{}G", soft_limit + 1);
+                let soft_limit = format!("{}G", soft_limit);
+
+                assert!(
+                    cmd(
+                        "setquota",
+                        &["-u", &username, &soft_limit, &hard_limit, "0", "0", "/"]
+                    )?
+                    .status
+                    .success(),
+                    "failed to set a user quota"
+                );
+            }
+        }
     }
     // Delete all keys for users that weren't on the list
     for entry in std::fs::read_dir(KEY_DIR)? {
