@@ -21,6 +21,14 @@
     echo "${RUSTUP_SHA}  rustup-init.sh" | sha256sum --check --
     sh rustup-init.sh --default-toolchain nightly -y --component rust-src
 
+- name: Allow users to debug their own processes
+  replace:
+    path: /etc/sysctl.d/10-ptrace.conf
+    regexp: '^kernel.yama.ptrace_scope = [\d]$'
+    replace: 'kernel.yama.ptrace_scope = 0'
+  notify:
+    - reboot-machine
+
 - name: Configure update script service
   copy:
     src: team_login/

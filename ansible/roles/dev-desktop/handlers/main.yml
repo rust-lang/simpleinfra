@@ -3,3 +3,6 @@
   service:
     name: firewall
     state: restarted
+
+- name: reboot-machine
+  reboot:
