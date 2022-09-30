@@ -20,7 +20,7 @@ const KEY_DIR: &str = "/etc/ssh/authorized_keys/";
 #[derive(Parser)]
 struct Args {
     #[clap(long, value_parser)]
-    user_quota: u32,
+    user_quota_gb: u32,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
