@@ -67,7 +67,15 @@ resource "aws_iam_role_policy" "web" {
           "arn:aws:s3:::rust-docs-rs",
           "arn:aws:s3:::rust-docs-rs/*",
         ]
-      }
+      },
+      {
+        Effect   = "Allow"
+        Action   = "cloudfront:CreateInvalidation"
+        Resource = [
+          aws_cloudfront_distribution.webapp.arn,
+          aws_cloudfront_distribution.static.arn,
+        ]
+      },
     ]
   })
 }
