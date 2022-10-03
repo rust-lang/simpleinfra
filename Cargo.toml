@@ -1,5 +1,6 @@
 [workspace]
 members = [
     "setup-deploy-keys",
+    "ansible/roles/dev-desktop/files/team_login",
     "libs/travis-ci",
 ]

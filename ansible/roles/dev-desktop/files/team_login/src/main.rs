@@ -101,8 +101,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         );
 
         // Set a user quota
-        let hard_limit = format!("{}G", args.user_quota + 1);
-        let soft_limit = format!("{}G", args.user_quota);
+        let hard_limit = format!("{}G", args.user_quota_gb + 1);
+        let soft_limit = format!("{}G", args.user_quota_gb);
 
         assert!(
             cmd(
