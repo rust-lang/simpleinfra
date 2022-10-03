@@ -124,10 +124,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 if extension == "keys" {
                     if let Some(stem) = path.file_stem() {
                         if let Some(stem) = stem.to_str() {
-                            if stem.starts_with("gh-") {
-                                if !users.contains(stem) {
-                                    std::fs::remove_file(path)?;
-                                }
+                            if stem.starts_with("gh-") && !users.contains(stem) {
+                                std::fs::remove_file(path)?;
                             }
                         }
                     }
