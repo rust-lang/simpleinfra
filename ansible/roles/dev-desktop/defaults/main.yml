@@ -2,3 +2,10 @@
 
 vars_team_login_path: "/root/team_login"
 allow_ssh_extra_groups: "dev-desktop-allow-ssh"
+
+# Filesystem quota per user in GB
+vars_user_quota_gb: 50
+
+# For Ubuntu hosts, change this in a host variable to:
+# "linux-modules-extra-virtual"
+vars_user_quota_linux_package: "linux-modules-extra-aws"

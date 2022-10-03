@@ -1,5 +1,6 @@
 const TEAM_URL: &str = "https://team-api.infra.rust-lang.org/v1/permissions/dev_desktop.json";
 
+use clap::Parser;
 use miniserde::Deserialize;
 use std::collections::HashSet;
 use std::process::Command;
@@ -16,7 +17,15 @@ fn cmd(cmd: &str, args: &[&str]) -> std::io::Result<Output> {
 
 const KEY_DIR: &str = "/etc/ssh/authorized_keys/";
 
+#[derive(Parser)]
+struct Args {
+    #[clap(long, value_parser)]
+    user_quota_gb: u32,
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let args = Args::parse();
+
     let mut handle = curl::easy::Easy::new();
     handle
         .useragent("rust-lang/simpleinfra (infra@rust-lang.org)")
@@ -90,7 +99,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .success(),
             "failed to set the default shell"
         );
+
+        // Set a user quota
+        let hard_limit = format!("{}G", args.user_quota + 1);
+        let soft_limit = format!("{}G", args.user_quota);
+
+        assert!(
+            cmd(
+                "setquota",
+                &["-u", &username, &soft_limit, &hard_limit, "0", "0", "/"]
+            )?
+            .status
+            .success(),
+            "failed to set a user quota"
+        );
     }
+
     // Delete all keys for users that weren't on the list
     for entry in std::fs::read_dir(KEY_DIR)? {
         let entry = entry?;
