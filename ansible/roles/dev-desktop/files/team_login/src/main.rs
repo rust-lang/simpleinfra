@@ -101,8 +101,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         );
 
         // Set a user quota
-        let hard_limit = format!("{}G", args.user_quota + 1);
-        let soft_limit = format!("{}G", args.user_quota);
+        let hard_limit = format!("{}G", args.user_quota_gb + 1);
+        let soft_limit = format!("{}G", args.user_quota_gb);
 
         assert!(
             cmd(
@@ -124,10 +124,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 if extension == "keys" {
                     if let Some(stem) = path.file_stem() {
                         if let Some(stem) = stem.to_str() {
-                            if stem.starts_with("gh-") {
-                                if !users.contains(stem) {
-                                    std::fs::remove_file(path)?;
-                                }
+                            if stem.starts_with("gh-") && !users.contains(stem) {
+                                std::fs::remove_file(path)?;
                             }
                         }
                     }

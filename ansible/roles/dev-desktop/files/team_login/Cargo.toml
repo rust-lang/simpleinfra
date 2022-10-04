@@ -8,5 +8,3 @@ version = "0.1.0"
 miniserde = "0.1"
 clap = { version = "3", default-features = false, features = ["std", "derive"] }
 curl = "0.4"
-
-[workspace]
