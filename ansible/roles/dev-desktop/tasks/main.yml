@@ -10,8 +10,8 @@
       - python3-jwt
       - python3-cryptography
       - quota
-      - "{{ vars_user_quota_linux_package }}"
-      - "{{ vars_perf_linux_package }}"
+      - "linux-modules-extra-{{ vars_linux_kernel_flavor }}"
+      - "linux-tools-{{ vars_linux_kernel_flavor }}"
     state: present
 
 - name: install rustup in userspace for root

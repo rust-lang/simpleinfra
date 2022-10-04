@@ -6,10 +6,5 @@ allow_ssh_extra_groups: "dev-desktop-allow-ssh"
 # Filesystem quota per user in GB
 vars_user_quota_gb: 50
 
-# For Ubuntu hosts, change this in a host variable to:
-# "linux-modules-extra-virtual"
-vars_user_quota_linux_package: "linux-modules-extra-aws"
-
-# For Ubuntu hosts, change this in a host variable to:
-# "linux-tools-common"
-vars_perf_linux_package: "linux-tools-aws"
+# Set the flavor of the linux kernel, e.g. "aws" or "virtual"
+vars_linux_kernel_flavor: "aws"
