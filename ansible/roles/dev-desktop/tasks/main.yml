@@ -11,6 +11,7 @@
       - python3-cryptography
       - quota
       - "{{ vars_user_quota_linux_package }}"
+      - "{{ vars_perf_linux_package }}"
     state: present
 
 - name: install rustup in userspace for root
@@ -28,6 +29,14 @@
     path: /etc/sysctl.d/10-ptrace.conf
     regexp: '^kernel.yama.ptrace_scope = [\d]$'
     replace: 'kernel.yama.ptrace_scope = 0'
+  notify:
+    - reboot-machine
+
+- name: Allow users to run perf on their own processes
+  template:
+    src: 10-perf-event-paranoid.conf
+    dest: /etc/sysctl.d/10-perf-event-paranoid.conf
+    mode: 0644
   notify:
     - reboot-machine
 
