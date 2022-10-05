@@ -77,7 +77,7 @@ resource "aws_codebuild_project" "sync_team" {
 resource "aws_cloudwatch_event_rule" "start_daily" {
   name                = "cloudbuild--sync-team"
   description         = "Run the sync-team CodeBuild every day."
-  schedule_expression = "cron(0 0 * * ? *)"
+  schedule_expression = "cron(0 * * * ? *)"
 }
 
 resource "aws_cloudwatch_event_target" "start_daily" {
