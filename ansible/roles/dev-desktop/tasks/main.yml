@@ -1,5 +1,9 @@
 ---
 
+- name: Discover kernel
+  command: uname -r
+  register: kernel
+
 - name: install deps
   apt:
     name:
@@ -11,7 +15,9 @@
       - python3-cryptography
       - quota
       - "linux-modules-extra-{{ vars_linux_kernel_flavor }}"
+      - "linux-modules-extra-{{ kernel.stdout }}"
       - "linux-tools-{{ vars_linux_kernel_flavor }}"
+      - "linux-tools-{{ kernel.stdout }}"
     state: present
 
 - name: install rustup in userspace for root
