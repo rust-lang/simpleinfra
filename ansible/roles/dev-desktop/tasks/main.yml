@@ -4,6 +4,10 @@
   command: uname -r
   register: kernel
 
+- name: Discover kernel flavor
+  shell: uname -r | awk -F- '{print $NF}'
+  register: kernel_flavor
+
 - name: install deps
   apt:
     name:
@@ -14,11 +18,23 @@
       - python3-jwt
       - python3-cryptography
       - quota
-      - "linux-modules-extra-{{ vars_linux_kernel_flavor }}"
-      - "linux-modules-extra-{{ kernel.stdout }}"
-      - "linux-tools-{{ vars_linux_kernel_flavor }}"
+      - "linux-tools-{{ kernel_flavor.stdout }}"
       - "linux-tools-{{ kernel.stdout }}"
     state: present
+
+- name: Install kernel modules on cloud machines
+  apt:
+    name:
+      - "linux-modules-extra-{{ kernel_flavor.stdout }}"
+      - "linux-modules-extra-{{ kernel.stdout }}"
+    state: present
+  when: kernel_flavor.stdout != "generic"
+
+- name: Install kernel modules on local Ubuntu VMs
+  apt:
+    name:
+      - linux-image-extra-virtual
+  when: kernel_flavor.stdout == "generic"
 
 - name: install rustup in userspace for root
   shell: |
