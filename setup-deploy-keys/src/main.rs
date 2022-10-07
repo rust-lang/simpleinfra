@@ -7,7 +7,6 @@ use std::error::Error;
 use std::fs;
 use std::process::Command;
 use structopt::StructOpt;
-use travis_ci::TravisCI;
 
 #[derive(StructOpt)]
 struct Cli {
@@ -15,12 +14,6 @@ struct Cli {
     repo: String,
     #[structopt(long = "github-token", env = "GITHUB_TOKEN", help = "GitHub API key")]
     github_token: String,
-    #[structopt(
-        long = "travis-token",
-        env = "TRAVIS_TOKEN",
-        help = "Travis CI API key"
-    )]
-    travis_token: Option<String>,
     #[structopt(long = "rsa")]
     rsa: bool,
 }
@@ -50,18 +43,6 @@ fn main() -> Result<(), Box<dyn Error>> {
     let pubkey = fs::read_to_string("_ssh_keygen_tmp_out.pub").unwrap();
     fs::remove_file("_ssh_keygen_tmp_out.pub").unwrap();
 
-    // If a Travis CI token is present try to add the key to the repo
-    if let Some(token) = &cli.travis_token {
-        let travis = TravisCI::new(token);
-        if let Some(repo) = travis.repo(&cli.repo)? {
-            if repo.active {
-                println!("the repository is active on Travis CI, adding the environment var...");
-                travis.set_env_var(&cli.repo, "GITHUB_DEPLOY_KEY", &key, false)?;
-            }
-        }
-    }
-
-    println!("if you're not using Travis CI add this variable to the CI configuration:");
     println!("GITHUB_DEPLOY_KEY={}", key);
 
     println!("uploading the deploy key...");

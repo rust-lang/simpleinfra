@@ -6,8 +6,7 @@ use std::os::unix::prelude::*;
 use std::process::{Command, Stdio};
 
 fn main() {
-    let slug = env::var("TRAVIS_REPO_SLUG")
-        .or_else(|_| env::var("BUILD_REPOSITORY_ID"))
+    let slug = env::var("BUILD_REPOSITORY_ID")
         .or_else(|_| env::var("GITHUB_REPOSITORY"))
         .unwrap();
     let key = env::var("GITHUB_DEPLOY_KEY").unwrap();
@@ -42,8 +41,7 @@ fn main() {
         .env("SSH_AUTH_SOCK", &socket));
     fs::remove_file(&path).unwrap();
 
-    let sha = env::var("TRAVIS_COMMIT")
-        .or_else(|_| env::var("BUILD_SOURCEVERSION"))
+    let sha = env::var("BUILD_SOURCEVERSION")
         .or_else(|_| env::var("GITHUB_SHA"))
         .unwrap();
     let msg = format!("Deploy {} to gh-pages", sha);
