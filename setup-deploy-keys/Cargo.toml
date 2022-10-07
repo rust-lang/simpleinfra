@@ -9,8 +9,6 @@ name = "deploy"
 path = "src/deploy.rs"
 
 [dependencies]
-travis-ci = { path = "../libs/travis-ci" }
-
 structopt = "0.2.15"
 chrono = "0.4.6"
 reqwest = "0.9.16"

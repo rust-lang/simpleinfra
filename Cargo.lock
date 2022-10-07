@@ -1371,7 +1371,6 @@ dependencies = [
  "serde",
  "serde_json",
  "structopt",
- "travis-ci",
 ]
 
 [[package]]
@@ -1677,15 +1676,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "350c9edade9830dc185ae48ba45667a445ab59f6167ef6d0254ec9d2430d9dd3"
 dependencies = [
  "lazy_static",
-]
-
-[[package]]
-name = "travis-ci"
-version = "0.1.0"
-dependencies = [
- "reqwest",
- "serde",
- "serde_json",
 ]
 
 [[package]]
