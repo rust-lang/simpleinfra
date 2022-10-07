@@ -7,7 +7,8 @@ module "ecr" {
   name   = "sync-team"
 }
 
-// IAM role used by rust-lang/sync-team's CI to push the built images on ECR.
+// IAM role used by rust-lang/sync-team's CI to push the built images to ECR
+// and to invoke the lambda function that runs sync-team.
 
 module "ci_sync_team" {
   source = "../shared/modules/gha-oidc-role"
@@ -15,6 +16,18 @@ module "ci_sync_team" {
   repo   = "sync-team"
   branch = "master"
 }
+
+// IAM role used by rust-lang/team's CI to invoke the lambda function that
+// runs sync-team.
+
+module "ci_team" {
+  source = "../shared/modules/gha-oidc-role"
+  org    = "rust-lang"
+  repo   = "team"
+  branch = "master"
+}
+
+// Policies that allow the sync-team role to interact with ECR
 
 resource "aws_iam_role_policy_attachment" "ci_sync_team_pull" {
   role       = module.ci_sync_team.role.id
@@ -26,23 +39,15 @@ resource "aws_iam_role_policy_attachment" "ci_sync_team_push" {
   policy_arn = module.ecr.policy_push_arn
 }
 
-// IAM role and Lambda function used by rust-lang/team CI to start the sync.
+// Policy for interacting with the lambda function that runs sync-team through CodeBuild.
 //
 // The CI needs to call the intermediate Lambda function to start the CodeBuild
 // for security reasons, as CodeBuild's StartBuild API call allows to override
 // pretty much any build parameter, including the executed commands. That could
 // allow an attacker to (for example) leak secrets.
 
-module "ci_team" {
-  source = "../shared/modules/gha-oidc-role"
-  org    = "rust-lang"
-  repo   = "team"
-  branch = "master"
-}
-
-resource "aws_iam_role_policy" "ci_sync_team_lambda" {
-  name = "start-sync-team"
-  role = module.ci_team.role.id
+resource "aws_iam_policy" "start_sync_team_policy" {
+  name = "start-sync-team-policy"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -55,6 +60,20 @@ resource "aws_iam_role_policy" "ci_sync_team_lambda" {
     ]
   })
 }
+
+// Attaching the invoke lambda function policy to the team and team-sync repos' roles.
+
+resource "aws_iam_role_policy_attachment" "start_sync_team_team_repo" {
+  role       = module.ci_team.role.id
+  policy_arn = aws_iam_policy.start_sync_team_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "start_sync_team_sync_team_repo" {
+  role       = module.ci_sync_team.role.id
+  policy_arn = aws_iam_policy.start_sync_team_policy.arn
+}
+
+// The lambda function for running team-sync
 
 module "lambda_start_sync_team" {
   source = "../shared/modules/lambda"
