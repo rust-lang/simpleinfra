@@ -1,7 +1,7 @@
 use chrono::Utc;
 use reqwest::{
+    blocking::Client,
     header::{HeaderValue, ACCEPT, AUTHORIZATION, USER_AGENT},
-    Client,
 };
 use std::error::Error;
 use std::fs;
