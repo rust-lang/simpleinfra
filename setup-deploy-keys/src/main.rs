@@ -1,4 +1,5 @@
 use chrono::Utc;
+use clap::Parser;
 use reqwest::{
     blocking::Client,
     header::{HeaderValue, ACCEPT, AUTHORIZATION, USER_AGENT},
@@ -6,20 +7,19 @@ use reqwest::{
 use std::error::Error;
 use std::fs;
 use std::process::Command;
-use structopt::StructOpt;
 
-#[derive(StructOpt)]
+#[derive(Parser)]
 struct Cli {
-    #[structopt(help = "the name of the repository to setup")]
+    #[clap(help = "the name of the repository to setup")]
     repo: String,
-    #[structopt(long = "github-token", env = "GITHUB_TOKEN", help = "GitHub API key")]
+    #[clap(long = "github-token", env = "GITHUB_TOKEN", help = "GitHub API key")]
     github_token: String,
-    #[structopt(long = "rsa")]
+    #[clap(long = "rsa")]
     rsa: bool,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let cli = Cli::from_args();
+    let cli = Cli::parse();
     let date = Utc::today().format("%Y-%m-%d");
     let comment = format!("{} {}", cli.repo, date);
 
