@@ -68,7 +68,7 @@ resource "aws_iam_role_policy_attachment" "start_sync_team_team_repo" {
   policy_arn = aws_iam_policy.start_sync_team_policy.arn
 }
 
-resource "aws_iam_role_policy_attachment" "start_sync_team_team_repo" {
+resource "aws_iam_role_policy_attachment" "start_sync_team_sync_team_repo" {
   role       = module.ci_sync_team.role.id
   policy_arn = aws_iam_policy.start_sync_team_policy.arn
 }
