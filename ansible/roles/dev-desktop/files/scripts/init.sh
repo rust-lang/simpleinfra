@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
 
-username=`id -u -n`
-gh_name=${username#"gh-"}
+# Enable strict mode for Bash
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+IFS=$'\n\t'
 
-# Using https instead of git urls because vscode only handles login on push/pull
-git clone https://github.com/$gh_name/rust.git
-pushd rust
-git remote add upstream https://github.com/rust-lang/rust.git
-git fetch upstream
-git checkout upstream/master
-popd
+# Check if rustup is already installed and exit if that's the case.
+if command -v rustup &>/dev/null; then
+  rustup --version
+  exit 0
+fi
 
 init_git.py
-setup_rustup.sh
+
+echo "Installing rustup..."
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
