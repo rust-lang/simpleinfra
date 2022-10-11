@@ -10,7 +10,7 @@ module "aws_eu_central_1" {
       storage       = 25
     }
     "dev-desktop-eu-1" = {
-      instance_type = "c7g.8xlarge"
+      instance_type = "c6g.8xlarge"
       storage       = 1000
     }
   }
