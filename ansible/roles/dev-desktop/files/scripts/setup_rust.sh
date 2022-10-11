@@ -26,11 +26,4 @@ git checkout upstream/master
 popd
 
 set_defaults.sh
-
-for D in rust*; do
-    if [ -d "${D}" ]; then
-        cd "${D}" && ./x.py build
-        rustup toolchain link "$D"_stage1 "$D/build/x86_64-unknown-linux-gnu/stage1"
-        rustup toolchain link "$D"_stage2 "$D/build/x86_64-unknown-linux-gnu/stage2"
-    fi
-done
+link_rust.sh
