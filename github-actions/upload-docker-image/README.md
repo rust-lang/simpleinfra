@@ -39,7 +39,7 @@ on that service.
 
 ## Development
 
-The action is written in NodeJS 12, and you can install the dependencies with:
+The action is written in NodeJS 16, and you can install the dependencies with:
 
 ```
 npm install
