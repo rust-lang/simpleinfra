@@ -3,7 +3,7 @@
 resource "aws_instance" "instance" {
   for_each = var.instances
 
-  ami                     = data.aws_ami.instance.id
+  ami                     = data.aws_ami.instance[each.value.instance_arch].id
   instance_type           = each.value.instance_type
   key_name                = aws_key_pair.instance.key_name
   ebs_optimized           = true
@@ -32,12 +32,14 @@ resource "aws_instance" "instance" {
 }
 
 data "aws_ami" "instance" {
+  for_each = toset(values(var.instances)[*].instance_arch)
+
   most_recent = true
   owners      = ["099720109477"] # Canonical
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-arm64-server-*"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-${each.key}-server-*"]
   }
 
   filter {
