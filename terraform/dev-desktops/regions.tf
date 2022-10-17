@@ -7,10 +7,12 @@ module "aws_eu_central_1" {
   instances = {
     "dev-desktop-staging" = {
       instance_type = "t3a.micro"
+      instance_arch = "amd64"
       storage       = 25
     }
     "dev-desktop-eu-1" = {
-      instance_type = "c7g.8xlarge"
+      instance_type = "c6g.8xlarge"
+      instance_arch = "arm64"
       storage       = 1000
     }
   }
@@ -25,6 +27,7 @@ module "aws_us_east_1" {
   instances = {
     "dev-desktop-us-1" = {
       instance_type = "c7g.8xlarge"
+      instance_arch = "arm64"
       storage       = 1000
     }
   }
