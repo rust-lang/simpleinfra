@@ -25,6 +25,8 @@ resource "aws_cloudfront_distribution" "webapp" {
     min_ttl     = 0
     max_ttl     = 31536000 // 1 year
 
+    response_headers_policy_id = var.strict_security_headers ? aws_cloudfront_response_headers_policy.webapp[0].id : null
+
     forwarded_values {
       headers = [
         // The crates.io website and API respond with different content based
@@ -123,5 +125,22 @@ resource "aws_route53_record" "webapp_apex" {
     name                   = aws_cloudfront_distribution.webapp.domain_name
     zone_id                = aws_cloudfront_distribution.webapp.hosted_zone_id
     evaluate_target_health = false
+  }
+}
+
+resource "aws_cloudfront_response_headers_policy" "webapp" {
+  count = var.strict_security_headers ? 1 : 0
+
+  name = replace(var.webapp_domain_name, ".", "-")
+
+  security_headers_config {
+    strict_transport_security {
+      access_control_max_age_sec = 31536000
+      include_subdomains         = true
+      preload                    = false
+
+      # Override the response header received from the origin
+      override = true
+    }
   }
 }
