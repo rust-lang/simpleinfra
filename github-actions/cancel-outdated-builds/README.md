@@ -22,12 +22,12 @@ seconds to wait between checks:
 - uses: rust-lang/simpleinfra/github-actions/cancel-outdated-builds@master
   with:
     github_token: "${{ secrets.github_token }}"
-    check_every_seconds: 120  # 2 minutes
+    check_every_seconds: 120 # 2 minutes
 ```
 
 ## Development
 
-The action is written in NodeJS 12, and you can install the dependencies with:
+The action is written in NodeJS 16, and you can install the dependencies with:
 
 ```
 npm install
