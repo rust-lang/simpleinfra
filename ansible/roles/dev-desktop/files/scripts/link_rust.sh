@@ -12,8 +12,6 @@ for D in rust*; do
   if [ -d "${D}" ]; then
     pushd "${D}"
 
-    ./x.py build
-
     if [[ -d "$D/build/$target/stage1" ]]; then
       rustup toolchain link "$D"_stage1 "$D/build/$target/stage1"
     fi
