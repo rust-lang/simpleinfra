@@ -1,6 +1,6 @@
 const actions = require("@actions/core");
 const childProcess = require("child_process");
-const fetch = require("node-fetch");
+import fetch from "node-fetch";
 
 const main = (async () => {
     let checkEverySeconds = parseInt(actions.getInput("check_every_seconds", { required: true }));
