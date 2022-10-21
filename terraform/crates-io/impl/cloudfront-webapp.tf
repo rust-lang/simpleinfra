@@ -128,6 +128,8 @@ resource "aws_route53_record" "webapp_apex" {
   }
 }
 
+# Set strict-transport-security headers for crates.io and its subdomains
+# See https://github.com/rust-lang/crates.io/issues/5332 for details
 resource "aws_cloudfront_response_headers_policy" "webapp" {
   count = var.strict_security_headers ? 1 : 0
 
