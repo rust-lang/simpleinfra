@@ -59,3 +59,8 @@ variable "dns_apex" {
   type    = bool
   default = false
 }
+
+variable "strict_security_headers" {
+  type    = bool
+  default = false
+}

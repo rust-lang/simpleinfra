@@ -42,4 +42,6 @@ module "staging" {
   webapp_origin_domain = "staging-crates-io.herokuapp.com"
 
   iam_prefix = "staging-crates-io"
+
+  strict_security_headers = true
 }
