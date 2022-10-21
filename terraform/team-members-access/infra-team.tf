@@ -19,3 +19,9 @@ resource "aws_iam_group_policy_attachment" "infra_team_iam_access" {
   group      = aws_iam_group.infra_team.name
   policy_arn = "arn:aws:iam::aws:policy/IAMReadOnlyAccess"
 }
+
+// Infra team members are allowed to have read access to Route53
+resource "aws_iam_group_policy_attachment" "infra_team_route53_access" {
+  group      = aws_iam_group.infra_team.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonRoute53ReadOnlyAccess"
+}
