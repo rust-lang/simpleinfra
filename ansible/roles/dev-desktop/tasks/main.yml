@@ -186,6 +186,11 @@
       - gcc-multilib # for 32 bit cross compiles of libstd and tests
     state: present
 
+- name: Install Nodejs
+  shell: |
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+    apt-get install -y nodejs
+
 - name: Set up the git credential helper user
   user:
     name: github-app-credentials
