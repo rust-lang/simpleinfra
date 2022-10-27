@@ -8,17 +8,32 @@ IFS=$'\n\t'
 # Discover target triple (e.g. "aarch64-unknown-linux-gnu")
 target="$(rustc -vV | awk '/host/ { print $2 }')"
 
+rustc_dummy=$(
+  cat <<EOF
+#!/usr/bin/env bash
+echo "This is a dummy file to trick rustup into thinking this is a sysroot"
+echo 'Run "x.py build --stage 1 library/std" to create a real sysroot you can use with rustup'
+EOF
+)
+
+stages=(stage1 stage2)
+
 for D in rust*; do
-  if [ -d "${D}" ]; then
-    pushd "${D}"
+  if [ -d "$D" ]; then
+    pushd "$D"
 
-    if [[ -d "$D/build/$target/stage1" ]]; then
-      rustup toolchain link "$D"_stage1 "$D/build/$target/stage1"
-    fi
+    for stage in "${stages[@]}"; do
+      directory="build/${target}/${stage}"
 
-    if [[ -d "$D/build/$target/stage2" ]]; then
-      rustup toolchain link "$D"_stage2 "$D/build/$target/stage2"
-    fi
+      if [ ! -d "$directory" ]; then
+        mkdir -p "${directory}/lib"
+        mkdir -p "${directory}/bin"
+        echo "$rustc_dummy" >> "${directory}/bin/rustc"
+        chmod +x "${directory}/bin/rustc"
+      fi
+
+      rustup toolchain link "${D}_${stage}" "$directory"
+    done
 
     popd
   fi
