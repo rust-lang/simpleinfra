@@ -18,10 +18,11 @@ module "web" {
   ephemeral_storage_gb = 40
 
   environment = {
-    DOCSRS_PREFIX          = "/tmp"
-    DOCSRS_STORAGE_BACKEND = "s3"
-    DOCSRS_LOG             = "docs_rs=debug,rustwide=info"
-    RUST_BACKTRACE         = "1"
+    DOCSRS_PREFIX               = "/tmp"
+    DOCSRS_STORAGE_BACKEND      = "s3"
+    DOCSRS_LOG                  = "docs_rs=debug,rustwide=info"
+    RUST_BACKTRACE              = "1"
+    DOCSRS_STATIC_CLOUDFRONT_ID = "${aws_cloudfront_distribution.static.id}"
   }
 
   secrets = {
@@ -57,6 +58,7 @@ resource "aws_iam_role_policy" "web" {
         Effect = "Allow"
         Action = [
           "s3:PutObject",
+          "s3:GetObjectTagging",
           "s3:PutObjectTagging",
           "s3:GetObject",
           "s3:PutObjectAcl",
