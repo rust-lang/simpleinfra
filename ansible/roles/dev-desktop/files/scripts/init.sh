@@ -11,4 +11,5 @@ git fetch upstream
 git checkout upstream/master
 popd
 
+init_git.py
 setup_rustup.sh
