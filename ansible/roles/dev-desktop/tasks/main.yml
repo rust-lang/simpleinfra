@@ -186,6 +186,23 @@
       - gcc-multilib # for 32 bit cross compiles of libstd and tests
     state: present
 
+- name: Check if Node is installed
+  command: node --version
+  register: node_version
+  changed_when: false
+  failed_when: node_version.rc != 0 and node_version.rc != 2
+
+- name: Set up NodeSource repository
+  shell: |
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+  when: node_version.rc == 2
+
+- name: Install Node
+  apt:
+    name: nodejs
+    state: present
+    update_cache: yes
+
 - name: Set up the git credential helper user
   user:
     name: github-app-credentials
