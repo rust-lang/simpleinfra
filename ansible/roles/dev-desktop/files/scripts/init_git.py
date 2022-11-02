@@ -23,7 +23,7 @@ if username not in people_map:
     print("E: Could not configure your git name and email. Please do so manually.")
     exit(1)
 
-person = people_map[github_name]
+person = people_map[username]
 
 for config in ["email", "name"]:
     if config not in person:
