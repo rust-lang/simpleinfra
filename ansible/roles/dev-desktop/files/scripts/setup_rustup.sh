@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 
-set -x
+# Enable strict mode for Bash
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -euo pipefail
+IFS=$'\n\t'
 
-rustup --version || curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+# Check if rustup is already installed and exit if that's the case.
+if command -v rustup &>/dev/null; then
+  rustup --version
+  exit 0
+fi
 
-source "$HOME/.cargo/env"
-
-for D in rust*; do
-    if [ -d "${D}" ]; then
-        rustup toolchain link "$D"_stage1 "$D/build/x86_64-unknown-linux-gnu/stage1"
-        rustup toolchain link "$D"_stage2 "$D/build/x86_64-unknown-linux-gnu/stage2"
-    fi
-done
+echo "Installing rustup..."
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y

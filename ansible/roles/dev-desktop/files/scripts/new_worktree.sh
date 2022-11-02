@@ -13,4 +13,4 @@ git checkout upstream/master
 ln -s ../config.toml
 popd
 
-setup_rustup.sh
+link_rust.sh
