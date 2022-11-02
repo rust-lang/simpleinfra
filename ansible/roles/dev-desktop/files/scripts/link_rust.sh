@@ -16,11 +16,17 @@ echo 'Run "x.py build --stage 1 library/std" to create a real sysroot you can us
 EOF
 )
 
-stages=(stage1 stage2)
-
 for D in rust*; do
   if [ -d "$D" ]; then
     pushd "$D"
+
+    bootstrap_version=$(grep 'pub const VERSION' src/bootstrap/lib.rs | grep -o '[0-9]*')
+
+    if [ "$bootstrap_version" -eq 3 ]; then
+      stages=(stage1-sysroot stage2-sysroot)
+    else
+      stages=(stage1 stage2)
+    fi
 
     for stage in "${stages[@]}"; do
       directory="build/${target}/${stage}"
