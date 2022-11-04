@@ -12,8 +12,8 @@ fn main() {
     let key = env::var("GITHUB_DEPLOY_KEY").unwrap();
 
     let socket = "/tmp/.github-deploy-socket";
-    run(Command::new("ssh-agent").arg("-a").arg(&socket));
-    while UnixStream::connect(&socket).is_err() {
+    run(Command::new("ssh-agent").arg("-a").arg(socket));
+    while UnixStream::connect(socket).is_err() {
         std::thread::sleep(std::time::Duration::from_millis(5));
     }
 
@@ -34,12 +34,12 @@ fn main() {
     decode.wait().unwrap();
 
     let path = "_the_key";
-    fs::write(&path, key).unwrap();
-    fs::set_permissions(&path, fs::Permissions::from_mode(0o600)).unwrap();
+    fs::write(path, key).unwrap();
+    fs::set_permissions(path, fs::Permissions::from_mode(0o600)).unwrap();
     run(Command::new("ssh-add")
-        .arg(&path)
-        .env("SSH_AUTH_SOCK", &socket));
-    fs::remove_file(&path).unwrap();
+        .arg(path)
+        .env("SSH_AUTH_SOCK", socket));
+    fs::remove_file(path).unwrap();
 
     let sha = env::var("BUILD_SOURCEVERSION")
         .or_else(|_| env::var("GITHUB_SHA"))
@@ -60,7 +60,7 @@ fn main() {
         .arg(format!("git@github.com:{}", slug))
         .arg("master:gh-pages")
         .env("GIT_SSH_COMMAND", "ssh -o StrictHostKeyChecking=no")
-        .env("SSH_AUTH_SOCK", &socket)
+        .env("SSH_AUTH_SOCK", socket)
         .arg("-f"));
 }
 
