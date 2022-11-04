@@ -183,6 +183,7 @@
       - llvm
       - valgrind
       - ninja-build
+      - fish
     state: present
 
 - name: Install tools for x86
