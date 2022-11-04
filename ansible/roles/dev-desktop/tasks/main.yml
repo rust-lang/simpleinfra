@@ -183,8 +183,14 @@
       - llvm
       - valgrind
       - ninja-build
+    state: present
+
+- name: Install tools for x86
+  apt:
+    name:
       - gcc-multilib # for 32 bit cross compiles of libstd and tests
     state: present
+  when: ansible_architecture == "x86_64"
 
 - name: Check if Node is installed
   command: node --version
