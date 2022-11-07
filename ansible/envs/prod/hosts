@@ -10,6 +10,7 @@ crater-azure-2.infra.rust-lang.org
 
 [gha_self_hosted]
 ci-arm-1.infra.rust-lang.org
+ci-arm-2.infra.rust-lang.org
 
 [playground]
 play-1.infra.rust-lang.org
