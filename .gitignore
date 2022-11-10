@@ -4,6 +4,7 @@
 /terraform/shared/modules/lambda/packages
 /terraform/rds-databases/.forward-ports-cache-*.json
 .terraform
+*.tfvars
 node_modules
 __pycache__
 *.py[co]
