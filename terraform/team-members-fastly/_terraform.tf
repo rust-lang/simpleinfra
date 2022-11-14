@@ -19,11 +19,4 @@ terraform {
   }
 }
 
-provider "fastly" {
-  api_key = var.fastly_api_key
-}
-
-variable "fastly_api_key" {
-  description = "Personal API token for Fastly"
-  type        = string
-}
+provider "fastly" {}

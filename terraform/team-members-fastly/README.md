@@ -26,16 +26,11 @@ generate a token with the following settings:
 - Select `global` as the **Scope** and make sure to disable read-only access
 - Leave the **Expiration** date at 3 months in the future
 
-Create a file called `_terraform.auto.tfvars` in this directory and paste the
-generated token into it:
-
-```terraform
-fastly_api_key = "<your token>"
-```
-
-Then run any Terraform command as you normally would:
+Then export the token as an environment variable and run any Terraform command
+like you normally would:
 
 ```shell
+export FASTLY_API_KEY="afastlyapikey"
 terraform plan
 ```
 
