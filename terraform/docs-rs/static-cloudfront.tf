@@ -15,8 +15,24 @@ module "static_certificate" {
   ]
 }
 
-data "aws_cloudfront_cache_policy" "none" {
-  name = "Managed-CachingDisabled"
+resource "aws_cloudfront_cache_policy" "static_docs_rs" {
+  name        = "static-docs-rs"
+  default_ttl = 86400
+  min_ttl     = 0
+  max_ttl     = 86400
+  parameters_in_cache_key_and_forwarded_to_origin {
+    cookies_config {
+      cookie_behavior = "none"
+    }
+    headers_config {
+      header_behavior = "none"
+    }
+    query_strings_config {
+      query_string_behavior = "none"
+    }
+    enable_accept_encoding_brotli = true
+    enable_accept_encoding_gzip   = true
+  }
 }
 
 data "aws_cloudfront_origin_request_policy" "s3cors" {
@@ -57,7 +73,7 @@ resource "aws_cloudfront_distribution" "static" {
     target_origin_id       = "s3"
     viewer_protocol_policy = "redirect-to-https"
 
-    cache_policy_id          = data.aws_cloudfront_cache_policy.none.id
+    cache_policy_id          = aws_cloudfront_cache_policy.static_docs_rs.id
     origin_request_policy_id = data.aws_cloudfront_origin_request_policy.s3cors.id
 
     trusted_key_groups = []
