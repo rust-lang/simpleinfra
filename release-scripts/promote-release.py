@@ -33,11 +33,13 @@ def promote_release(args):
         vars["PROMOTE_RELEASE_BYPASS_STARTUP_CHECKS"] = "1"
 
     if args.env == "dev" and args.channel == "stable":
-        vars["PROMOTE_RELEASE_BLOG_REPOSITORY"] = "rust-lang/blog.rust-lang.org"
-        if args.release_date is None:
+        if args.release_date:
+            vars["PROMOTE_RELEASE_BLOG_REPOSITORY"] = "rust-lang/blog.rust-lang.org"
+        if args.release_date is None and not args.bypass_startup_checks:
             print(f"--release_date YYYY-MM-DD required for stable dev-static releases")
             exit(1)
-        vars["PROMOTE_RELEASE_BLOG_SCHEDULED_RELEASE_DATE"] = args.release_date
+        if args.release_date:
+            vars["PROMOTE_RELEASE_BLOG_SCHEDULED_RELEASE_DATE"] = args.release_date
 
     run_build(args.env, vars)
 
