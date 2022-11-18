@@ -72,7 +72,11 @@ resource "aws_iam_role_policy" "web" {
       },
       {
         Effect = "Allow"
-        Action = "cloudfront:CreateInvalidation"
+        Action = [
+          "cloudfront:CreateInvalidation",
+          "cloudfront:GetInvalidation",
+          "cloudfront:ListInvalidations",
+        ]
         Resource = [
           aws_cloudfront_distribution.webapp.arn,
           aws_cloudfront_distribution.static.arn,
