@@ -4,9 +4,16 @@ locals {
       given_name  = "Jan David",
       family_name = "Nose"
       email       = "jandavidnose@rustfoundation.org"
-      groups      = ["infra", "infra-admins"]
+      groups      = [aws_identitystore_group.infra, aws_identitystore_group.infra-admins]
     }
   }
+
+  # Expand local.users into collection by group association
+  group_memberships = distinct(flatten([for user_name, user in local.users : [
+    for group in user.groups : {
+      name : user_name, group : group
+    }
+  ]]))
 }
 
 resource "aws_identitystore_user" "users" {
@@ -27,20 +34,10 @@ resource "aws_identitystore_user" "users" {
   }
 }
 
-resource "aws_identitystore_group_membership" "infra_admins_group_membership" {
-  for_each = { for key, val in local.users :
-  key => val if contains(val.groups, "infra-admins") }
+resource "aws_identitystore_group_membership" "group_membership" {
+  for_each          = { for membership in local.group_memberships : "${membership.name}.${membership.group.id}" => membership }
   identity_store_id = local.identity_store_id
 
-  member_id = aws_identitystore_user.users[each.key].user_id
-  group_id  = aws_identitystore_group.infra-admins.group_id
-}
-
-resource "aws_identitystore_group_membership" "infra_group_membership" {
-  for_each = { for key, val in local.users :
-  key => val if contains(val.groups, "infra") }
-  identity_store_id = local.identity_store_id
-
-  member_id = aws_identitystore_user.users[each.key].user_id
-  group_id  = aws_identitystore_group.infra.group_id
+  member_id = aws_identitystore_user.users[each.value.name].user_id
+  group_id  = each.value.group.group_id
 }
