@@ -13,4 +13,4 @@ vars_grafana_admin_password: passw0rd
 
 vars_backup_repository: /tmp/backups
 vars_alertmanager_receiver_zulip_infra: http://0.0.0.0
-vars_alertmanager_receiver_discord_docsrs: http://0.0.0.0
+vars_alertmanager_receiver_zulip_docsrs: http://0.0.0.0

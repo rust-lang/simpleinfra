@@ -10,9 +10,16 @@ vars_backup_env:
 vars_postgresql_grafana_password: "{{ ssm_monitoring['postgresql-grafana-password'] }}"
 vars_grafana_github_oauth_id: "{{ ssm_monitoring['grafana-github-oauth-id'] }}"
 vars_grafana_github_oauth_secret: "{{ ssm_monitoring['grafana-github-oauth-secret'] }}"
-vars_alertmanager_receiver_zulip_infra: "{{ ssm_monitoring['alertmanager-receiver-zulip-infra'] }}"
-vars_alertmanager_receiver_discord_docsrs: "{{ ssm_monitoring['alertmanager-receiver-discord-docsrs'] }}"
 vars_grafana_admin_password: "{{ ssm_monitoring['grafana-admin-password'] }}"
+
+# If you need to add a new receiver on the rust-lang Zulip server, and the
+# alerts are supposed to be routed to a private channel, make sure to also
+# invite alertmanager-bot@zulipchat.com into the private stream.
+#
+# Also, in the stream name, replace "/" with "%2F".
+vars_alertmanager_zulip_url: "https://rust-lang.zulipchat.com/api/v1/external/slack_incoming?api_key={{ ssm_monitoring['alertmanager-receiver-zulip-token'] }}"
+vars_alertmanager_receiver_zulip_infra: "{{ vars_alertmanager_zulip_url }}&stream=t-infra%2Fprivate&topic=alertmanager"
+vars_alertmanager_receiver_zulip_docsrs: "{{ vars_alertmanager_zulip_url }}&stream=t-docs-rs%2Fprivate&topic=alertmanager"
 
 vars_prometheus_monitorbot_secret: "{{ lookup('aws_ssm', '/prod/monitorbot/secret', region='us-west-1') }}"
 vars_prometheus_cratesio_secret: "{{ ssm_monitoring['cratesio-scrape-secret'] }}"

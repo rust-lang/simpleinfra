@@ -251,12 +251,12 @@
         receiver: zulip-infra
 
         routes:
-          - receiver: discord-docsrs
+          - receiver: zulip-docsrs
             group_by: ['alertname']
             match:
               dispatch: docsrs
 
-          - receiver: discord-docsrs
+          - receiver: zulip-docsrs
             group_by: ['alertname']
             match:
               job: node
@@ -282,10 +282,10 @@
               text: "{{ '{{ range .Alerts }}**{{ if eq .Status \"firing\" }}Fired{{ else }}Resolved{{ end }}: {{ .Annotations.summary }}**\n{{ .Annotations.description }}\n{{ end }}' }}"
               send_resolved: true
 
-        - name: discord-docsrs
+        - name: zulip-docsrs
           slack_configs:
-            - api_url: "{{ vars_alertmanager_receiver_discord_docsrs }}/slack"
-              channel: doesnt-matter
+            - api_url: "{{ vars_alertmanager_receiver_zulip_docsrs }}"
+              channel: alertmanager
               title: "{{ '{{ .Alerts.Firing | len }} alerts fired, {{ .Alerts.Resolved | len }} alerts resolved!' }}"
               title_link: "https://grafana.rust-lang.org"
               text: "{{ '{{ range .Alerts }}**{{ if eq .Status \"firing\" }}Fired{{ else }}Resolved{{ end }}: {{ .Annotations.summary }}**\n{{ .Annotations.description }}\n{{ end }}' }}"
