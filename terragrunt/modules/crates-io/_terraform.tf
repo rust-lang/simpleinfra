@@ -5,6 +5,10 @@ terraform {
       version               = "~> 4.20"
       configuration_aliases = [aws.us-east-1, aws.eu-west-1]
     }
+    fastly = {
+      source  = "fastly/fastly"
+      version = "3.0.0"
+    }
   }
 }
 
@@ -17,6 +21,8 @@ provider "aws" {
   alias  = "eu-west-1"
   region = "eu-west-1"
 }
+
+provider "fastly" {}
 
 data "aws_caller_identity" "current" {}
 
