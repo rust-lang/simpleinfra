@@ -1,0 +1,12 @@
+# This file describes a Fastly Compute@Edge package. To learn more visit:
+# https://developer.fastly.com/reference/fastly-toml/
+
+authors = ["infra@rust-lang.org"]
+description = "Compute@Edge function for static.crates.io"
+language = "rust"
+manifest_version = 2
+name = "compute-static"
+service_id = ""
+
+[scripts]
+  build = "cargo build --bin compute-static --release --target wasm32-wasi --color always"
