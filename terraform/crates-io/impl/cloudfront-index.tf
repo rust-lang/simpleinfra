@@ -26,9 +26,9 @@ resource "aws_cloudfront_distribution" "index" {
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
 
-    default_ttl = 60
+    default_ttl = 300 // 5 minutes
     min_ttl     = 1
-    max_ttl     = 60
+    max_ttl     = 300 // 5 minutes
 
     forwarded_values {
       headers = [
