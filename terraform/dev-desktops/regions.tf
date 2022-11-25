@@ -32,3 +32,29 @@ module "aws_us_east_1" {
     }
   }
 }
+
+module "azure_us_west_2" {
+  source = "./azure-region"
+
+  location = "West US 2"
+
+  instances = {
+    "dev-desktop-us-2" = {
+      instance_type = "Standard_F32s_v2"
+      storage       = 1000
+    }
+  }
+}
+
+module "azure_eu_west" {
+  source = "./azure-region"
+
+  location = "West Europe"
+
+  instances = {
+    "dev-desktop-eu-2" = {
+      instance_type = "Standard_F32s_v2"
+      storage       = 1000
+    }
+  }
+}
