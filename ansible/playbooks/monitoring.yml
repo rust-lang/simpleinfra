@@ -202,7 +202,7 @@
                 description: "There are more than 1000 deprioritized crates in the docs.rs queue, and the situation didn't resolve itself in the 24 hours. The build queue is available at https://docs.rs/releases/queue"
 
             - alert: HighCpuUsage
-              expr: avg by (mode) (rate(node_cpu_seconds_total{job="node",instance="docsrs.infra.rust-lang.org:9100",mode="user"}[1m])) > 0.9
+              expr: avg(rate(node_cpu_seconds_total{job="node",instance="docsrs.infra.rust-lang.org:9100",mode="idle"}[1m])) < 0.1
               for: 30m
               labels:
                 dispatch: docsrs
