@@ -201,6 +201,15 @@
                 summary: "The docs.rs deprioritized queue is unreasonably long"
                 description: "There are more than 1000 deprioritized crates in the docs.rs queue, and the situation didn't resolve itself in the 24 hours. The build queue is available at https://docs.rs/releases/queue"
 
+            - alert: HighCpuUsage
+              expr: avg by (mode) (rate(node_cpu_seconds_total{job="node",instance="docsrs.infra.rust-lang.org:9100",mode="user"}[1m])) > 0.9
+              for: 30m
+              labels:
+                dispatch: docsrs
+              annotations:
+                summary: "High CPU usage on the docs.rs server"
+                description: "user-mode CPU usage is > 90% for longer than 30 minutes, something is wrong. Please check `htop` for which threads consume the CPU. Restarting the server helps then."
+
             - alert: FailingBuilds
               expr: increase(docsrs_failed_builds{job="docsrs"}[3h]) / increase(docsrs_total_builds{job="docsrs"}[3h]) > 0.75
               for: 1m
