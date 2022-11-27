@@ -244,6 +244,15 @@
                 summary: "Self-Hosted runner {{ '{{ $labels.runner }}' }} in repo {{ '{{ $labels.repo }}' }} is offline"
                 description: "GitHub is reporting that the self-hosted runner {{ '{{ $labels.runner }}' }} in the repo {{ '{{ $labels.repo }}' }} is offline. This could be caused by the machine hosting the runner having problems, or by the runner software being out of date."
 
+        - name: playground
+          rules:
+            - alert: PlaygroundDown
+              expr: sum(increase(playground_request_duration_seconds_count[5m])) == 0
+              for: 1m
+              annotations:
+                summary: "play.rust-lang.org is down"
+                description: "No requests have been serviced by the playground in the last five minutes."
+
       alertmanager_route:
         group_by: ['alertname']
         group_wait: 30s
