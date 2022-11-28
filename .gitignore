@@ -7,5 +7,7 @@
 node_modules
 __pycache__
 *.py[co]
+terragrunt-generated-*.tf
+.terragrunt-cache
 
 .aws-creds-mfa-arn
