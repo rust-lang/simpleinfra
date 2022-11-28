@@ -1,14 +1,21 @@
 terraform {
   required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 3.59"
-    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = "3.31.0"
     }
   }
+}
+
+provider "azurerm" {
+  features {}
+
+  subscription_id = var.subscription_id
+}
+
+variable "subscription_id" {
+  description = "The subscription id for Azure"
+  type        = string
 }
 
 variable "location" {
@@ -17,6 +24,7 @@ variable "location" {
 }
 
 variable "instances" {
+  description = "A map of instances with their instance and disk sizes"
   type = map(object({
     instance_type = string
     storage       = number
