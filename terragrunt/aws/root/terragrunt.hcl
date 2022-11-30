@@ -11,3 +11,32 @@ remote_state {
     key            = "${path_relative_to_include()}.tfstate"
   }
 }
+
+inputs = {
+  users = {
+    "jdno" = {
+      given_name  = "Jan David",
+      family_name = "Nose"
+      email       = "jandavidnose@rustfoundation.org"
+      groups      = ["infra", "infra-admins"]
+    }
+    "pietroalbini" = {
+      given_name  = "Pietro",
+      family_name = "Albini"
+      email       = "pietro@pietroalbini.org"
+      groups      = ["infra", "infra-admins"]
+    }
+    "simulacrum" = {
+      given_name  = "Mark",
+      family_name = "Rousskov"
+      email       = "mark.simulacrum@gmail.com"
+      groups      = ["infra", "infra-admins"]
+    }
+    "rylev" = {
+      given_name  = "Ryan",
+      family_name = "Levick"
+      email       = "me@ryanlevick.com"
+      groups      = ["infra"]
+    }
+  }
+}
