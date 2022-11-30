@@ -1,11 +1,13 @@
 locals {
-  infra_group        = aws_identitystore_group.infra
-  infra_admins_group = aws_identitystore_group.infra-admins
+  groups = {
+    infra : aws_identitystore_group.infra
+    infra-admins : aws_identitystore_group.infra-admins
+  }
 
   # Expand local.users into collection by group association
   group_memberships = distinct(flatten([for user_name, user in var.users : [
     for group in user.groups : {
-      name : user_name, group : group == "infra-admins" ? local.infra_admins_group : local.infra_group
+      name : user_name, group : local.groups[group]
     }
   ]]))
 }
