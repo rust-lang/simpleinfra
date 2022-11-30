@@ -1,23 +1,17 @@
 locals {
-  users = {
-    "jdno" = {
-      given_name  = "Jan David",
-      family_name = "Nose"
-      email       = "jandavidnose@rustfoundation.org"
-      groups      = [aws_identitystore_group.infra, aws_identitystore_group.infra-admins]
-    }
-  }
+  infra_group        = aws_identitystore_group.infra
+  infra_admins_group = aws_identitystore_group.infra-admins
 
   # Expand local.users into collection by group association
-  group_memberships = distinct(flatten([for user_name, user in local.users : [
+  group_memberships = distinct(flatten([for user_name, user in var.users : [
     for group in user.groups : {
-      name : user_name, group : group
+      name : user_name, group : group == "infra-admins" ? local.infra_admins_group : local.infra_group
     }
   ]]))
 }
 
 resource "aws_identitystore_user" "users" {
-  for_each          = local.users
+  for_each          = var.users
   identity_store_id = local.identity_store_id
 
   display_name = "${each.value.given_name} ${each.value.family_name}"
