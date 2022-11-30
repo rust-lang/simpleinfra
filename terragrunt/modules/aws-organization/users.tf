@@ -29,7 +29,7 @@ resource "aws_identitystore_user" "users" {
 }
 
 resource "aws_identitystore_group_membership" "group_membership" {
-  for_each          = { for membership in local.group_memberships : "${membership.user}.${local.groups[membership.group].id}" => membership }
+  for_each          = { for membership in local.group_memberships : "${local.groups[membership.group].display_name}[${membership.user}]" => membership }
   identity_store_id = local.identity_store_id
 
   member_id = aws_identitystore_user.users[each.value.user].user_id
