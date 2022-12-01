@@ -1,11 +1,15 @@
 data "aws_ssoadmin_instances" "sso" {}
 
-resource "aws_ssoadmin_account_assignment" "account_group_permission" {
-  for_each           = { for permission_set in var.permission_sets : "${var.group.display_name}[${permission_set.name}]" => permission_set.arn }
-  instance_arn       = (data.aws_ssoadmin_instances.sso.arns)[0]
-  permission_set_arn = each.value
+locals {
+  group_permissions = flatten([for group in var.groups : [for permission in group.permissions : { group : group.group, permission : permission }]])
+}
 
-  principal_id   = var.group.group_id
+resource "aws_ssoadmin_account_assignment" "account_group_permission" {
+  for_each           = { for group_permission in local.group_permissions : "${group_permission.group.display_name}[${group_permission.permission.name}]" => group_permission }
+  instance_arn       = (data.aws_ssoadmin_instances.sso.arns)[0]
+  permission_set_arn = each.value.permission.arn
+
+  principal_id   = each.value.group.group_id
   principal_type = "GROUP"
 
   target_id   = var.account_id
@@ -17,12 +21,10 @@ variable "account_id" {
   description = "The Amazon account id tha the group is being assigned to"
 }
 
-variable "group" {
-  type        = object({ display_name : string, group_id : string })
-  description = "The group being assigned to the account"
-}
-
-variable "permission_sets" {
-  type        = list(object({ name : string, arn : string }))
-  description = "The permission sets that the group should have"
+variable "groups" {
+  type = list(object({
+    group : object({ display_name : string, group_id : string }),
+    permissions : list(object({ name : string, arn : string }))
+  }))
+  description = "The groups being assigned to the account with their permissions"
 }
