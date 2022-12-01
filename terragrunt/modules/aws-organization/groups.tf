@@ -47,50 +47,48 @@ resource "aws_ssoadmin_managed_policy_attachment" "view_only_access" {
 
 # The assignment of groups to accounts with their respective permission sets
 
-## Admin Account
+locals {
+  assignments = [
+    # Admin
+    {
+      account : aws_organizations_account.admin,
+      group : aws_identitystore_group.infra-admins,
+      permissions : [aws_ssoadmin_permission_set.view_only_access, aws_ssoadmin_permission_set.administrator_access]
+    },
+    {
+      account : aws_organizations_account.admin,
+      group : aws_identitystore_group.infra,
+      permissions : [aws_ssoadmin_permission_set.view_only_access]
+    },
+    # docs-rs Staging
+    {
+      account : aws_organizations_account.docs_rs_staging,
+      group : aws_identitystore_group.infra-admins,
+      permissions : [aws_ssoadmin_permission_set.view_only_access, aws_ssoadmin_permission_set.administrator_access]
+    },
+    {
+      account : aws_organizations_account.docs_rs_staging,
+      group : aws_identitystore_group.infra,
+      permissions : [aws_ssoadmin_permission_set.view_only_access, aws_ssoadmin_permission_set.administrator_access]
+    },
+    # Dev-Desktops Prod
+    {
+      account : aws_organizations_account.dev_desktops_prod,
+      group : aws_identitystore_group.infra-admins,
+      permissions : [aws_ssoadmin_permission_set.view_only_access, aws_ssoadmin_permission_set.administrator_access]
+    },
+    {
+      account : aws_organizations_account.dev_desktops_prod,
+      group : aws_identitystore_group.infra,
+      permissions : [aws_ssoadmin_permission_set.view_only_access]
+    },
+  ]
+}
 
 module "infra_admins_to_admin_assignment" {
+  for_each        = { for assignment in local.assignments : "${assignment.group.display_name} in ${assignment.account.name}" => assignment }
   source          = "./sso-account-assignment"
-  account_id      = aws_organizations_account.admin.id
-  group           = aws_identitystore_group.infra-admins
-  permission_sets = [aws_ssoadmin_permission_set.view_only_access, aws_ssoadmin_permission_set.administrator_access]
-}
-
-module "infra_to_admin_assignment" {
-  source          = "./sso-account-assignment"
-  account_id      = aws_organizations_account.admin.id
-  group           = aws_identitystore_group.infra
-  permission_sets = [aws_ssoadmin_permission_set.view_only_access]
-}
-
-## docs-rs Staging
-
-module "infra_admins_to_docs_rs_staging_assignment" {
-  source          = "./sso-account-assignment"
-  account_id      = aws_organizations_account.docs_rs_staging.id
-  group           = aws_identitystore_group.infra-admins
-  permission_sets = [aws_ssoadmin_permission_set.view_only_access, aws_ssoadmin_permission_set.administrator_access]
-}
-
-module "infra_to_docs_rs_staging_assignment" {
-  source          = "./sso-account-assignment"
-  account_id      = aws_organizations_account.docs_rs_staging.id
-  group           = aws_identitystore_group.infra
-  permission_sets = [aws_ssoadmin_permission_set.view_only_access, aws_ssoadmin_permission_set.administrator_access]
-}
-
-## Dev Desktops Prod
-
-module "infra_admins_to_dev_desktops_prod_assignment" {
-  source          = "./sso-account-assignment"
-  account_id      = aws_organizations_account.dev_desktops_prod.id
-  group           = aws_identitystore_group.infra-admins
-  permission_sets = [aws_ssoadmin_permission_set.view_only_access, aws_ssoadmin_permission_set.administrator_access]
-}
-
-module "infra_to_dev_desktops_prod_assignment" {
-  source          = "./sso-account-assignment"
-  account_id      = aws_organizations_account.dev_desktops_prod.id
-  group           = aws_identitystore_group.infra
-  permission_sets = [aws_ssoadmin_permission_set.view_only_access]
+  account_id      = each.value.account.id
+  group           = each.value.group
+  permission_sets = each.value.permissions
 }
