@@ -38,5 +38,17 @@ inputs = {
       email       = "me@ryanlevick.com"
       groups      = ["infra"]
     }
+    "jynelson" = {
+      given_name  = "Joshua",
+      family_name = "Nelson",
+      email       = "rust@jyn.dev"
+      groups      = ["infra"]
+    }
+    "shepmaster" = {
+      given_name  = "Jake",
+      family_name = "Goulding",
+      email       = "jake.goulding@integer32.com"
+      groups      = ["infra"]
+    }
   }
 }
