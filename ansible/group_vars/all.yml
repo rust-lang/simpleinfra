@@ -32,9 +32,9 @@ alertmanager_checksum: sha256:6fa982232ae7be5524f5b3cd4e90b7c6a75086368200c91764
 # Version of https://grafana.com to install in our instances. The checksum is
 # the hash of the .deb for the specified architecture, found here:
 # https://grafana.com/grafana/download
-grafana_version: 9.2.6
+grafana_version: 9.3.1
 grafana_arch: amd64
-grafana_checksum: sha256:7bc4becea8cb4d66167121a7bdc54c1ab547ae8d590c7c15ca8b4d9ac480ebb4
+grafana_checksum: sha256:f2bfaf926656a19fe94ef6bd06b6e2af769997862b435f49dfa2e98e33b15884
 
 # Version of https://github.com/letsencrypt/pebble to install on our instances.
 # The checksum is the hash of the downloadable binary for the specific
