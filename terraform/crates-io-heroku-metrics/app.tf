@@ -8,8 +8,8 @@ module "crates_io_heroku_metrics" {
   name = "crates-io-heroku-metrics"
   repo = "rust-lang/crates-io-heroku-metrics"
 
-  cpu              = 512
-  memory           = 1024
+  cpu              = 1024
+  memory           = 2048
   tasks_count      = 1
   platform_version = "1.4.0"
 
@@ -21,6 +21,8 @@ module "crates_io_heroku_metrics" {
   expose_http = {
     container_port = 80
     domains        = ["crates-io-heroku-metrics.infra.rust-lang.org"]
+
+    prometheus = null
 
     health_check_path     = "/health"
     health_check_interval = 60

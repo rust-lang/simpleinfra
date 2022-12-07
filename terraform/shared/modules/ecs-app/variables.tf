@@ -37,7 +37,7 @@ variable "mount_efs" {
 
 variable "ephemeral_storage_gb" {
   type    = number
-  default = 20
+  default = 21
 }
 
 variable "expose_http" {
