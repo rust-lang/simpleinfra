@@ -208,7 +208,7 @@
                 dispatch: docsrs
               annotations:
                 summary: "High CPU usage on the docs.rs server"
-                description: "user-mode CPU usage is > 85% for longer than 30 minutes, something is wrong. Please check `htop` for which threads consume the CPU. Restarting the server helps then."
+                description: "the 10-minute rolling average idle time over a 30-minute period was < 15%, something is wrong. Please check `htop` for which threads consume the CPU. Restarting the server can help then."
 
             - alert: FailingBuilds
               expr: increase(docsrs_failed_builds{job="docsrs"}[3h]) / increase(docsrs_total_builds{job="docsrs"}[3h]) > 0.75
