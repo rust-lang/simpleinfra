@@ -5,6 +5,7 @@ resource "azurerm_public_ip" "v4" {
   resource_group_name = azurerm_resource_group.dev_desktops.name
   location            = azurerm_resource_group.dev_desktops.location
   allocation_method   = "Dynamic"
+  domain_name_label   = each.key
 
   tags = {
     Name = "dev-desktops"
