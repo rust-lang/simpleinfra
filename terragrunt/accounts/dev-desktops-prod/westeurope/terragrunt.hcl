@@ -7,7 +7,12 @@ include {
   merge_strategy = "deep"
 }
 
+dependency "resource_group" {
+  config_path = "../resource-group"
+}
+
 inputs = {
+  resource_group_name = dependency.resource_group.outputs.name
   location = "West Europe"
   instances = {
     "dev-desktop-eu-2" = {

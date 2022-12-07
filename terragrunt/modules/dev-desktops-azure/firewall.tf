@@ -1,7 +1,7 @@
 resource "azurerm_network_security_group" "dev_desktops" {
-  name                = "dev-desktops"
-  resource_group_name = azurerm_resource_group.dev_desktops.name
-  location            = azurerm_resource_group.dev_desktops.location
+  name                = "${var.resource_group_name}-${replace(lower(var.location), " ", "")}"
+  resource_group_name = var.resource_group_name
+  location            = var.location
 
   security_rule {
     name                       = "node_exporter"

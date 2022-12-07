@@ -2,8 +2,8 @@ resource "azurerm_public_ip" "v4" {
   for_each = var.instances
 
   name                = "${each.key}-v4"
-  resource_group_name = azurerm_resource_group.dev_desktops.name
-  location            = azurerm_resource_group.dev_desktops.location
+  resource_group_name = var.resource_group_name
+  location            = var.location
   allocation_method   = "Dynamic"
   domain_name_label   = each.key
 
@@ -16,8 +16,8 @@ resource "azurerm_network_interface" "instance" {
   for_each = var.instances
 
   name                = each.key
-  resource_group_name = azurerm_resource_group.dev_desktops.name
-  location            = azurerm_resource_group.dev_desktops.location
+  resource_group_name = var.resource_group_name
+  location            = var.location
 
   ip_configuration {
     name                          = "primary4"
@@ -43,8 +43,8 @@ resource "azurerm_linux_virtual_machine" "instance" {
   for_each = var.instances
 
   name                = each.key
-  resource_group_name = azurerm_resource_group.dev_desktops.name
-  location            = azurerm_resource_group.dev_desktops.location
+  resource_group_name = var.resource_group_name
+  location            = var.location
   size                = each.value.instance_type
 
   admin_username = "ubuntu"
