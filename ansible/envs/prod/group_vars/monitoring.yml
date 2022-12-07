@@ -20,6 +20,7 @@ vars_grafana_admin_password: "{{ ssm_monitoring['grafana-admin-password'] }}"
 vars_alertmanager_zulip_url: "https://rust-lang.zulipchat.com/api/v1/external/slack_incoming?api_key={{ ssm_monitoring['alertmanager-receiver-zulip-token'] }}"
 vars_alertmanager_receiver_zulip_infra: "{{ vars_alertmanager_zulip_url }}&stream=t-infra%2Fprivate&topic=alertmanager"
 vars_alertmanager_receiver_zulip_docsrs: "{{ vars_alertmanager_zulip_url }}&stream=t-docs-rs%2Fprivate&topic=alertmanager"
+vars_alertmanager_receiver_pagerduty_cratesio: "{{ ssm_monitoring['alertmanager-receiver-pagerduty-cratesio'] }}"
 
 vars_prometheus_monitorbot_secret: "{{ lookup('aws_ssm', '/prod/monitorbot/secret', region='us-west-1') }}"
 vars_prometheus_cratesio_secret: "{{ ssm_monitoring['cratesio-scrape-secret'] }}"

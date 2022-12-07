@@ -154,6 +154,14 @@
                 summary: "High RAM usage on {{ '{{ $labels.instance }}' }}"
                 description: "There is less than 20% available RAM on the {{ '{{ $labels.instance }}' }} instance, for more than 1 minute."
 
+        - name: cratesio
+          rules:
+            - alert: HerokuRouterError
+              expr: sum by (code) (increase(heroku_router_errors[1m])) > 100
+              for: 5m
+              labels:
+                dispatch: pagerduty-cratesio
+
         - name: docsrs
           rules:
             - alert: DocsRsDown
@@ -269,6 +277,11 @@
         receiver: zulip-infra
 
         routes:
+          - receiver: pagerduty-cratesio
+            group_by: ['alertname']
+            match:
+              dispatch: pagerduty-cratesio
+
           - receiver: zulip-docsrs
             group_by: ['alertname']
             match:
@@ -308,6 +321,10 @@
               title_link: "https://grafana.rust-lang.org"
               text: "{{ '{{ range .Alerts }}**{{ if eq .Status \"firing\" }}Fired{{ else }}Resolved{{ end }}: {{ .Annotations.summary }}**\n{{ .Annotations.description }}\n{{ end }}' }}"
               send_resolved: true
+
+        - name: pagerduty-cratesio
+          pagerduty_configs:
+            - service_key: "{{ vars_alertmanager_receiver_pagerduty_cratesio }}"
 
         - name: devnull
 
