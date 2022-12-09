@@ -103,7 +103,7 @@ resource "aws_s3_bucket_inventory" "static" {
   }
   destination {
     bucket {
-      bucket_arn = var.inventories_bucket_arn
+      bucket_arn = local.inventories_bucket_arn
       prefix     = aws_s3_bucket.static.id
       format     = "CSV"
     }

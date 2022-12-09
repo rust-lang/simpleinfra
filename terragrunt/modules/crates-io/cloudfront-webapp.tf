@@ -10,7 +10,7 @@ resource "aws_cloudfront_distribution" "webapp" {
 
   aliases = [var.webapp_domain_name]
   viewer_certificate {
-    acm_certificate_arn = module.certificate.arn
+    acm_certificate_arn = var.certificate_arn
     ssl_support_method  = "sni-only"
   }
 

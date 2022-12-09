@@ -1,7 +1,11 @@
-// This file configures static.crates.io
+// This file configures index.crates.io
 
-resource "aws_cloudfront_distribution" "static" {
-  comment = var.static_domain_name
+resource "aws_cloudfront_origin_access_identity" "index" {
+  comment = "index.crates.io access"
+}
+
+resource "aws_cloudfront_distribution" "index" {
+  comment = var.index_domain_name
 
   enabled             = true
   wait_for_deployment = false
@@ -9,18 +13,22 @@ resource "aws_cloudfront_distribution" "static" {
   default_root_object = "index.html"
   price_class         = "PriceClass_All"
 
-  aliases = [var.static_domain_name]
+  aliases = [var.index_domain_name]
   viewer_certificate {
-    acm_certificate_arn = module.certificate.arn
+    acm_certificate_arn = var.certificate_arn
     ssl_support_method  = "sni-only"
   }
 
   default_cache_behavior {
-    target_origin_id       = "main-with-fallback"
+    target_origin_id       = "main"
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
+
+    default_ttl = 3600 // 1 hour
+    min_ttl     = 1
+    max_ttl     = 3600 // 1 hour
 
     forwarded_values {
       headers = [
@@ -39,27 +47,9 @@ resource "aws_cloudfront_distribution" "static" {
 
   origin {
     origin_id   = "main"
-    domain_name = aws_s3_bucket.static.bucket_regional_domain_name
-  }
-
-  origin {
-    origin_id   = "fallback"
-    domain_name = aws_s3_bucket.fallback.bucket_regional_domain_name
-  }
-
-  origin_group {
-    origin_id = "main-with-fallback"
-
-    failover_criteria {
-      status_codes = [500, 502, 503]
-    }
-
-    member {
-      origin_id = "main"
-    }
-
-    member {
-      origin_id = "fallback"
+    domain_name = aws_s3_bucket.index.bucket_regional_domain_name
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity.index.cloudfront_access_identity_path
     }
   }
 
@@ -74,15 +64,15 @@ resource "aws_cloudfront_distribution" "static" {
   }
 }
 
-data "aws_route53_zone" "static" {
+data "aws_route53_zone" "index" {
   // Convert foo.bar.baz into bar.baz
-  name = join(".", reverse(slice(reverse(split(".", var.static_domain_name)), 0, 2)))
+  name = join(".", reverse(slice(reverse(split(".", var.index_domain_name)), 0, 2)))
 }
 
-resource "aws_route53_record" "static" {
-  zone_id = data.aws_route53_zone.static.id
-  name    = var.static_domain_name
+resource "aws_route53_record" "index" {
+  zone_id = data.aws_route53_zone.index.id
+  name    = var.index_domain_name
   type    = "CNAME"
   ttl     = 300
-  records = [aws_cloudfront_distribution.static.domain_name]
+  records = [aws_cloudfront_distribution.index.domain_name]
 }

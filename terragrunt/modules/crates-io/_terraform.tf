@@ -8,19 +8,33 @@ terraform {
   }
 }
 
+provider "aws" {
+  region = "us-west-1"
+}
+
+provider "aws" {
+  alias  = "us-east-1"
+  region = "us-east-1"
+}
+
+provider "aws" {
+  alias  = "eu-west-1"
+  region = "eu-west-1"
+}
+
 data "aws_caller_identity" "current" {}
 
-module "certificate" {
-  source = "../../shared/modules/acm-certificate"
-  providers = {
-    aws = aws.us-east-1
+data "terraform_remote_state" "shared" {
+  backend = "s3"
+  config = {
+    bucket = "rust-terraform"
+    key    = "simpleinfra/shared.tfstate"
+    region = "us-west-1"
   }
+}
 
-  domains = [
-    var.webapp_domain_name,
-    var.static_domain_name,
-    var.index_domain_name,
-  ]
+locals {
+  inventories_bucket_arn = data.terraform_remote_state.shared.outputs.inventories_bucket_arn
 }
 
 variable "webapp_domain_name" {
@@ -43,10 +57,6 @@ variable "index_bucket_name" {
   type = string
 }
 
-variable "inventories_bucket_arn" {
-  type = string
-}
-
 variable "webapp_origin_domain" {
   type = string
 }
@@ -63,4 +73,8 @@ variable "dns_apex" {
 variable "strict_security_headers" {
   type    = bool
   default = false
+}
+
+variable "certificate_arn" {
+  type = string
 }
