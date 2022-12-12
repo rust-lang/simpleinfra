@@ -1,15 +1,19 @@
 locals {
+  fastly_domain_name = "fastly-${var.static_domain_name}"
+
   primary_host_name  = aws_s3_bucket.static.region
   fallback_host_name = aws_s3_bucket.fallback.region
-  dictionary_name    = "compute_static"
-  package_path       = "./compute-static/pkg/compute-static.tar.gz"
+
+  dictionary_name = "compute_static"
+
+  package_path = "./compute-static/pkg/compute-static.tar.gz"
 }
 
 resource "fastly_service_compute" "static" {
   name = var.static_domain_name
 
   domain {
-    name = var.static_domain_name
+    name = local.fastly_domain_name
   }
 
   backend {
@@ -63,7 +67,7 @@ resource "fastly_service_dictionary_items" "compute_static" {
 
 resource "fastly_tls_subscription" "static" {
   certificate_authority = "lets-encrypt"
-  domains               = [var.static_domain_name]
+  domains               = [local.fastly_domain_name]
 }
 
 resource "aws_route53_record" "static_tls_validation" {
@@ -80,4 +84,13 @@ resource "aws_route53_record" "static_tls_validation" {
 resource "fastly_tls_subscription_validation" "static" {
   depends_on      = [aws_route53_record.static_tls_validation]
   subscription_id = fastly_tls_subscription.static.id
+}
+
+resource "aws_route53_record" "fastly_static_domain" {
+  name            = local.fastly_domain_name
+  type            = "CNAME"
+  zone_id         = data.aws_route53_zone.static.id
+  allow_overwrite = true
+  records         = ["n.sni.global.fastly.net"]
+  ttl             = 60
 }
