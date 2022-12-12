@@ -7,17 +7,6 @@ terraform {
   }
 }
 
-provider "azurerm" {
-  features {}
-
-  subscription_id = var.subscription_id
-}
-
-variable "subscription_id" {
-  description = "The subscription id for Azure"
-  type        = string
-}
-
 variable "location" {
   description = "The Azure Region for the dev desktops"
   type        = string
