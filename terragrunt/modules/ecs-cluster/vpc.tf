@@ -1,4 +1,4 @@
-module "vpc_prod" {
+module "vpc" {
   source = "../shared/vpc"
 
   name      = "docs-rs-staging"

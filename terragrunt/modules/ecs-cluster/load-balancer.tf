@@ -6,7 +6,7 @@
 resource "aws_lb" "lb" {
   name                       = var.cluster_name
   load_balancer_type         = "application"
-  subnets                    = var.load_balancer_subnet_ids
+  subnets                    = module.vpc.public_subnets
   security_groups            = [aws_security_group.lb.id]
   ip_address_type            = "dualstack"
   drop_invalid_header_fields = true
@@ -16,14 +16,8 @@ resource "aws_lb" "lb" {
   }
 }
 
-data "aws_route53_zone" "zone" {
-  provider = aws.legacy
-  // Convert foo.bar.baz into bar.baz
-  name = join(".", reverse(slice(reverse(split(".", var.load_balancer_domain)), 0, 2)))
-}
-
 resource "aws_route53_record" "lb" {
-  zone_id = data.aws_route53_zone.zone.id
+  zone_id = var.zone_id
   name    = var.load_balancer_domain
   type    = "CNAME"
   ttl     = 300
@@ -33,7 +27,7 @@ resource "aws_route53_record" "lb" {
 resource "aws_security_group" "lb" {
   name        = "${var.cluster_name}-load-balancer"
   description = "Allow incoming traffic for the load balancer"
-  vpc_id      = var.vpc_id
+  vpc_id      = module.vpc.id
 
   ingress {
     from_port        = 80

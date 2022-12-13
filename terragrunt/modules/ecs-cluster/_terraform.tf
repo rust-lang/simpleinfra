@@ -13,10 +13,4 @@ terraform {
 
 provider "aws" {
   region = "us-east-1"
-  profile = "DocsRsStaging"
-}
-
-provider "aws" {
-  region = "us-east-1"
-  alias  = "legacy"
 }

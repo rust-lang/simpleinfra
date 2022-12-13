@@ -8,15 +8,13 @@ locals {
     lb_listener_arn           = aws_lb_listener.lb_https.arn
     lb_dns_name               = aws_lb.lb.dns_name
     service_security_group_id = aws_security_group.service.id
-    subnet_ids                = var.subnet_ids
-    vpc_id                    = var.vpc_id
+    subnet_ids                = module.vpc.private_subnets
+    vpc_id                    = module.vpc.id
   }
 }
 
 resource "aws_ecs_cluster" "cluster" {
   name = var.cluster_name
-  # TODO: change this as it is deprecated
-  capacity_providers = ["FARGATE", "FARGATE_SPOT"]
 
   setting {
     name  = "containerInsights"
@@ -28,13 +26,23 @@ resource "aws_ecs_cluster" "cluster" {
   }
 }
 
+resource "aws_ecs_cluster_capacity_providers" "provider" {
+  cluster_name = aws_ecs_cluster.cluster.name
+
+  capacity_providers = ["FARGATE", "FARGATE_SPOT"]
+
+  default_capacity_provider_strategy {
+    capacity_provider = "FARGATE"
+  }
+}
+
 // This security group is used by all the services hosted on the cluster: it
 // only allows ingress HTTP connections from members of the load balancer
 // security group, and allows any egress.
 resource "aws_security_group" "service" {
   name        = "${var.cluster_name}-service"
   description = "Allow HTTP requests from the load balancer"
-  vpc_id      = var.vpc_id
+  vpc_id      = module.vpc.id
 
   ingress {
     from_port       = 80

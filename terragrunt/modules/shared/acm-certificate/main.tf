@@ -1,5 +1,5 @@
 locals {
-  top_level_domains = { for domain in var.domains : domain => join(".", reverse(slice(reverse(split(".", domain)), 0, 2))) }
+  top_level_domains = { for domain in var.domains : domain => join(".", reverse(slice(reverse(split(".", domain)), 0, 3))) }
 }
 
 terraform {

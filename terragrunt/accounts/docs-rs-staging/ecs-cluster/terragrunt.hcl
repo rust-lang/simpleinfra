@@ -7,10 +7,12 @@ include {
   merge_strategy = "deep"
 }
 
+dependency "dns_zone" {
+  config_path = "../dns-zone"
+}
+
 inputs = {
   cluster_name = "docs-rs-staging"
-  load_balancer_domain = "ecs-docs-rs-staging.infra.rust-lang.org"
-  load_balancer_subnet_ids = []
-  vpc_id = "TODO"
-  subnet_ids = []
+  load_balancer_domain = "ecs.${dependency.dns_zone.outputs.name}"
+  zone_id = dependency.dns_zone.outputs.id
 }
