@@ -9,6 +9,8 @@ locals {
   package_path = "./compute-static/pkg/compute-static.tar.gz"
 }
 
+### Stage 1
+
 resource "fastly_service_compute" "static" {
   name = var.static_domain_name
 
@@ -70,14 +72,21 @@ resource "fastly_tls_subscription" "static" {
   domains               = [local.fastly_domain_name]
 }
 
+### Stage 2
+
 resource "aws_route53_record" "static_tls_validation" {
   depends_on = [fastly_tls_subscription.static]
 
-  name            = fastly_tls_subscription.static.managed_dns_challenge.record_name
-  type            = fastly_tls_subscription.static.managed_dns_challenge.record_type
+  for_each = {
+    for challenge in fastly_tls_subscription.static.managed_dns_challenges :
+    trimprefix(challenge.record_name, "_acme-challenge.") => challenge
+  }
+
+  name            = each.value.record_name
+  type            = each.value.record_type
   zone_id         = data.aws_route53_zone.static.id
   allow_overwrite = true
-  records         = [fastly_tls_subscription.static.managed_dns_challenge.record_value]
+  records         = [each.value.record_value]
   ttl             = 60
 }
 
