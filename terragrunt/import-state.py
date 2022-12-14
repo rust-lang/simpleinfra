@@ -6,6 +6,15 @@
 # the terragrunt configuration in the current directory. The script only
 # performs non-destructive imports into the terragrunt state, and leaves the
 # original Terraform state untouched.
+#
+# The following example will import all resources that start with module.staging
+# from the Terraform module at `/terraform/crates-io`, except for the IAM policy
+# for Heroku.
+#
+#     import-state.py \
+#       -t crates-io \
+#       -p module.staging \
+#       --ignore 'module.prod.aws_iam_user_policy_attachment.heroku_static_write'
 
 import argparse
 import json
