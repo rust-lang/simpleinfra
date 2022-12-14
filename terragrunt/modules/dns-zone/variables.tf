@@ -1,4 +1,4 @@
 variable "name" {
-  description = ""
+  description = "The name of the DNS zone"
   type        = string
 }
