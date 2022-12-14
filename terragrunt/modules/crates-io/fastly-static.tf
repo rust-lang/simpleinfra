@@ -1,3 +1,8 @@
+# The Fastly service must be deployed in two steps, since some resources depend
+# on attributes that are only known after an `apply`. To deploy the service,
+# comment out everything in Stage 2 and then run `terragrunt apply`. After the
+# run has finished, uncomment Stage 2 and run `terragrunt apply` again.
+
 locals {
   fastly_domain_name = "fastly-${var.static_domain_name}"
 
