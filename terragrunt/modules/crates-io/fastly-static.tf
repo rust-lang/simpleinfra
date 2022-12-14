@@ -95,11 +95,24 @@ resource "fastly_tls_subscription_validation" "static" {
   subscription_id = fastly_tls_subscription.static.id
 }
 
+locals {
+  # It is currently not possible to get the CNAME for TLS-enabled hostnames as a
+  # Terraform resource. But the ACME HTTP challenge redirects production traffic
+  # to Fastly, for which it uses the CNAME that we are looking for.
+  #
+  # The below snippet is a hack to get the CNAME for the static domain from the
+  # HTTP challenge, until Fastly exposes it in the Terraform provider.
+  fastly_static_destinations = flatten([
+    for record in fastly_tls_subscription.static.managed_http_challenges :
+    record.record_values if record.record_type == "CNAME"
+  ])
+}
+
 resource "aws_route53_record" "fastly_static_domain" {
   name            = local.fastly_domain_name
   type            = "CNAME"
   zone_id         = data.aws_route53_zone.static.id
   allow_overwrite = true
-  records         = ["n.sni.global.fastly.net"]
+  records         = local.fastly_static_destinations
   ttl             = 60
 }
