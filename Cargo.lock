@@ -922,7 +922,6 @@ dependencies = [
 name = "team_login"
 version = "0.1.0"
 dependencies = [
- "clap",
  "curl",
  "miniserde",
 ]

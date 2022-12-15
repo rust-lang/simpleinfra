@@ -5,3 +5,6 @@ allow_ssh_extra_groups: "dev-desktop-allow-ssh"
 
 # Filesystem quota per user in GB
 vars_user_quota_gb: 100
+
+# Prototype user whose file system quota will be copied to new user accounts
+vars_user_quota_prototype_user: "quota-prototype"
