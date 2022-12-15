@@ -93,15 +93,13 @@
     - "quotaon -uv /"
   when: user_quota_check.rc == 0
 
-- name: Copy the scripts to manage quotas
-  template:
-    src: "{{ item }}"
-    dest: "/usr/local/bin/{{ item }}"
-    owner: root
-    mode: 0700
-  with_items:
-    - "increase-quota.sh"
-    - "report-quota.sh"
+- name: Get a list of dev-desktop users
+  shell: "cut -d: -f1 /etc/passwd | grep gh-"
+  register: dev_desktop_users
+
+- name: Set quota for users
+  command: "setquota -u {{ item }} {{ vars_user_quota_gb}}G {{ vars_user_quota_gb + 2 }}G 0 0 -a"
+  with_items: "{{ dev_desktop_users.stdout_lines }}"
 
 - name: Configure update script service
   copy:
