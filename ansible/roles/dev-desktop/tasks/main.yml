@@ -93,6 +93,16 @@
     - "quotaon -uv /"
   when: user_quota_check.rc == 0
 
+- name: Copy the scripts to manage quotas
+  template:
+    src: "{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    owner: root
+    mode: 0700
+  with_items:
+    - "increase-quota.sh"
+    - "report-quota.sh"
+
 - name: Configure update script service
   copy:
     src: team_login/
