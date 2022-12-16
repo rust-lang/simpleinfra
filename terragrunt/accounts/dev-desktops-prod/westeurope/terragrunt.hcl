@@ -7,6 +7,11 @@ include {
   merge_strategy = "deep"
 }
 
+include "azure" {
+  path = find_in_parent_folders("azure-provider.hcl")
+  merge_strategy = "deep"
+}
+
 dependency "resource_group" {
   config_path = "../resource-group"
 }

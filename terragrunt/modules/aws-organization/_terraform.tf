@@ -11,10 +11,6 @@ terraform {
   }
 }
 
-provider "aws" {
-  region = "us-east-1"
-}
-
 variable "users" {
   description = "The users inside the aws organization"
   type = map(object({
