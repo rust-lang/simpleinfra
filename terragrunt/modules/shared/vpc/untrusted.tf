@@ -69,8 +69,8 @@ resource "aws_vpc_endpoint_route_table_association" "untrusted_s3" {
 resource "aws_vpc_endpoint_route_table_association" "untrusted_dynamodb" {
   for_each = toset(values(var.untrusted_subnets))
 
-  vpc_endpoint_id = aws_vpc_endpoint.dynamodb.id
   route_table_id  = aws_route_table.untrusted[each.value].id
+  vpc_endpoint_id = aws_vpc_endpoint.dynamodb.id
 }
 
 // This Network ACL isolates instances in the untrusted subnet from each other

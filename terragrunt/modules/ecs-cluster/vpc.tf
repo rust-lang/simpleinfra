@@ -6,14 +6,8 @@ module "vpc" {
 
   public_subnets = {
     0 = "usw1-az1",
-    1 = "usw1-az3",
   }
   private_subnets = {
-    2 = "usw1-az1",
-    3 = "usw1-az3",
-  }
-  untrusted_subnets = {
-    4 = "usw1-az1",
-    5 = "usw1-az3",
+    1 = "usw1-az1",
   }
 }

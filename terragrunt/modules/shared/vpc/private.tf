@@ -75,6 +75,6 @@ resource "aws_vpc_endpoint_route_table_association" "private_s3" {
 resource "aws_vpc_endpoint_route_table_association" "private_dynamodb" {
   for_each = toset(values(var.private_subnets))
 
-  vpc_endpoint_id = aws_vpc_endpoint.dynamodb.id
   route_table_id  = aws_route_table.private[each.value].id
+  vpc_endpoint_id = aws_vpc_endpoint.dynamodb.id
 }
