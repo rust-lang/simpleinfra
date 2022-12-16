@@ -38,7 +38,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .arg("-C")
         .arg(&comment));
     let key = fs::read_to_string("_ssh_keygen_tmp_out").unwrap();
-    let key = base64::encode(&key);
+    let key = base64::encode(key);
     fs::remove_file("_ssh_keygen_tmp_out").unwrap();
     let pubkey = fs::read_to_string("_ssh_keygen_tmp_out.pub").unwrap();
     fs::remove_file("_ssh_keygen_tmp_out.pub").unwrap();
@@ -48,7 +48,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!("uploading the deploy key...");
     let client = Client::new();
     client
-        .post(&format!("https://api.github.com/repos/{}/keys", cli.repo))
+        .post(format!("https://api.github.com/repos/{}/keys", cli.repo))
         .header(
             USER_AGENT,
             HeaderValue::from_static("rust-lang/simpleinfra"),
