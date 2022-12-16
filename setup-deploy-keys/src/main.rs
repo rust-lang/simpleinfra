@@ -20,7 +20,7 @@ struct Cli {
 
 fn main() -> Result<(), Box<dyn Error>> {
     let cli = Cli::parse();
-    let date = Utc::today().format("%Y-%m-%d");
+    let date = Utc::now().format("%Y-%m-%d");
     let comment = format!("{} {}", cli.repo, date);
 
     println!("generating the ssh key...");
