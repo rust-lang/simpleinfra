@@ -8,8 +8,6 @@ locals {
     lb_listener_arn           = aws_lb_listener.lb_https.arn
     lb_dns_name               = aws_lb.lb.dns_name
     service_security_group_id = aws_security_group.service.id
-    subnet_ids                = module.vpc.private_subnets
-    vpc_id                    = module.vpc.id
   }
 }
 
@@ -42,7 +40,7 @@ resource "aws_ecs_cluster_capacity_providers" "provider" {
 resource "aws_security_group" "service" {
   name        = "${var.cluster_name}-service"
   description = "Allow HTTP requests from the load balancer"
-  vpc_id      = module.vpc.id
+  vpc_id      = var.vpc_id
 
   ingress {
     from_port       = 80

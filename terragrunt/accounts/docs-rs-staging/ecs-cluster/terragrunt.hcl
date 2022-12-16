@@ -11,8 +11,14 @@ dependency "dns_zone" {
   config_path = "../dns-zone"
 }
 
+dependency "vpc" {
+  config_path = "../vpc"
+}
+
 inputs = {
   cluster_name = "docs-rs-staging"
   load_balancer_domain = "ecs.${dependency.dns_zone.outputs.name}"
   zone_id = dependency.dns_zone.outputs.id
+  vpc_id  = dependency.vpc.outputs.id
+  subnet_ids = dependency.vpc.outputs.public_subnets
 }

@@ -6,7 +6,7 @@
 resource "aws_lb" "lb" {
   name                       = var.cluster_name
   load_balancer_type         = "application"
-  subnets                    = module.vpc.public_subnets
+  subnets                    = var.subnet_ids
   security_groups            = [aws_security_group.lb.id]
   ip_address_type            = "dualstack"
   drop_invalid_header_fields = true
@@ -27,7 +27,7 @@ resource "aws_route53_record" "lb" {
 resource "aws_security_group" "lb" {
   name        = "${var.cluster_name}-load-balancer"
   description = "Allow incoming traffic for the load balancer"
-  vpc_id      = module.vpc.id
+  vpc_id      = var.vpc_id
 
   ingress {
     from_port        = 80
@@ -85,7 +85,7 @@ resource "aws_lb_listener" "lb_http" {
 // domain": that domain will always serve the 404 page when visited.
 
 module "default_lb_certificate" {
-  source = "../shared/acm-certificate"
+  source = "../acm-certificate"
 
   domains = [
     var.load_balancer_domain,
