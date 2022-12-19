@@ -21,8 +21,8 @@ functionality that we find useful. The features of Terragrunt we use are:
 
 The [Terragrunt] configuration is split into two parts: _modules_ and _state_:
 
-- _Modules_ are normal [Terraform] modules that each provision a specific part
-  of our infrastructure. They are stored in the [`modules`](#modules) directory.
+- _Modules_ are normal [Terraform] modules that each define a specific part of
+  our infrastructure. They are stored in the [`modules`](#modules) directory.
 - _State_ represents concrete instances of our infrastructure. For example, the
   [staging environment for `crates.io`](./accounts/legacy/crates-io-staging) is
   an instances of the [`crates-io`](./modules/crates-io) [Terraform] module.
@@ -48,9 +48,11 @@ accounts
     └── westus2
 ```
 
-`dev-desktops-prod` is (AWS) _account_ that stores the Terraform state files for
-this environment. `westeurope` and `westus2` are two _states_, i.e. concrete
+`dev-desktops-prod` is the (AWS) _account_ that stores the Terraform state files
+for this environment. `westeurope` and `westus2` are two _states_, i.e. concrete
 instances of the [`dev-desktops-azure`](./modules/dev-desktops-azure) module.
+While these modules are deployed to Azure, their state is stored inside the
+parent AWS account.
 
 ### `modules`
 
