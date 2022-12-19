@@ -1,20 +1,124 @@
 # Terragrunt
 
-This directory contains all of the infrastructure configuration controlled through terragrunt.
+This directory contains all the infrastructure configuration controlled through
+Terragrunt.
 
-## What and why terragrunt?
+## What and why Terragrunt?
 
-[Terragrunt](https://terragrunt.gruntwork.io/) is a wrapper around terraform that adds some additional functionality that we find useful. The features of terragrunt we use are:
-* Configuration of s3 and dynamodb to handle remote terraform state files. This is done automatically instead of needing to be configured manually as is the case when using plain terraform.
-* Module reuse. Terragrunt allows for different environments (e.g., staging and production) which share almost all of their configuration. When using plain terraform this would require copy/pasting configuration and updating configuration in multiple places.
+[Terragrunt] is a wrapper around [Terraform] that adds some additional
+functionality that we find useful. The features of Terragrunt we use are:
 
+  - [Managed state files](https://terragrunt.gruntwork.io/docs/getting-started/quick-start/#keep-your-backend-configuration-dry):
+    Terragrunt can create the S3 bucket and DynamoDB tables that Terraform needs
+    to store its state. Automating their creation ensures consistency across
+    environments.
+  - [Versioned environments](https://terragrunt.gruntwork.io/docs/getting-started/quick-start/#promote-immutable-versioned-terraform-modules-across-environments):
+    With Terragrunt, we can have multiple environments that use different
+    versions of a Terraform module. This enables us to test on staging, review
+    changes, and then update production to the specific version.
 
-## Directory structure
+## Directory Structure
 
-The `terragrunt` directory is split into two subdirectories:
-* `modules`: the reuseable module definitions for the logical services we manage.
-* `aws`: AWS account definitions which use the modules in the `modules` directory to configure the various AWS accounts we manage.
+The [Terragrunt] configuration is split into two parts: _modules_ and _state_:
 
-## Running
+- _Modules_ are normal [Terraform] modules that each define a specific part of
+  our infrastructure. They are stored in the [`modules`](#modules) directory.
+- _State_ represents concrete instances of our infrastructure. For example, the
+  [staging environment for `crates.io`](./accounts/legacy/crates-io-staging) is
+  an instances of the [`crates-io`](./modules/crates-io) [Terraform] module.
+  State is managed using [Terragrunt], and is configured inside the
+  [`accounts`](#accounts) directory.
 
-Running terragrunt requires permissions to the AWS account you are configuring. Assuming you have permission, you can cd into the corresponding service within the `aws` directory and run `terragrunt plan` to see the plan terraform will apply and `terragrunt apply` to actually apply the plan.
+Both concepts are described in more details below.
+
+### `accounts`
+
+The `accounts` subdirectory contains the _state_ of our infrastructure.
+
+A _state_ is a concrete instance of a _service_ or a shared module, which has
+been defined as a [Terraform] module in [`modules`](#modules). States are
+deployed using [Terragrunt], and are grouped by the account in which they run.
+
+Given the following directory structure:
+
+```text
+accounts
+└── dev-desktops-prod
+    ├── westeurope
+    └── westus2
+```
+
+`dev-desktops-prod` is the (AWS) _account_ that stores the Terraform state files
+for this environment. `westeurope` and `westus2` are two _states_, i.e. concrete
+instances of the [`dev-desktops-azure`](./modules/dev-desktops-azure) module.
+While these modules are deployed to Azure, their state is stored inside the
+parent AWS account.
+
+### `modules`
+
+The `modules` subdirectory contains the _configuration_ for our infrastructure.
+We use [Terraform] to declare our infrastructure as code, which we have split
+into composable _modules_.
+
+Modules at the root of the `modules` directory are called _services_ and define
+an app or service within our infrastructure. For example, we have a module for
+our [dev desktops](./modules/dev-desktops-azure) that contains every piece of 
+infrastructure that is required to run one or more instances on Azure.
+
+_Services_ can be deployed multiple times. Each deployment is a concrete
+instance of the configuration, and is managed with [Terragrunt] as a _state_
+inside the [`accounts`](#accounts) directory. For example, `crates.io` has a
+staging and a production _state_, which are both configured through the
+[`crates-io`](./modules/crates-io) _service_ module.
+
+Modules that are generic and can be shared between _services_ are stored in the
+`modules/shared` directory. They often provide a higher-level abstraction over
+concrete implementation details. For example, the shared module
+[`acm-certificate`](./modules/shared/acm-certificate) makes it easy to generate
+a TLS certificate for a list of domain names.
+
+## State vs. Module
+
+We have two tools to define dependencies between pieces of our infrastructure:
+
+  1. With [Terragrunt], we can define [dependencies](https://terragrunt.gruntwork.io/docs/features/execute-terraform-commands-on-multiple-modules-at-once/#dependencies-between-modules)
+     between [_states_](#accounts). 
+  2. A [Terraform] module can include other modules.
+
+### State
+
+As a rule of thumb, we want to use dependencies in [Terragrunt] to _share
+resources within an account_. For example, we can create an ECS cluster in an
+account and run multiple services on it. The cluster and each service would be
+configured with its own _state_:
+
+```text
+accounts
+└── docs-rs-staging
+    ├── docs-rs-web
+    ├── docs-rs-worker
+    └── ecs-cluster
+```
+
+In this example, `docs-rs-web` and `docs-rs-worker` both have a dependency on
+the `ecs-cluster`.
+
+### Module
+
+On the other hand, we want to use [Terraform] modules for anything that can be
+reused and shared inside _services_. These resources are scoped to each _state_
+or _service_, but are not shared across an _account_.
+
+For example, the [`acm-certificate`](./modules/shared/acm-certificate) module
+creates TLS certificates. When included in a service such as `crates-io`, each
+instance of the service will create its own certificate.
+
+## Running Terragrunt
+
+Running [Terragrunt] requires permissions to the AWS account you are
+configuring. Assuming you have permission, you can `cd` into the corresponding
+service within the `accounts` directory and run `terragrunt plan` to see the
+plan terraform will apply and `terragrunt apply` to actually apply the plan.
+
+[terraform]: https://www.terraform.io/
+[terragrunt]: https://terragrunt.gruntwork.io/
