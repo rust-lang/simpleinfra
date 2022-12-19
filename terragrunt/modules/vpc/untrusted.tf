@@ -78,6 +78,7 @@ resource "aws_vpc_endpoint_route_table_association" "untrusted_dynamodb" {
 // the public subnet or outgoing connections to the Internet.
 
 resource "aws_network_acl" "untrusted" {
+  count      = length(var.untrusted_subnets) > 0 ? 1 : 0
   vpc_id     = aws_vpc.vpc.id
   subnet_ids = [for subnet, az in var.untrusted_subnets : aws_subnet.untrusted[subnet].id]
 

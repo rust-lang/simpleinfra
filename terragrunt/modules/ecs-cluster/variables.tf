@@ -9,8 +9,8 @@ variable "load_balancer_domain" {
 }
 
 variable "zone_id" {
-  type              = string
-  descridescription = "The DNS zone where the load balancer DNS records should live"
+  type        = string
+  description = "The DNS zone where the load balancer DNS records should live"
 }
 
 variable "vpc_id" {

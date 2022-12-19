@@ -12,9 +12,9 @@ inputs = {
   ipv4_cidr = "10.0.0.0/16"
 
   public_subnets = {
-    0 = "usw1-az1",
+    0 = "use1-az1",
   }
   private_subnets = {
-    1 = "usw1-az1",
+    1 = "use1-az1",
   }
 }
