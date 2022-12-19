@@ -10,8 +10,11 @@ locals {
   fallback_host_name = aws_s3_bucket.fallback.region
 
   dictionary_name = "compute_static"
+}
 
-  package_path = "./compute-static/pkg/compute-static.tar.gz"
+data "external" "package" {
+  program = ["bash", "terraform-external-build.sh"]
+  working_dir = "./compute-static/bin"
 }
 
 ### Stage 1
@@ -52,8 +55,8 @@ resource "fastly_service_compute" "static" {
   }
 
   package {
-    filename         = local.package_path
-    source_code_hash = filesha512(local.package_path)
+    filename         = data.external.package.result.path
+    source_code_hash = filesha512(data.external.package.result.path)
   }
 }
 
