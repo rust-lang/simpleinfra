@@ -10,9 +10,9 @@
       papertrail_url: "{{ vars_papertrail_url }}"
       collect_metrics_from: "{{ global_collect_metrics_from }}"
       sudo_users:
-        - aidanhs
         - simulacrum
         - pietro
+        - jdn
 
     - role: docker
       images:

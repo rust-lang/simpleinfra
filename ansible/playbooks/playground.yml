@@ -13,6 +13,7 @@
         - pietro
         - shep
         - simulacrum
+        - jdn
       avoid_removing_docker_users:
         - playground
 

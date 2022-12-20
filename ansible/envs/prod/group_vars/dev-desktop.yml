@@ -4,7 +4,6 @@
 ssm_dev_desktop: "{{ lookup('aws_ssm', '/prod/ansible/dev-desktop/', region='us-west-1', shortnames=true, bypath=true, recursive=true) }}"
 
 vars_sudo_users:
-  - aidanhs
   - simulacrum
   - pietro
   - jdn
