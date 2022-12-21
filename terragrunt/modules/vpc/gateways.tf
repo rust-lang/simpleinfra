@@ -33,7 +33,7 @@ resource "aws_vpc_endpoint" "dynamodb" {
 // inside the first public subnet of each AZ.
 
 resource "aws_eip" "nat" {
-  for_each = toset(values(var.public_subnets)) # Name of the AZs
+  for_each = toset(values(var.private_subnets)) # Name of the AZs
 
   vpc = true
   tags = {
@@ -41,8 +41,8 @@ resource "aws_eip" "nat" {
   }
 }
 
-resource "aws_nat_gateway" "nat" {
-  # Transform a map of subnet numbers and AZ names:
+locals {
+  # Transform a map of public subnet numbers and AZ names:
   #
   #   {"0" = "usw1-az1", "1" = "usw1-az3", "2" = "usw1-az1", "3" = "usw1-az3"}
   #
@@ -50,13 +50,24 @@ resource "aws_nat_gateway" "nat" {
   #
   #   {"usw1-az1" = "0", "usw1-az3" = "1"}
   #
-  for_each = {
+  az_to_public_subnet = {
     for az, subnets in transpose({
       for num, az in var.public_subnets : num => [az]
     }) : az => subnets[0]
   }
 
-  subnet_id     = aws_subnet.public[each.value].id
+  # Same as above but for private subnets
+  az_to_private_subnet = {
+    for az, subnets in transpose({
+      for num, az in var.private_subnets : num => [az]
+    }) : az => subnets[0]
+  }
+}
+
+resource "aws_nat_gateway" "nat" {
+  for_each = local.az_to_private_subnet
+
+  subnet_id     = aws_subnet.public[local.az_to_public_subnet[each.key]].id
   allocation_id = aws_eip.nat[each.key].id
 
   tags = {

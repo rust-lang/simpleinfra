@@ -13,8 +13,9 @@ inputs = {
 
   public_subnets = {
     0 = "use1-az1",
+    1 = "use1-az2",
   }
   private_subnets = {
-    1 = "use1-az1",
+    2 = "use1-az1",
   }
 }
