@@ -20,12 +20,20 @@ resource "aws_vpc_endpoint" "s3" {
   vpc_id            = aws_vpc.vpc.id
   service_name      = "com.amazonaws.${data.aws_region.current.name}.s3"
   vpc_endpoint_type = "Gateway"
+
+  tags = {
+    Name = "S3 VPC Endpoint"
+  }
 }
 
 resource "aws_vpc_endpoint" "dynamodb" {
   vpc_id            = aws_vpc.vpc.id
   service_name      = "com.amazonaws.${data.aws_region.current.name}.dynamodb"
   vpc_endpoint_type = "Gateway"
+
+  tags = {
+    Name = "DynamoDB VPC Endpoint"
+  }
 }
 
 // The NAT gateway allows IPv4 connections to the public internet in private
