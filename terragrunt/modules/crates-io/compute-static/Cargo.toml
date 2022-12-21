@@ -1,0 +1,19 @@
+# The Fastly function is built inside a virtual Terragrunt environment. Only the
+# crates-io module is copied into this environment, which means it cannot be a
+# part of the workspace at the root of this repository.
+[workspace]
+
+[package]
+name = "compute-static"
+description = "Compute@Edge function for static.crates.io"
+version = "0.1.0"
+edition = "2021"
+
+publish = false
+
+[profile.release]
+debug = 1
+
+[dependencies]
+fastly = "0.8.9"
+log = "0.4.17"
