@@ -1,5 +1,5 @@
 locals {
-  top_level_domains = { for domain in var.domains : domain => join(".", reverse(slice(reverse(split(".", domain)), 0, 2))) }
+  top_level_domains = { for domain in var.domains : domain => join(".", reverse(slice(reverse(split(".", domain)), 0, 3))) }
 }
 
 data "aws_route53_zone" "zones" {
@@ -17,6 +17,7 @@ resource "aws_acm_certificate" "cert" {
   }
 }
 
+# We use DNS records to prove to ACM that we control the domains we're getting certs for
 resource "aws_route53_record" "cert_validation" {
   for_each = {
     for dvo in aws_acm_certificate.cert.domain_validation_options : dvo.domain_name => {
