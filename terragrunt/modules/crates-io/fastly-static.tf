@@ -13,7 +13,7 @@ locals {
 }
 
 data "external" "package" {
-  program = ["bash", "terraform-external-build.sh"]
+  program     = ["bash", "terraform-external-build.sh"]
   working_dir = "./compute-static/bin"
 }
 
