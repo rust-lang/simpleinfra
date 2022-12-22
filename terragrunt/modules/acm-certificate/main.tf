@@ -1,5 +1,9 @@
 locals {
-  top_level_domains = { for domain in var.domains : domain => join(".", reverse(slice(reverse(split(".", domain)), 0, 3))) }
+  # The legacy account has zones for top-level domains (e.g. crates.io), while
+  # new accounts have zones for subdomains (e.g. staging.crates.io).
+  depth = var.legacy ? 2 : 3
+
+  top_level_domains = { for domain in var.domains : domain => join(".", reverse(slice(reverse(split(".", domain)), 0, local.depth))) }
 }
 
 data "aws_route53_zone" "zones" {

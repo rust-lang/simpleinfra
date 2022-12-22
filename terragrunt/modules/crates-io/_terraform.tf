@@ -76,7 +76,3 @@ variable "strict_security_headers" {
   type    = bool
   default = false
 }
-
-variable "certificate_arn" {
-  type = string
-}

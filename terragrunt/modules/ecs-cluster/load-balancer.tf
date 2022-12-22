@@ -90,6 +90,8 @@ module "default_lb_certificate" {
   domains = [
     var.load_balancer_domain,
   ]
+
+  legacy = false
 }
 
 resource "aws_lb_listener" "lb_https" {
