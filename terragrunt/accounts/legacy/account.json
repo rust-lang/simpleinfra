@@ -1,6 +1,6 @@
 {
     "aws": {
-        "profile": "default",
+        "profile": null,
         "region": "us-west-1"
     }
 }
