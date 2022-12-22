@@ -45,5 +45,11 @@ inputs = {
       email       = "jake.goulding@integer32.com"
       groups      = ["infra"]
     }
+    "abibroom" = {
+      given_name = "Abi"
+      family_name = "Broom"
+      email = "abibroom@rustfoundation.org"
+      groups = ["billing"]
+    }
   }
 }
