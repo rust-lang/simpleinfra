@@ -35,8 +35,7 @@ def find_aws_account_id(account_json):
             "aws",
             "sts",
             "get-caller-identity",
-            "--profile",
-            account_json["aws"]["profile"],
+            *profile_args(account_json),
             "--output",
             "text",
             "--query",
@@ -57,12 +56,26 @@ def calculate_remote_state_key(account_json_file, terragrunt_dir):
 
 
 def calculate_providers_content(account_json):
-    return f"""
+    if account_json["aws"]["profile"] is not None:
+        return f"""
 provider "aws" {{
   profile = "{account_json["aws"]["profile"]}"
   region = "{account_json["aws"]["region"]}"
 }}
 """
+    else:
+        return f"""
+provider "aws" {{
+  region = "{account_json["aws"]["region"]}"
+}}
+"""
+
+
+def profile_args(account_json):
+    if account_json["aws"]["profile"] is not None:
+        return ["--profile", account_json["aws"]["profile"]]
+    else:
+        return []
 
 
 def error(message):
