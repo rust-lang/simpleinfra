@@ -1,5 +1,6 @@
 locals {
   groups = {
+    billing : aws_identitystore_group.billing
     infra : aws_identitystore_group.infra
     infra-admins : aws_identitystore_group.infra-admins
   }
