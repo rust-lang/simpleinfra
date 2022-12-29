@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-for d in rust*
+for d in ~/rust*
 do
     cd $d
     echo $d
