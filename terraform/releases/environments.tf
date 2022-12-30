@@ -60,6 +60,16 @@ module "prod" {
       name  = "PROMOTE_RELEASE_RUSTC_TAG_REPOSITORY"
       value = "rust-lang/rust"
       type  = "PLAINTEXT"
+    },
+    {
+      name  = "PROMOTE_RELEASE_DISCOURSE_API_USER"
+      value = "system"
+      type  = "PLAINTEXT"
+    },
+    {
+      name  = "PROMOTE_RELEASE_DISCOURSE_API_KEY"
+      value = "/prod/promote-release/users-discourse-api-key"
+      type  = "PARAMETER_STORE"
     }
   ])
 
