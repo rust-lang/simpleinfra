@@ -232,7 +232,8 @@ resource "aws_iam_role_policy" "promote_release" {
         Action = ["ssm:GetParameters"]
         Resource = [
           "${data.aws_ssm_parameter.github_app_key.arn}",
-          "${data.aws_ssm_parameter.discourse.arn}"
+          "${data.aws_ssm_parameter.internals_discourse.arn}",
+          "${data.aws_ssm_parameter.users_discourse.arn}",
         ]
       }
     ]
@@ -244,8 +245,13 @@ data "aws_ssm_parameter" "github_app_key" {
   with_decryption = false
 }
 
-data "aws_ssm_parameter" "discourse" {
+data "aws_ssm_parameter" "internals_discourse" {
   name            = "/prod/promote-release/discourse-api-key"
+  with_decryption = false
+}
+
+data "aws_ssm_parameter" "users_discourse" {
+  name            = "/prod/promote-release/users-discourse-api-key"
   with_decryption = false
 }
 
