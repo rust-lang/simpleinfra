@@ -1,5 +1,10 @@
 ---
 
+global_sudo_users:
+  - simulacrum
+  - pietro
+  - jdn
+
 global_collect_metrics_from:
   - 52.9.166.219  # monitoring.infra.rust-lang.org
 
