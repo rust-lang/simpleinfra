@@ -50,9 +50,8 @@ resource "aws_cloudfront_distribution" "webapp" {
   }
 
   origin {
-    origin_id = "ec2"
-    // TODO: replace with real origin
-    domain_name = "example.com"
+    origin_id   = "ec2"
+    domain_name = local.web_domain
 
     custom_origin_config {
       http_port              = 80

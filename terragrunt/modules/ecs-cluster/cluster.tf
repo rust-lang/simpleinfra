@@ -8,6 +8,8 @@ locals {
     lb_listener_arn           = aws_lb_listener.lb_https.arn
     lb_dns_name               = aws_lb.lb.dns_name
     service_security_group_id = aws_security_group.service.id
+    subnet_ids                = var.subnet_ids
+    vpc_id                    = var.vpc_id
   }
 }
 
