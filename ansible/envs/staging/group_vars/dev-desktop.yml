@@ -3,11 +3,7 @@
 # Fetch all the group params from AWS SSM
 ssm_dev_desktop: "{{ lookup('aws_ssm', '/staging/ansible/dev-desktop/', region='us-west-1', shortnames=true, bypath=true, recursive=true) }}"
 
-vars_sudo_users:
-  - aidanhs
-  - simulacrum
-  - pietro
-  - jdn
+vars_extra_sudo_users:
   - oli-obk
 
 vars_github_app_id: 196783

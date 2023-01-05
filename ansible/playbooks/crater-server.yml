@@ -8,10 +8,8 @@
 
     - role: common
       collect_metrics_from: "{{ global_collect_metrics_from }}"
-      sudo_users:
-        - aidanhs
-        - simulacrum
-        - pietro
+      sudo_users: "{{ global_sudo_users }}"
+
     - role: docker
       images:
         region: us-west-1

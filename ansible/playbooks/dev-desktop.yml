@@ -9,7 +9,7 @@
     - role: common
       papertrail_url: "{{ vars_papertrail_url }}"
       collect_metrics_from: "{{ global_collect_metrics_from }}"
-      sudo_users: "{{ vars_sudo_users }}"
+      sudo_users: "{{ global_sudo_users + vars_extra_sudo_users }}"
       allow_ssh_extra_groups: dev-desktop-allow-ssh
 
     - role: dev-desktop
