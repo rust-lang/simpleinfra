@@ -197,7 +197,7 @@
   notify:
     - restart-firewall
 
-- name: install common tooling
+- name: Install common tooling
   apt:
     name:
       - build-essential
@@ -209,6 +209,13 @@
       - valgrind
       - ninja-build
       - fish
+      - ripgrep
+      - hyperfine
+      - jq
+      - mdbook
+      - git-absorb
+      # Allows running `x check --target x86_64-pc-windows-gnu`
+      - gcc-mingw-w64-x86-64
     state: present
 
 - name: Install tools for x86
