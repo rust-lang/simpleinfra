@@ -1,0 +1,13 @@
+---
+
+- name: Disable the fwupd-refresh timer
+  ansible.builtin.systemd:
+    enabled: false
+    state: stopped
+    name: fwupd-refresh.timer
+
+- name: Disable the fwupd-refresh service
+  ansible.builtin.systemd:
+    enabled: false
+    state: stopped
+    name: fwupd-refresh.service

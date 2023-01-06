@@ -8,3 +8,4 @@
 - include: metrics.yml
 - include: papertrail.yml
 - include: cleanup.yml
+- include: services.yml
