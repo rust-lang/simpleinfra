@@ -1,0 +1,7 @@
+---
+
+- name: Set up the convenience files for managing worktrees
+  copy:
+    src: scripts/
+    dest: /usr/local/bin/
+    mode: a+x

@@ -1,0 +1,61 @@
+---
+
+- name: Enable kernel modules for quota
+  command: "{{ item }}"
+  with_items:
+    - "modprobe quota_v1"
+    - "modprobe quota_v2"
+
+- name: Determine name of root volume
+  shell:
+    cmd: cat /etc/fstab | grep -E '\s+/\s+' | awk -F ' ' '{ print $1 }'
+  register: fstab_root_volume_name
+
+- name: Enable quotas for the root volume
+  mount:
+    path: "/"
+    src: "{{ fstab_root_volume_name.stdout }}"
+    fstype: ext4
+    opts: "usrquota"
+    state: mounted
+
+- name: Check if quota system is already enabled
+  command: "quotaon -up /"
+  register: user_quota_check
+  failed_when: user_quota_check.rc != 0 and user_quota_check.rc != 1
+
+- name: Enable the quota system for users
+  command: "{{ item }}"
+  with_items:
+    - "quotacheck -um /"
+    - "quotaon -uv /"
+  when: user_quota_check.rc == 0
+
+  # Setting a default quota for new users works by copying the quota settings
+  # from an existing user to the new user account. We are creating an empty,
+  # locked user that we can use for this purpose.
+- name: Create a prototype user for the file system quota
+  user:
+    name: "{{ vars_user_quota_prototype_user }}"
+    shell: "/usr/sbin/nologin"
+    password_lock: true
+    create_home: false
+    state: present
+
+- name: Configure default quota for new user accounts
+  replace:
+    path: /etc/adduser.conf
+    regexp: '^QUOTAUSER=""$'
+    replace: 'QUOTAUSER="{{ vars_user_quota_prototype_user }}"'
+
+- name: Get a list of dev-desktop users
+  shell: "cut -d: -f1 /etc/passwd | grep gh- || true"
+  register: dev_desktop_users
+
+- name: Set quota for users
+  command: "setquota -u {{ item }} {{ vars_user_quota_gb}}G {{ vars_user_quota_gb + 2 }}G 0 0 -a"
+  with_items: "{{ dev_desktop_users.stdout_lines + [vars_user_quota_prototype_user] }}"
+- name: Configure update script service
+  copy:
+    src: team_login/
+    dest: "{{ vars_team_login_path }}"
