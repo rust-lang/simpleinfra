@@ -7,10 +7,6 @@ include {
   merge_strategy = "deep"
 }
 
-dependency "certificate" {
-  config_path = "../acm-certificate"
-}
-
 inputs = {
   webapp_domain_name = "crates.io"
   static_domain_name = "static.crates.io"
@@ -25,6 +21,4 @@ inputs = {
   iam_prefix = "crates-io"
 
   strict_security_headers = true
-
-  certificate_arn = dependency.certificate.outputs.arn
 }
