@@ -74,7 +74,7 @@ staging and a production _state_, which are both configured through the
 Modules that are generic and can be shared between _services_ are stored in the
 `modules/shared` directory. They often provide a higher-level abstraction over
 concrete implementation details. For example, the shared module
-[`acm-certificate`](./modules/shared/acm-certificate) makes it easy to generate
+[`acm-certificate`](modules/acm-certificate) makes it easy to generate
 a TLS certificate for a list of domain names.
 
 ## State vs. Module
@@ -109,7 +109,7 @@ On the other hand, we want to use [Terraform] modules for anything that can be
 reused and shared inside _services_. These resources are scoped to each _state_
 or _service_, but are not shared across an _account_.
 
-For example, the [`acm-certificate`](./modules/shared/acm-certificate) module
+For example, the [`acm-certificate`](modules/acm-certificate) module
 creates TLS certificates. When included in a service such as `crates-io`, each
 instance of the service will create its own certificate.
 

@@ -15,7 +15,7 @@ resource "aws_cloudfront_distribution" "index" {
 
   aliases = [var.index_domain_name]
   viewer_certificate {
-    acm_certificate_arn = var.certificate_arn
+    acm_certificate_arn = module.certificate.arn
     ssl_support_method  = "sni-only"
   }
 
