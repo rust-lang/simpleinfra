@@ -26,6 +26,10 @@ resource "fastly_service_compute" "static" {
     name = local.fastly_domain_name
   }
 
+  domain {
+    name = var.static_domain_name
+  }
+
   backend {
     # Must be identical to s3-primary-host item in dictionary
     name = local.primary_host_name
@@ -77,7 +81,10 @@ resource "fastly_service_dictionary_items" "compute_static" {
 
 resource "fastly_tls_subscription" "static" {
   certificate_authority = "lets-encrypt"
-  domains               = [local.fastly_domain_name]
+  domains = [
+    local.fastly_domain_name,
+    var.static_domain_name
+  ]
 }
 
 ### Stage 2
