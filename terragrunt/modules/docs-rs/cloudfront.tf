@@ -52,7 +52,7 @@ resource "aws_cloudfront_distribution" "webapp" {
   origin {
     origin_id = "ec2"
     // TODO: replace with real origin
-    domain_name = "http://example.com"
+    domain_name = "example.com"
 
     custom_origin_config {
       http_port              = 80
@@ -86,7 +86,11 @@ resource "aws_cloudfront_distribution" "webapp" {
 resource "aws_route53_record" "webapp" {
   zone_id = var.zone_id
   name    = var.domain
-  type    = "CNAME"
-  ttl     = 300
-  records = [aws_cloudfront_distribution.webapp.domain_name]
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.webapp.domain_name
+    zone_id                = aws_cloudfront_distribution.webapp.hosted_zone_id
+    evaluate_target_health = false
+  }
 }
