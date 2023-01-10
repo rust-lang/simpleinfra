@@ -5,7 +5,7 @@ locals {
 }
 
 resource "aws_s3_bucket" "storage" {
-  bucket = "static-docs-rs-${local.account_id}"
+  bucket = "docs-rs-storage-${local.account_id}"
 }
 
 resource "aws_s3_bucket_policy" "static_access" {
@@ -32,29 +32,6 @@ resource "aws_s3_bucket_policy" "static_access" {
       }
     ]
   })
-}
-
-// Store inventory CSV for later processing
-resource "aws_s3_bucket_inventory" "storage" {
-  count = var.inventories_bucket_arn == "" ? 0 : 1
-
-  name    = "all-objects-csv"
-  bucket  = aws_s3_bucket.storage.id
-  enabled = true
-
-  included_object_versions = "Current"
-  optional_fields          = ["ETag", "ReplicationStatus", "Size"]
-
-  schedule {
-    frequency = "Weekly"
-  }
-  destination {
-    bucket {
-      bucket_arn = var.inventories_bucket_arn
-      prefix     = aws_s3_bucket.storage.id
-      format     = "CSV"
-    }
-  }
 }
 
 resource "aws_s3_bucket_public_access_block" "storage" {
@@ -109,4 +86,29 @@ resource "aws_s3_bucket_public_access_block" "backups" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket" "inventory" {
+  bucket = "docs-rs-inventory-${local.account_id}"
+}
+
+// Store inventory CSV for later processing
+resource "aws_s3_bucket_inventory" "storage" {
+  name    = "all-objects-csv"
+  bucket  = aws_s3_bucket.storage.id
+  enabled = true
+
+  included_object_versions = "Current"
+  optional_fields          = ["ETag", "ReplicationStatus", "Size"]
+
+  schedule {
+    frequency = "Weekly"
+  }
+  destination {
+    bucket {
+      bucket_arn = aws_s3_bucket.inventory.arn
+      prefix     = aws_s3_bucket.storage.id
+      format     = "CSV"
+    }
+  }
 }
