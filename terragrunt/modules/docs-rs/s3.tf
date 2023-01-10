@@ -1,5 +1,11 @@
+data "aws_caller_identity" "current" {}
+
+locals {
+  account_id = data.aws_caller_identity.current.account_id
+}
+
 resource "aws_s3_bucket" "storage" {
-  bucket = "static-docs-rs"
+  bucket = "static-docs-rs-${local.account_id}"
 }
 
 resource "aws_s3_bucket_policy" "static_access" {
@@ -61,7 +67,7 @@ resource "aws_s3_bucket_public_access_block" "storage" {
 }
 
 resource "aws_s3_bucket" "backups" {
-  bucket = "docs.rs-backups"
+  bucket = "docs-rs-backups-${local.account_id}"
 }
 
 resource "aws_s3_bucket_acl" "backups" {
