@@ -30,8 +30,7 @@ module "web" {
   }
 
   secrets = {
-    # TODO: ensure that this is a secret in the SSM store
-    # DOCSRS_GITHUB_ACCESSTOKEN = "/prod/docs-rs/github-access-token"
+    DOCSRS_GITHUB_ACCESSTOKEN = "/prod/docs-rs/github-access-token"
   }
 
   computed_secrets = {
