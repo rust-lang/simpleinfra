@@ -5,6 +5,7 @@ locals {
 module "certificate" {
   source  = "../acm-certificate"
   domains = var.domains
+  legacy  = false
 }
 
 resource "aws_lb_listener_certificate" "service" {

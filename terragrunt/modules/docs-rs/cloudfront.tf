@@ -6,6 +6,8 @@ module "certificate" {
   domains = [
     var.domain,
   ]
+
+  legacy = false
 }
 
 resource "aws_cloudfront_distribution" "webapp" {

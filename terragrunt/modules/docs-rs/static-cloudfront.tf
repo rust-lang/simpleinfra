@@ -13,6 +13,8 @@ module "static_certificate" {
   domains = [
     local.static_domain_name
   ]
+
+  legacy = false
 }
 
 resource "aws_cloudfront_cache_policy" "static_docs_rs" {
