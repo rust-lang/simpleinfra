@@ -80,7 +80,7 @@ resource "aws_iam_policy" "manage_own_credentials" {
         "iam:CreateVirtualMFADevice",
         "iam:DeleteVirtualMFADevice"
       ],
-      "Resource": "arn:aws:iam::*:mfa/$${aws:username}"
+      "Resource": "arn:aws:iam::*:mfa/*"
     },
     {
       "Sid": "AllowManageOwnUserMFA",
