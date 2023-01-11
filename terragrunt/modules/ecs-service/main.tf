@@ -23,6 +23,10 @@ resource "aws_ecs_service" "service" {
       [var.cluster_config.service_security_group_id],
       var.additional_security_group_ids,
     )
-    assign_public_ip = false
+    // TODO: We assign a public IP address so that the service communicate
+    // to all the services it needs (e.g., SSM and ECR). Eventually, we'd
+    // like to shut down public access to the ecs service, but the work
+    // around is tediuous.
+    assign_public_ip = true
   }
 }
