@@ -27,7 +27,7 @@ resource "aws_cloudfront_distribution" "webapp" {
   }
 
   default_cache_behavior {
-    target_origin_id       = "ec2"
+    target_origin_id       = "web"
     allowed_methods        = ["GET", "HEAD", "OPTIONS"]
     cached_methods         = ["GET", "HEAD", "OPTIONS"]
     compress               = true
@@ -52,7 +52,7 @@ resource "aws_cloudfront_distribution" "webapp" {
   }
 
   origin {
-    origin_id   = "ec2"
+    origin_id   = "web"
     domain_name = local.web_domain
 
     custom_origin_config {
