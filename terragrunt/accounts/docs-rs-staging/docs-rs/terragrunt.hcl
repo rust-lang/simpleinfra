@@ -15,9 +15,13 @@ dependency "vpc" {
   config_path = "../vpc"
 }
 
+dependency "cluster" {
+  config_path = "../ecs-cluster"
+}
+
 inputs = {
   zone_id            = dependency.dns_zone.outputs.id
-  vpc_id             = dependency.vpc.outputs.id
+  cluster_config     = dependency.cluster.outputs.config
   private_subnet_ids = dependency.vpc.outputs.private_subnets
   domain             = "docs-rs-staging.rust-lang.net"
 }
