@@ -30,7 +30,7 @@ module "web" {
   }
 
   secrets = {
-    DOCSRS_GITHUB_ACCESSTOKEN = "/prod/docs-rs/github-access-token"
+    DOCSRS_GITHUB_ACCESSTOKEN = "/docs-rs/github-access-token"
   }
 
   computed_secrets = {

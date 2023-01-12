@@ -69,7 +69,7 @@ resource "aws_db_instance" "db" {
 }
 
 resource "aws_ssm_parameter" "connection_url" {
-  name  = "/prod/docs-rs/database-url"
+  name  = "/docs-rs/database-url"
   type  = "SecureString"
   value = "postgres://docsrs:${random_password.db.result}@${aws_db_instance.db.address}/docsrs"
 }
