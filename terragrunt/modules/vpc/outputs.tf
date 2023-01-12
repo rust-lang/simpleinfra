@@ -22,3 +22,8 @@ output "untrusted_subnets" {
   value       = [for count, subnet in aws_subnet.untrusted : subnet.id]
   description = "IDs of the untrusted subnets inside the VPC"
 }
+
+output "bastion_security_group_id" {
+  value       = module.bastion.security_group_id
+  description = "Id of the security group for the bastion instance"
+}

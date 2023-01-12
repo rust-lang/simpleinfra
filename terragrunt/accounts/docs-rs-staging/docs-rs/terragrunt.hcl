@@ -20,8 +20,9 @@ dependency "cluster" {
 }
 
 inputs = {
-  zone_id            = dependency.dns_zone.outputs.id
-  cluster_config     = dependency.cluster.outputs.config
-  private_subnet_ids = dependency.vpc.outputs.private_subnets
-  domain             = "docs-rs-staging.rust-lang.net"
+  zone_id                   = dependency.dns_zone.outputs.id
+  cluster_config            = dependency.cluster.outputs.config
+  private_subnet_ids        = dependency.vpc.outputs.private_subnets
+  domain                    = "docs-rs-staging.rust-lang.net"
+  bastion_security_group_id = dependency.vpc.outputs.bastion_security_group_id
 }

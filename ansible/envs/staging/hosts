@@ -1,2 +1,5 @@
 [dev-desktop]
 dev-desktop-staging.infra.rust-lang.org
+
+[bastion]
+bastion.docs-rs-staging.rust-lang.net

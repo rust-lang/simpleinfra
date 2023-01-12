@@ -13,6 +13,11 @@ variable "private_subnet_ids" {
   description = "Private subnet ids"
 }
 
+variable "bastion_security_group_id" {
+  type        = string
+  description = "Id of the security group for the bastion instance"
+}
+
 variable "cluster_config" {
   type = object({
     cluster_id                = string,

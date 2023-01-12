@@ -29,3 +29,8 @@ variable "peering" {
   default     = {}
   description = "Map of CIDR blocks to peering connection IDs"
 }
+
+variable "zone_id" {
+  type        = string
+  description = "The id of the zone where DNS records live"
+}
