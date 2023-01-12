@@ -71,8 +71,8 @@ resource "aws_iam_role_policy" "web" {
           "s3:DeleteObject",
         ]
         Resource = [
-          "arn:aws:s3:::rust-docs-rs",
-          "arn:aws:s3:::rust-docs-rs/*",
+          aws_s3_bucket.storage.arn,
+          "${aws_s3_bucket.storage.arn}/*",
         ]
       },
       {

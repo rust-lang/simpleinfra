@@ -107,6 +107,8 @@ resource "aws_cloudwatch_log_group" "task" {
   retention_in_days = 7
 }
 
+data "aws_region" "current" {}
+
 resource "aws_ecs_task_definition" "task" {
   family       = var.name
   cpu          = var.cpu
@@ -127,7 +129,7 @@ resource "aws_ecs_task_definition" "task" {
         logDriver = "awslogs"
         options = {
           "awslogs-group"         = aws_cloudwatch_log_group.task.name
-          "awslogs-region"        = "us-west-1"
+          "awslogs-region"        = data.aws_region.current.name
           "awslogs-stream-prefix" = "app"
         }
       }
