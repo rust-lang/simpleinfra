@@ -13,7 +13,7 @@ module "iam_ci" {
   source     = "../gha-iam-user"
   org        = split("/", var.repo)[0]
   repo       = split("/", var.repo)[1]
-  env_prefix = var.env == "dev" ? "DEV" : null
+  env_prefix = var.env == "staging" ? "STAGING" : null
 }
 
 resource "aws_iam_user_policy" "update_service" {

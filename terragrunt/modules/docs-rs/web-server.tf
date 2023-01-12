@@ -11,7 +11,7 @@ module "web" {
   source         = "../ecs-app"
   cluster_config = var.cluster_config
 
-  env  = "dev"
+  env  = "staging"
   name = "docs-rs-web"
   repo = "rust-lang/docs.rs"
 
