@@ -76,24 +76,6 @@ resource "aws_iam_role_policy_attachment" "task_execution_ecr_pull" {
   policy_arn = module.ecr.policy_pull_arn
 }
 
-// EFS filesystem used for persistent storage across tasks. The filesystem is
-// created only if it's meant to be mounted inside the tasks.
-
-module "efs" {
-  for_each = var.mount_efs == null ? toset([]) : toset([var.name])
-  source   = "../efs-filesystem"
-
-  name          = "${var.env}--${var.name}"
-  allow_subnets = var.cluster_config.subnet_ids
-}
-
-resource "aws_iam_role_policy_attachment" "use_efs" {
-  for_each = var.mount_efs == null ? toset([]) : toset([var.name])
-
-  role       = aws_iam_role.task.name
-  policy_arn = module.efs[var.name].root_policy_arn
-}
-
 // Task definition of the application, which specifies which containers should
 // be part of the task and which settings do they have.
 
@@ -167,14 +149,6 @@ resource "aws_ecs_task_definition" "task" {
         }
       ]
 
-      mountPoints = var.mount_efs == null ? [] : [
-        {
-          sourceVolume  = "efs"
-          containerPath = var.mount_efs
-          readOnly      = false
-        }
-      ]
-
       dockerLabels = var.expose_http == null || var.expose_http.prometheus == null ? {} : {
         PROMETHEUS_EXPORTER_PORT     = 80
         PROMETHEUS_EXPORTER_PATH     = var.expose_http.prometheus
@@ -185,22 +159,6 @@ resource "aws_ecs_task_definition" "task" {
 
   ephemeral_storage {
     size_in_gib = var.ephemeral_storage_gb
-  }
-
-  dynamic "volume" {
-    for_each = module.efs
-    content {
-      name = "efs"
-      efs_volume_configuration {
-        file_system_id     = volume.value.id
-        root_directory     = "/"
-        transit_encryption = "ENABLED"
-
-        authorization_config {
-          iam = "ENABLED"
-        }
-      }
-    }
   }
 }
 

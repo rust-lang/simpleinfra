@@ -30,11 +30,6 @@ variable "tasks_count" {
   type = number
 }
 
-variable "mount_efs" {
-  type    = string
-  default = null
-}
-
 variable "ephemeral_storage_gb" {
   type    = number
   default = 21
