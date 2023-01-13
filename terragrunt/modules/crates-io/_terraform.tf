@@ -76,3 +76,8 @@ variable "strict_security_headers" {
   type    = bool
   default = false
 }
+
+variable "static_ttl" {
+  description = "TTL for static crates"
+  type        = number
+}

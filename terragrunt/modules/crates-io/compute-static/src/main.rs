@@ -7,13 +7,14 @@ use crate::config::Config;
 mod config;
 
 #[fastly::main]
-fn main(request: Request) -> Result<Response, Error> {
+fn main(mut request: Request) -> Result<Response, Error> {
     let config = Config::from_dictionary();
 
     if let Some(response) = limit_http_methods(&request) {
         return Ok(response);
     }
 
+    set_ttl(&config, &mut request);
     send_request_to_s3(&config, &request)
 }
 
@@ -33,6 +34,14 @@ fn limit_http_methods(request: &Request) -> Option<Response> {
     }
 
     None
+}
+
+/// Set the TTL
+///
+/// A TTL header is added to the request to ensure that the content is cached for the given amount
+/// of time.
+fn set_ttl(config: &Config, request: &mut Request) {
+    request.set_ttl(config.static_ttl);
 }
 
 /// Forward client request to S3
