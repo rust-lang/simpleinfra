@@ -81,3 +81,13 @@ variable "static_ttl" {
   description = "TTL for static crates"
   type        = number
 }
+
+variable "static_cloudfront_weight" {
+  description = "Weight of the traffic for static.crates.io that is routed through CloudFront"
+  type        = number
+}
+
+variable "static_fastly_weight" {
+  description = "Weight of the traffic for static.crates.io that is routed through Fastly"
+  type        = number
+}

@@ -1,5 +1,9 @@
 // This file configures static.crates.io
 
+locals {
+  cloudfront_domain_name = "cloudfront-${var.static_domain_name}"
+}
+
 resource "aws_cloudfront_distribution" "static" {
   comment = var.static_domain_name
 
@@ -9,7 +13,11 @@ resource "aws_cloudfront_distribution" "static" {
   default_root_object = "index.html"
   price_class         = "PriceClass_All"
 
-  aliases = [var.static_domain_name]
+  aliases = [
+    local.cloudfront_domain_name,
+    var.static_domain_name
+  ]
+
   viewer_certificate {
     acm_certificate_arn = module.certificate.arn
     ssl_support_method  = "sni-only"
@@ -81,10 +89,24 @@ data "aws_route53_zone" "static" {
   name = join(".", reverse(slice(reverse(split(".", var.static_domain_name)), 0, 2)))
 }
 
-resource "aws_route53_record" "static" {
+resource "aws_route53_record" "cloudfront_static_domain" {
+  zone_id = data.aws_route53_zone.static.id
+  name    = local.cloudfront_domain_name
+  type    = "CNAME"
+  ttl     = 300
+  records = [aws_cloudfront_distribution.static.domain_name]
+}
+
+resource "aws_route53_record" "weighted_static_cloudfront" {
   zone_id = data.aws_route53_zone.static.id
   name    = var.static_domain_name
   type    = "CNAME"
   ttl     = 300
-  records = [aws_cloudfront_distribution.static.domain_name]
+  records = [aws_route53_record.cloudfront_static_domain.fqdn]
+
+  weighted_routing_policy {
+    weight = var.static_cloudfront_weight
+  }
+
+  set_identifier = "cloudfront"
 }
