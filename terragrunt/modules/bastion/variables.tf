@@ -1,5 +1,5 @@
 variable "allowed_users" {
-  description = "Users allowed to connect to the bastion through SSH. Each user needs to have the CIDR of the static IP they want to connect from stored in AWS SSM Parameter Store (us-west-1), in a string key named: /prod/bastion/allowed-ips/$user "
+  description = "Users allowed to connect to the bastion through SSH. Each user needs to have the CIDR of the static IP they want to connect from stored in AWS SSM Parameter Store, in a string key named: /prod/bastion/allowed-ips/$user"
   type        = list(string)
 }
 

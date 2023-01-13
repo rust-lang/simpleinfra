@@ -24,4 +24,5 @@ inputs = {
     3 = "use1-az2",
   }
   zone_id = dependency.dns_zone.outputs.id
+  bastion_users = ["rylev"]
 }
