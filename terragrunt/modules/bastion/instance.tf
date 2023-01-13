@@ -35,7 +35,7 @@ resource "aws_route53_record" "bastion" {
 
 // Create the EC2 instance itself.
 
-data "aws_ami" "ubuntu_bionic" {
+data "aws_ami" "ubuntu" {
   most_recent = true
   owners      = ["099720109477"] # Canonical
 
@@ -51,7 +51,7 @@ data "aws_ami" "ubuntu_bionic" {
 }
 
 resource "aws_instance" "bastion" {
-  ami                     = data.aws_ami.ubuntu_bionic.id
+  ami                     = data.aws_ami.ubuntu.id
   instance_type           = "t3a.nano"
   ebs_optimized           = true
   disable_api_termination = true
