@@ -7,6 +7,10 @@ include {
   merge_strategy = "deep"
 }
 
+dependency "dns_zone" {
+  config_path = "../dns-zone"
+}
+
 inputs = {
   name      = "docs-rs-staging"
   ipv4_cidr = "10.0.0.0/16"
@@ -19,4 +23,6 @@ inputs = {
     2 = "use1-az1",
     3 = "use1-az2",
   }
+  zone_id = dependency.dns_zone.outputs.id
+  bastion_users = ["rylev"]
 }

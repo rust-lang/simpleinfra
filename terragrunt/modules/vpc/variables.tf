@@ -29,3 +29,13 @@ variable "peering" {
   default     = {}
   description = "Map of CIDR blocks to peering connection IDs"
 }
+
+variable "zone_id" {
+  type        = string
+  description = "The id of the zone where DNS records live"
+}
+
+variable "bastion_users" {
+  type        = list(string)
+  description = "Users allowed to connect to the bastion through SSH. Each user needs to have the CIDR of the static IP they want to connect from stored in AWS SSM Parameter Store, in a string key named: /prod/bastion/allowed-ips/$user"
+}

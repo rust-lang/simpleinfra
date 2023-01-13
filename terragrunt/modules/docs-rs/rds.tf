@@ -8,11 +8,6 @@ resource "aws_db_subnet_group" "db" {
   subnet_ids = var.private_subnet_ids
 }
 
-resource "aws_security_group" "bastion" {
-  name   = "docs-rs-bastion"
-  vpc_id = var.cluster_config.vpc_id
-}
-
 resource "aws_security_group" "db" {
   vpc_id      = var.cluster_config.vpc_id
   name        = "docs-rs-db"
@@ -31,7 +26,7 @@ resource "aws_security_group" "db" {
     to_port         = 5432
     protocol        = "tcp"
     description     = "Connections from the bastion"
-    security_groups = [aws_security_group.bastion.id]
+    security_groups = [var.bastion_security_group_id]
   }
 }
 
