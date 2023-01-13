@@ -1,7 +1,3 @@
-locals {
-  web_domain = "web.${var.domain}"
-}
-
 resource "aws_security_group" "web" {
   vpc_id = var.cluster_config.vpc_id
   name   = "docs-rs-web"
@@ -40,7 +36,7 @@ module "web" {
   expose_http = {
     container_port = 80
     prometheus     = "/about/metrics"
-    domains        = [local.web_domain]
+    domains        = [var.cluster_config.domain, var.domain]
     zone_id        = var.zone_id
 
     health_check_path     = "/"

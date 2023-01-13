@@ -23,6 +23,7 @@ variable "cluster_config" {
     cluster_id                = string,
     lb_listener_arn           = string,
     lb_dns_name               = string,
+    domain                    = string
     service_security_group_id = string,
     subnet_ids                = list(string),
     vpc_id                    = string,
