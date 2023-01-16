@@ -76,6 +76,7 @@ resource "fastly_service_dictionary_items" "compute_static" {
   items = {
     "s3-primary-host" : local.primary_host_name
     "s3-fallback-host" : local.fallback_host_name
+    "static-ttl" : var.static_ttl
   }
 }
 
