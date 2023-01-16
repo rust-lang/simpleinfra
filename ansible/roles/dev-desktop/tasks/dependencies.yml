@@ -1,0 +1,96 @@
+---
+
+- name: Discover kernel
+  command: uname -r
+  register: kernel
+
+- name: Discover kernel flavor
+  shell: uname -r | awk -F- '{print $NF}'
+  register: kernel_flavor
+
+- name: Install packages
+  apt:
+    name:
+      - build-essential
+      - clang
+      - cmake
+      - fish
+      - gcc-mingw-w64-x86-64 # Allows running `x check --target x86_64-pc-windows-gnu`
+      - jq
+      - libssl-dev
+      - llvm
+      - ninja-build
+      - pkg-config
+      - python-is-python3
+      - python3
+      - python3-cryptography
+      - python3-jwt
+      - python3-pip
+      - quota
+      - ripgrep
+      - valgrind
+      - "linux-tools-{{ kernel.stdout }}"
+      - "linux-tools-{{ kernel_flavor.stdout }}"
+    state: present
+
+- name: Install tools for x86
+  apt:
+    name:
+      - gcc-multilib # for 32 bit cross compiles of libstd and tests
+    state: present
+  when: ansible_architecture == "x86_64"
+
+- name: Install kernel modules on cloud machines
+  apt:
+    name:
+      - "linux-modules-extra-{{ kernel_flavor.stdout }}"
+      - "linux-modules-extra-{{ kernel.stdout }}"
+    state: present
+  when: kernel_flavor.stdout != "generic"
+
+- name: Install kernel modules on local Ubuntu VMs
+  apt:
+    name:
+      - linux-image-extra-virtual
+  when: kernel_flavor.stdout == "generic"
+
+- name: Install rustup in userspace for root
+  shell: |
+    set -eu
+    RUSTUP_VERSION=1.24.3
+    RUSTUP_SHA="a3cb081f88a6789d104518b30d4aa410009cd08c3822a1226991d6cf0442a0f8"
+    curl --proto '=https' --tlsv1.2 -sSf -O \
+      https://raw.githubusercontent.com/rust-lang/rustup/${RUSTUP_VERSION}/rustup-init.sh
+    echo "${RUSTUP_SHA}  rustup-init.sh" | sha256sum --check --
+    sh rustup-init.sh --default-toolchain nightly -y --component rust-src
+
+- name: Check if Node is installed
+  command: node --version
+  register: node_version
+  changed_when: false
+  failed_when: node_version.rc != 0 and node_version.rc != 2
+
+- name: Set up NodeSource repository
+  shell: |
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+  when: node_version.rc == 2
+
+- name: Install Node
+  apt:
+    name: nodejs
+    state: present
+    update_cache: yes
+
+- name: Install mosh
+  apt:
+    name:
+      - mosh
+    state: present
+
+- name: Upload firewall rules for mosh
+  template:
+    src: firewall.sh
+    dest: /etc/firewall/mosh.sh
+    mode: 0750
+  notify:
+    - restart-firewall

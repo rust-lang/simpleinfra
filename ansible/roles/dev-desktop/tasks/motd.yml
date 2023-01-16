@@ -1,0 +1,34 @@
+---
+
+- name: Enable message of the day
+  template:
+    src: motd_sshd_config
+    dest: /etc/ssh/sshd_config.d/motd
+
+- name: Find all existing motd scripts
+  find:
+    paths: /etc/update-motd.d/
+    patterns: "*"
+  register: files_to_delete
+
+- name: Disable automatically generated message of the day
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ files_to_delete.files }}"
+
+- name: Stop and disable news service
+  service:
+    name: "motd-news"
+    state: stopped
+
+- name: Stop and disable news service timer
+  ansible.builtin.systemd:
+    name: motd-news.timer
+    state: stopped
+    enabled: no
+
+- name: Set up message of the day
+  template:
+    src: motd_rules
+    dest: /etc/motd

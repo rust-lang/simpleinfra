@@ -1,0 +1,49 @@
+---
+
+- name: Set up the git credential helper user
+  user:
+    name: github-app-credentials
+    state: present
+
+- name: Upload git-credential-dev-desktop-inner
+  copy:
+    src: git-credential-dev-desktop-inner
+    dest: /usr/local/bin/git-credential-dev-desktop-inner
+    owner: root
+    group: github-app-credentials
+    mode: 0750
+
+- name: Upload git-credential-dev-desktop
+  copy:
+    src: git-credential-dev-desktop
+    dest: /usr/local/bin/git-credential-dev-desktop
+    mode: 0755
+
+- name: Insert the git credential login for everyone
+  copy:
+    src: templates/gitconfig
+    dest: /etc/gitconfig
+
+- name: Create GitHub App configuration directory
+  file:
+    path: /etc/github-app-credentials
+    owner: root
+    group: github-app-credentials
+    mode: 0750
+    state: directory
+
+- name: Copy GitHub App ID
+  copy:
+    content: "{{ vars_github_app_id }}"
+    dest: /etc/github-app-credentials/app_id.txt
+    owner: root
+    group: github-app-credentials
+    mode: 0640
+
+- name: Copy GitHub App private key
+  copy:
+    content: "{{ vars_github_app_private_key }}"
+    dest: /etc/github-app-credentials/app_private_key.pem
+    owner: root
+    group: github-app-credentials
+    mode: 0640

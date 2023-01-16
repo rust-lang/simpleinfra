@@ -1,0 +1,33 @@
+---
+
+- name: Allow users to debug their own processes
+  replace:
+    path: /etc/sysctl.d/10-ptrace.conf
+    regexp: '^kernel.yama.ptrace_scope = [\d]$'
+    replace: 'kernel.yama.ptrace_scope = 0'
+  notify:
+    - reboot-machine
+
+- name: Allow users to run perf on their own processes
+  template:
+    src: 10-perf-event-paranoid.conf
+    dest: /etc/sysctl.d/10-perf-event-paranoid.conf
+    mode: 0644
+  notify:
+    - reboot-machine
+
+- name: Set up the files that initially appear in a user's home dir
+  copy:
+    src: skel/
+    dest: /etc/skel/
+
+- name: Set up the group for people allowed to ssh into the dev-desktop
+  group:
+    name: dev-desktop-allow-ssh
+    state: present
+
+- name: Upload sudo configuration
+  template:
+    src: sudoers
+    dest: /etc/sudoers.d/dev-desktop
+    mode: 0440

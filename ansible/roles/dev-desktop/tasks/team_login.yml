@@ -1,0 +1,22 @@
+---
+
+- name: Configure update script service
+  copy:
+    src: team_login/
+    dest: "{{ vars_team_login_path }}"
+
+- name: Build team login cron job
+  shell: "cd {{ vars_team_login_path }} && PATH=$PATH:$HOME/.cargo/bin cargo build"
+
+- name: Install the team login binary
+  shell: "cp {{ vars_team_login_path }}/target/debug/team_login /etc/cron.team_login"
+
+- name: Set up the team login cron job
+  template:
+    src: crontab_append
+    dest: /etc/cron.d/team_login
+  # if the cron job is running right now, keep retrying until it finishes
+  register: task_result
+  until: task_result is not failed
+  retries: 10
+  delay: 5
