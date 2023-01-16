@@ -1,18 +1,3 @@
-locals {
-  top_level_domains = { for domain in var.domains : domain => join(".", reverse(slice(reverse(split(".", domain)), 0, 2))) }
-}
-
-module "certificate" {
-  source  = "../acm-certificate"
-  domains = var.domains
-  legacy  = false
-}
-
-resource "aws_lb_listener_certificate" "service" {
-  listener_arn    = var.cluster_config.lb_listener_arn
-  certificate_arn = module.certificate.arn
-}
-
 resource "aws_lb_listener_rule" "service" {
   listener_arn = var.cluster_config.lb_listener_arn
 
@@ -46,14 +31,4 @@ resource "aws_lb_target_group" "service" {
     healthy_threshold   = 5
     unhealthy_threshold = 2
   }
-}
-
-resource "aws_route53_record" "service" {
-  for_each = toset(var.domains)
-
-  zone_id = var.zone_id
-  name    = each.value
-  type    = "CNAME"
-  ttl     = 300
-  records = [var.cluster_config.lb_dns_name]
 }

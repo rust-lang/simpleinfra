@@ -53,12 +53,12 @@ resource "aws_cloudfront_distribution" "webapp" {
 
   origin {
     origin_id   = "web"
-    domain_name = local.web_domain
+    domain_name = var.cluster_config.lb_domain
 
     custom_origin_config {
       http_port              = 80
       https_port             = 443
-      origin_protocol_policy = "http-only"
+      origin_protocol_policy = "match-viewer"
       origin_ssl_protocols   = ["TLSv1.2"]
     }
   }
