@@ -58,7 +58,7 @@ resource "aws_cloudfront_distribution" "webapp" {
     custom_origin_config {
       http_port              = 80
       https_port             = 443
-      origin_protocol_policy = "http-only"
+      origin_protocol_policy = "match-viewer"
       origin_ssl_protocols   = ["TLSv1.2"]
     }
   }
