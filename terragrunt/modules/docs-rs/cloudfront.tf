@@ -53,7 +53,7 @@ resource "aws_cloudfront_distribution" "webapp" {
 
   origin {
     origin_id   = "web"
-    domain_name = var.cluster_config.domain
+    domain_name = var.cluster_config.lb_domain
 
     custom_origin_config {
       http_port              = 80

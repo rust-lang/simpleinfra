@@ -4,12 +4,9 @@ locals {
   // repeating ourselves, all those variables are grouped in this local
   // variable, which is passed as a whole to the module.
   cluster_config = {
-    cluster_id      = aws_ecs_cluster.cluster.id
-    lb_listener_arn = aws_lb_listener.lb_https.arn
-    // The domain assigned by AWS
-    lb_dns_name = aws_lb.lb.dns_name
-    // The vanity domain we use
-    domain                    = var.load_balancer_domain
+    cluster_id                = aws_ecs_cluster.cluster.id
+    lb_listener_arn           = aws_lb_listener.lb_https.arn
+    lb_domain                 = var.load_balancer_domain
     service_security_group_id = aws_security_group.service.id
     subnet_ids                = var.subnet_ids
     vpc_id                    = var.vpc_id

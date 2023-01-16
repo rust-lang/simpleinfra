@@ -36,7 +36,7 @@ module "web" {
   expose_http = {
     container_port = 80
     prometheus     = "/about/metrics"
-    domains        = [var.cluster_config.domain, var.domain]
+    domains        = [var.cluster_config.lb_domain, var.domain]
     zone_id        = var.zone_id
 
     health_check_path     = "/"
