@@ -132,3 +132,17 @@ resource "aws_route53_record" "fastly_static_domain" {
   records         = local.fastly_static_destinations
   ttl             = 60
 }
+
+resource "aws_route53_record" "weighted_static_fastly" {
+  zone_id = data.aws_route53_zone.static.id
+  name    = var.static_domain_name
+  type    = "CNAME"
+  ttl     = 300
+  records = [aws_route53_record.fastly_static_domain.fqdn]
+
+  weighted_routing_policy {
+    weight = var.static_fastly_weight
+  }
+
+  set_identifier = "fastly"
+}

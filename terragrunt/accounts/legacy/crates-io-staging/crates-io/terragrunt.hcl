@@ -22,4 +22,7 @@ inputs = {
   iam_prefix = "staging-crates-io"
 
   strict_security_headers = true
+
+  static_cloudfront_weight = 50
+  static_fastly_weight = 50
 }
