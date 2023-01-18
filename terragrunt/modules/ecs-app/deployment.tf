@@ -1,164 +1,26 @@
-// IAM Role used during the execution of the application, granting all
-// permissions needed at runtime.
+module "ecs_task" {
+  source = "../ecs-task"
 
-resource "aws_iam_role" "task" {
-  name = var.name
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "ECS"
-        Effect = "Allow"
-        Principal = {
-          Service = "ecs-tasks.amazonaws.com"
-        }
-        Action = "sts:AssumeRole"
-      }
-    ]
-  })
-}
+  name                 = var.name
+  env                  = var.env
+  cpu                  = var.cpu
+  memory               = var.memory
+  ephemeral_storage_gb = var.ephemeral_storage_gb
 
-// IAM Role used during the startup of the application, granting all
-// permissions needed while creating the task.
-
-resource "aws_iam_role" "task_execution" {
-  name = "ecs-task-execution--${var.name}"
-  assume_role_policy = jsonencode({
-    Version = "2008-10-17"
-    Statement = [
-      {
-        Sid    = "ECS"
-        Effect = "Allow"
-        Action = "sts:AssumeRole"
-        Principal = {
-          Service = "ecs-tasks.amazonaws.com"
-        }
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy" "task_execution" {
-  role = aws_iam_role.task_execution.name
-  name = "permissions"
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      // Access to SSM Parameter Store
-      {
-        Sid    = "AllowParameterStore"
-        Effect = "Allow"
-        Action = "ssm:GetParameters"
-
-        Resource = concat(
-          values(data.aws_ssm_parameter.task).*.arn,
-          values(var.computed_secrets),
-        )
-      },
-
-      // Access to CloudWatch Logs
-      {
-        Sid    = "AllowLogs"
-        Effect = "Allow"
-        Action = [
-          "logs:PutLogEvents",
-          "logs:CreateLogStream",
-        ]
-        Resource = "${aws_cloudwatch_log_group.task.arn}:*"
-      },
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "task_execution_ecr_pull" {
-  role       = aws_iam_role.task_execution.name
-  policy_arn = module.ecr.policy_pull_arn
-}
-
-// Task definition of the application, which specifies which containers should
-// be part of the task and which settings do they have.
-
-data "aws_ssm_parameter" "task" {
-  for_each = toset(values(var.secrets))
-  name     = each.value
-}
-
-resource "aws_cloudwatch_log_group" "task" {
-  name              = "/${var.env}/${var.name}"
-  retention_in_days = 7
-}
-
-data "aws_region" "current" {}
-
-resource "aws_ecs_task_definition" "task" {
-  family       = var.name
-  cpu          = var.cpu
-  memory       = var.memory
-  network_mode = "awsvpc"
-
-  task_role_arn            = aws_iam_role.task.arn
-  execution_role_arn       = aws_iam_role.task_execution.arn
-  requires_compatibilities = ["FARGATE"]
-
-  container_definitions = jsonencode([
+  secrets               = var.secrets
+  computed_secrets      = var.computed_secrets
+  environment_variables = var.environment
+  port_mappings = var.expose_http == null ? [] : [
     {
-      name      = "app"
-      image     = module.ecr.url
-      essential = true
-
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          "awslogs-group"         = aws_cloudwatch_log_group.task.name
-          "awslogs-region"        = data.aws_region.current.name
-          "awslogs-stream-prefix" = "app"
-        }
-      }
-
-      environment = [
-        for name, value in var.environment :
-        {
-          name  = name
-          value = value
-        }
-      ]
-
-      secrets = concat(
-        [
-          for name, param in var.secrets :
-          {
-            name      = name
-            valueFrom = data.aws_ssm_parameter.task[param].arn
-          }
-        ],
-        [
-          for name, param in var.computed_secrets :
-          {
-            name      = name
-            valueFrom = param
-          }
-        ],
-      )
-
-      portMappings = var.expose_http == null ? [] : [
-        {
-          containerPort = var.expose_http.container_port
-          hostPort      = 80
-          protocol      = "tcp"
-        }
-      ]
-
-      dockerLabels = var.expose_http == null || var.expose_http.prometheus == null ? {} : {
-        PROMETHEUS_EXPORTER_PORT     = 80
-        PROMETHEUS_EXPORTER_PATH     = var.expose_http.prometheus
-        PROMETHEUS_EXPORTER_JOB_NAME = "ecs-${var.name}"
-      }
+      containerPort = var.expose_http.container_port
+      hostPort      = 80
+      protocol      = "tcp"
     }
-  ])
-
-  ephemeral_storage {
-    size_in_gib = var.ephemeral_storage_gb
+  ]
+  docker_labels = var.expose_http == null || var.expose_http.prometheus == null ? {} : {
+    PROMETHEUS_EXPORTER_PORT     = 80
+    PROMETHEUS_EXPORTER_PATH     = var.expose_http.prometheus
+    PROMETHEUS_EXPORTER_JOB_NAME = "ecs-${var.name}"
   }
 }
 
@@ -171,7 +33,7 @@ module "ecs_service" {
   platform_version = var.platform_version
 
   name        = var.name
-  task_arn    = aws_ecs_task_definition.task.arn
+  task_arn    = module.ecs_task.task_arn
   tasks_count = var.tasks_count
 
   http_container = "app"

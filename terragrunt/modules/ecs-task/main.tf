@@ -26,7 +26,7 @@ resource "aws_ecs_task_definition" "task" {
       }
 
       environment = [
-        for name, value in var.environment :
+        for name, value in var.environment_variables :
         {
           name  = name
           value = value
@@ -63,7 +63,7 @@ resource "aws_ecs_task_definition" "task" {
 data "aws_region" "current" {}
 
 resource "aws_cloudwatch_log_group" "task" {
-  name              = "/${var.environment}/${var.name}"
+  name              = "/${var.env}/${var.name}"
   retention_in_days = 7
 }
 

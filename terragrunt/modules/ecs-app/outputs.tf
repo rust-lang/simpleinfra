@@ -1,3 +1,3 @@
 output "role_id" {
-  value = aws_iam_role.task.id
+  value = module.ecs_task.task_execution_role_id
 }

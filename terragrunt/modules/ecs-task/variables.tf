@@ -4,6 +4,14 @@ variable "name" {
   description = "The name of the task"
 }
 
+variable "env" {
+  type = string
+  validation {
+    condition     = contains(["staging", "prod"], var.env)
+    error_message = "The environment must be 'staging' or 'prod'."
+  }
+}
+
 variable "cpu" {
   type        = number
   description = "The number of CPU units used for the task"
@@ -14,9 +22,10 @@ variable "memory" {
   description = "Amount (in MiB) of memory used by the task"
 }
 
-variable "environment" {
-  type    = map(string)
-  default = {}
+variable "environment_variables" {
+  type        = map(string)
+  default     = {}
+  description = "A map of environment variable names to their values"
 }
 
 variable "secrets" {
@@ -40,11 +49,11 @@ variable "computed_secrets" {
 }
 
 variable "port_mappings" {
-  type = list({
+  type = list(object({
     containerPort = number
     hostPort      = number
     protocol      = string
-  })
+  }))
   description = "Mappings between port in container and on the host"
 }
 
