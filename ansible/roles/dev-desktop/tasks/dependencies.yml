@@ -44,6 +44,7 @@
       - libcairo2
       - libasound2
       - libatspi2.0-0
+      - libelf-dev  # Allows building tools that link against libelf
 
     state: present
 
