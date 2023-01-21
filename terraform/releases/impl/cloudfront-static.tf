@@ -11,6 +11,10 @@ module "lambda_static" {
   role_arn   = data.aws_iam_role.cloudfront_lambda.arn
 }
 
+data "aws_s3_bucket" "logs" {
+  bucket = var.log_bucket
+}
+
 resource "aws_cloudfront_distribution" "static" {
   comment = var.static_domain_name
 
@@ -74,6 +78,12 @@ resource "aws_cloudfront_distribution" "static" {
     geo_restriction {
       restriction_type = "none"
     }
+  }
+
+  logging_config {
+    include_cookies = false
+    bucket          = data.aws_s3_bucket.logs.bucket_regional_domain_name
+    prefix          = "cloudfront/${var.static_domain_name}"
   }
 }
 

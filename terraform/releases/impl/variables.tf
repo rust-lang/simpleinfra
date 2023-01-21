@@ -34,3 +34,7 @@ variable "promote_release_ecr_repo" {
 variable "promote_release_cron" {
   type = map(string)
 }
+
+variable "log_bucket" {
+  type = string
+}

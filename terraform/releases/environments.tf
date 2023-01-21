@@ -3,6 +3,34 @@
 // The environments are completly separate, with no configuration shared
 // between them. This reduces the chances of compromise between them.
 
+resource "aws_s3_bucket" "logs" {
+  bucket = "rust-release-logs"
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "logs" {
+  bucket = aws_s3_bucket.logs.id
+
+  rule {
+    id     = "yearly-delete"
+    status = "Enabled"
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+    expiration {
+      days = 330
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "logs" {
+  bucket = aws_s3_bucket.logs.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 module "dev" {
   source = "./impl"
   providers = {
@@ -19,6 +47,7 @@ module "dev" {
   inventories_bucket_arn   = data.terraform_remote_state.shared.outputs.inventories_bucket_arn
   promote_release_ecr_repo = module.promote_release_ecr
   release_keys_bucket_arn  = aws_s3_bucket.release_keys.arn
+  log_bucket               = aws_s3_bucket.logs.id
 
   extra_environment_variables = toset([
     {
@@ -52,6 +81,7 @@ module "prod" {
   inventories_bucket_arn   = data.terraform_remote_state.shared.outputs.inventories_bucket_arn
   promote_release_ecr_repo = module.promote_release_ecr
   release_keys_bucket_arn  = aws_s3_bucket.release_keys.arn
+  log_bucket               = aws_s3_bucket.logs.id
 
   extra_environment_variables = toset([
     // Setting this enables tagging of releases, so we only do it for the production
