@@ -1,6 +1,10 @@
 module "certificate" {
   source = "../acm-certificate"
 
+  providers = {
+    aws = aws.us-east-1
+  }
+
   domains = [
     var.webapp_domain_name,
     var.static_domain_name,
