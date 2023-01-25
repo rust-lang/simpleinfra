@@ -16,9 +16,14 @@ inputs = {
   static_bucket_name     = "crates-io"
   index_bucket_name      = "crates-io-index"
 
+  static_ttl = 86400 // 1 day
+
   webapp_origin_domain = "crates-io.herokuapp.com"
 
   iam_prefix = "crates-io"
 
   strict_security_headers = true
+
+  static_cloudfront_weight = 99
+  static_fastly_weight = 1
 }
