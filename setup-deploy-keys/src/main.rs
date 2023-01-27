@@ -43,7 +43,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let pubkey = fs::read_to_string("_ssh_keygen_tmp_out.pub").unwrap();
     fs::remove_file("_ssh_keygen_tmp_out.pub").unwrap();
 
-    println!("GITHUB_DEPLOY_KEY={}", key);
+    println!("GITHUB_DEPLOY_KEY={key}");
 
     println!("uploading the deploy key...");
     let client = Client::new();
