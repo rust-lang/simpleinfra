@@ -1,10 +1,3 @@
-// ECR repository which will store the Docker image powering the application.
-
-module "ecr" {
-  source = "../ecr-repo"
-  name   = var.name
-}
-
 // IAM User used by GitHub Actions to pull and push images to ECR, and to
 // restart the ECS service once the image is uploaded. The credentials will
 // be added automatically to the GitHub Actions secrets.
@@ -35,10 +28,10 @@ resource "aws_iam_user_policy" "update_service" {
 
 resource "aws_iam_user_policy_attachment" "ci_pull" {
   user       = module.iam_ci.user_name
-  policy_arn = module.ecr.policy_pull_arn
+  policy_arn = module.ecs_task.policy_pull_arn
 }
 
 resource "aws_iam_user_policy_attachment" "ci_push" {
   user       = module.iam_ci.user_name
-  policy_arn = module.ecr.policy_push_arn
+  policy_arn = module.ecs_task.policy_push_arn
 }
