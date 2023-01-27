@@ -61,6 +61,12 @@
     fstype: ext3
     state: mounted
 
+- name: Change kubeconfig file permission
+  file:
+    path: "{{ vars_mountpoint_path }}"
+    owner: "{{ vars_user }}"
+    group: docker
+
 # --------------------
 
 - name: Create user
@@ -89,11 +95,6 @@
 
 # ---------
 
-- name: check if cargo is installed
-  shell: command -v cargo
-  register: cargo_exists
-  ignore_errors: yes
-
 - name: update apt cache
   apt:
     update_cache: true
@@ -108,6 +109,11 @@
       - pkg-config
     state: present
 
+- name: check if cargo is installed
+  shell: command -v cargo
+  register: cargo_exists
+  ignore_errors: yes
+
 - name: Download Installer
   when: cargo_exists is failed
   get_url:
@@ -119,6 +125,11 @@
 - name: install rust/cargo
   when: cargo_exists is failed
   shell: /tmp/sh.rustup.rs -y
+
+- name: Install rustup-toolchain-install-master
+  shell: | 
+    . ~/.cargo/env
+    cargo install rustup-toolchain-install-master
 
 - name: Build builder
   shell: | 
