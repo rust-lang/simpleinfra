@@ -1,0 +1,19 @@
+#
+# {{ ansible_managed }}
+#
+
+[Unit]
+Description=The docs.rs Builder
+
+[Service]
+Environment=TMPDIR={{ vars_mountpoint_path }}
+Environment=RUST_LOG=info
+Environment=DOCSRS_PREFIX=
+Environment=DOCSRS_DATABASE_URL=TODO
+
+WorkingDirectory={{ vars_working_dir }}
+
+ExecStart={{ vars_executable_path }} daemon --registry-watcher=disabled
+
+[Install]
+WantedBy=multi-user.target

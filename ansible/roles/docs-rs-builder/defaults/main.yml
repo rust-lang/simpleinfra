@@ -1,0 +1,16 @@
+---
+
+vars_mountpoint_file_path: /builder.fs
+vars_mountpoint_size: 53687091200
+vars_mountpoint_path: /mnt/builder
+
+vars_user: builder
+vars_group: "{{ vars_user }}"
+vars_home_path: "/home/{{ vars_user }}"
+
+vars_repository_url: https://github.com/rust-lang/docs.rs
+
+vars_checkout_path: "{{ vars_home_path }}/builder"
+vars_working_dir: "{{ vars_checkout_path }}"
+vars_executable_path: "{{ vars_working_dir }}/target/release/cratesfyi"
+
