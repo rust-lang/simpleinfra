@@ -12,7 +12,7 @@ resource "aws_ecs_task_definition" "task" {
 
   container_definitions = jsonencode([
     {
-      name      = "app"
+      name      = var.container_name
       image     = module.ecr.url
       essential = true
 
@@ -21,7 +21,7 @@ resource "aws_ecs_task_definition" "task" {
         options = {
           "awslogs-group"         = aws_cloudwatch_log_group.task.name
           "awslogs-region"        = data.aws_region.current.name
-          "awslogs-stream-prefix" = "app"
+          "awslogs-stream-prefix" = var.container_name
         }
       }
 

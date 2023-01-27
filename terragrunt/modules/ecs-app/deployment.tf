@@ -1,3 +1,7 @@
+locals {
+  container_name = "app"
+}
+
 module "ecs_task" {
   source = "../ecs-task"
 
@@ -7,6 +11,7 @@ module "ecs_task" {
   memory               = var.memory
   ephemeral_storage_gb = var.ephemeral_storage_gb
 
+  container_name        = local.container_name
   secrets               = var.secrets
   computed_secrets      = var.computed_secrets
   environment_variables = var.environment
@@ -36,7 +41,7 @@ module "ecs_service" {
   task_arn    = module.ecs_task.task_arn
   tasks_count = var.tasks_count
 
-  http_container = "app"
+  http_container = local.container_name
   http_port      = 80
   domains        = var.expose_http.domains
   zone_id        = var.expose_http.zone_id

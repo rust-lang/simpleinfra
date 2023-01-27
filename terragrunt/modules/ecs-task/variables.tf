@@ -4,6 +4,11 @@ variable "name" {
   description = "The name of the task"
 }
 
+variable "container_name" {
+  type        = string
+  description = "The name of the container being run"
+}
+
 variable "env" {
   type = string
   validation {
