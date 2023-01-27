@@ -44,7 +44,7 @@ fn main() {
     let sha = env::var("BUILD_SOURCEVERSION")
         .or_else(|_| env::var("GITHUB_SHA"))
         .unwrap();
-    let msg = format!("Deploy {} to gh-pages", sha);
+    let msg = format!("Deploy {sha} to gh-pages");
 
     drop(fs::remove_dir_all(".git"));
     run(Command::new("git").arg("init"));
@@ -57,7 +57,7 @@ fn main() {
     run(Command::new("git").arg("commit").arg("-m").arg(&msg));
     run(Command::new("git")
         .arg("push")
-        .arg(format!("git@github.com:{}", slug))
+        .arg(format!("git@github.com:{slug}"))
         .arg("master:gh-pages")
         .env("GIT_SSH_COMMAND", "ssh -o StrictHostKeyChecking=no")
         .env("SSH_AUTH_SOCK", socket)
@@ -65,7 +65,7 @@ fn main() {
 }
 
 fn run(cmd: &mut Command) {
-    println!("{:?}", cmd);
+    println!("{cmd:?}");
     let status = cmd.status().unwrap();
     assert!(status.success());
 }

@@ -38,9 +38,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let all: All = miniserde::json::from_str(&data).unwrap();
     let mut users = HashSet::new();
     for username in all.github_users {
-        let url = format!("https://github.com/{}.keys", username);
+        let url = format!("https://github.com/{username}.keys");
         // Pick a user name that won't conflict with system users
-        let username = format!("gh-{}", username);
+        let username = format!("gh-{username}");
 
         users.insert(username.clone());
         // Get the keys the user added to their github account.
@@ -58,8 +58,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             transfer.perform().expect("failed to download user's keys");
         }
         let keys = String::from_utf8(keys).unwrap();
-        std::fs::write(format!("{}{}", KEY_DIR, username), keys)
-            .expect("Failed to create key file");
+        std::fs::write(format!("{KEY_DIR}{username}"), keys).expect("Failed to create key file");
 
         // Check if user exists
         let id = cmd("id", &[&username]).expect("failed to run `id` command");
