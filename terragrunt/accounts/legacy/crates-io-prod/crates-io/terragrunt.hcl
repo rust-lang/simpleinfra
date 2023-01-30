@@ -24,6 +24,6 @@ inputs = {
 
   strict_security_headers = true
 
-  static_cloudfront_weight = 99
-  static_fastly_weight = 1
+  static_cloudfront_weight = 95
+  static_fastly_weight = 5
 }
