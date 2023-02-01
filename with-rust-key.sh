@@ -2,7 +2,7 @@
 # This script executes the command provided as argument with the gpg
 # environment configured to use the Rust release signing key. Sample usage:
 #
-#    ./with-rust-key.sh gpg tag -u FA1BE5FE 2.0.0 stable
+#    ./with-rust-key.sh gpg tag -u 108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE 2.0.0 stable
 #
 # The script has been tested with GnuPG 2.2, and requires jq and the 1password
 # CLI 2.x to be installed and configured:
@@ -29,7 +29,7 @@ IMPORT_KEYS=(
 SECRET_KEY_PASSWORD_URI="op://tnuk54f56audltg5e7if776ieq/pks4bn2wf4r7plue24cdqsw4ga/password"
 
 # ID of the key used to sign Rust releases
-SIGNING_KEY_ID="FA1BE5FE"
+SIGNING_KEY_ID="108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE"
 
 ##############################################################################
 
