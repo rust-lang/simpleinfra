@@ -7,6 +7,11 @@ resource "aws_organizations_account" "admin" {
   email = "admin+root@rust-lang.org"
 }
 
+resource "aws_organizations_account" "legacy" {
+  name  = "Rust Admin - 8450"
+  email = "admin@rust-lang.org"
+}
+
 resource "aws_organizations_account" "docs_rs_staging" {
   name  = "docs-rs-staging"
   email = "admin+docs-rs-staging@rust-lang.org"
