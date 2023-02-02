@@ -115,8 +115,37 @@ instance of the service will create its own certificate.
 
 ## Running Terragrunt
 
+When running [Terragrunt], it fetches and stores the state of the infrastructure
+in AWS. This requires that an AWS profile is configured for each account. After
+that has been done, running [Terragrunt] is as simple as replacing `terraform`
+with `terragrunt` in the command.
+
+### Configure AWS Profiles
+
 Running [Terragrunt] requires permissions to the AWS account you are
-configuring. Assuming you have permission, you can `cd` into the corresponding
+configuring. For each of the accounts, copy the following snippet into the
+configuration file at `~/.aws/config`:
+
+```text
+[profile rust-root]
+sso_start_url = https://rust-lang.awsapps.com/start
+sso_account_id = <rust-root-account-id>
+sso_role_name = AdministratorAccess
+sso_region = us-east-1
+region = us-east-1
+```
+
+Each account in `./accounts` has a `account.json` file that contains the name of
+the respective profile. In the above example, `./account/root/account.json` sets
+the profile name to `rust-root`.
+
+The `sso_account_id` can be found in the web interface of AWS SSO. Open the
+`sso_start_url` in a browser, log in, and you'll see a list of accounts with
+their respective account ids.
+
+### Run Terragrunt
+
+Assuming you have permission, you can `cd` into the corresponding
 service within the `accounts` directory and run `terragrunt plan` to see the
 plan terraform will apply and `terragrunt apply` to actually apply the plan.
 
