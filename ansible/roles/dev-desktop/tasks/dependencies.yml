@@ -46,6 +46,8 @@
       - libatspi2.0-0
       - libelf-dev  # Allows building tools that link against libelf
       - emacs
+      - lld
+      - lldb
     state: present
 
 - name: Install tools for x86
