@@ -1,5 +1,11 @@
 ---
 
+- name: Create user
+  user:
+    name: "{{ vars_user }}"
+    groups: docker
+    append: true
+
 - name: Add Docker APT repository GPG key
   apt_key:
     state: present
@@ -17,6 +23,11 @@
     name: docker-ce
     state: present
   notify: restart-docker
+
+- name: Make sure /etc/docker dir exists
+  file:
+    path: /etc/docker
+    state: directory
 
 - name: Configure Docker daemon
   template:
@@ -69,12 +80,6 @@
 
 # --------------------
 
-- name: Create user
-  user:
-    name: "{{ vars_user }}"
-    groups: docker
-    append: true
-
 - name: Checkout repository
   become: true
   become_user: "{{ vars_user }}"
@@ -94,11 +99,6 @@
     mode: 0440
 
 # ---------
-
-- name: update apt cache
-  apt:
-    update_cache: true
-    cache_valid_time: 14400  # 4 hours
 
 - name: install apt packages
   apt:
@@ -135,6 +135,17 @@
   shell: | 
     . ~/.cargo/env
     chdir={{ vars_checkout_path }} cargo build --release
+
+- name: Make sure AWS config folder exists
+  file:
+    path: "{{ vars_home_path }}/.aws"
+    state: directory
+
+- name: Configure AWS SDK
+  template:
+    src: aws-config
+    dest: "{{ vars_home_path }}/.aws/config"
+    mode: 0644
 
 - name: Configure service
   template:
