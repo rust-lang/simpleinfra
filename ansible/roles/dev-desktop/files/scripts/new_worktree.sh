@@ -2,6 +2,7 @@
 
 set -ex
 
+cd ~
 N=$(ls | grep -E -e "rust[0-9]+" | wc -l)
 echo $N
 pushd rust

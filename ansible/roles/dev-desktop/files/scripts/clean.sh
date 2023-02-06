@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-rm -rf rust*/build
+rm -rf ~/rust*/build

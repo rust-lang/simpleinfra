@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+cd ~
+
 for d in rust*
 do
     if ! [ -d $d ]; then
