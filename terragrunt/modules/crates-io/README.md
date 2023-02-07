@@ -52,6 +52,18 @@ two different S3 buckets that are geographically distributed for disaster
 resilience. Traffic is routed through one of two CDNs, either CloudFront or
 Fastly, using [load-balancing at the DNS level][weighted-routing].
 
+### Fastly
+
+We use Fastly's [Compute@Edge] workers to serve the static crates, which mirror
+the functionality of the CloudFront distribution. The logic of these workers is
+implemented in the [`compute-static`](./compute-static) crate within the
+Terraform module.
+
+When applying changes to the infrastructure, an external data source in
+Terraform builds the compute function. This ensures that the latest version gets
+deployed.
+
 [crates.io]: https://crates.io/
+[compute@edge]: https://www.fastly.com/products/edge-compute
 [terraform]: https://terraform.io/
 [weighted-routing]: https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy-weighted.html
