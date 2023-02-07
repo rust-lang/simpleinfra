@@ -79,6 +79,18 @@ locals {
         permissions : [aws_ssoadmin_permission_set.view_only_access] }
       ]
     },
+    # Legacy
+    {
+      account : aws_organizations_account.legacy,
+      groups : [
+        { group : aws_identitystore_group.infra-admins,
+        permissions : [aws_ssoadmin_permission_set.view_only_access, aws_ssoadmin_permission_set.administrator_access] },
+        { group : aws_identitystore_group.billing,
+        permissions : [aws_ssoadmin_permission_set.billing_access] },
+        { group : aws_identitystore_group.infra,
+        permissions : [aws_ssoadmin_permission_set.view_only_access] }
+      ]
+    },
     # docs-rs Staging
     {
       account : aws_organizations_account.docs_rs_staging,
@@ -103,7 +115,7 @@ locals {
 }
 
 module "sso_account_assignment" {
-  for_each   = { for assignment in local.assignments : "${assignment.account.name}" => assignment }
+  for_each   = { for assignment in local.assignments : assignment.account.name => assignment }
   source     = "./sso-account-assignment"
   account_id = each.value.account.id
   groups     = each.value.groups
