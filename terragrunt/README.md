@@ -145,9 +145,17 @@ their respective account ids.
 
 ### Run Terragrunt
 
-Assuming you have permission, you can `cd` into the corresponding
-service within the `accounts` directory and run `terragrunt plan` to see the
-plan terraform will apply and `terragrunt apply` to actually apply the plan.
+Before running Terragrunt, make sure you are signed into the correct AWS
+profile. For example, run the following command to sign into the `rust-root`
+account:
+
+```shell
+aws sso login --profile rust-root
+```
+
+You can then `cd` into the corresponding service within the `accounts` directory
+and run `terragrunt plan` to see the plan terraform will apply and
+`terragrunt apply` to actually apply the plan.
 
 [terraform]: https://www.terraform.io/
 [terragrunt]: https://terragrunt.gruntwork.io/
