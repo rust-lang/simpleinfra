@@ -127,11 +127,6 @@
   when: cargo_exists is failed
   shell: /tmp/sh.rustup.rs -y
 
-- name: Install rustup-toolchain-install-master
-  shell: | 
-    . ~/.cargo/env
-    cargo install rustup-toolchain-install-master
-
 - name: Build builder
   shell: | 
     . ~/.cargo/env
