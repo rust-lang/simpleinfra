@@ -92,7 +92,7 @@
     name: awscli
     state: present
 
-- name: Allow update script to restart
+- name: Allow user to start and stop service
   template:
     src: sudoers
     dest: "/etc/sudoers.d/{{ vars_user }}"
@@ -110,7 +110,8 @@
     state: present
 
 - name: check if cargo is installed
-  shell: command -v cargo
+  shell: |
+    test -f ~/.cargo/env && . ~/.cargo/env && command -v cargo
   register: cargo_exists
   ignore_errors: yes
 
