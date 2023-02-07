@@ -136,17 +136,6 @@
     . ~/.cargo/env
     chdir={{ vars_checkout_path }} cargo build --release
 
-- name: Make sure AWS config folder exists
-  file:
-    path: "{{ vars_home_path }}/.aws"
-    state: directory
-
-- name: Configure AWS SDK
-  template:
-    src: aws-config
-    dest: "{{ vars_home_path }}/.aws/config"
-    mode: 0644
-
 - name: Configure service
   template:
     src: builder.service

@@ -13,7 +13,6 @@ Environment=DOCSRS_DATABASE_URL={{ vars_database_url }}
 Environment=DOCSRS_DOCKER_IMAGE=ghcr.io/rust-lang/crates-build-env/linux-micro
 Environment=DOCSRS_STORAGE_BACKEND=s3
 Environment=S3_REGION=us-east-1
-Environment=AWS_PROFILE=builder
 Environment={{ vars_s3_bucket }}
 
 WorkingDirectory={{ vars_working_dir }}

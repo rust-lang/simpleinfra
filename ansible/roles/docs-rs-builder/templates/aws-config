@@ -1,4 +1,0 @@
-[profile builder]
-role_arn = {{ vars_builder_role_arn }}
-credential_source = Ec2InstanceMetadata
-region = us-east-1
