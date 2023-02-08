@@ -21,7 +21,7 @@ Environment=DOCSRS_TOOLCHAIN={{ vars_toolchain }}
 LimitNOFILE=20000 # Consider removing now that we upload zip files
 Restart=on-failure
 WorkingDirectory={{ vars_working_dir }}
-ExecStart={{ vars_executable_path }} daemon --registry-watcher=disabled
+ExecStart={{ vars_executable_path }} start-build-server
 
 [Install]
 WantedBy=multi-user.target
