@@ -6,6 +6,10 @@
     groups: docker
     append: true
 
+# --------------------
+
+# Install Docker
+
 - name: Add Docker APT repository GPG key
   apt_key:
     state: present
@@ -86,6 +90,7 @@
   git:
     repo: "{{ vars_repository_url }}"
     dest: "{{ vars_checkout_path }}"
+    version: "{{ vars_repository_sha }}"
 
 - name: Install awscli
   apt:

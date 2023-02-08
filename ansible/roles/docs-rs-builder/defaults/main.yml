@@ -9,6 +9,7 @@ vars_group: "{{ vars_user }}"
 vars_home_path: "/home/{{ vars_user }}"
 
 vars_repository_url: https://github.com/rust-lang/docs.rs
+vars_repository_sha: HEAD
 
 vars_checkout_path: "{{ vars_home_path }}/builder"
 vars_working_dir: "{{ vars_checkout_path }}"

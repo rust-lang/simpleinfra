@@ -1,0 +1,4 @@
+---
+
+sha: "{{ lookup('aws_ssm', '/docs-rs/builder/sha') }}"
+vars_repository_sha: "{{  sha | ternary(sha, 'HEAD') }}"
