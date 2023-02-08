@@ -15,5 +15,7 @@ vars_checkout_path: "{{ vars_home_path }}/builder"
 vars_working_dir: "{{ vars_checkout_path }}"
 vars_executable_path: "{{ vars_working_dir }}/target/release/cratesfyi"
 
+vars_toolchain: nightly
+
 vars_database_url: "{{ lookup('aws_ssm', '/docs-rs/database-url') }}"
 vars_s3_bucket: docs-rs-storage-519825364412
