@@ -7,7 +7,7 @@ Remember that only DNS records pointing to resources **not** managed by
 Terraform are present here. Other Terraform resources will create the records
 they need on their own.
 
-* [How to interact with our Terraform configuration](../shared/README.md)
+* [How to interact with our Terraform configuration](../README.md)
 * [Documentation on the project's DNS setup][forge]
 
 [forge]: https://forge.rust-lang.org/infra/docs/dns.html
