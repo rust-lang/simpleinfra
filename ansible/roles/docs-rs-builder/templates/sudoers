@@ -1,0 +1,7 @@
+#
+# {{ ansible_managed }}
+#
+
+builder ALL= NOPASSWD: /bin/systemctl stop builder.service
+builder ALL= NOPASSWD: /bin/systemctl start builder.service
+builder ALL= NOPASSWD: /bin/systemctl restart builder.service

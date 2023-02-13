@@ -1,0 +1,152 @@
+---
+
+- name: Create user
+  user:
+    name: "{{ vars_user }}"
+    groups: docker
+    append: true
+
+# --------------------
+
+# Install Docker
+
+- name: Add Docker APT repository GPG key
+  apt_key:
+    state: present
+    keyserver: "https://download.docker.com/linux/{{ ansible_distribution|lower }}/gpg"
+    id: 7EA0A9C3F273FCD8
+
+- name: Add Docker APT repository
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution|lower }} {{ ansible_distribution_release }} stable"
+    state: present
+    update_cache: true
+
+- name: Install Docker
+  apt:
+    name: docker-ce
+    state: present
+  notify: restart-docker
+
+- name: Make sure /etc/docker dir exists
+  file:
+    path: /etc/docker
+    state: directory
+
+- name: Configure Docker daemon
+  template:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+    mode: 0600
+  notify: restart-docker
+
+# --------------------
+
+# Set up a partition with limited space to avoid temporary
+# input/output files consuming all of the space on the primary
+# partition.
+
+- name: Check for mountpoint file
+  stat:
+    path: "{{ vars_mountpoint_file_path }}"
+  register: mountpoint_stat
+
+- name: Create mountpoint file
+  block:
+    - name: Allocate file
+      command: "fallocate -l {{ vars_mountpoint_size }} {{ vars_mountpoint_file_path }}"
+
+    - name: Locate mountpoint loopback device
+      command: "losetup -f --show {{ vars_mountpoint_file_path }}"
+      register: loopback
+
+    - name: Partition mountpoint
+      command: "mkfs -t ext3 -m 1 -v {{ loopback.stdout }}"
+  when: mountpoint_stat.stat.size is not defined or mountpoint_stat.stat.size != vars_mountpoint_size
+
+- name: Create mountpoint
+  file:
+    path: "{{ vars_mountpoint_path }}"
+    state: directory
+
+- name: Mount mountpoint
+  mount:
+    src: "{{ vars_mountpoint_file_path }}"
+    name: "{{ vars_mountpoint_path }}"
+    fstype: ext3
+    state: mounted
+
+- name: Change kubeconfig file permission
+  file:
+    path: "{{ vars_mountpoint_path }}"
+    owner: "{{ vars_user }}"
+    group: docker
+
+# --------------------
+
+- name: Checkout repository
+  become: true
+  become_user: "{{ vars_user }}"
+  git:
+    repo: "{{ vars_repository_url }}"
+    dest: "{{ vars_checkout_path }}"
+    version: "{{ vars_repository_sha }}"
+
+- name: Install awscli
+  apt:
+    name: awscli
+    state: present
+
+- name: Allow user to start and stop service
+  template:
+    src: sudoers
+    dest: "/etc/sudoers.d/{{ vars_user }}"
+    mode: 0440
+
+# ---------
+
+- name: install apt packages
+  apt:
+    name:
+      - build-essential
+      - cmake
+      - libssl-dev
+      - pkg-config
+    state: present
+
+- name: check if cargo is installed
+  shell: |
+    test -f ~/.cargo/env && . ~/.cargo/env && command -v cargo
+  register: cargo_exists
+  ignore_errors: yes
+
+- name: Download Installer
+  when: cargo_exists is failed
+  get_url:
+    url: https://sh.rustup.rs
+    dest: /tmp/sh.rustup.rs
+    mode: '0755'
+    force: 'yes'
+
+- name: install rust/cargo
+  when: cargo_exists is failed
+  shell: /tmp/sh.rustup.rs -y
+
+- name: Build builder
+  shell: | 
+    . ~/.cargo/env
+    cargo build --release
+  args:
+    chdir: "{{ vars_checkout_path }}"
+
+- name: Configure service
+  template:
+    src: builder.service
+    dest: /etc/systemd/system/builder.service
+    mode: 0644
+
+- name: Start and enable service
+  systemd:
+    name: builder
+    state: started
+    enabled: true

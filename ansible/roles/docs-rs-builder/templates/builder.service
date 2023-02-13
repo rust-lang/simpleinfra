@@ -1,0 +1,27 @@
+#
+# {{ ansible_managed }}
+#
+
+[Unit]
+Description=The docs.rs Builder
+
+[Service]
+Environment=TMPDIR={{ vars_mountpoint_path }}
+Environment=DOCSRS_PREFIX={{ vars_mountpoint_path }}
+Environment=DOCSRS_RUSTWIDE_WORKSPACE={{ vars_mountpoint_path }}
+Environment=DOCSRS_LOG=debug
+Environment=DOCSRS_DATABASE_URL={{ vars_database_url }}
+Environment=DOCSRS_DOCKER_IMAGE=ghcr.io/rust-lang/crates-build-env/linux
+Environment=DOCSRS_STORAGE_BACKEND=s3
+Environment=S3_REGION=us-east-1
+Environment=DOCSRS_S3_BUCKET={{ vars_s3_bucket }}
+Environment=RUST_BACKTRACE=1
+Environment=DOCSRS_TOOLCHAIN={{ vars_toolchain }}
+
+LimitNOFILE=20000 # Consider removing now that we upload zip files
+Restart=on-failure
+WorkingDirectory={{ vars_working_dir }}
+ExecStart={{ vars_executable_path }} start-build-server
+
+[Install]
+WantedBy=multi-user.target

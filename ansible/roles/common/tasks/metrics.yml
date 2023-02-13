@@ -33,7 +33,7 @@
         state: absent
 
   when: |
-    node_exporter_capture.rc != 0 or not node_exporter_capture.stderr.startswith(
+    node_exporter_capture.rc != 0 or not node_exporter_capture.stdout.startswith(
       "node_exporter, version " + node_exporter_version
     )
 
