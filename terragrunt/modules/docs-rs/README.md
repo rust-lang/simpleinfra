@@ -8,9 +8,12 @@ This is the [Terraform] module that defines the infrastructure for [docs.rs].
 
 [docs.rs] consists of a few different components:
 
-  - A web frontend hosted as a container running in an [ECS] cluster.
-  - A background documentation builder running on [ec2](https://aws.amazon.com/ec2) instances as part of an [autoscaling](https://aws.amazon.com/ec2/autoscaling) group.
-  - A crate registry watcher (**TODO**: this is currently not configured).
+- A web frontend hosted as a container running in an [ECS] cluster.
+- A background documentation builder running on [ec2](https://aws.amazon.com/ec2) instances as part of an [autoscaling](https://aws.amazon.com/ec2/autoscaling) group.
+- A background utility (**TODO**: this is currently not configured) which includes:
+  - crate registry watcher that watches for changes to the crates registry and enqueues doc builds
+  - the repository stats updater that ensures # stars, # issues, etc. from GitHub & GitLab are up-to-date
+  - the CDN invalidation queue handler
 
 These are documented in more detail below.
 
@@ -36,13 +39,14 @@ The registry watcher watches the registry for new entries. When a new crate is a
 
 ```mermaid
 flowchart LR
-    DNS1[Frontend DNS] --> CloudFront
-    CloudFront --> DNS2[ECS LB DNS]
-    DNS2 --> ECSLB[Cluster Load Balancer]
-    ECSLB --> cluster[ECS Cluster]
-    cluster --> service[ECS Service]
-    service --> task[ECS Task]
-    task --> Container
+    User -- DNS --> CloudFront
+    CloudFront -- DNS --> ECSLB[Application Load Balancer]    
+    ECSLB --> service[ECS Service]
+    
+    subgraph ecs [ECS Cluster]
+        service --> Container
+        service -.-> task[Task Definition]
+    end
 ```
 
 The user-facing web frontend for [docs.rs] is hosted on AWS [ECS]. Requests go through several hops on their way from the [CloudFront] distribution through the ECS Cluster to an ECS service and ultimately an ECS task which contains a container running the docs.rs web server. Many of these steps are behind a domain name which is configured in AWS [Route 53].
