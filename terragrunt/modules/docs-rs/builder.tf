@@ -32,7 +32,14 @@ resource "aws_iam_role_policy" "builder_s3" {
       // Access to s3
       {
         Effect = "Allow"
-        Action = "s3:*"
+        Action = [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:CreateBucket",
+          "s3:ListBucket",
+          "s3:PutObjectTagging",
+          "s3:DeleteObject"
+        ]
 
         Resource = [
           aws_s3_bucket.storage.arn,
