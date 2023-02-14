@@ -46,6 +46,21 @@ module "rustconf_com" {
   permanent = true
 }
 
+module "cfp_rustconf_com" {
+  source = "./impl"
+  providers = {
+    aws       = aws
+    aws.east1 = aws.east1
+  }
+
+  to_host = "sessionize.com"
+  to_path = "rustconf-2023"
+  from = [
+    "cfp.rustconf.com"
+  ]
+  permanent = false
+}
+
 module "arewewebyet_org" {
   source = "./impl"
   providers = {
