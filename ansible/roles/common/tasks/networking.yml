@@ -3,7 +3,7 @@
 - name: set the system hostname
   hostname:
     name: "{{ inventory_hostname }}"
-  notify: reboot
+  # notify: reboot
 
 - name: upload /etc/hosts
   template:
