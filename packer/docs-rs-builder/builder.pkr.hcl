@@ -13,10 +13,12 @@ data "amazon-parameterstore" "revision" {
 
 locals {
   revision = data.amazon-parameterstore.revision.value
+  pretty_revision = substr(local.revision, 0, 8)
+  timestamp = regex_replace(timestamp(), "[- TZ:]", "")
 }
 
 source "amazon-ebs" "ubuntu" {
-  ami_name      = "docs-rs-builder-${local.revision}"
+  ami_name      = "docs-rs-builder-${local.pretty_revision}-${local.timestamp}"
   instance_type = "t2.large"
   region        = "us-east-1"
   source_ami_filter {
@@ -43,12 +45,11 @@ build {
 
   provisioner "ansible" {
     command = ".venv/bin/ansible-playbook"
-    # The default is "default"
-    host_alias = "docs-rs-builder"
+    groups = ["docs-rs-builder"]
     inventory_directory = "./env"
     playbook_file = "./play/playbook.yml"
     # The default is the user running packer
     user = "ubuntu"
-    extra_arguments = [ "--extra-vars", "vars_repository_sha=${local.revision}"]
+    extra_arguments = ["--extra-vars", "vars_repository_sha=${local.revision}"]
   }
 }
