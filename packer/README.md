@@ -8,8 +8,8 @@ This directory contains a python script named `packer` which wraps the system `p
 
 ### Running `packer`
 
-To run the wrapper pass the environment, playbook, and any vars ansible is expecting:
+To run the wrapper pass the environment and playbook:
 
 ```bash
-$ ./packer staging docs-rs-builder --var "revision=SOME_REVISION5
+$ ./packer staging docs-rs-build
 ```
