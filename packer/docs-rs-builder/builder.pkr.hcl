@@ -7,8 +7,16 @@ packer {
   }
 }
 
+data "amazon-parameterstore" "revision" {
+  name = "/docs-rs/builder/sha"
+}
+
+locals {
+  revision = data.amazon-parameterstore.revision.value
+}
+
 source "amazon-ebs" "ubuntu" {
-  ami_name      = "docs-rs-builder-${var.revision}"
+  ami_name      = "docs-rs-builder-${local.revision}"
   instance_type = "t2.large"
   region        = "us-east-1"
   source_ami_filter {
@@ -41,5 +49,6 @@ build {
     playbook_file = "./play/playbook.yml"
     # The default is the user running packer
     user = "ubuntu"
+    extra_arguments = [ "--extra-vars", "vars_repository_sha=${local.revision}"]
   }
 }

@@ -51,7 +51,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("env")
     parser.add_argument("playbook")
-    parser.add_argument('--var', action='append', help='Ansible variables as $key=$value')
+    parser.add_argument('--var', action='append', help='Ansible variables as $key=$value', default=[])
     args = parser.parse_args()
 
     workspace = create_workspace(args.env, args.playbook)
