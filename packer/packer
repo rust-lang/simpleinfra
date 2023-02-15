@@ -1,22 +1,13 @@
 #!/usr/bin/env python3
 
 import os
-import sys
 import subprocess
 import pathlib
 import shutil
 import argparse
-
-# Python makes us jump through hoops to import module from
-# a file that does not end in .py
-def load_module():
-    from importlib.util import spec_from_loader, module_from_spec
-    from importlib.machinery import SourceFileLoader 
-    apply = os.path.join(os.path.dirname(__file__), '../ansible/apply')
-    spec = spec_from_loader("apply", SourceFileLoader("apply", apply))
-    apply = module_from_spec(spec)
-    spec.loader.exec_module(apply)
-    return apply
+import sys
+sys.path.append("../ansible")
+import ansible
 
 # Utility for removing everything in a directory except one thing
 def remove_all_except_one(directory, exception):
@@ -46,9 +37,8 @@ def create_workspace_dir():
 # Create the workspace environment
 def create_workspace(env, playbook):
     workspace = create_workspace_dir()
-    apply = load_module()
-    apply.install_ansible(workspace / ".venv")
-    apply.create_workspace(workspace, env, playbook)
+    ansible.install_ansible(workspace / ".venv")
+    ansible.create_workspace(workspace, env, playbook)
 
     # Link the template into the workspace
     template_path = pathlib.Path(playbook).resolve()
