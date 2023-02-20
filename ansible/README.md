@@ -33,6 +33,22 @@ the `./apply` script followed by the username you want to use:
 ./apply <environment> <playbook> -u <username>
 ```
 
+### Permissions
+
+In order to run the `./apply` script, you need SSH permissions for the user
+on the host. If the host does not already have a public key for the given
+user, you can consider temporarily pushing one to the host using the AWS CLI.
+
+```
+aws ec2-instance-connect send-ssh-public-key \
+    --instance-id $HOST_INSTANCE_ID \
+    --instance-os-user $USER \
+    --ssh-public-key file://$PATH_TO_PUBLIC_KEY
+```
+
+You will then have 60 seconds to kick off the `./apply` script before the
+public key is removed again.
+
 ## Environments
 
 Making changes directly on production is not a great idea: to ease local
