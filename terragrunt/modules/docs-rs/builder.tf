@@ -37,6 +37,13 @@ resource "aws_launch_template" "builder" {
     }
   }
 
+  tag_specifications {
+    resource_type = "instance"
+
+    tags = {
+      Name = "docs-rs-builder"
+    }
+  }
 }
 
 data "aws_ami" "builder" {
