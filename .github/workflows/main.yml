@@ -33,7 +33,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
       - name: Ensure the bundled action is the same as the source code
         run: |
           for action in $(ls github-actions/); do
