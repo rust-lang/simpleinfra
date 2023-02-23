@@ -15,7 +15,13 @@ fn main(mut request: Request) -> Result<Response, Error> {
     }
 
     set_ttl(&config, &mut request);
-    send_request_to_s3(&config, &request)
+
+    // Database dump is too big to cache on Fastly
+    if request.get_url_str().ends_with("db-dump.tar.gz") {
+        redirect_db_dump_to_cloudfront(&config)
+    } else {
+        send_request_to_s3(&config, &request)
+    }
 }
 
 /// Limit HTTP methods
@@ -42,6 +48,15 @@ fn limit_http_methods(request: &Request) -> Option<Response> {
 /// of time.
 fn set_ttl(config: &Config, request: &mut Request) {
     request.set_ttl(config.static_ttl);
+}
+
+/// Redirect request to CloudFront
+///
+/// As of early 2023, certain files are too large to be served through Fastly. One of those is the
+/// database dump, which gets redirected to CloudFront.
+fn redirect_db_dump_to_cloudfront(config: &Config) -> Result<Response, Error> {
+    let url = format!("https://{}/db-dump.tar.gz", config.cloudfront_url);
+    Ok(Response::temporary_redirect(url))
 }
 
 /// Forward client request to S3
