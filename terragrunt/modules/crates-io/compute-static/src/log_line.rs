@@ -2,7 +2,7 @@ use std::net::IpAddr;
 
 use derive_builder::Builder;
 use serde::Serialize;
-use time::{Date, Time};
+use time::OffsetDateTime;
 
 #[derive(Debug, Serialize)]
 #[serde(tag = "version")]
@@ -13,8 +13,8 @@ pub enum LogLine {
 
 #[derive(Debug, Builder, Serialize)]
 pub struct LogLineV1 {
-    date: Date,
-    time: Time,
+    #[serde(with = "time::serde::rfc3339")]
+    date_time: OffsetDateTime,
     url: String,
     bytes: Option<usize>,
     ip: Option<IpAddr>,

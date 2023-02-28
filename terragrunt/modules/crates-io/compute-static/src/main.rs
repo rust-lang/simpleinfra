@@ -43,11 +43,8 @@ fn init_logging(config: &Config) {
 
 /// Collect data for the logs from the request
 fn collect_request(request: &Request) -> LogLineV1Builder {
-    let datetime = OffsetDateTime::now_utc();
-
     LogLineV1Builder::default()
-        .date(datetime.date())
-        .time(datetime.time())
+        .date_time(OffsetDateTime::now_utc())
         .url(request.get_url_str().into())
         .ip(request.get_client_ip_addr())
         .method(Some(request.get_method().to_string()))
