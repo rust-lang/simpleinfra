@@ -3,6 +3,9 @@ use fastly::ConfigStore;
 // Name of the dictionary. Must match the dictionary in `fastly-static.tf`.
 const DICTIONARY_NAME: &str = "compute_static";
 
+// Name of the dictionary item with the CloudFront URL
+const CLOUDFRONT_URL: &str = "cloudfront-url";
+
 // Name of the dictionary item with the name of the primary host.
 const PRIMARY_HOST: &str = "s3-primary-host";
 
@@ -17,6 +20,7 @@ pub struct Config {
     pub primary_host: String,
     pub fallback_host: String,
     pub static_ttl: u32,
+    pub cloudfront_url: String,
 }
 
 impl Config {
@@ -35,11 +39,15 @@ impl Config {
             .expect("failed to get TTL for the static bucket from dictionary")
             .parse()
             .expect("failed to parse TTL for the static bucket");
+        let cloudfront_url = dictionary
+            .get(CLOUDFRONT_URL)
+            .expect("failed to get CloudFront URL from dictionary");
 
         Self {
             primary_host,
             fallback_host,
             static_ttl,
+            cloudfront_url,
         }
     }
 }
