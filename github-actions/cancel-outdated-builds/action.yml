@@ -4,7 +4,8 @@ description: Start a daemon that will cancel the current build if a new commit i
 inputs:
   github_token:
     description: GitHub token used to interact with the GitHub API
-    required: true
+    default: ${{ github.token }}
+    required: false
   check_every_seconds:
     description: How many seconds to wait between checks
     required: true

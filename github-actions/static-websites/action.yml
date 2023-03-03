@@ -7,7 +7,8 @@ inputs:
     required: true
   github_token:
     description: 'GitHub token used to push the website'
-    required: true
+    default: ${{ github.token }}
+    required: false
   cloudfront_distribution:
     description: 'Cloudfront distribution to invalidate'
     required: false
