@@ -2,10 +2,7 @@
 
 import argparse
 import json
-import os
 import subprocess
-import sys
-import tempfile
 import time
 
 
@@ -36,12 +33,13 @@ def promote_release(args):
         if args.release_date:
             vars["PROMOTE_RELEASE_BLOG_REPOSITORY"] = "rust-lang/blog.rust-lang.org"
         if args.release_date is None and not args.bypass_startup_checks:
-            print(f"--release_date YYYY-MM-DD required for stable dev-static releases")
+            print("--release_date YYYY-MM-DD required for stable dev-static releases")
             exit(1)
         if args.release_date:
             vars["PROMOTE_RELEASE_BLOG_SCHEDULED_RELEASE_DATE"] = args.release_date
 
     run_build(args.env, vars)
+
 
 def promote_branches():
     vars = {}
@@ -50,6 +48,7 @@ def promote_branches():
     # to nightly which is 'safer' to get wrong.
     vars["PROMOTE_RELEASE_CHANNEL"] = "nightly"
     run_build('prod', vars)
+
 
 def run_build(env, vars):
     res = subprocess.run([
@@ -88,7 +87,7 @@ def run_build(env, vars):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers(help='release or branches',
-            required=True, dest='action')
+                                       required=True, dest='action')
     parser_a = subparsers.add_parser('release', help='promote-release')
     parser_b = subparsers.add_parser('branches', help='promote-branches')
 
