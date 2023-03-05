@@ -5,18 +5,32 @@ import os
 import subprocess
 import sys
 import urllib.parse
+import argparse
 
 
 # Default port to use when connecting to the PostgreSQL database
 DEFAULT_PORT = 5432
 
-# Hostname of the bastion instance
-BASTION_HOST = "bastion.infra.rust-lang.org"
+# Hostname of the default bastion instance
+DEFAULT_BASTION_HOST = "bastion.infra.rust-lang.org"
 
-
-def main(instance, database):
+def main():
     """CLI entrypoint of the program."""
-    creds = fetch_connection_url(instance, database)
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-i", "--instance", help="database instance to connect to", default=None,
+    )
+    parser.add_argument(
+        "-d", "--database", help="database connect to", default=None,
+    )
+    parser.add_argument(
+        "-k", "--ssm-key", help="the ssm key where the database url is stored", default=None,
+    )
+    parser.add_argument(
+        "-b", "--bastion", help="the bastion host (optionally with the '$USERNAME@' prepended)", default=DEFAULT_BASTION_HOST,
+    )
+    args = parser.parse_args()
+    creds = fetch_connection_url(get_key(args))
 
     # Log into the bastion and execute psql in it.
     eprint("logging into the bastion and executing psql on it...\n")
@@ -34,7 +48,7 @@ def main(instance, database):
         # Allocate a TTY for the SSH session, enabling the interactive prompt:
         "-t",
         # Host to connect to:
-        BASTION_HOST,
+        args.bastion,
         # Command line arguments:
         "psql",
         "--host", creds.hostname,
@@ -51,15 +65,25 @@ def main(instance, database):
         "PGPASSWORD": creds.password,
     }).returncode)
 
+def get_key(args):
+    if args.instance and args.database:
+        return f"/prod/rds/{args.instance}/connection-urls/{args.database}"
+    elif args.ssm_key:
+        return args.ssm_key
+    else:
+        err("error: either both the instance (-i) and database (-d) must \
+            be specified or the raw ssm parameter store key (-k) where the\
+            database url is stored")
 
-def fetch_connection_url(instance, database):
+
+def fetch_connection_url(key):
     """Fetch the connection URL from AWS SSM Parameter Store"""
     eprint("fetching database credentials from AWS SSM Parameter Store...")
     try:
         out = json.loads(run_command([
             "aws", "ssm", "get-parameter",
             "--with-decryption",
-            "--name", f"/prod/rds/{instance}/connection-urls/{database}",
+            "--name", key,
         ]).stdout)
     except subprocess.CalledProcessError as e:
         err(f"failed to retrieve database credentials: {e}")
@@ -98,7 +122,4 @@ def run_command(*args, **kwargs):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        eprint(f"usage: {sys.argv[0]} <rds-instance> <database>")
-        exit(1)
-    main(sys.argv[1], sys.argv[2])
+    main()
