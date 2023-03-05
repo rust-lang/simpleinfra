@@ -51,5 +51,11 @@ inputs = {
       email = "abibroom@rustfoundation.org"
       groups = ["billing"]
     }
+    "joelmarcey" = {
+      given_name = "Joel"
+      family_name = "Marcey"
+      email = "joelmarcey@rustfoundation.org"
+      groups = ["billing"]
+    }
   }
 }
