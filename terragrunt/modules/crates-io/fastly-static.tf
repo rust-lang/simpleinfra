@@ -10,6 +10,9 @@ locals {
   fallback_host_name = aws_s3_bucket.fallback.region
 
   dictionary_name = "compute_static"
+
+  request_logs_endpoint = "s3-request-logs"
+  service_logs_endpoint = "s3-service-logs"
 }
 
 data "external" "package" {
@@ -62,6 +65,24 @@ resource "fastly_service_compute" "static" {
     filename         = data.external.package.result.path
     source_code_hash = filesha512(data.external.package.result.path)
   }
+
+  logging_s3 {
+    name        = local.request_logs_endpoint
+    bucket_name = aws_s3_bucket.logs.bucket
+
+    s3_iam_role = aws_iam_role.fastly_assume_role.arn
+    domain      = "s3.us-west-1.amazonaws.com"
+    path        = "/fastly-requests/${var.static_domain_name}/"
+  }
+
+  logging_s3 {
+    name        = local.service_logs_endpoint
+    bucket_name = aws_s3_bucket.logs.bucket
+
+    s3_iam_role = aws_iam_role.fastly_assume_role.arn
+    domain      = "s3.us-west-1.amazonaws.com"
+    path        = "/fastly-logs/${var.static_domain_name}/"
+  }
 }
 
 resource "fastly_service_dictionary_items" "compute_static" {
@@ -78,6 +99,8 @@ resource "fastly_service_dictionary_items" "compute_static" {
     "s3-primary-host" : local.primary_host_name
     "s3-fallback-host" : local.fallback_host_name
     "static-ttl" : var.static_ttl
+    "request-logs-endpoint" : local.request_logs_endpoint
+    "service-logs-endpoint" : local.service_logs_endpoint
   }
 }
 
