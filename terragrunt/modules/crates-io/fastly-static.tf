@@ -71,6 +71,7 @@ resource "fastly_service_compute" "static" {
     bucket_name = aws_s3_bucket.logs.bucket
 
     s3_iam_role = aws_iam_role.fastly_assume_role.arn
+    domain      = "s3.us-west-1.amazonaws.com"
     path        = "/fastly-requests/${var.static_domain_name}/"
   }
 
@@ -79,6 +80,7 @@ resource "fastly_service_compute" "static" {
     bucket_name = aws_s3_bucket.logs.bucket
 
     s3_iam_role = aws_iam_role.fastly_assume_role.arn
+    domain      = "s3.us-west-1.amazonaws.com"
     path        = "/fastly-logs/${var.static_domain_name}/"
   }
 }
