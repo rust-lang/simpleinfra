@@ -22,3 +22,9 @@
     dest: "/usr/lib/python3/dist-packages/lldb/{{ item.path | basename }}"
     state: link
   with_items: "{{ lldb_python_files.files + lldb_python_directories.files }}"
+
+- name: Fix lldb-server-14.0.0
+  ansible.builtin.file:
+    src: /usr/lib/llvm-14/bin/lldb-server
+    dest: /usr/bin/lldb-server-14.0.0
+    state: link
