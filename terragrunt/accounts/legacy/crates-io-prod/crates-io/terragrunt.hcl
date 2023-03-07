@@ -26,4 +26,6 @@ inputs = {
 
   static_cloudfront_weight = 80
   static_fastly_weight = 20
+
+  fastly_customer_id_ssm_parameter = "/prod/crates-io/fastly/customer-id"
 }
