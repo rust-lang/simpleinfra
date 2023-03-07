@@ -73,6 +73,8 @@ resource "fastly_service_compute" "static" {
     s3_iam_role = aws_iam_role.fastly_assume_role.arn
     domain      = "s3.us-west-1.amazonaws.com"
     path        = "/fastly-requests/${var.static_domain_name}/"
+
+    compression_codec = "gzip"
   }
 
   logging_s3 {
@@ -82,6 +84,8 @@ resource "fastly_service_compute" "static" {
     s3_iam_role = aws_iam_role.fastly_assume_role.arn
     domain      = "s3.us-west-1.amazonaws.com"
     path        = "/fastly-logs/${var.static_domain_name}/"
+
+    compression_codec = "gzip"
   }
 }
 
