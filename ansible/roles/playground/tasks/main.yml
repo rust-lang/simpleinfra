@@ -18,6 +18,11 @@
     state: present
   notify: restart-docker
 
+- name: Ensure Docker configuration directory exists
+  file:
+    path: /etc/docker
+    state: directory
+
 - name: Configure Docker daemon
   template:
     src: daemon.json
