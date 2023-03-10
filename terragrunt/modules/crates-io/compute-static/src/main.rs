@@ -18,7 +18,12 @@ fn main(request: Request) -> Result<Response, Error> {
 
     let mut log = collect_request(&request);
 
-    let response = handle_request(&config, request);
+    let has_origin_header = request.get_header("Origin").is_some();
+    let mut response = handle_request(&config, request);
+
+    if has_origin_header {
+        add_cors_headers(&mut response);
+    }
 
     let log = collect_response(&mut log, &response);
     build_and_send_log(log, &config);
@@ -128,6 +133,18 @@ fn send_request_to_s3(config: &Config, request: &Request) -> Result<Response, Er
     }
 
     Ok(response)
+}
+
+/// Add CORS headers to response
+///
+/// We are explicitly adding the three CORS headers to requests that include an `Origin` header to
+/// match functionality with CloudFront.
+fn add_cors_headers(response: &mut Result<Response, Error>) {
+    if let Ok(response) = response {
+        response.set_header("Access-Control-Allow-Origin", "*");
+        response.set_header("Access-Control-Allow-Methods", "GET");
+        response.set_header("Access-Control-Max-Age", "3000");
+    }
 }
 
 /// Collect data for the logs from the response
