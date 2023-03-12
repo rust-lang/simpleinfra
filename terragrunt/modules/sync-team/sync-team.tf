@@ -75,7 +75,7 @@ resource "aws_codebuild_project" "sync_team" {
     environment_variable {
       type  = "PLAINTEXT"
       name  = "CONFIRMATION_BASE_URL"
-      value = "${module.lambda_confirmation.lambda_function_url}/authorize"
+      value = "https://${aws_cloudfront_distribution.confirmation.domain_name}/authorize"
     }
   }
 
