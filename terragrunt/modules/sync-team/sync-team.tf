@@ -20,7 +20,7 @@ resource "aws_codebuild_project" "sync_team" {
       phases:
         build:
           commands:
-            - sync-team --live
+            - sync-team --live --require-confirmation
       EOF
   }
 
@@ -58,6 +58,24 @@ resource "aws_codebuild_project" "sync_team" {
       type  = "PARAMETER_STORE"
       name  = "ZULIP_API_TOKEN"
       value = "/prod/sync-team/zulip-api-token"
+    }
+
+    environment_variable {
+      type  = "PLAINTEXT"
+      name  = "CONFIRMATION_STREAM"
+      value = "t-infra/private"
+    }
+
+    environment_variable {
+      type  = "PLAINTEXT"
+      name  = "CONFIRMATION_TOPIC"
+      value = "sync-team"
+    }
+
+    environment_variable {
+      type  = "PLAINTEXT"
+      name  = "CONFIRMATION_BASE_URL"
+      value = "${module.lambda_confirmation.lambda_function_url}/authorize"
     }
   }
 
