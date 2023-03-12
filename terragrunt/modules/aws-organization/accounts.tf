@@ -21,3 +21,8 @@ resource "aws_organizations_account" "dev_desktops_prod" {
   name  = "dev-desktops-prod"
   email = "admin+dev-desktops-prod@rust-lang.org"
 }
+
+resource "aws_organizations_account" "sync_team_prod" {
+  name  = "sync-team-prod"
+  email = "admin+sync-team-prod@rust-lang.org"
+}
