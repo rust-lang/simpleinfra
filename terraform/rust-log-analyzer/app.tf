@@ -8,8 +8,8 @@ module "rla" {
   name = "rust-log-analyzer"
   repo = "rust-lang/rust-log-analyzer"
 
-  cpu              = 256
-  memory           = 512
+  cpu              = 1024
+  memory           = 2048
   tasks_count      = 1
   platform_version = "1.4.0"
   mount_efs        = "/opt/rla"
@@ -31,6 +31,7 @@ module "rla" {
   expose_http = {
     container_port = 80
     domains        = ["rla.infra.rust-lang.org"]
+    prometheus     = null
 
     health_check_path     = "/"
     health_check_interval = 5
