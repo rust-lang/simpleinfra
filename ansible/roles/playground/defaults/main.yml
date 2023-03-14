@@ -8,7 +8,7 @@ vars_playground_user: playground
 vars_playground_group: "{{ vars_playground_user }}"
 vars_playground_home_path: /home/playground
 
-vars_playground_repository_url: https://github.com/integer32llc/rust-playground.git
+vars_playground_repository_url: https://github.com/rust-lang/rust-playground.git
 
 vars_playground_checkout_path: "{{ vars_playground_home_path }}/rust-playground"
 vars_playground_update_path: "{{ vars_playground_home_path }}/update.sh"
