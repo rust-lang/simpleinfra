@@ -46,7 +46,7 @@ resource "aws_iam_role" "upload_artifacts" {
         }
         Condition = {
           StringEquals = {
-            "token.actions.githubusercontent.com:sub" = "repo:integer32llc/rust-playground:ref:refs/heads/master"
+            "token.actions.githubusercontent.com:sub" = "repo:rust-lang/rust-playground:ref:refs/heads/main"
           }
         }
       }
