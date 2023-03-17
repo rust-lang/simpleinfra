@@ -78,11 +78,11 @@ resource "aws_security_group" "fastly_exporter" {
   vpc_id      = data.terraform_remote_state.shared.outputs.ecs_cluster_config.vpc_id
 
   ingress {
-    from_port        = 8080
-    to_port          = 8080
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
+    from_port = 8080
+    to_port   = 8080
+    protocol  = "tcp"
+    # Elastic IP of the monitoring server
+    cidr_blocks = ["52.9.166.219/32"]
   }
 }
 
