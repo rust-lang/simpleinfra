@@ -5,9 +5,13 @@
     enabled: false
     state: stopped
     name: fwupd-refresh.timer
+  # Not all of our hosts actually have this, just ignore it if it fails.
+  ignore_errors: true
 
 - name: Disable the fwupd-refresh service
   ansible.builtin.systemd:
     enabled: false
     state: stopped
     name: fwupd-refresh.service
+  # Not all of our hosts actually have this, just ignore it if it fails.
+  ignore_errors: true
