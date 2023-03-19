@@ -34,7 +34,7 @@
         state: absent
 
   when: |
-    alertmanager_capture.rc != 0 or not alertmanager_capture.stderr.startswith(
+    alertmanager_capture.rc != 0 or not alertmanager_capture.stdout.startswith(
       "alertmanager, version " + alertmanager_version
     )
 
