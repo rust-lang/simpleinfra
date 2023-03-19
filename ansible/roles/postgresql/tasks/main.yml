@@ -1,5 +1,5 @@
 ---
 
-- include: setup.yml
-- include: databases.yml
-- include: backup.yml
+- include_tasks: setup.yml
+- include_tasks: databases.yml
+- include_tasks: backup.yml

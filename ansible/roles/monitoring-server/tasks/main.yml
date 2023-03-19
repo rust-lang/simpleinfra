@@ -1,6 +1,6 @@
 ---
 
-- include: prometheus-ecs-discovery.yml
-- include: prometheus.yml
-- include: alertmanager.yml
-- include: grafana.yml
+- include_tasks: prometheus-ecs-discovery.yml
+- include_tasks: prometheus.yml
+- include_tasks: alertmanager.yml
+- include_tasks: grafana.yml

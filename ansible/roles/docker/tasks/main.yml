@@ -1,5 +1,5 @@
 ---
 
-- include: install.yml
-- include: update-images.yml
-- include: containers.yml
+- include_tasks: install.yml
+- include_tasks: update-images.yml
+- include_tasks: containers.yml

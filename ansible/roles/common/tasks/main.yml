@@ -1,11 +1,11 @@
 ---
 
-- include: apt.yml
-- include: users.yml
-- include: ssh.yml
-- include: networking.yml
-- include: backup.yml
-- include: metrics.yml
-- include: papertrail.yml
-- include: cleanup.yml
-- include: services.yml
+- include_tasks: apt.yml
+- include_tasks: users.yml
+- include_tasks: ssh.yml
+- include_tasks: networking.yml
+- include_tasks: backup.yml
+- include_tasks: metrics.yml
+- include_tasks: papertrail.yml
+- include_tasks: cleanup.yml
+- include_tasks: services.yml

@@ -1,6 +1,6 @@
 ---
 
-- include: pebble.yml
+- include_tasks: pebble.yml
   when: dummy_certs
-- include: install.yml
-- include: renewer.yml
+- include_tasks: install.yml
+- include_tasks: renewer.yml

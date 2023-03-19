@@ -1,5 +1,5 @@
 ---
 
-- include: install.yml
-- include: host.yml
-- include: instances.yml
+- include_tasks: install.yml
+- include_tasks: host.yml
+- include_tasks: instances.yml
