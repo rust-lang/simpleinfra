@@ -128,7 +128,7 @@
           metrics_path: /metrics
           static_configs:
             - targets:
-              - fastly-exporter.infra.rust-lang.org:8080
+              - fastly-exporter.infra.rust-lang.org
 
 
       prometheus_rule_groups:
