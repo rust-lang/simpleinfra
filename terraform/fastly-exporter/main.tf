@@ -83,6 +83,8 @@ resource "aws_security_group" "fastly_exporter" {
     protocol  = "tcp"
     # Elastic IP of the monitoring server
     cidr_blocks = ["52.9.166.219/32"]
+    # Load balancer security group, required for health checks
+    security_groups = ["sg-0ddcb954525a46b70"]
   }
 }
 
