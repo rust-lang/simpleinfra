@@ -59,6 +59,12 @@ resource "aws_cloudfront_distribution" "index" {
     }
   }
 
+  logging_config {
+    include_cookies = false
+    bucket          = aws_s3_bucket.logs.bucket_regional_domain_name
+    prefix          = "cloudfront/${var.index_domain_name}"
+  }
+
   tags = {
     TeamAccess = "crates-io"
   }
