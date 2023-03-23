@@ -102,7 +102,7 @@ resource "fastly_service_dictionary_items" "compute_static" {
 }
 
 module "fastly_tls_subscription_globalsign" {
-  source = "./fastly-tls-subscription"
+  source = "../fastly-tls-subscription"
 
   certificate_authority = "globalsign"
   aws_route53_zone_id   = data.aws_route53_zone.static.id
