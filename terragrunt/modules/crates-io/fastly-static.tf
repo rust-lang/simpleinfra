@@ -116,6 +116,18 @@ resource "fastly_tls_subscription" "static" {
   ]
 }
 
+module "fastly_tls_subscription_globalsign" {
+  source = "./fastly-tls-subscription"
+
+  certificate_authority = "globalsign"
+  aws_route53_zone_id   = data.aws_route53_zone.static.id
+
+  domains = [
+    local.fastly_domain_name,
+    var.static_domain_name
+  ]
+}
+
 ### Stage 2
 
 resource "aws_route53_record" "static_tls_validation" {
