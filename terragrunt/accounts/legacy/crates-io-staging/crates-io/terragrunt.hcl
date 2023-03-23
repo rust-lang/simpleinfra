@@ -23,8 +23,8 @@ inputs = {
 
   strict_security_headers = true
 
-  static_cloudfront_weight = 50
-  static_fastly_weight = 50
+  static_cloudfront_weight = 0
+  static_fastly_weight = 100
 
   fastly_customer_id_ssm_parameter = "/staging/crates-io/fastly/customer-id"
 }
