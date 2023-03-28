@@ -1,8 +1,3 @@
-# The Fastly service must be deployed in two steps, since some resources depend
-# on attributes that are only known after an `apply`. To deploy the service,
-# comment out everything in Stage 2 and then run `terragrunt apply`. After the
-# run has finished, uncomment Stage 2 and run `terragrunt apply` again.
-
 locals {
   fastly_domain_name = "fastly-${var.static_domain_name}"
 
@@ -19,8 +14,6 @@ data "external" "package" {
   program     = ["bash", "terraform-external-build.sh"]
   working_dir = "./compute-static/bin"
 }
-
-### Stage 1
 
 resource "fastly_service_compute" "static" {
   name = var.static_domain_name
@@ -108,48 +101,16 @@ resource "fastly_service_dictionary_items" "compute_static" {
   }
 }
 
-resource "fastly_tls_subscription" "static" {
-  certificate_authority = "lets-encrypt"
+module "fastly_tls_subscription_globalsign" {
+  source = "../fastly-tls-subscription"
+
+  certificate_authority = "globalsign"
+  aws_route53_zone_id   = data.aws_route53_zone.static.id
+
   domains = [
     local.fastly_domain_name,
     var.static_domain_name
   ]
-}
-
-### Stage 2
-
-resource "aws_route53_record" "static_tls_validation" {
-  depends_on = [fastly_tls_subscription.static]
-
-  for_each = {
-    for challenge in fastly_tls_subscription.static.managed_dns_challenges :
-    trimprefix(challenge.record_name, "_acme-challenge.") => challenge
-  }
-
-  name            = each.value.record_name
-  type            = each.value.record_type
-  zone_id         = data.aws_route53_zone.static.id
-  allow_overwrite = true
-  records         = [each.value.record_value]
-  ttl             = 60
-}
-
-resource "fastly_tls_subscription_validation" "static" {
-  depends_on      = [aws_route53_record.static_tls_validation]
-  subscription_id = fastly_tls_subscription.static.id
-}
-
-locals {
-  # It is currently not possible to get the CNAME for TLS-enabled hostnames as a
-  # Terraform resource. But the ACME HTTP challenge redirects production traffic
-  # to Fastly, for which it uses the CNAME that we are looking for.
-  #
-  # The below snippet is a hack to get the CNAME for the static domain from the
-  # HTTP challenge, until Fastly exposes it in the Terraform provider.
-  fastly_static_destinations = flatten([
-    for record in fastly_tls_subscription.static.managed_http_challenges :
-    record.record_values if record.record_type == "CNAME"
-  ])
 }
 
 resource "aws_route53_record" "fastly_static_domain" {
@@ -157,7 +118,7 @@ resource "aws_route53_record" "fastly_static_domain" {
   type            = "CNAME"
   zone_id         = data.aws_route53_zone.static.id
   allow_overwrite = true
-  records         = local.fastly_static_destinations
+  records         = module.fastly_tls_subscription_globalsign.destinations
   ttl             = 60
 }
 
