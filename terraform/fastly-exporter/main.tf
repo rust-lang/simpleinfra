@@ -3,7 +3,7 @@ locals {
 }
 
 data "aws_ssm_parameter" "fastly_api_token" {
-  name = "/prod/crates-io/fastly/api-token"
+  name = "/prod/fastly-exporter/fastly/api-token"
 }
 
 resource "aws_iam_policy" "read_fastly_api_token" {
