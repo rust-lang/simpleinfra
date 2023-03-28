@@ -14,6 +14,14 @@ data "aws_s3_bucket" "artifacts" {
   bucket = "rust-lang-ci2"
 }
 
+data "aws_cloudfront_distribution" "doc" {
+  id = var.cloudfront_doc_id
+}
+
+data "aws_cloudfront_distribution" "static" {
+  id = var.cloudfront_static_id
+}
+
 resource "aws_cloudwatch_log_group" "promote_release" {
   name              = "/${var.name}/promote-release"
   retention_in_days = 90
@@ -48,12 +56,12 @@ resource "aws_codebuild_project" "promote_release" {
 
     environment_variable {
       name  = "PROMOTE_RELEASE_CLOUDFRONT_DOC_ID"
-      value = aws_cloudfront_distribution.doc.id
+      value = data.aws_cloudfront_distribution.doc.id
     }
 
     environment_variable {
       name  = "PROMOTE_RELEASE_CLOUDFRONT_STATIC_ID"
-      value = aws_cloudfront_distribution.static.id
+      value = data.aws_cloudfront_distribution.static.id
     }
 
     environment_variable {
@@ -227,8 +235,8 @@ resource "aws_iam_role_policy" "promote_release" {
         Effect = "Allow"
         Action = "cloudfront:CreateInvalidation"
         Resource = [
-          aws_cloudfront_distribution.doc.arn,
-          aws_cloudfront_distribution.static.arn,
+          data.aws_cloudfront_distribution.doc.arn,
+          data.aws_cloudfront_distribution.static.arn,
         ]
       },
       {
