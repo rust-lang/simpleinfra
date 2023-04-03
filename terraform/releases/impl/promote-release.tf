@@ -102,6 +102,11 @@ resource "aws_codebuild_project" "promote_release" {
       type  = "PARAMETER_STORE"
     }
 
+    environment_variable {
+      name  = "PROMOTE_RELEASE_RECOMPRESS_XZ"
+      value = "1"
+    }
+
     dynamic "environment_variable" {
       for_each = var.extra_environment_variables
       content {
