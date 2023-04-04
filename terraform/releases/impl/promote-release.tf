@@ -41,7 +41,7 @@ resource "aws_codebuild_project" "promote_release" {
   }
 
   environment {
-    compute_type                = "BUILD_GENERAL1_LARGE"
+    compute_type                = "BUILD_GENERAL1_2XLARGE"
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "SERVICE_ROLE"
     image                       = var.promote_release_ecr_repo.url
