@@ -49,6 +49,7 @@
       - emacs
       - lld
       - lldb
+      - mold
     state: present
 
 - name: Install tools for x86
