@@ -35,6 +35,11 @@ variable "mount_efs" {
   default = null
 }
 
+variable "efs_elastic_throughput" {
+  type    = bool
+  default = false
+}
+
 variable "ephemeral_storage_gb" {
   type    = number
   default = 21

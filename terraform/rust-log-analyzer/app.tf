@@ -12,7 +12,9 @@ module "rla" {
   memory           = 2048
   tasks_count      = 1
   platform_version = "1.4.0"
-  mount_efs        = "/opt/rla"
+
+  mount_efs              = "/opt/rla"
+  efs_elastic_throughput = true
 
   environment = {
     CI_REPO     = "rust-lang/rust"

@@ -1,7 +1,8 @@
 // Create the EFS filesystem.
 
 resource "aws_efs_file_system" "efs" {
-  creation_token = var.name
+  creation_token  = var.name
+  throughput_mode = var.elastic_throughput ? "elastic" : "bursting"
 
   tags = {
     Name = var.name

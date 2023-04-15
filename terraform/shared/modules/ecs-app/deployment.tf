@@ -104,8 +104,9 @@ module "efs" {
   for_each = var.mount_efs == null ? toset([]) : toset([var.name])
   source   = "../efs-filesystem"
 
-  name          = "${var.env}--${var.name}"
-  allow_subnets = var.cluster_config.subnet_ids
+  name               = "${var.env}--${var.name}"
+  allow_subnets      = var.cluster_config.subnet_ids
+  elastic_throughput = var.efs_elastic_throughput
 }
 
 resource "aws_iam_role_policy_attachment" "use_efs" {
