@@ -13,15 +13,12 @@ module "rla" {
   tasks_count      = 1
   platform_version = "1.4.0"
 
-  mount_efs              = "/opt/rla"
-  efs_elastic_throughput = true
-
   environment = {
     CI_REPO     = "rust-lang/rust"
     CI_PROVIDER = "actions"
     EXTRA_ARGS  = "--secondary-repo rust-lang-ci/rust"
     GITHUB_USER = "rust-log-analyzer"
-    INDEX_FILE  = "/opt/rla/rust-lang/rust/actions.idx"
+    INDEX_FILE  = "s3://${aws_s3_bucket.storage.id}/rust-lang/rust/actions.idx"
     RLA_LOG     = "rla_server=trace,rust_log_analyzer=trace"
   }
 
