@@ -13,6 +13,6 @@ inputs = {
   static_domain_name = "static.rust-lang.org"
   doc_domain_name = "doc.rust-lang.org"
 
-  static_bucket = ""
-  log_bucket = ""
+  static_bucket = "static-rust-lang-org"
+  log_bucket = "rust-release-logs"
 }
