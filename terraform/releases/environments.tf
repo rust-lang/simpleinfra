@@ -42,12 +42,13 @@ module "dev" {
 
   bucket             = "dev-static-rust-lang-org"
   static_domain_name = "dev-static.rust-lang.org"
-  doc_domain_name    = "dev-doc.rust-lang.org"
+
+  cloudfront_static_id = "E30AO2GXMDY230"
+  cloudfront_doc_id    = "E3BB4EZOGX5YED"
 
   inventories_bucket_arn   = data.terraform_remote_state.shared.outputs.inventories_bucket_arn
   promote_release_ecr_repo = module.promote_release_ecr
   release_keys_bucket_arn  = aws_s3_bucket.release_keys.arn
-  log_bucket               = aws_s3_bucket.logs.id
 
   extra_environment_variables = toset([
     {
@@ -76,12 +77,13 @@ module "prod" {
 
   bucket             = "static-rust-lang-org"
   static_domain_name = "static.rust-lang.org"
-  doc_domain_name    = "doc.rust-lang.org"
+
+  cloudfront_static_id = "E3NZU1LCBHH4A4"
+  cloudfront_doc_id    = "ECO8GQQ6UCG66"
 
   inventories_bucket_arn   = data.terraform_remote_state.shared.outputs.inventories_bucket_arn
   promote_release_ecr_repo = module.promote_release_ecr
   release_keys_bucket_arn  = aws_s3_bucket.release_keys.arn
-  log_bucket               = aws_s3_bucket.logs.id
 
   extra_environment_variables = toset([
     // Setting this enables tagging of releases, so we only do it for the production
