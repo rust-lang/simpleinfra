@@ -5,6 +5,7 @@ locals {
   release_keys_bucket_users = [
     "pietroalbini",
     "simulacrum",
+    "jdn",
   ]
 }
 
