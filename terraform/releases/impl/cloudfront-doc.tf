@@ -71,7 +71,45 @@ resource "aws_cloudfront_distribution" "doc" {
   }
 
   ordered_cache_behavior {
-    path_pattern     = "*.woff2"
+    path_pattern     = "/nightly/static.files/*"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD", "OPTIONS"]
+    target_origin_id = "main"
+
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.cache_immutable.id
+    cache_policy_id            = data.aws_cloudfront_cache_policy.caching.id
+
+    compress               = true
+    viewer_protocol_policy = "redirect-to-https"
+
+    lambda_function_association {
+      event_type   = "origin-request"
+      lambda_arn   = module.lambda_doc_router.version_arn
+      include_body = false
+    }
+  }
+
+  ordered_cache_behavior {
+    path_pattern     = "/beta/static.files/*"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD", "OPTIONS"]
+    target_origin_id = "main"
+
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.cache_immutable.id
+    cache_policy_id            = data.aws_cloudfront_cache_policy.caching.id
+
+    compress               = true
+    viewer_protocol_policy = "redirect-to-https"
+
+    lambda_function_association {
+      event_type   = "origin-request"
+      lambda_arn   = module.lambda_doc_router.version_arn
+      include_body = false
+    }
+  }
+
+  ordered_cache_behavior {
+    path_pattern     = "/static.files/*"
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
     target_origin_id = "main"
