@@ -39,7 +39,7 @@ module "rla" {
 }
 
 resource "aws_s3_bucket" "storage" {
-   bucket = "rust-log-analyzer-storage"
+  bucket = "rust-log-analyzer-storage"
 }
 
 resource "aws_s3_bucket_public_access_block" "storage" {
