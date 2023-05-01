@@ -1,18 +1,14 @@
 module "lambda_static" {
-  source = "../../shared/modules/lambda"
+  source = "../aws-lambda"
   providers = {
     aws = aws.east1
   }
 
-  name       = "${var.bucket}--static-router"
-  source_dir = "impl/lambdas/static-router"
+  name       = "${local.name}--static-router"
+  source_dir = "lambdas/static-router"
   handler    = "index.handler"
   runtime    = "nodejs16.x"
   role_arn   = data.aws_iam_role.cloudfront_lambda.arn
-}
-
-data "aws_s3_bucket" "logs" {
-  bucket = var.log_bucket
 }
 
 resource "aws_cloudfront_distribution" "static" {
@@ -71,7 +67,7 @@ resource "aws_cloudfront_distribution" "static" {
 
   origin {
     origin_id   = "main"
-    domain_name = aws_s3_bucket.static.bucket_regional_domain_name
+    domain_name = data.aws_s3_bucket.static.bucket_regional_domain_name
   }
 
   restrictions {

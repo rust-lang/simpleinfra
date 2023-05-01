@@ -1,18 +1,18 @@
 module "lambda_doc_router" {
-  source = "../../shared/modules/lambda"
+  source = "../aws-lambda"
   providers = {
     aws = aws.east1
   }
 
-  name       = "${var.bucket}--doc-router"
-  source_dir = "impl/lambdas/doc-router"
+  name       = "${local.name}--doc-router"
+  source_dir = "lambdas/doc-router"
   handler    = "index.handler"
   runtime    = "nodejs16.x"
   role_arn   = data.aws_iam_role.cloudfront_lambda.arn
 }
 
 resource "aws_cloudfront_response_headers_policy" "cache_immutable" {
-  name = format("immutable-for-%s-releases", var.name)
+  name = format("immutable-for-%s-releases", var.environment)
 
   custom_headers_config {
     items {
@@ -91,7 +91,7 @@ resource "aws_cloudfront_distribution" "doc" {
 
   origin {
     origin_id   = "main"
-    domain_name = aws_s3_bucket.static.website_endpoint
+    domain_name = data.aws_s3_bucket.static.website_endpoint
     origin_path = "/doc"
 
     custom_origin_config {
