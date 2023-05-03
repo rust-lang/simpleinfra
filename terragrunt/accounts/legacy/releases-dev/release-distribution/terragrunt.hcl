@@ -1,5 +1,5 @@
 terraform {
-  source = "../../../../modules//release-distribution"
+  source = "../../../../..//terragrunt/modules/release-distribution"
 }
 
 include {
