@@ -44,6 +44,10 @@ def pack(query):
         os.makedirs(parent, exist_ok=True)
     zip = zipfile.ZipFile(query["destination"], mode="w")
     for path in paths:
+        # Ignore Terragrunt's metadata files.
+        if os.path.basename(path) == ".terragrunt-source-manifest":
+            continue
+
         # Override the permissions to set 0644 if the file is not executable,
         # or 0755 if the file is executable.
         permission = 0o100644
