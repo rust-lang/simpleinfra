@@ -2,6 +2,11 @@ data "aws_iam_role" "cloudfront_lambda" {
   name = "cloudfront-lambda"
 }
 
+data "aws_route53_zone" "static" {
+  // Convert foo.bar.baz into bar.baz
+  name = join(".", reverse(slice(reverse(split(".", var.static_domain_name)), 0, 2)))
+}
+
 data "aws_s3_bucket" "static" {
   bucket = var.static_bucket
 }
