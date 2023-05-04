@@ -6,6 +6,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 4.32"
     }
+    fastly = {
+      source  = "fastly/fastly"
+      version = "3.0.0"
+    }
   }
 }
 
@@ -14,3 +18,4 @@ provider "aws" {
   region = "us-east-1"
 }
 
+provider "fastly" {}
