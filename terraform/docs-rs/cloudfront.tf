@@ -41,7 +41,7 @@ resource "aws_cloudfront_distribution" "webapp" {
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
 
-    default_ttl = 604800 // 1 week
+    default_ttl = 31536000 // 1 year
     min_ttl     = 0
     max_ttl     = 31536000 // 1 year
 

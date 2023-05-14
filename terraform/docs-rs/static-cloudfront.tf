@@ -17,7 +17,7 @@ module "static_certificate" {
 
 resource "aws_cloudfront_cache_policy" "static_docs_rs" {
   name        = "static-docs-rs"
-  default_ttl = 604800 // 1 week
+  default_ttl = 31536000 // 1 year
   min_ttl     = 0
   max_ttl     = 604800 // 1 week
   parameters_in_cache_key_and_forwarded_to_origin {
