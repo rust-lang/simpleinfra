@@ -15,6 +15,10 @@ data "external" "package" {
   working_dir = "./compute-static/bin"
 }
 
+data "fastly_package_hash" "package" {
+  filename = data.external.package.result.path
+}
+
 resource "fastly_service_compute" "static" {
   name = var.static_domain_name
 
@@ -56,7 +60,7 @@ resource "fastly_service_compute" "static" {
 
   package {
     filename         = data.external.package.result.path
-    source_code_hash = filesha512(data.external.package.result.path)
+    source_code_hash = data.fastly_package_hash.package.hash
   }
 
   logging_s3 {
