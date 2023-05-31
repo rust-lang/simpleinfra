@@ -102,6 +102,7 @@ module "docs_rs_metadata" {
   to_path = "about/metadata"
   from = [
     "package.metadata.docs.rs",
+    "project.metadata.docs.rs",
   ]
   permanent = true
 }
