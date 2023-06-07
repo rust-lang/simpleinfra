@@ -60,7 +60,12 @@ module "dev" {
       name  = "PROMOTE_RELEASE_DISCOURSE_API_KEY"
       value = "/prod/promote-release/discourse-api-key"
       type  = "PARAMETER_STORE"
-    }
+    },
+    {
+      name  = "PROMOTE_RELEASE_INVALIDATE_FASTLY"
+      value = "true"
+      type  = "PLAINTEXT"
+    },
   ])
 
   promote_release_cron = {}
