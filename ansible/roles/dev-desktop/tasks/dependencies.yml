@@ -51,6 +51,7 @@
       - lld
       - lldb
       - mold
+      - podman
     state: present
 
 - name: Install tools for x86
