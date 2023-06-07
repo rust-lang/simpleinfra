@@ -24,6 +24,8 @@ resource "fastly_service_vcl" "static" {
     ssl_cert_hostname = data.aws_s3_bucket.static.bucket_regional_domain_name
   }
 
+  default_ttl = var.static_ttl
+
   # The VCL snippets can be tested here: https://fiddle.fastly.dev/fiddle/eb4b0dfb
   snippet {
     name    = "list files in S3"

@@ -41,6 +41,8 @@ resource "aws_cloudfront_distribution" "static" {
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
 
+    default_ttl = var.static_ttl
+
     forwarded_values {
       headers = [
         // Following the spec, AWS S3 only replies with the CORS headers when

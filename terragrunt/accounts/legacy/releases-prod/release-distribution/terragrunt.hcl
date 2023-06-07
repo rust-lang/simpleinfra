@@ -15,4 +15,6 @@ inputs = {
 
   static_bucket = "static-rust-lang-org"
   log_bucket = "rust-release-logs"
+
+  static_ttl = 86400 // 1 day
 }
