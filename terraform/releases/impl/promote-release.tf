@@ -255,9 +255,10 @@ resource "aws_iam_role_policy" "promote_release" {
         Effect = "Allow"
         Action = ["ssm:GetParameters"]
         Resource = [
-          "${data.aws_ssm_parameter.github_app_key.arn}",
-          "${data.aws_ssm_parameter.internals_discourse.arn}",
-          "${data.aws_ssm_parameter.users_discourse.arn}",
+          data.aws_ssm_parameter.github_app_key.arn,
+          data.aws_ssm_parameter.internals_discourse.arn,
+          data.aws_ssm_parameter.users_discourse.arn,
+          data.aws_ssm_parameter.fastly_api_token.arn,
         ]
       }
     ]
