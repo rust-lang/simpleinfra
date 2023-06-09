@@ -101,7 +101,7 @@ resource "aws_route53_record" "cloudfront_static_domain" {
   records = [aws_cloudfront_distribution.static.domain_name]
 }
 
-resource "aws_route53_record" "static" {
+resource "aws_route53_record" "weighted_static_cloudfront" {
   zone_id = data.aws_route53_zone.static.id
   name    = var.static_domain_name
   type    = "CNAME"
