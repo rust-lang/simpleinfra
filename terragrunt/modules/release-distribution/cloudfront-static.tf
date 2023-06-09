@@ -106,5 +106,11 @@ resource "aws_route53_record" "static" {
   name    = var.static_domain_name
   type    = "CNAME"
   ttl     = 300
-  records = [aws_cloudfront_distribution.static.domain_name]
+  records = [aws_route53_record.cloudfront_static_domain.fqdn]
+
+  weighted_routing_policy {
+    weight = var.static_cloudfront_weight
+  }
+
+  set_identifier = "cloudfront"
 }

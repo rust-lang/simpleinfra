@@ -88,10 +88,24 @@ module "fastly_tls_subscription" {
 }
 
 resource "aws_route53_record" "fastly_static_domain" {
+  zone_id         = data.aws_route53_zone.static.id
   name            = local.fastly_domain_name
   type            = "CNAME"
-  zone_id         = data.aws_route53_zone.static.id
+  ttl             = 300
   allow_overwrite = true
   records         = module.fastly_tls_subscription.destinations
-  ttl             = 60
+}
+
+resource "aws_route53_record" "weighted_static_fastly" {
+  zone_id = data.aws_route53_zone.static.id
+  name    = var.static_domain_name
+  type    = "CNAME"
+  ttl     = 300
+  records = [aws_route53_record.fastly_static_domain.fqdn]
+
+  weighted_routing_policy {
+    weight = var.static_fastly_weight
+  }
+
+  set_identifier = "fastly"
 }
