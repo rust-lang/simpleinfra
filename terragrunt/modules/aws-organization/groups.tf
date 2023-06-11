@@ -119,6 +119,24 @@ locals {
         permissions : [aws_ssoadmin_permission_set.view_only_access, aws_ssoadmin_permission_set.administrator_access] },
       ]
     },
+    # bors staging
+    {
+      account : aws_organizations_account.bors_staging,
+      groups : [
+        { group : aws_identitystore_group.infra,
+        permissions : [aws_ssoadmin_permission_set.view_only_access, aws_ssoadmin_permission_set.administrator_access] },
+        { group : aws_identitystore_group.infra-admins,
+        permissions : [aws_ssoadmin_permission_set.view_only_access, aws_ssoadmin_permission_set.administrator_access] },
+      ]
+    },
+    # bors prod
+    {
+      account : aws_organizations_account.bors_prod,
+      groups : [
+        { group : aws_identitystore_group.infra-admins,
+        permissions : [aws_ssoadmin_permission_set.view_only_access, aws_ssoadmin_permission_set.administrator_access] },
+      ]
+    },
   ]
 }
 

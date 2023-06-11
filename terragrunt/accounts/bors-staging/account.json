@@ -1,0 +1,6 @@
+{
+    "aws": {
+        "profile": "bors-staging",
+        "region": "us-east-2"
+    }
+}

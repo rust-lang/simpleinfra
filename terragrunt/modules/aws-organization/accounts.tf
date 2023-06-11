@@ -26,3 +26,13 @@ resource "aws_organizations_account" "sync_team_prod" {
   name  = "sync-team-prod"
   email = "admin+sync-team-prod@rust-lang.org"
 }
+
+resource "aws_organizations_account" "bors_staging" {
+  name  = "bors-staging"
+  email = "admin+bors-staging@rust-lang.org"
+}
+
+resource "aws_organizations_account" "bors_prod" {
+  name  = "bors-prod"
+  email = "admin+bors-prod@rust-lang.org"
+}
