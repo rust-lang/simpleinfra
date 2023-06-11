@@ -11,4 +11,3 @@ remote_state {
     key            = "${path_relative_to_include()}.tfstate"
   }
 }
-
