@@ -17,4 +17,7 @@ inputs = {
   log_bucket = "rust-release-logs"
 
   static_ttl = 86400 // 1 day
+
+  static_cloudfront_weight = 50
+  static_fastly_weight = 50
 }

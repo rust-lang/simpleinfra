@@ -28,6 +28,16 @@ variable "static_ttl" {
   type        = number
 }
 
+variable "static_cloudfront_weight" {
+  description = "Weight of the traffic for static.rust-lang.org that is routed through CloudFront"
+  type        = number
+}
+
+variable "static_fastly_weight" {
+  description = "Weight of the traffic for static.rust-lang.org that is routed through Fastly"
+  type        = number
+}
+
 variable "log_bucket" {
   description = "Name of the bucket that stores the CloudFront logs"
   type        = string
