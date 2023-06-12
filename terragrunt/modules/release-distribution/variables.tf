@@ -23,6 +23,11 @@ variable "static_bucket" {
   type        = string
 }
 
+variable "static_ttl" {
+  description = "TTL for static assets"
+  type        = number
+}
+
 variable "log_bucket" {
   description = "Name of the bucket that stores the CloudFront logs"
   type        = string
