@@ -58,7 +58,7 @@ resource "aws_iam_role_policy_attachment" "lambda_confirmation" {
 }
 
 module "confirmation_certificate" {
-  source  = "../acm-certificate"
+  source = "../acm-certificate"
   providers = {
     aws = aws.us-east-1
   }
