@@ -122,8 +122,9 @@ resource "aws_codebuild_project" "promote_release" {
     }
 
     environment_variable {
-      name  = "PROMOTE_RELEASE_FASTLY_STATIC_DOMAIN"
-      value = var.static_domain_name
+      name  = "PROMOTE_RELEASE_FASTLY_SERVICE_ID"
+      value = data.aws_ssm_parameter.fastly_service_id.name
+      type  = "PARAMETER_STORE"
     }
 
     dynamic "environment_variable" {
@@ -267,6 +268,11 @@ resource "aws_iam_role_policy" "promote_release" {
 
 data "aws_ssm_parameter" "fastly_api_token" {
   name            = "/${var.name}/promote-release/fastly-api-token"
+  with_decryption = false
+}
+
+data "aws_ssm_parameter" "fastly_service_id" {
+  name            = "/${var.name}/promote-release/fastly-service-id"
   with_decryption = false
 }
 
