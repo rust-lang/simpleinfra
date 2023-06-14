@@ -14,3 +14,7 @@ data "aws_s3_bucket" "static" {
 data "aws_s3_bucket" "logs" {
   bucket = var.log_bucket
 }
+
+data "aws_ssm_parameter" "fastly_customer_id" {
+  name = var.fastly_customer_id_ssm_parameter
+}

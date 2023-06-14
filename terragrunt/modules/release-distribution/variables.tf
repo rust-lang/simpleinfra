@@ -42,3 +42,14 @@ variable "log_bucket" {
   description = "Name of the bucket that stores the CloudFront logs"
   type        = string
 }
+
+variable "fastly_customer_id_ssm_parameter" {
+  description = "Name of the SSM parameter with our Fastly customer id"
+  type        = string
+}
+
+variable "fastly_aws_account_id" {
+  # See https://docs.fastly.com/en/guides/creating-an-aws-iam-role-for-fastly-logging
+  description = "The AWS account ID that Fastly uses to write logs"
+  default     = "717331877981"
+}
