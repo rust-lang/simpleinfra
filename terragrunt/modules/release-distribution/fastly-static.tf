@@ -54,8 +54,8 @@ resource "fastly_service_vcl" "static" {
   }
 
   snippet {
-    name = "set cache key for dist"
-    type = "fetch"
+    name    = "set cache key for dist"
+    type    = "fetch"
     content = <<-VCL
       if (req.url ~ "^\/dist/") {
         set beresp.http.Surrogate-Key = "/dist/*";
