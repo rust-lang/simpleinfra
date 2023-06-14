@@ -54,6 +54,16 @@ resource "fastly_service_vcl" "static" {
   }
 
   snippet {
+    name = "set cache key for dist"
+    type = "fetch"
+    content = <<-VCL
+      if (req.url ~ "^\/dist/") {
+        set beresp.http.Surrogate-Key = "/dist/*";
+      }
+    VCL
+  }
+
+  snippet {
     name    = "redirect rustup.sh to rustup.rs"
     type    = "error"
     content = <<-VCL
