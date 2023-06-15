@@ -16,5 +16,6 @@ data "aws_s3_bucket" "logs" {
 }
 
 data "aws_ssm_parameter" "fastly_customer_id" {
-  name = var.fastly_customer_id_ssm_parameter
+  name            = "/${var.environment}/promote-release/fastly-customer-id"
+  with_decryption = false
 }
