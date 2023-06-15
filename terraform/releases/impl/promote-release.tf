@@ -260,6 +260,7 @@ resource "aws_iam_role_policy" "promote_release" {
           data.aws_ssm_parameter.internals_discourse.arn,
           data.aws_ssm_parameter.users_discourse.arn,
           data.aws_ssm_parameter.fastly_api_token.arn,
+          data.aws_ssm_parameter.fastly_service_id.arn,
         ]
       }
     ]
