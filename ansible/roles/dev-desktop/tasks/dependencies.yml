@@ -47,6 +47,7 @@
       - libatspi2.0-0
       - libelf-dev  # Allows building tools that link against libelf
       - libsecret-1-dev # used by cargo
+      - libfuse3-dev
       - emacs
       - lld
       - lldb
