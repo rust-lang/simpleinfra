@@ -18,6 +18,6 @@ inputs = {
 
   static_ttl = 86400 // 1 day
 
-  static_cloudfront_weight = 95
-  static_fastly_weight = 5
+  static_cloudfront_weight = 90
+  static_fastly_weight = 10
 }
