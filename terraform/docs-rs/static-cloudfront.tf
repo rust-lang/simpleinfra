@@ -19,7 +19,7 @@ resource "aws_cloudfront_cache_policy" "static_docs_rs" {
   name        = "static-docs-rs"
   default_ttl = 31536000 // 1 year
   min_ttl     = 0
-  max_ttl     = 604800 // 1 week
+  max_ttl     = 31536000 // 1 year
   parameters_in_cache_key_and_forwarded_to_origin {
     cookies_config {
       cookie_behavior = "none"

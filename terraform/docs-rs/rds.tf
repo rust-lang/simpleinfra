@@ -52,7 +52,7 @@ resource "aws_db_instance" "db" {
   identifier = "docs-rs-prod"
 
   engine         = "postgres"
-  engine_version = "14.3"
+  engine_version = "14.7"
 
   instance_class        = "db.t4g.small"
   storage_type          = "gp2"
