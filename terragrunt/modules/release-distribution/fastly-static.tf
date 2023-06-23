@@ -57,8 +57,8 @@ resource "fastly_service_vcl" "static" {
     name    = "set cache key for dist"
     type    = "fetch"
     content = <<-VCL
-      if (req.url ~ "^\/dist/") {
-        set beresp.http.Surrogate-Key = "/dist/*";
+      if (req.url ~ "^\/dist\/") {
+        set beresp.http.Surrogate-Key = "dist";
       }
     VCL
   }
