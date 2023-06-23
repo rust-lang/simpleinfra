@@ -25,3 +25,13 @@
     src: after-ssl-renew.sh
     dest: /etc/ssl/letsencrypt/after-renew.d
     mode: 0750
+
+- name: create systemd override file
+  file:
+    path: /etc/systemd/system/nginx.service.d
+    state: directory
+
+- name: create systemd override file
+  template:
+    src: override.conf
+    dest: /etc/systemd/system/nginx.service.d/override.conf
