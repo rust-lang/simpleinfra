@@ -22,7 +22,7 @@
     - role: nginx
       proxied:
         - domain: "{{ vars_playground_domain }}"
-          to: "http://localhost:{{ vars_playground_env_ui_port }}"
+          to: "http://127.0.0.1:{{ vars_playground_env_ui_port }}"
           websockets:
             - '/websocket'
 
