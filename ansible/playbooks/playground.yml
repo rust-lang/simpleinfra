@@ -20,6 +20,7 @@
         - "{{ vars_playground_domain }}"
 
     - role: nginx
+      worker_connections: "{{ vars_playground_number_connections }}"
       proxied:
         - domain: "{{ vars_playground_domain }}"
           to: "http://127.0.0.1:{{ vars_playground_env_ui_port }}"

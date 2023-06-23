@@ -19,5 +19,7 @@ WorkingDirectory={{ vars_playground_artifacts_path }}
 
 ExecStart={{ vars_playground_executable_path }}
 
+LimitNOFILE={{ vars_playground_number_connections }}
+
 [Install]
 WantedBy=multi-user.target
