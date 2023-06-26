@@ -29,6 +29,7 @@
       - python3-pip
       - quota
       - ripgrep
+      - rustfilt
       - valgrind
       - "linux-tools-{{ kernel.stdout }}"
       - "linux-tools-{{ kernel_flavor.stdout }}"
