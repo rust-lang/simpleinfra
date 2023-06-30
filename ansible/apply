@@ -4,15 +4,15 @@ import pathlib
 import shutil
 import tempfile
 import argparse
-import ansible
+import ansibleutils
 
 def run_playbook(args):
     tempdir = pathlib.Path(tempfile.mkdtemp())
-    ansible.create_workspace(tempdir, args.env, args.playbook)
+    ansibleutils.create_workspace(tempdir, args.env, args.playbook)
     try:
         # Invoke the ansible binary installed in the virtualenv
         ansible_args = [
-            str(ansible.VENV_PATH / "bin" / "ansible-playbook"),
+            str(ansibleutils.VENV_PATH / "bin" / "ansible-playbook"),
             "-i", str(tempdir / "env" / "hosts"),
             str(tempdir / "play" / "playbook.yml"),
         ]
@@ -39,5 +39,5 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    ansible.install_ansible()
+    ansibleutils.install_ansible()
     run_playbook(args)

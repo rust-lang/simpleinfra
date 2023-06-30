@@ -6,8 +6,10 @@ import pathlib
 import shutil
 import argparse
 import sys
+# This adds the ansible folder to the python package search path 
+# so we can reuse functionality from there.
 sys.path.append("../ansible")
-import ansible
+import ansibleutils
 
 # Utility for removing everything in a directory except one thing
 def remove_all_except_one(directory, exception):
@@ -37,8 +39,8 @@ def create_workspace_dir():
 # Create the workspace environment
 def create_workspace(env, playbook):
     workspace = create_workspace_dir()
-    ansible.install_ansible(workspace / ".venv")
-    ansible.create_workspace(workspace, env, playbook)
+    ansibleutils.install_ansible(workspace / ".venv")
+    ansibleutils.create_workspace(workspace, env, playbook)
 
     # Link the template into the workspace
     template_path = pathlib.Path(playbook).resolve()

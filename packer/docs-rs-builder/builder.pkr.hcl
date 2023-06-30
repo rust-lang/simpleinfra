@@ -9,6 +9,7 @@ packer {
 
 data "amazon-parameterstore" "revision" {
   name = "/docs-rs/builder/sha"
+  region = "us-east-1"
 }
 
 locals {
@@ -23,7 +24,7 @@ source "amazon-ebs" "ubuntu" {
   region        = "us-east-1"
   source_ami_filter {
     filters = {
-      name                = "ubuntu/images/*ubuntu-focal-20.04-amd64-server-*"
+      name                = "ubuntu/images/*ubuntu-jammy-22.04-amd64-server-*"
       root-device-type    = "ebs"
       virtualization-type = "hvm"
     }
@@ -51,5 +52,7 @@ build {
     # The default is the user running packer
     user = "ubuntu"
     extra_arguments = ["--extra-vars", "vars_repository_sha=${local.revision}"]
+    # Work around for https://github.com/hashicorp/packer-plugin-ansible/issues/69
+    ansible_ssh_extra_args = ["-oHostKeyAlgorithms=+ssh-rsa -oPubkeyAcceptedKeyTypes=+ssh-rsa"]
   }
 }

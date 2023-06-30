@@ -8,7 +8,7 @@
 - name: install apt packages
   apt:
     name:
-      - aptitude  # needed by ansible itself
+      # - aptitude  # needed by ansible itself
       - ca-certificates
       - htop
       - iptables
