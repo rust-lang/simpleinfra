@@ -67,6 +67,7 @@ fn handle_request(config: &Config, mut request: Request) -> Result<Response, Err
     }
 
     set_ttl(config, &mut request);
+    rewrite_urls_with_plus_character(&mut request);
 
     // Database dump is too big to cache on Fastly
     if request.get_url_str().ends_with("db-dump.tar.gz") {
@@ -100,6 +101,24 @@ fn limit_http_methods(request: &Request) -> Option<Response> {
 /// of time.
 fn set_ttl(config: &Config, request: &mut Request) {
     request.set_ttl(config.static_ttl);
+}
+
+/// Rewrite URLs with a plus character
+///
+/// An issue was reported for crates.io where URLs that encoded the `+` character in a crate's
+/// version as `%2B` were not working correctly. As a backwards-compatible fix, we are transparently
+/// rewriting URLs that contain the `+` character to use `%2B` instead. This ensures that crates in
+/// Amazon S3 are accessed in a consistent way across all clients and Content Delivery Networks.
+///
+/// See more: https://github.com/rust-lang/crates.io/issues/4891
+fn rewrite_urls_with_plus_character(request: &mut Request) {
+    let url = request.get_url_mut();
+    let path = url.path();
+
+    if path.contains('+') {
+        let new_path = path.replace('+', "%2B");
+        url.set_path(&new_path);
+    }
 }
 
 /// Redirect request to CloudFront
