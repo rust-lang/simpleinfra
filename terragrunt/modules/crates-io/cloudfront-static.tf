@@ -4,22 +4,11 @@ locals {
   cloudfront_domain_name = "cloudfront-${var.static_domain_name}"
 }
 
-data "aws_iam_role" "cloudfront_lambda" {
-  name = "cloudfront-lambda"
-}
-
-module "lambda_static" {
-  source = "../aws-lambda"
-
-  providers = {
-    aws = aws.us-east-1
-  }
-
-  name       = "${replace(var.static_domain_name, ".", "-")}--static-router"
-  source_dir = "lambdas/static-router"
-  handler    = "index.handler"
-  runtime    = "nodejs18.x"
-  role_arn   = data.aws_iam_role.cloudfront_lambda.arn
+resource "aws_cloudfront_function" "static_router" {
+  name    = "${replace(var.static_domain_name, ".", "-")}--static-router"
+  runtime = "cloudfront-js-1.0"
+  publish = true
+  code    = file("${path.module}/cloudfront-functions/static-router.js")
 }
 
 resource "aws_cloudfront_distribution" "static" {
@@ -64,10 +53,9 @@ resource "aws_cloudfront_distribution" "static" {
       }
     }
 
-    lambda_function_association {
-      event_type   = "origin-request"
-      lambda_arn   = module.lambda_static.version_arn
-      include_body = false
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.static_router.arn
     }
   }
 

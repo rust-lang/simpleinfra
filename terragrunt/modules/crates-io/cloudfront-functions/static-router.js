@@ -1,7 +1,5 @@
-'use strict';
-
-exports.handler = (event, context, callback) => {
-    const request = event.Records[0].cf.request;
+function handler(event) {
+    var request = event.request;
 
     // URL-encode the `+` character in the request URI
     // See more: https://github.com/rust-lang/crates.io/issues/4891
@@ -9,5 +7,5 @@ exports.handler = (event, context, callback) => {
         request.uri = request.uri.replace("+", "%2B");
     }
 
-    callback(null, request);
-};
+    return request;
+}
