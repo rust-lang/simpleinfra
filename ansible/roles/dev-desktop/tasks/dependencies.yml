@@ -54,6 +54,9 @@
       - lldb
       - mold
       - neovim
+      # Necessary for building rr
+      - capnproto
+      - libcapnp-dev
     state: present
 
 - name: Install tools for x86
