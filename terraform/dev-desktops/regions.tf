@@ -8,7 +8,7 @@ module "aws_eu_central_1" {
     "dev-desktop-staging" = {
       instance_type = "t3a.micro"
       instance_arch = "amd64"
-      storage       = 25
+      storage       = 250
     }
     "dev-desktop-eu-1" = {
       instance_type = "c6g.8xlarge"
