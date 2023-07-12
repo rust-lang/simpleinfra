@@ -53,6 +53,7 @@
       - lld
       - lldb
       - mold
+      - neovim
     state: present
 
 - name: Install tools for x86
