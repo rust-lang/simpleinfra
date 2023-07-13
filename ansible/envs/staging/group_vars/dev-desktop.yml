@@ -3,6 +3,8 @@
 # Fetch all the group params from AWS SSM
 ssm_dev_desktop: "{{ lookup('aws_ssm', '/staging/ansible/dev-desktop/', region='us-west-1', shortnames=true, bypath=true, recursive=true) }}"
 
+vars_datadog_api_key: "{{ ssm_dev_desktop['datadog-api-key'] }}"
+
 vars_extra_sudo_users:
   - oli-obk
 

@@ -1,0 +1,6 @@
+# Requirements for Ansible
+#
+# Dependencies are installed from Ansible Galaxy. See the documentation for more information:
+# https://docs.ansible.com/ansible/latest/galaxy/user_guide.html#installing-multiple-roles-from-a-file
+---
+- src: datadog.datadog

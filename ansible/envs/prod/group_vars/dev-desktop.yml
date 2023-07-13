@@ -5,5 +5,7 @@ ssm_dev_desktop: "{{ lookup('aws_ssm', '/prod/ansible/dev-desktop/', region='us-
 
 vars_extra_sudo_users: []
 
+vars_datadog_api_key: "{{ ssm_dev_desktop['datadog-api-key'] }}"
+
 vars_github_app_id: 196781
 vars_github_app_private_key: "{{ ssm_dev_desktop['github-app-private-key'] }}"
