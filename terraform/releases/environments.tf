@@ -113,6 +113,11 @@ module "prod" {
       value = "true"
       type  = "PLAINTEXT"
     },
+    {
+      name  = "PROMOTE_RELEASE_CARGO_TAG_REPOSITORY"
+      value = "rust-lang/cargo"
+      type  = "PLAINTEXT"
+    },
   ])
 
   promote_release_cron = {
