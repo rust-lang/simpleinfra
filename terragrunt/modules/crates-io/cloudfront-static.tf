@@ -4,6 +4,13 @@ locals {
   cloudfront_domain_name = "cloudfront-${var.static_domain_name}"
 }
 
+resource "aws_cloudfront_function" "static_router" {
+  name    = "${replace(var.static_domain_name, ".", "-")}--static-router"
+  runtime = "cloudfront-js-1.0"
+  publish = true
+  code    = file("${path.module}/cloudfront-functions/static-router.js")
+}
+
 resource "aws_cloudfront_distribution" "static" {
   comment = var.static_domain_name
 
@@ -44,6 +51,11 @@ resource "aws_cloudfront_distribution" "static" {
       cookies {
         forward = "none"
       }
+    }
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.static_router.arn
     }
   }
 
