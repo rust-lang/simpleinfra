@@ -1,0 +1,34 @@
+---
+
+# These tasks follow the instructions for running Podman without root privileges
+# https://github.com/containers/podman/blob/main/docs/tutorials/rootless_tutorial.md
+
+- name: Install podman
+  package:
+    name: podman
+    state: present
+
+- name: Install podman-docker
+  package:
+    name: podman-docker
+    state: present
+
+# Required for user-space networking
+- name: Install slirp4netns
+  package:
+    name: slirp4netns
+    state: present
+
+# Recommended instead of the default VFS file system
+- name: Install fuse-overlayfs
+  package:
+    name: fuse-overlayfs
+    state: present
+
+- name: Copy global configuration file for storage driver
+  copy:
+    src: podman/storage.conf
+    dest: /etc/containers/storage.conf
+    owner: root
+    group: root
+    mode: 0644
