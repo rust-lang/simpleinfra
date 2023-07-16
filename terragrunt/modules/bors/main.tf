@@ -89,7 +89,8 @@ resource "aws_iam_role" "gha" {
           Sid    = "GetAuthorizationToken"
           Effect = "Allow"
           Action = [
-            "ecr:GetAuthorizationToken"
+            "ecr:GetAuthorizationToken",
+            "ecs:UpdateService"
           ]
           Resource = "*"
         }
