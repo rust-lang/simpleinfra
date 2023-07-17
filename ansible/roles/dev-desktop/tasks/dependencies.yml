@@ -54,6 +54,7 @@
       - lldb
       - mold
       - neovim
+      - parallel
       # Necessary for building rr
       - capnproto
       - libcapnp-dev
