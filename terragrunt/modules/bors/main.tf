@@ -164,14 +164,14 @@ resource "aws_security_group" "ecs" {
 
 data "aws_subnet" "public" {
   for_each = toset(data.aws_subnets.public.ids)
-  id = each.value
+  id       = each.value
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ingress_lb" {
-  for_each = toset(data.aws_subnets.public.ids)
+  for_each          = toset(data.aws_subnets.public.ids)
   security_group_id = aws_security_group.ecs.id
 
-  cidr_ipv4 = data.aws_subnet.public[each.value].cidr_block
+  cidr_ipv4   = data.aws_subnet.public[each.value].cidr_block
   from_port   = 0
   ip_protocol = "TCP"
   to_port     = 8080
