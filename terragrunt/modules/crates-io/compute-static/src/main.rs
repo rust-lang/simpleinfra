@@ -14,8 +14,14 @@ mod log_line;
 #[fastly::main]
 fn main(request: Request) -> Result<Response, Error> {
     let config = Config::from_dictionary();
-    init_logging(&config);
 
+    // Forward purge requests immediately to a backend
+    // https://developer.fastly.com/learning/concepts/purging/#forwarding-purge-requests
+    if request.get_method() == "PURGE" {
+        return send_request_to_s3(&config, &request);
+    }
+
+    init_logging(&config);
     let mut log = collect_request(&request);
 
     let has_origin_header = request.get_header("Origin").is_some();
