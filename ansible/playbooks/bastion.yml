@@ -18,4 +18,16 @@
         - technetos  # RDS access to the discord-mods-bot database
         - rylev # RDS access to rustc-perf
 
+    - role: datadog.datadog
+      vars:
+        datadog_api_key: "{{ vars_datadog_api_key }}"
+        datadog_site: "datadoghq.com"
+
+        datadog_config:
+          tags:
+            - "env:{{ vars_environment }}"
+            - "service:bastion"
+          process_config:
+            enabled: "true"
+
     - role: bastion

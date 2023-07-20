@@ -10,6 +10,18 @@
       collect_metrics_from: "{{ global_collect_metrics_from }}"
       sudo_users: "{{ global_sudo_users }}"
 
+    - role: datadog.datadog
+      vars:
+        datadog_api_key: "{{ vars_datadog_api_key }}"
+        datadog_site: "datadoghq.com"
+
+        datadog_config:
+          tags:
+            - "env:{{ vars_environment }}"
+            - "service:crater-server"
+          process_config:
+            enabled: "true"
+
     - role: docker
       images:
         region: us-west-1

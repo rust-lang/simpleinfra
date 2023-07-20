@@ -12,6 +12,18 @@
         - 127.0.0.1
       sudo_users: "{{ global_sudo_users }}"
 
+    - role: datadog.datadog
+      vars:
+        datadog_api_key: "{{ vars_datadog_api_key }}"
+        datadog_site: "datadoghq.com"
+
+        datadog_config:
+          tags:
+            - "env:{{ vars_environment }}"
+            - "service:monitoring"
+          process_config:
+            enabled: "true"
+
     - role: backup
       repository: "{{ vars_backup_repository }}"
       password: "{{ vars_backup_password }}"
