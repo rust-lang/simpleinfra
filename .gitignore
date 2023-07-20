@@ -1,10 +1,12 @@
 /target
 /ansible/.venv
 /ansible/envs/dev
+/packer/.workspace
 /terraform/shared/modules/lambda/packages
 /terraform/rds-databases/.forward-ports-cache-*.json
 /terragrunt/modules/aws-lambda/packages
 .terraform
+packer-provisioner-*
 node_modules
 __pycache__
 *.py[co]

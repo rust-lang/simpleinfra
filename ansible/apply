@@ -1,53 +1,18 @@
 #!/usr/bin/env python3
 import subprocess
 import pathlib
-import sys
 import shutil
 import tempfile
 import argparse
-import os
-
-BASE_PATH = pathlib.Path(__file__).resolve().parent
-VENV_PATH = BASE_PATH / ".venv"
-
-# Ansible changes a lot between releases and deprecates a lot of stuff each of
-# them. Using a pinned ansible identical between all team members should
-# reduce the churn.
-def install_ansible():
-    requirements = BASE_PATH / "requirements.txt"
-    venv_requirements = VENV_PATH / "installed-requirements.txt"
-
-    # Avoid installing ansible in the virtualenv multiple times
-    if venv_requirements.exists() and \
-       venv_requirements.read_bytes() == requirements.read_bytes():
-        return
-
-    print("creating a new virtual environment and install ansible in it...")
-    shutil.rmtree(VENV_PATH, ignore_errors=True)
-    subprocess.run([sys.executable, "-m", "venv", str(VENV_PATH)], check=True)
-    subprocess.run([
-        str(VENV_PATH / "bin" / "pip"), "install", "-r", str(requirements),
-    ], check=True)
-    shutil.copy(str(requirements), str(venv_requirements))
+import ansibleutils
 
 def run_playbook(args):
-    env_dir = BASE_PATH / "envs" / args.env
     tempdir = pathlib.Path(tempfile.mkdtemp())
+    ansibleutils.create_workspace(tempdir, args.env, args.playbook)
     try:
-        # Create a temporary directory merging together the chosen
-        # environment, the chosen playbook and the shared files.
-        (tempdir / "play").mkdir()
-        (tempdir / "play" / "roles").symlink_to(BASE_PATH / "roles")
-        (tempdir / "play" / "group_vars").symlink_to(BASE_PATH / "group_vars")
-        (tempdir / "play" / "playbook.yml").symlink_to(
-            BASE_PATH / "playbooks" / (args.playbook + ".yml")
-        )
-        (tempdir / "env").symlink_to(env_dir)
-        (tempdir / "ansible.cfg").symlink_to(BASE_PATH / "ansible.cfg")
-
-        # Finally invoke the ansible binary installed in the virtualenv
+        # Invoke the ansible binary installed in the virtualenv
         ansible_args = [
-            str(VENV_PATH / "bin" / "ansible-playbook"),
+            str(ansibleutils.VENV_PATH / "bin" / "ansible-playbook"),
             "-i", str(tempdir / "env" / "hosts"),
             str(tempdir / "play" / "playbook.yml"),
         ]
@@ -74,5 +39,5 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    install_ansible()
+    ansibleutils.install_ansible()
     run_playbook(args)

@@ -26,3 +26,4 @@
 
 - name: reboot
   reboot:
+  when: packer_build_name is undefined
