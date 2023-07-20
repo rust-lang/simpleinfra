@@ -30,7 +30,6 @@
       - quota
       - ripgrep
       - rustfilt
-      - valgrind
       - "linux-tools-{{ kernel.stdout }}"
       - "linux-tools-{{ kernel_flavor.stdout }}"
       - libatk1.0-0 # Allows running `x test rustdoc-gui`
@@ -59,6 +58,16 @@
       - capnproto
       - libcapnp-dev
     state: present
+
+- name: Uninstall valgrind from apt
+  apt:
+    name: valgrind
+    state: absent
+
+- name: Install latest valgrind with snap
+  snap:
+    name: valgrind
+    classic: yes
 
 - name: Install tools for x86
   apt:
