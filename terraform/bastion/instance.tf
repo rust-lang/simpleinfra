@@ -52,7 +52,7 @@ data "aws_ami" "ubuntu_bionic" {
 
 resource "aws_instance" "bastion" {
   ami                     = data.aws_ami.ubuntu_bionic.id
-  instance_type           = "t3a.nano"
+  instance_type           = "t3a.micro"
   key_name                = data.terraform_remote_state.shared.outputs.master_ec2_key_pair
   ebs_optimized           = true
   disable_api_termination = true
