@@ -1,5 +1,10 @@
 ---
 
+# Fetch all the group params from AWS SSM
+ssm_all: "{{ lookup('aws_ssm', '/staging/ansible/all/', region='us-west-1', shortnames=true, bypath=true, recursive=true) }}"
+
+vars_datadog_api_key: "{{ ssm_all['datadog-api-key'] }}"
+
 # Do not log to Papertrail in the staging environment.
 vars_papertrail_url: null
 

@@ -15,6 +15,18 @@
       root_password: "{{ vars_root_password }}"
       root_password_salt: "{{ vars_root_password_salt }}"
 
+    - role: datadog.datadog
+      vars:
+        datadog_api_key: "{{ vars_datadog_api_key }}"
+        datadog_site: "datadoghq.com"
+
+        datadog_config:
+          tags:
+            - "env:{{ vars_environment }}"
+            - "service:gha-self-hosted"
+          process_config:
+            enabled: "true"
+
     - role: gha-self-hosted
       source_repo: https://github.com/rust-lang/gha-self-hosted
 

@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-import subprocess
-import pathlib
-import sys
-import shutil
-import tempfile
 import argparse
-import os
+import pathlib
+import shutil
+import subprocess
+import sys
+import tempfile
 
 BASE_PATH = pathlib.Path(__file__).resolve().parent
 VENV_PATH = BASE_PATH / ".venv"
+
 
 # Ansible changes a lot between releases and deprecates a lot of stuff each of
 # them. Using a pinned ansible identical between all team members should
@@ -19,7 +19,7 @@ def install_ansible():
 
     # Avoid installing ansible in the virtualenv multiple times
     if venv_requirements.exists() and \
-       venv_requirements.read_bytes() == requirements.read_bytes():
+            venv_requirements.read_bytes() == requirements.read_bytes():
         return
 
     print("creating a new virtual environment and install ansible in it...")
@@ -29,6 +29,24 @@ def install_ansible():
         str(VENV_PATH / "bin" / "pip"), "install", "-r", str(requirements),
     ], check=True)
     shutil.copy(str(requirements), str(venv_requirements))
+
+
+def install_ansible_galaxy_dependencies():
+    requirements = BASE_PATH / "requirements.yml"
+    venv_requirements = VENV_PATH / "installed-requirements.yml"
+
+    # Avoid unnecessary work by checking if the requirements are already installed
+    if venv_requirements.exists() and \
+            venv_requirements.read_bytes() == requirements.read_bytes():
+        return
+
+    subprocess.run([sys.executable, "-m", "venv", str(VENV_PATH)], check=True)
+    subprocess.run([
+        str(VENV_PATH / "bin" / "ansible-galaxy"), "install", "-r", str(requirements),
+    ], check=True)
+
+    shutil.copy(str(requirements), str(venv_requirements))
+
 
 def run_playbook(args):
     env_dir = BASE_PATH / "envs" / args.env
@@ -49,6 +67,7 @@ def run_playbook(args):
         ansible_args = [
             str(VENV_PATH / "bin" / "ansible-playbook"),
             "-i", str(tempdir / "env" / "hosts"),
+            "--extra-vars", f"vars_environment={args.env}",
             str(tempdir / "play" / "playbook.yml"),
         ]
         if args.user is not None:
@@ -60,6 +79,7 @@ def run_playbook(args):
             exit(1)
     finally:
         shutil.rmtree(str(tempdir), ignore_errors=True)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -75,4 +95,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     install_ansible()
+    install_ansible_galaxy_dependencies()
     run_playbook(args)

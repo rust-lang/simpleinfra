@@ -3,6 +3,8 @@
 # Fetch all the group params from AWS SSM
 ssm_all: "{{ lookup('aws_ssm', '/prod/ansible/all/', region='us-west-1', shortnames=true, bypath=true, recursive=true) }}"
 
+vars_datadog_api_key: "{{ ssm_all['datadog-api-key'] }}"
+
 vars_papertrail_url: "{{ ssm_all['papertrail-url'] }}"
 
 vars_letsencrypt_dummy_certs: false

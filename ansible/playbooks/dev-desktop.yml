@@ -12,4 +12,16 @@
       sudo_users: "{{ global_sudo_users + vars_extra_sudo_users }}"
       allow_ssh_extra_groups: dev-desktop-allow-ssh
 
+    - role: datadog.datadog
+      vars:
+        datadog_api_key: "{{ vars_datadog_api_key }}"
+        datadog_site: "datadoghq.com"
+
+        datadog_config:
+          tags:
+            - "env:{{ vars_environment }}"
+            - "service:dev-desktops"
+          process_config:
+            enabled: "true"
+
     - role: dev-desktop
