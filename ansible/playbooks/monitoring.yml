@@ -188,6 +188,12 @@
               labels:
                 dispatch: pagerduty-cratesio
 
+            - alert: TooManyQueuedJobs
+              expr: cratesio_service_background_jobs{env="prod"} > 100
+              for: 1m
+              labels:
+                dispatch: pagerduty-cratesio
+
         - name: docsrs
           rules:
             - alert: DocsRsDown
