@@ -157,7 +157,7 @@ resource "aws_route53_record" "ipv4" {
   zone_id = data.aws_route53_zone.rust_lang_org.id
   name    = "${each.key}.infra.rust-lang.org"
   type    = "A"
-  records = aws_eip.dev_desktop[each.key].public_ip
+  records = [aws_eip.dev_desktop[each.key].public_ip]
   ttl     = 60
 }
 
