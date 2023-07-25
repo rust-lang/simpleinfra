@@ -84,6 +84,11 @@ resource "fastly_service_vcl" "static" {
     VCL
   }
 
+  logging_datadog {
+    name  = "datadog"
+    token = data.aws_ssm_parameter.datadog_api_key.value
+  }
+
   logging_s3 {
     name        = "s3-request-logs"
     bucket_name = data.aws_s3_bucket.logs.bucket
