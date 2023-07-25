@@ -11,6 +11,7 @@ module "crates_io" {
   ttl     = 300
 
   CNAME = {
+    "fedi"   = ["vip.masto.host"]
     "status" = ["pvbm341xnpgm.stspg-customer.com"],
     "doc"    = ["rust-lang.github.io"], # https://github.com/rust-lang/cargo/tree/gh-pages
   }
