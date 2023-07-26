@@ -19,6 +19,7 @@ locals {
     "rylev",
     "rylev-ip-2",
     "jdn",
+    "guillaumegomez",
   ]
 }
 
