@@ -126,6 +126,13 @@ resource "datadog_integration_aws" "aws" {
   account_id = data.aws_caller_identity.current.account_id
   role_name  = local.datadog_iam_role_name
 
+  account_specific_namespace_rules = {
+    # The AWS Lambda integration includes CloudFront functions, which are
+    # redundantly deployed to many regions. This creates a large number of
+    # serverless functions in Datadog, which we don't need.
+    lambda = false
+  }
+
   host_tags = [
     "env:${var.env}"
   ]
