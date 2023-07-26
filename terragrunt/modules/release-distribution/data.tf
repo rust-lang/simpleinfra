@@ -16,7 +16,7 @@ data "aws_s3_bucket" "logs" {
 }
 
 data "aws_ssm_parameter" "datadog_api_key" {
-  name            = "/${var.environment}/promote-release/datadog-api-key"
+  name = "/${var.environment}/promote-release/datadog-api-key"
 }
 
 data "aws_ssm_parameter" "fastly_customer_id" {

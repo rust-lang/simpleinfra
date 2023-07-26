@@ -10,6 +10,8 @@ easy to filter and group metrics in Datadog. Each Fastly service is tagged with
 the following variables:
 
 - `env`: The environment of the service, either `prod` or `staging`
+- `app`: The app or component that this service belongs to, e.g. `crates-io`
+- `service`: The name of the service, e.g. `static-crates-io`
 
 [datadog]: https://datadoghq.com
 [datadog-fastly]: https://docs.datadoghq.com/integrations/fastly

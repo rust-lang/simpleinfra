@@ -1,7 +1,9 @@
 variable "services" {
   description = "List of Fastly services"
   type = map(object({
-    env = string
+    env     = string
+    app     = string
+    service = string
   }))
   default = {}
 

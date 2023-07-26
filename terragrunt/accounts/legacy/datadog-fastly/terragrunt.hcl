@@ -10,16 +10,24 @@ include {
 inputs = {
   services = {
     "5qaYFyyiorVua6uCZg7It0" = {
-      env = "staging"
+      env     = "staging"
+      app     = "releases"
+      service = "dev-static-rust-lang-org"
     },
     "gEfRWQihVaQqh6vsPlY0H1" = {
-      env = "prod"
+      env     = "prod"
+      app     = "crates-io"
+      service = "static-crates-io"
     },
     "MWlq3AIDXubpbw725c7og3" = {
-      env = "prod"
+      env     = "prod"
+      app     = "releases"
+      service = "static-rust-lang-org"
     },
     "liljrvY3Xt0CzNk0mpuLa7" = {
-      env = "staging"
+      env     = "staging"
+      app     = "crates-io"
+      service = "static-staging-crates-io"
     },
   }
 }

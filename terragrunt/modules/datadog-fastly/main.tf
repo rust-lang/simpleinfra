@@ -15,6 +15,8 @@ resource "datadog_integration_fastly_service" "service" {
   service_id = each.key
 
   tags = [
-    "env:${each.value.env}"
+    "env:${each.value.env}",
+    "app:${each.value.app}",
+    "service:${each.value.service}",
   ]
 }
