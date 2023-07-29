@@ -17,6 +17,20 @@
     - passwordless-sudo
     - docker
 
+- name: Install fish shell if any user has it as their shell
+  apt:
+    name: fish
+    state: present
+  loop: "{{ unprivileged_users + sudo_users }}"
+  when: vars_user_shell[item] | default('/bin/bash') == '/usr/bin/fish'
+
+- name: Install zShell if any user has it as their shell
+  apt:
+    name: zsh
+    state: present
+  loop: "{{ unprivileged_users + sudo_users }}"
+  when: vars_user_shell[item] | default('/bin/bash') == '/usr/bin/zsh'
+
 - name: create user accounts
   user:
     name: "{{ item }}"
@@ -26,7 +40,7 @@
       - allow-ssh
     append: true
 
-    shell: /bin/bash
+    shell: "{{ vars_user_shell[item] | default('/bin/bash') }}"
     state: present
 
   loop: "{{ unprivileged_users + sudo_users }}"
