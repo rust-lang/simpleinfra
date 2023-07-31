@@ -4,6 +4,7 @@
 - include_tasks: podman.yml
 - include_tasks: quota.yml
 - include_tasks: user_configuration.yml
+- include_tasks: usermod.yml
 - include_tasks: team_login.yml
 - include_tasks: github.yml
 - include_tasks: motd.yml

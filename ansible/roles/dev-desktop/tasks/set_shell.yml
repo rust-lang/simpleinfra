@@ -1,0 +1,16 @@
+---
+- name: Check user exists coming from {{ item.username }}
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ item.username }}"
+  register: user_exists
+  failed_when: false
+
+- name: debug
+  debug: var=user_exists
+
+- name: Set the user shell
+  ansible.builtin.user:
+    name: "{{ item.username }}"
+    shell: "{{ item.shell }}"
+  when: user_exists is succeeded

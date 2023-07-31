@@ -1,0 +1,4 @@
+---
+- name: Set shell
+  include_tasks: set_shell.yml
+  with_items: "{{ vars_user_config }}"
