@@ -1,5 +1,22 @@
 // Instances
 
+resource "aws_eip" "dev_desktop" {
+  for_each = var.instances
+
+  vpc = true
+
+  tags = {
+    Name = each.key
+  }
+}
+
+resource "aws_eip_association" "dev_desktop" {
+  for_each = var.instances
+
+  instance_id   = aws_instance.instance[each.key].id
+  allocation_id = aws_eip.dev_desktop[each.key].id
+}
+
 resource "aws_instance" "instance" {
   for_each = var.instances
 
@@ -140,7 +157,7 @@ resource "aws_route53_record" "ipv4" {
   zone_id = data.aws_route53_zone.rust_lang_org.id
   name    = "${each.key}.infra.rust-lang.org"
   type    = "A"
-  records = [aws_instance.instance[each.key].public_ip]
+  records = [aws_eip.dev_desktop[each.key].public_ip]
   ttl     = 60
 }
 
