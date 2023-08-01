@@ -1,4 +1,13 @@
 ---
-- name: Set shell
-  include_tasks: set_shell.yml
-  with_items: "{{ vars_user_config }}"
+- name: Check user {{ item.username }} exists
+  ansible.builtin.getent:
+    database: passwd
+    key: "{{ item.username }}"
+  register: user_exists
+  failed_when: false
+
+- name: Set the user shell
+  ansible.builtin.user:
+    name: "{{ item.username }}"
+    shell: "{{ item.shell }}"
+  when: user_exists is succeeded
