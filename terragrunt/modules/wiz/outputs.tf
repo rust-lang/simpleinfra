@@ -1,3 +1,3 @@
-output "wiz_connector_arn" {
-  value = module.wiz.role_arn
+output "role_arn" {
+  value = aws_iam_role.user-role-tf.arn
 }
