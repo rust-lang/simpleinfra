@@ -4,9 +4,9 @@
     database: passwd
     key: "{{ item.username }}"
   register: user_exists
-  ignore_errors: yes
+  ignore_errors: true
 
-- name: Set the user shell
+- name: Set the user shell to {{ item.shell }}
   ansible.builtin.user:
     name: "{{ item.username }}"
     shell: "{{ item.shell }}"
