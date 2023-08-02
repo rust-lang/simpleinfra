@@ -10,9 +10,7 @@ vars_user_quota_gb: 150
 vars_user_quota_prototype_user: "quota-prototype"
 
 vars_user_config:
-  # - username: rylev
-  #   shell: /bin/sh
-  # - username: meysam
-  #   shell: /usr/bin/zsh
-  # - username: jdno
-  #   shell: /usr/bin/fish
+  - username: gh-jdno
+    shell: /usr/bin/zsh
+  - username: gh-WaffleLapkin
+    shell: /usr/bin/fish
