@@ -8,3 +8,11 @@ vars_user_quota_gb: 150
 
 # Prototype user whose file system quota will be copied to new user accounts
 vars_user_quota_prototype_user: "quota-prototype"
+
+vars_user_config:
+  # - username: rylev
+  #   shell: /bin/sh
+  # - username: meysam
+  #   shell: /usr/bin/zsh
+  # - username: jdno
+  #   shell: /usr/bin/fish

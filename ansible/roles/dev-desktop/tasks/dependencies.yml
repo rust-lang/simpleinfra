@@ -57,6 +57,7 @@
       # Necessary for building rr
       - capnproto
       - libcapnp-dev
+      - zsh
     state: present
 
 - name: Uninstall valgrind from apt
