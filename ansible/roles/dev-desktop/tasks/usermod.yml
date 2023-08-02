@@ -4,7 +4,7 @@
     database: passwd
     key: "{{ item.username }}"
   register: user_exists
-  failed_when: false
+  ignore_errors: yes
 
 - name: Set the user shell
   ansible.builtin.user:
