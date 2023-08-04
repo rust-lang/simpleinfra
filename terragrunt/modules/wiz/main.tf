@@ -121,8 +121,6 @@ resource "aws_iam_role_policy" "tf-policy" {
         "Action" : [
           "ec2:CopySnapshot",
           "ec2:CreateSnapshot",
-          "kms:CreateKey",
-          "kms:DescribeKey",
           "ec2:GetEbsEncryptionByDefault",
           "ec2:DescribeSnapshots"
         ],
@@ -143,19 +141,6 @@ resource "aws_iam_role_policy" "tf-policy" {
           "arn:aws:kms:*:*:alias/wizKey",
           "arn:aws:kms:*:*:key/*"
         ]
-      },
-      {
-        "Action" : [
-          "kms:CreateGrant",
-          "kms:ReEncryptFrom"
-        ],
-        "Condition" : {
-          "StringLike" : {
-            "kms:ViaService" : "ec2.*.amazonaws.com"
-          }
-        },
-        "Effect" : "Allow",
-        "Resource" : "*"
       },
       {
         "Action" : [
