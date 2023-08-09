@@ -170,16 +170,11 @@ resource "aws_iam_role_policy" "tf-policy" {
       },
       {
         "Action" : [
-          "s3:*",
+          "s3:GetObject"
         ],
         "Effect" : "Deny",
         "Resource" : [
-          "arn:aws:s3:::*terraform*",
-          "arn:aws:s3:::*tfstate*",
-          "arn:aws:s3:::*tf?state*",
-          "arn:aws:s3:::*cloudtrail*",
-          "arn:aws:s3:::elasticbeanstalk-*",
-          "arn:aws:s3:::rust-release-keys",
+          "*"
         ],
         "Sid" : "WizAccessS3"
       }
