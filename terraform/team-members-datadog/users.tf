@@ -1,5 +1,10 @@
 locals {
   users = {
+    "admin" = {
+      login = "admin@rust-lang.org"
+      name  = "Rust Admin"
+      role  = "Datadog Admin Role"
+    }
     "jdn" = {
       login = "jandavidnose@rustfoundation.org"
       name  = "Jan David Nose"
