@@ -53,6 +53,19 @@ resource "fastly_service_vcl" "static" {
     content = "set req.enable_segmented_caching = true;"
   }
 
+  # The streaming miss feature streams responses back to clients immediately,
+  # which reduces the first-byte latency.
+  # https://docs.fastly.com/en/guides/streaming-miss
+  snippet {
+    name    = "enable streaming miss"
+    type    = "fetch"
+    content = <<-VCL
+      if (req.url.ext ~ "^(?:gz|xz|zip)$") {
+        set beresp.do_stream = true;
+      }
+    VCL
+  }
+
   snippet {
     name    = "set cache key for dist"
     type    = "fetch"
