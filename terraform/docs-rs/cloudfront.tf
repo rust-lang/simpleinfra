@@ -18,6 +18,55 @@ module "certificate" {
   ]
 }
 
+resource "aws_cloudfront_cache_policy" "docs_rs" {
+  name = "docs-rs"
+
+  default_ttl = 31536000 // 1 year
+  min_ttl     = 0
+  max_ttl     = 31536000 // 1 year
+
+  parameters_in_cache_key_and_forwarded_to_origin {
+    headers_config {
+      header_behavior = "whitelist"
+      headers {
+        items = [
+          // Allow detecting HTTPS from the webapp
+          "CloudFront-Forwarded-Proto",
+          // Allow detecting the domain name from the webapp
+          "Host",
+        ]
+      }
+    }
+
+    query_strings_config {
+      query_string_behavior = "all"
+    }
+
+    cookies_config {
+      cookie_behavior = "none"
+    }
+  }
+}
+
+resource "aws_cloudfront_origin_request_policy" "docs_rs" {
+  name = "docs-rs"
+
+  headers_config {
+    header_behavior = "whitelist"
+    headers {
+      items = ["User-Agent"]
+    }
+  }
+
+  query_strings_config {
+    query_strings_behavior = "all"
+  }
+
+  cookies_config {
+    cookie_behavior = "none"
+  }
+}
+
 resource "aws_cloudfront_distribution" "webapp" {
   comment = local.domain_name
 
@@ -41,22 +90,8 @@ resource "aws_cloudfront_distribution" "webapp" {
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
 
-    default_ttl = 31536000 // 1 year
-    min_ttl     = 0
-    max_ttl     = 31536000 // 1 year
-
-    forwarded_values {
-      headers = [
-        // Allow detecting HTTPS from the webapp
-        "CloudFront-Forwarded-Proto",
-        // Allow detecting the domain name from the webapp
-        "Host",
-      ]
-      query_string = true
-      cookies {
-        forward = "none"
-      }
-    }
+    cache_policy_id          = aws_cloudfront_cache_policy.docs_rs.id
+    origin_request_policy_id = aws_cloudfront_origin_request_policy.docs_rs.id
   }
 
   origin {
