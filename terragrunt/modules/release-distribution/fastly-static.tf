@@ -50,7 +50,10 @@ resource "fastly_service_vcl" "static" {
   snippet {
     name    = "enable segmented caching"
     type    = "recv"
-    content = "set req.enable_segmented_caching = true;"
+    content = <<-VCL
+      set req.enable_segmented_caching = true;
+      set segmented_caching.block_size = 10000000;
+    VCL
   }
 
   # The streaming miss feature streams responses back to clients immediately,
