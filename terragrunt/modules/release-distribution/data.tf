@@ -15,6 +15,10 @@ data "aws_s3_bucket" "logs" {
   bucket = var.log_bucket
 }
 
+data "aws_ssm_parameter" "datadog_api_key" {
+  name = "/${var.environment}/promote-release/datadog-api-key"
+}
+
 data "aws_ssm_parameter" "fastly_customer_id" {
   name            = "/${var.environment}/promote-release/fastly-customer-id"
   with_decryption = false
