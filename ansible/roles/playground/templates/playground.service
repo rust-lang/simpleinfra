@@ -6,6 +6,8 @@
 Description=The Rust Playground
 
 [Service]
+Slice=playground.slice
+
 Restart=on-failure
 
 Environment=TMPDIR={{ vars_playground_mountpoint_path }}
