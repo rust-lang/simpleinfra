@@ -6,6 +6,8 @@
 Description=The Rust Playground
 
 [Service]
+Restart=on-failure
+
 Environment=TMPDIR={{ vars_playground_mountpoint_path }}
 Environment=RUST_LOG=info
 Environment=PLAYGROUND_CORS_ENABLED={{ vars_playground_env_cors_enabled }}
