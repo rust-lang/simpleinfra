@@ -63,6 +63,27 @@ resource "aws_ssoadmin_managed_policy_attachment" "view_only_access" {
   permission_set_arn = aws_ssoadmin_permission_set.view_only_access.arn
 }
 
+// Grants limited but additional access from ViewOnlyAccess -- e.g., to logs.
+// We will expand this mostly as needed without granting write access.
+// This role should only be granted in accounts that are scoped to a single
+// service (i.e., not our legacy account), because that automatically scopes access.
+resource "aws_ssoadmin_permission_set" "read_only_access" {
+  instance_arn = local.instance_arn
+  name         = "ReadOnlyAccess"
+}
+
+resource "aws_ssoadmin_managed_policy_attachment" "read_only_access" {
+  instance_arn       = local.instance_arn
+  managed_policy_arn = "arn:aws:iam::aws:policy/job-function/ViewOnlyAccess"
+  permission_set_arn = aws_ssoadmin_permission_set.read_only_access.arn
+}
+
+resource "aws_ssoadmin_managed_policy_attachment" "cloudwatch_readonly" {
+  instance_arn       = local.instance_arn
+  managed_policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsReadOnlyAccess"
+  permission_set_arn = aws_ssoadmin_permission_set.read_only_access.arn
+}
+
 # The assignment of groups to accounts with their respective permission sets
 
 locals {
@@ -124,9 +145,9 @@ locals {
       account : aws_organizations_account.bors_staging,
       groups : [
         { group : aws_identitystore_group.infra,
-        permissions : [aws_ssoadmin_permission_set.view_only_access, aws_ssoadmin_permission_set.administrator_access] },
+        permissions : [aws_ssoadmin_permission_set.read_only_access] },
         { group : aws_identitystore_group.infra-admins,
-        permissions : [aws_ssoadmin_permission_set.view_only_access, aws_ssoadmin_permission_set.administrator_access] },
+        permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
       ]
     },
     # bors prod
@@ -134,7 +155,7 @@ locals {
       account : aws_organizations_account.bors_prod,
       groups : [
         { group : aws_identitystore_group.infra-admins,
-        permissions : [aws_ssoadmin_permission_set.view_only_access, aws_ssoadmin_permission_set.administrator_access] },
+        permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
       ]
     },
   ]

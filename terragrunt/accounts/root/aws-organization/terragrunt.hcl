@@ -33,12 +33,6 @@ inputs = {
       email       = "me@ryanlevick.com"
       groups      = ["infra"]
     }
-    "jynelson" = {
-      given_name  = "Joshua",
-      family_name = "Nelson",
-      email       = "rust@jyn.dev"
-      groups      = ["infra"]
-    }
     "shepmaster" = {
       given_name  = "Jake",
       family_name = "Goulding",
@@ -56,6 +50,12 @@ inputs = {
       family_name = "Marcey"
       email = "joelmarcey@rustfoundation.org"
       groups = ["billing"]
+    }
+    "kobzol" = {
+      given_name = "Jakub"
+      family_name = "Beránek"
+      email = "berykubik@gmail.com"
+      groups = ["infra"]
     }
   }
 }
