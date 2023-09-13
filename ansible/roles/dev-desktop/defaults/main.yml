@@ -10,6 +10,8 @@ vars_user_quota_gb: 150
 vars_user_quota_prototype_user: "quota-prototype"
 
 vars_user_config:
+  - username: gh-Alexendoo
+    shell: /usr/bin/zsh
   - username: gh-jdno
     shell: /usr/bin/zsh
   - username: gh-WaffleLapkin
