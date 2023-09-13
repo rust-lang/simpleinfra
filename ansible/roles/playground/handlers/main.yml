@@ -6,6 +6,12 @@
     state: restarted
     daemon_reload: true
 
+- name: restart-containerd
+  systemd:
+    name: containerd
+    state: restarted
+    daemon_reload: true
+
 - name: start-playground-update
   systemd:
     name: playground-update

@@ -1,5 +1,16 @@
 ---
 
+# Create a Systemd slice to manage resources (Memory, CPU) across the
+# processes spawned by the playground.
+
+- name: Configure playground slice
+  template:
+    src: playground.slice
+    dest: /etc/systemd/system/playground.slice
+    mode: 0644
+
+# --------------------
+
 - name: Add Docker APT repository GPG key
   apt_key:
     state: present
@@ -29,6 +40,30 @@
     dest: /etc/docker/daemon.json
     mode: 0600
   notify: restart-docker
+
+- name: Add Docker to the Playground slice
+  file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+
+- name: Add Docker to the Playground slice
+  template:
+    src: docker-override.conf
+    dest: /etc/systemd/system/docker.service.d/override.conf
+    mode: 0600
+  notify: restart-docker
+
+- name: Add ContainerD to the Playground slice
+  file:
+    path: /etc/systemd/system/containerd.service.d
+    state: directory
+
+- name: Add ContainerD to the Playground slice
+  template:
+    src: containerd-override.conf
+    dest: /etc/systemd/system/containerd.service.d/override.conf
+    mode: 0600
+  notify: restart-containerd
 
 # --------------------
 

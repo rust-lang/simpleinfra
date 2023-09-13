@@ -1,3 +1,4 @@
 {
+  "cgroup-parent": "playground.slice",
   "storage-driver": "overlay2"
 }
