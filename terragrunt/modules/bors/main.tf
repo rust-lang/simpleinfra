@@ -276,8 +276,12 @@ resource "aws_ecs_task_definition" "bors" {
         },
         {
           name  = "RUST_LOG"
-          value = "debug"
+          value = "bors=debug"
         },
+        {
+          name  = "CMD_PREFIX",
+          value = "@bors2"
+        }
       ]
 
       secrets = [
