@@ -26,15 +26,45 @@ rm -rf "/etc/ssl/letsencrypt/accounts/localhost_14000/{{ email }}"
 server="https://acme-v02.api.letsencrypt.org/directory"
 {% endif %}
 
-lego --email "{{ email }}" \
-    --server "${server}" \
-    --accept-tos \
-    --path /etc/ssl/letsencrypt \
-    --http \
-    ${renew_kind} \
-    {% for domain in domains -%}
-    -d "{{ domain }}" \
-    {% endfor -%}
-    ${action}
+retries="{{ vars_ssl_renew_number_of_retries }}"
+wait_time="{{ vars_ssl_renew_retry_delay }}"
+
+lego_cmd="lego --email '{{ email }}' \
+        --server '${server}' \
+        --accept-tos \
+        --path /etc/ssl/letsencrypt \
+        --http \
+        ${renew_kind} \
+        {% for domain in domains -%}
+        -d '{{ domain }}' \
+        {% endfor -%}
+        ${action}"
+
+function run_with_retries {
+    command=$1
+    local i=0
+    while true; do
+        ${command}
+        exit_code=$?
+
+        if [ ${exit_code} -eq 0 ]; then
+            break
+        fi
+
+        if [ ${i} -ge ${retries} ]; then
+            exit ${exit_code}
+        fi
+
+        jitter=$(($RANDOM % 10))
+        wait_time_with_jitter=$((${wait_time} + ${jitter}))
+
+        echo "Command failed with exit code ${exit_code}. Retrying in ${wait_time_with_jitter} seconds..."
+        sleep ${wait_time_with_jitter}
+
+        i=$(($i + 1))
+    done
+}
+
+run_with_retries $lego_cmd
 
 sudo /etc/ssl/letsencrypt/after-renew
