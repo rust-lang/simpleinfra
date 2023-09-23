@@ -4,7 +4,7 @@ This GitHub Action will upload metrics collected by CI run to GitHub Artifacts.
 This allows for future runners or other actions to download the artifact and
 upload them to S3 bucket that is used for monitoring GitHub CI.
 
-You can follow the discussion in [the relevant GitHub issue][issue-source].
+You can follow the discussion in [the corresponding GitHub issue][issue-source].
 
 ## Usage
 
@@ -37,9 +37,11 @@ action:
 
 This is a composite GitHub Action, and as such, you can run the action using
 [`act`][act-github]. You can also use one of the above syntaxes in your own
-fork of this repository.
+fork of this repository. Here's one [test-run][first-test-run] for your
+reference.
 
 [issue-source]: https://github.com/rust-lang/infra-team/issues/74
 [act-github]: https://github.com/nektos/act
 [rust-cpu-collector-ci]: https://github.com/rust-lang/rust/blob/1.72.1/.github/workflows/ci.yml#L90
 [rust-cpu-collector-script]: https://github.com/rust-lang/rust/blob/1.72.1/src/ci/scripts/collect-cpu-stats.sh#L10
+[first-test-run]: https://github.com/meysam81/simpleinfra/actions/runs/6283641163
