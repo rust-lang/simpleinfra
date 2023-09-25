@@ -65,6 +65,8 @@ function run_with_retries {
     done
 }
 
+set +e
 run_with_retries $lego_cmd
+set -e
 
 sudo /etc/ssl/letsencrypt/after-renew
