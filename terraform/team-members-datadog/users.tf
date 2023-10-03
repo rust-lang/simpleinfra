@@ -20,6 +20,11 @@ locals {
       name  = "Mark Rousskov"
       role  = "DataDog Admin Role"
     }
+    "paullenz" = {
+      login = "paullenz@rustfoundation.org"
+      name  = "Paul Lenz"
+      role  = "Datadog Read Only Role"
+    }
     "pietro" = {
       login = "pietro@pietroalbini.org"
       name  = "Pietro Albini"
@@ -29,6 +34,11 @@ locals {
       login = "infra@rustfoundation.org"
       name  = "Rust Foundation Infrastructure"
       role  = "Datadog Admin Role"
+    }
+    "tobias" = {
+      login = "tobiasbieniek@rustfoundation.org"
+      name  = "Tobias Bieniek"
+      role  = "Datadog Standard Role"
     }
   }
 }
