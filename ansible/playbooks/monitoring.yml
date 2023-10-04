@@ -82,6 +82,13 @@
             - targets:
               - docs.rs:443
 
+        - job_name: docsrs-builder
+          metrics_path: /about/metrics/instance.builder
+          scheme: https
+          static_configs:
+            - targets:
+              - docs.rs:443
+
         - job_name: perfrlo
           metrics_path: /perf/metrics
           scheme: https
