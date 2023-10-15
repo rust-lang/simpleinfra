@@ -59,7 +59,7 @@ resource "aws_cloudfront_origin_request_policy" "docs_rs" {
   }
 
   query_strings_config {
-    query_strings_behavior = "all"
+    query_string_behavior = "all"
   }
 
   cookies_config {
