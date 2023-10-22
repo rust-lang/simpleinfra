@@ -123,6 +123,7 @@ module "artifacts_cdn" {
 
   domain_name        = var.artifacts_domain
   origin_domain_name = aws_s3_bucket.artifacts.bucket_regional_domain_name
+  response_policy_id = var.response_policy_id
 }
 
 data "aws_s3_bucket" "inventories" {
