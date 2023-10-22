@@ -17,6 +17,7 @@ module "public" {
 
   delete_caches_after_days    = 90
   delete_artifacts_after_days = 168
+  response_policy_id = data.terraform_remote_state.shared.outputs.mdbook_response_policy
 }
 
 module "security" {
@@ -34,4 +35,5 @@ module "security" {
 
   delete_caches_after_days    = 30
   delete_artifacts_after_days = 90
+  response_policy_id = data.terraform_remote_state.shared.outputs.mdbook_response_policy
 }

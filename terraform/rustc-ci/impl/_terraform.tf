@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source                = "hashicorp/aws"
-      version               = "~> 3.59"
+      version               = "~> 4.67"
       configuration_aliases = [aws.east1]
     }
   }
@@ -54,4 +54,9 @@ variable "buckets_public_access" {
 variable "repo" {
   description = "GitHub repository to authorize"
   type        = string
+}
+
+variable "response_policy_id" {
+  description = "CDN response policy"
+  type = string
 }

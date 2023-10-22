@@ -116,4 +116,5 @@ module "caches_cdn" {
 
   domain_name        = var.caches_domain
   origin_domain_name = aws_s3_bucket.caches.bucket_regional_domain_name
+  response_policy_id = var.response_policy_id
 }
