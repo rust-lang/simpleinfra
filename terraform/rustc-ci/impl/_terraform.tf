@@ -56,7 +56,12 @@ variable "repo" {
   type        = string
 }
 
+variable "source_repo" {
+  description = "GitHub repository to authorize for roles"
+  type        = string
+}
+
 variable "response_policy_id" {
   description = "CDN response policy"
-  type = string
+  type        = string
 }
