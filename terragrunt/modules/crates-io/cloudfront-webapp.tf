@@ -57,24 +57,6 @@ resource "aws_cloudfront_distribution" "webapp" {
     }
   }
 
-  // Cache assets ignoring headers, query strings and cookies.
-  ordered_cache_behavior {
-    path_pattern           = "/assets"
-    target_origin_id       = "heroku"
-    allowed_methods        = ["GET", "HEAD"]
-    cached_methods         = ["GET", "HEAD"]
-    compress               = true
-    viewer_protocol_policy = "redirect-to-https"
-
-    forwarded_values {
-      headers      = []
-      query_string = false
-      cookies {
-        forward = "none"
-      }
-    }
-  }
-
   origin {
     origin_id   = "heroku"
     domain_name = var.webapp_origin_domain
