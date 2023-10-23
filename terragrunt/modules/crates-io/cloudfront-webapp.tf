@@ -32,6 +32,9 @@ resource "aws_cloudfront_distribution" "webapp" {
         // The crates.io website and API respond with different content based
         // on what the client is accepting (i.e. HTML, JSON...)
         "Accept",
+        // Pass the encoding header along so the origin can respond with
+        // compressed content if the client supports it.
+        "Accept-Encoding",
         // The header needs to be forwarded so it can be stored in the logs and
         // analyzed for abuse prevention and rate limiting purposes.
         "Referer",
