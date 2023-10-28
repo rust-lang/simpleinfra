@@ -172,6 +172,40 @@ resource "aws_iam_role" "crater" {
   })
 }
 
+
+resource "aws_iam_policy" "s3_access" {
+  name = "crater-s3-access"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:PutObjectACL",
+          "s3:GetObject",
+          "s3:GetObjectACL",
+          "s3:GetBucketLocation",
+          "s3:CreateMultipartUpload",
+          "s3:UploadPart",
+          "s3:CompleteMultipartUpload",
+          "s3:AbortMultipartUpload"
+        ]
+        Resource = [
+          "arn:aws:s3:::crater-reports/*",
+          "arn:aws:s3:::crater-reports"
+        ]
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "s3_access" {
+  role       = aws_iam_role.crater.name
+  policy_arn = aws_iam_policy.s3_access.arn
+}
+
 resource "aws_iam_role_policy_attachment" "ci_pull" {
   role       = aws_iam_role.crater.name
   policy_arn = module.ecr.policy_pull_arn
