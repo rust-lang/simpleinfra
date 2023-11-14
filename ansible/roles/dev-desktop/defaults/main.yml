@@ -18,3 +18,5 @@ vars_user_config:
     shell: /usr/bin/fish
   - username: gh-vincenzopalazzo
     shell: /usr/bin/zsh
+  - username: gh-thomcc
+    shell: /usr/bin/fish
