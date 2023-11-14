@@ -15,7 +15,6 @@
       - build-essential
       - clang
       - cmake
-      - fish
       - gcc-mingw-w64-x86-64 # Allows running `x check --target x86_64-pc-windows-gnu`
       - jq
       - libssl-dev
@@ -59,6 +58,21 @@
       - libcapnp-dev
       - zsh
     state: present
+
+- name: Uninstall fish from apt
+  apt:
+    name: fish
+    state: absent
+
+- name: Add fish repository
+  apt_repository:
+    repo: ppa:fish-shell/release-3
+
+- name: Install fish
+  apt:
+    name: fish
+    state: present
+    update_cache: yes
 
 - name: Uninstall valgrind from apt
   apt:
