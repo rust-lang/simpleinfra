@@ -1,6 +1,21 @@
 # Fetch all available permissions
 data "datadog_permissions" "all" {}
 
+resource "datadog_role" "board_member" {
+  name = "Board Member"
+
+  dynamic "permission" {
+    for_each = toset([
+      data.datadog_permissions.all.permissions.dashboards_write,
+    ])
+
+    content {
+      id = permission.value
+    }
+  }
+}
+
+
 resource "datadog_role" "contributor" {
   name = "Contributor"
 
