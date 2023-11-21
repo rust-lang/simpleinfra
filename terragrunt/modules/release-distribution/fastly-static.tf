@@ -113,7 +113,7 @@ resource "fastly_service_vcl" "static" {
     domain      = "s3.us-west-1.amazonaws.com"
     path        = "/fastly-requests/${var.static_domain_name}/"
 
-    compression_codec = "gzip"
+    compression_codec = "zstd"
   }
 }
 
