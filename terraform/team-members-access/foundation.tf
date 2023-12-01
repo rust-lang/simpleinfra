@@ -50,16 +50,7 @@ resource "aws_iam_group_policy" "foundation" {
       {
         Effect = "Allow"
         Action = [
-          "aws-portal:*Usage",
-          "aws-portal:*Billing",
-          "aws-portal:*PaymentMethods",
-          "ce:*",
-          "purchase-orders:*",
-          "tax:*",
-          "cur:DescribeReportDefinitions",
-          "cur:PutReportDefinition",
-          "cur:DeleteReportDefinition",
-          "cur:ModifyReportDefinition"
+          "Billing"
         ]
         Resource = "*"
       },
