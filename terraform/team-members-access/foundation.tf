@@ -46,31 +46,6 @@ resource "aws_iam_group_policy" "foundation" {
         Action   = ["support:*"]
         Resource = "*"
       },
-      // Billing-related resources
-      {
-        Effect = "Allow"
-        Action = [
-          "aws-portal:*Usage",
-          "aws-portal:*Billing",
-          "aws-portal:*PaymentMethods",
-          "ce:*",
-          "purchase-orders:*",
-          "tax:*",
-          "cur:DescribeReportDefinitions",
-          "cur:PutReportDefinition",
-          "cur:DeleteReportDefinition",
-          "cur:ModifyReportDefinition"
-        ]
-        Resource = "*"
-      },
-      // But not account settings
-      {
-        Effect = "Deny"
-        Action = [
-          "aws-portal:*Account",
-        ]
-        Resource = "*"
-      },
       // Access to the Route 53 console
       {
         Effect = "Allow"
