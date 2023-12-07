@@ -2,6 +2,8 @@ use fastly::http::{Method, StatusCode};
 use fastly::{Error, Request, Response};
 use log::{info, warn, LevelFilter};
 use log_fastly::Logger;
+use once_cell::sync::Lazy;
+use regex::Regex;
 use serde_json::json;
 use time::OffsetDateTime;
 
@@ -74,6 +76,7 @@ fn handle_request(config: &Config, mut request: Request) -> Result<Response, Err
 
     set_ttl(config, &mut request);
     rewrite_urls_with_plus_character(&mut request);
+    rewrite_download_urls(&mut request);
 
     // Database dump is too big to cache on Fastly
     if request.get_url_str().ends_with("db-dump.tar.gz") {
@@ -123,6 +126,28 @@ fn rewrite_urls_with_plus_character(request: &mut Request) {
 
     if path.contains('+') {
         let new_path = path.replace('+', "%2B");
+        url.set_path(&new_path);
+    }
+}
+
+/// Rewrite `/crates/{crate}/{version}/download` URLs to
+/// `/crates/{crate}/{crate}-{version}.crate`
+///
+/// cargo versions before 1.24 don't support placeholders in the `dl` field
+/// of the index, so we need to rewrite the download URL to point to the
+/// crate file instead.
+fn rewrite_download_urls(request: &mut Request) {
+    static RE: Lazy<Regex> = Lazy::new(|| {
+        Regex::new(r"^/crates/(?P<crate>[^/]+)/(?P<version>[^/]+)/download$").unwrap()
+    });
+
+    let url = request.get_url_mut();
+    let path = url.path();
+
+    if let Some(captures) = RE.captures(path) {
+        let krate = captures.name("crate").unwrap().as_str();
+        let version = captures.name("version").unwrap().as_str();
+        let new_path = format!("/crates/{krate}/{krate}-{version}.crate");
         url.set_path(&new_path);
     }
 }
@@ -198,4 +223,35 @@ fn build_and_send_log(log_line: LogLineV1Builder, config: &Config) {
             warn!("failed to serialize request log: {error}");
         }
     };
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_rewrite_download_urls() {
+        fn test(url: &str, expected: &str) {
+            let mut request = Request::get(url);
+            rewrite_download_urls(&mut request);
+            assert_eq!(request.get_url_str(), expected);
+        }
+
+        test(
+            "https://static.crates.io/unrelated",
+            "https://static.crates.io/unrelated",
+        );
+        test(
+            "https://static.crates.io/crates/serde/serde-1.0.0.crate",
+            "https://static.crates.io/crates/serde/serde-1.0.0.crate",
+        );
+        test(
+            "https://static.crates.io/crates/serde/1.0.0/download",
+            "https://static.crates.io/crates/serde/serde-1.0.0.crate",
+        );
+        test(
+            "https://static.crates.io/crates/serde/1.0.0-alpha.1+foo-bar/download",
+            "https://static.crates.io/crates/serde/serde-1.0.0-alpha.1+foo-bar.crate",
+        );
+    }
 }
