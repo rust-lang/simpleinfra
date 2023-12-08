@@ -38,7 +38,7 @@ locals {
     "tobias" = {
       login = "tobiasbieniek@rustfoundation.org"
       name  = "Tobias Bieniek"
-      roles = ["Contributor", "crates.io"]
+      roles = ["Datadog Standard Role", "crates.io"]
     }
   }
 }
