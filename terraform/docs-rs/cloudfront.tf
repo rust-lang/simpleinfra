@@ -104,6 +104,11 @@ resource "aws_cloudfront_distribution" "webapp" {
       origin_protocol_policy = "http-only"
       origin_ssl_protocols   = ["TLSv1.2"]
     }
+
+    custom_header {
+      name  = "X-Origin-Auth"
+      value = "some_secret_value"
+    }
   }
 
   restrictions {
