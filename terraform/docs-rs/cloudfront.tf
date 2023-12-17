@@ -67,6 +67,11 @@ resource "aws_cloudfront_origin_request_policy" "docs_rs" {
   }
 }
 
+resource "random_password" "origin_auth" {
+  length  = 32
+  special = false
+}
+
 resource "aws_cloudfront_distribution" "webapp" {
   comment = local.domain_name
 
@@ -107,7 +112,7 @@ resource "aws_cloudfront_distribution" "webapp" {
 
     custom_header {
       name  = "X-Origin-Auth"
-      value = "some_secret_value"
+      value = random_password.origin_auth.result
     }
   }
 
