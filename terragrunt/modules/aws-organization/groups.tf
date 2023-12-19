@@ -28,6 +28,13 @@ resource "aws_identitystore_group" "billing" {
   description  = "People with access to the billing portal"
 }
 
+resource "aws_identitystore_group" "crates_io" {
+  identity_store_id = local.identity_store_id
+
+  display_name = "crates-io"
+  description  = "The crates.io team"
+}
+
 # The different permission sets a group may have assigned to it
 
 resource "aws_ssoadmin_permission_set" "administrator_access" {
@@ -110,6 +117,30 @@ locals {
         permissions : [aws_ssoadmin_permission_set.billing_access] },
         { group : aws_identitystore_group.infra,
         permissions : [aws_ssoadmin_permission_set.view_only_access] }
+      ]
+    },
+    # crates-io Staging
+    {
+      account : aws_organizations_account.crates_io_staging,
+      groups : [
+        { group : aws_identitystore_group.infra-admins,
+        permissions : [aws_ssoadmin_permission_set.view_only_access, aws_ssoadmin_permission_set.administrator_access] },
+        { group : aws_identitystore_group.infra,
+        permissions : [aws_ssoadmin_permission_set.view_only_access, aws_ssoadmin_permission_set.administrator_access] },
+        { group : aws_identitystore_group.crates_io,
+        permissions : [aws_ssoadmin_permission_set.view_only_access] },
+      ]
+    },
+    # crates-io Production
+    {
+      account : aws_organizations_account.crates_io_prod,
+      groups : [
+        { group : aws_identitystore_group.infra-admins,
+        permissions : [aws_ssoadmin_permission_set.view_only_access, aws_ssoadmin_permission_set.administrator_access] },
+        { group : aws_identitystore_group.infra,
+        permissions : [aws_ssoadmin_permission_set.view_only_access] },
+        { group : aws_identitystore_group.crates_io,
+        permissions : [aws_ssoadmin_permission_set.view_only_access] },
       ]
     },
     # docs-rs Staging
