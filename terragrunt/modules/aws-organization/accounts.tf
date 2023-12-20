@@ -12,6 +12,16 @@ resource "aws_organizations_account" "legacy" {
   email = "admin@rust-lang.org"
 }
 
+resource "aws_organizations_account" "crates_io_staging" {
+  name  = "crates-io-staging"
+  email = "admin+crates-io-staging@rust-lang.org"
+}
+
+resource "aws_organizations_account" "crates_io_prod" {
+  name  = "crates-io-prod"
+  email = "admin+crates-io-prod@rust-lang.org"
+}
+
 resource "aws_organizations_account" "docs_rs_staging" {
   name  = "docs-rs-staging"
   email = "admin+docs-rs-staging@rust-lang.org"
