@@ -28,7 +28,7 @@ data "aws_iam_policy_document" "s3_push_to_queue" {
     condition {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
-      values   = [data.aws_arn.account]
+      values   = [data.aws_arn.src_bucket.account]
     }
   }
 }
