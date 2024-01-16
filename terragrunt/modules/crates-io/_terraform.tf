@@ -102,3 +102,9 @@ variable "fastly_aws_account_id" {
   description = "The AWS account ID that Fastly uses to write logs"
   default     = "717331877981"
 }
+
+variable "cdn_log_event_queue_arn" {
+  # See the `crates-io-logs` module
+  description = "ARN of the SQS queue that receives S3 notifications for CDN logs"
+  type        = string
+}

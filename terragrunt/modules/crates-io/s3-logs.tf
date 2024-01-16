@@ -25,3 +25,21 @@ resource "aws_s3_bucket_public_access_block" "logs" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
+
+resource "aws_s3_bucket_notification" "cdn_log_event_queue" {
+  bucket = aws_s3_bucket.logs.id
+
+  queue {
+    id            = "cloudfront"
+    events        = ["s3:ObjectCreated:*"]
+    queue_arn     = var.cdn_log_event_queue_arn
+    filter_prefix = "cloudfront/"
+  }
+
+  queue {
+    id            = "fastly"
+    events        = ["s3:ObjectCreated:*"]
+    queue_arn     = var.cdn_log_event_queue_arn
+    filter_prefix = "fastly-requests/"
+  }
+}

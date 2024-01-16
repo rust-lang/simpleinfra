@@ -27,4 +27,6 @@ inputs = {
   static_fastly_weight = 100
 
   fastly_customer_id_ssm_parameter = "/staging/crates-io/fastly/customer-id"
+
+  cdn_log_event_queue_arn = "arn:aws:sqs:us-west-1:359172468976:cdn-log-event-queue"
 }
