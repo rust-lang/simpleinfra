@@ -70,6 +70,32 @@ resource "aws_iam_user_policy_attachment" "heroku_static_write" {
   policy_arn = aws_iam_policy.static_write.arn
 }
 
+resource "aws_iam_policy" "cdn_logs_read" {
+  name        = "${var.iam_prefix}--cdn-logs-read"
+  description = "Read access to the S3 bucket with CDN logs"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "CDNLogsRead"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+        ]
+        Resource = [
+          "${aws_s3_bucket.logs.arn}/*",
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_user_policy_attachment" "heroku_cdn_logs_read" {
+  user       = aws_iam_user.heroku.name
+  policy_arn = aws_iam_policy.cdn_logs_read.arn
+}
+
 resource "aws_iam_role" "s3_replication" {
   name = "${var.iam_prefix}--s3-replication"
 
