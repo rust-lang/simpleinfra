@@ -20,6 +20,11 @@ data "aws_s3_bucket" "crates_io_buckets" {
   bucket   = each.value
 }
 
+data "aws_s3_bucket" "crates_io_log_buckets" {
+  for_each = toset(["rust-crates-io-logs", "rust-staging-crates-io-logs"])
+  bucket   = each.value
+}
+
 resource "aws_iam_group_policy" "crates_io" {
   group = aws_iam_group.crates_io.name
   name  = "prod-access"
@@ -88,6 +93,27 @@ resource "aws_iam_group_policy" "crates_io" {
           "s3:ListObjectsV2",
         ]
         Resource = [for _, bucket in data.aws_s3_bucket.crates_io_buckets : "${bucket.arn}/*"]
+      },
+
+      // CDN log access
+      //
+      // The logs from CloudFront and Fastly are stored in an S3 bucket. Since those logs
+      // are used to count crate downloads, team members might need to access them for
+      // debugging purposes. Compared to the other buckets that the team has access to, the
+      // log buckets are read-only.
+      {
+        Effect   = "Allow"
+        Action   = "s3:ListBucket"
+        Resource = [for _, bucket in data.aws_s3_bucket.crates_io_log_buckets : bucket.arn]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:GetObjectAcl",
+          "s3:ListObjectsV2",
+        ]
+        Resource = [for _, bucket in data.aws_s3_bucket.crates_io_log_buckets : "${bucket.arn}/*"]
       },
 
       // Support access
