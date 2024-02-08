@@ -1,61 +1,10 @@
 locals {
-  users = {
-    "admin" = {
-      login = "admin@rust-lang.org"
-      name  = "Rust Admin"
-      roles = ["Datadog Admin Role"]
-    }
-    "jdn" = {
-      login = "jandavidnose@rustfoundation.org"
-      name  = "Jan David Nose"
-      roles = ["Datadog Admin Role"]
-    }
-    "joel" = {
-      login = "joelmarcey@rustfoundation.org"
-      name  = "Joel Marcey"
-      roles = ["Datadog Admin Role"]
-    }
-    "mark" = {
-      login = "mark.simulacrum@gmail.com"
-      name  = "Mark Rousskov"
-      roles = ["DataDog Admin Role"]
-    }
-    "nell" = {
-      login = "nells@microsoft.com"
-      name  = "Nell Shamrell-Harrington"
-      roles = ["Board Member"]
-    }
-    "paullenz" = {
-      login = "paullenz@rustfoundation.org"
-      name  = "Paul Lenz"
-      roles = ["Datadog Read Only Role"]
-    }
-    "peixin" = {
-      login = "peixin.hou@gmail.com"
-      name  = "Peixin Hou"
-      roles = ["Board Member"]
-    }
-    "pietro" = {
-      login = "pietro@pietroalbini.org"
-      name  = "Pietro Albini"
-      roles = ["DataDog Admin Role"]
-    }
-    "rustfoundation" = {
-      login = "infra@rustfoundation.org"
-      name  = "Rust Foundation Infrastructure"
-      roles = ["Datadog Admin Role"]
-    }
-    "seth" = {
-      login = "smarkle.aws@gmail.com"
-      name  = "Seth Markle"
-      roles = ["Board Member"]
-    }
-    "tobias" = {
-      login = "tobiasbieniek@rustfoundation.org"
-      name  = "Tobias Bieniek"
-      roles = ["Datadog Standard Role", "crates.io"]
-    }
-  }
+  users = merge(
+    { for name, user in local.crates_io : name => merge(user, { roles = ["crates.io"] }) },
+    { for name, user in local.foundation : name => merge(user, { roles = ["Datadog Read Only Role"] }) },
+    { for name, user in local.foundation_board : name => merge(user, { roles = ["Board Member"] }) },
+    { for name, user in local.infra_admins : name => merge(user, { roles = ["Datadog Admin Role"] }) },
+  )
 }
 
 data "datadog_role" "role" {
