@@ -19,7 +19,7 @@ script_path=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 project_path=$(cd "${script_path}" && cd ".." && pwd)
 project_name="${project_path##*/}"
 
-cd "${project_path}" && fastly compute build --metadata-disable &>/dev/null
+cd "${project_path}" && fastly compute build &>/dev/null
 
 # Return a valid JSON object that Terraform can consume
 echo "{\"path\": \"./${project_name}/pkg/compute-static.tar.gz\"}"
