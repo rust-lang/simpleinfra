@@ -1,8 +1,28 @@
 locals {
   foundation = {
+    "adam" = {
+      login = "adamharvey@rustfoundation.org"
+      name  = "Adam Harvey"
+    }
+    "jdn" = {
+      login = "jandavidnose@rustfoundation.org"
+      name  = "Jan David Nose"
+    }
+    "joel" = {
+      login = "joelmarcey@rustfoundation.org"
+      name  = "Joel Marcey"
+    }
     "paullenz" = {
       login = "paullenz@rustfoundation.org"
       name  = "Paul Lenz"
+    }
+    "rustfoundation" = {
+      login = "infra@rustfoundation.org"
+      name  = "Rust Foundation Infrastructure"
+    }
+    "tobias" = {
+      login = "tobiasbieniek@rustfoundation.org"
+      name  = "Tobias Bieniek"
     }
   }
 }
