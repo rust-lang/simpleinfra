@@ -11,7 +11,7 @@ locals {
   #   ]
   _do_not_use_all_teams = [
     { for name, user in local.crates_io : name => merge(user, { roles = [datadog_role.crates_io.name] }) },
-    { for name, user in local.foundation : name => merge(user, { roles = ["Datadog Read Only Role"] }) },
+    { for name, user in local.foundation : name => merge(user, { roles = [datadog_role.foundation.name] }) },
     { for name, user in local.foundation_board : name => merge(user, { roles = [datadog_role.board_member.name] }) },
     { for name, user in local.infra_admins : name => merge(user, { roles = ["Datadog Admin Role"] }) },
   ]

@@ -27,6 +27,20 @@ locals {
   }
 }
 
+resource "datadog_role" "foundation" {
+  name = "Rust Foundation"
+
+  dynamic "permission" {
+    for_each = toset([
+      data.datadog_permissions.all.permissions.dashboards_write,
+    ])
+
+    content {
+      id = permission.value
+    }
+  }
+}
+
 resource "datadog_team" "foundation" {
   name        = "Rust Foundation"
   description = "The staff of the Rust Foundation"
