@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+#
+# {{ ansible_managed }}
+#
+
 # Clean up unused checkouts
 #
 # This script is used to find old checkouts that are no longer in use. Given the
