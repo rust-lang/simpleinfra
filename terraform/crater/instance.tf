@@ -190,13 +190,22 @@ resource "aws_iam_policy" "s3_access" {
           "s3:CreateMultipartUpload",
           "s3:UploadPart",
           "s3:CompleteMultipartUpload",
-          "s3:AbortMultipartUpload"
+          "s3:AbortMultipartUpload",
+          "s3:ListBucket"
         ]
         Resource = [
           "arn:aws:s3:::crater-reports/*",
           "arn:aws:s3:::crater-reports"
         ]
       },
+      {
+        Effect = "Allow"
+        Action = "s3:DeleteObject"
+        Resource = [
+          "arn:aws:s3:::crater-reports/backup/*",
+          "arn:aws:s3:::crater-reports"
+        ]
+      }
     ]
   })
 }
@@ -244,7 +253,7 @@ resource "aws_instance" "crater" {
 
   root_block_device {
     volume_type           = "gp3"
-    volume_size           = 60
+    volume_size           = 100
     delete_on_termination = true
   }
 
