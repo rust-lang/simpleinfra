@@ -99,6 +99,7 @@ resource "fastly_service_dictionary_items" "compute_static" {
     "cloudfront-url" : local.cloudfront_domain_name
     "s3-primary-host" : local.primary_host_name
     "s3-fallback-host" : local.fallback_host_name
+    "service-name": var.static_domain_name
     "static-ttl" : var.static_ttl
     "request-logs-endpoint" : local.request_logs_endpoint
     "service-logs-endpoint" : local.service_logs_endpoint

@@ -6,6 +6,9 @@ const DICTIONARY_NAME: &str = "compute_static";
 // Name of the dictionary item with the CloudFront URL
 const CLOUDFRONT_URL: &str = "cloudfront-url";
 
+// Name of the dictionary item with the name of the service.
+const SERVICE_NAME: &str = "service-name";
+
 // Name of the dictionary item with the name of the primary host.
 const PRIMARY_HOST: &str = "s3-primary-host";
 
@@ -23,6 +26,7 @@ const SERVICE_LOGS_ENDPOINT: &str = "service-logs-endpoint";
 
 #[derive(Debug)]
 pub struct Config {
+    pub service_name: String,
     pub primary_host: String,
     pub fallback_host: String,
     pub static_ttl: u32,
@@ -34,6 +38,11 @@ pub struct Config {
 impl Config {
     pub fn from_dictionary() -> Self {
         let dictionary = ConfigStore::open(DICTIONARY_NAME);
+
+        // Look up the name of the service
+        let service_name = dictionary
+            .get(SERVICE_NAME)
+            .expect("failed to get service name from dictionary");
 
         // Look up S3 hosts for current environment
         let primary_host = dictionary
@@ -62,6 +71,7 @@ impl Config {
             .expect("failed to get endpoint for service logs from dictionary");
 
         Self {
+            service_name,
             primary_host,
             fallback_host,
             static_ttl,

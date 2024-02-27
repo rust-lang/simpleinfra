@@ -24,7 +24,7 @@ fn main(request: Request) -> Result<Response, Error> {
     }
 
     init_logging(&config);
-    let mut log = collect_request(&request);
+    let mut log = collect_request(&config, &request);
 
     let has_origin_header = request.get_header("Origin").is_some();
     let mut response = handle_request(&config, request);
@@ -55,8 +55,9 @@ fn init_logging(config: &Config) {
 }
 
 /// Collect data for the logs from the request
-fn collect_request(request: &Request) -> LogLineV1Builder {
+fn collect_request(config: &Config, request: &Request) -> LogLineV1Builder {
     LogLineV1Builder::default()
+        .service(config.service_name.clone())
         .date_time(OffsetDateTime::now_utc())
         .url(request.get_url_str().into())
         .ip(request.get_client_ip_addr())
