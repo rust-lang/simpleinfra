@@ -108,3 +108,11 @@ variable "cdn_log_event_queue_arn" {
   description = "ARN of the SQS queue that receives S3 notifications for CDN logs"
   type        = string
 }
+
+variable "env" {
+  type = string
+  validation {
+    condition     = contains(["staging", "prod"], var.env)
+    error_message = "The environment must be 'staging' or 'prod'."
+  }
+}

@@ -48,8 +48,8 @@ fn main(request: Request) -> Result<Response, Error> {
 fn init_logging(config: &Config) {
     Logger::builder()
         .max_level(LevelFilter::Debug)
-        .endpoint(config.request_logs_endpoint.clone())
-        .default_endpoint(config.service_logs_endpoint.clone())
+        .endpoint(config.s3_request_logs_endpoint.clone())
+        .default_endpoint(config.s3_service_logs_endpoint.clone())
         .echo_stdout(true)
         .init();
 }
@@ -218,7 +218,15 @@ fn build_and_send_log(log_line: LogLineV1Builder, config: &Config) {
     match log_line.build() {
         Ok(log) => {
             let versioned_log = LogLine::V1(log);
-            info!(target: &config.request_logs_endpoint, "{}", json!(versioned_log).to_string())
+
+            [
+                &config.datadog_request_logs_endpoint,
+                &config.s3_request_logs_endpoint,
+            ]
+            .iter()
+            .for_each(|endpoint| {
+                info!(target: endpoint, "{}", json!(versioned_log).to_string());
+            });
         }
         Err(error) => {
             warn!("failed to serialize request log: {error}");
