@@ -92,11 +92,6 @@ variable "static_fastly_weight" {
   type        = number
 }
 
-variable "fastly_customer_id_ssm_parameter" {
-  description = "Name of the SSM parameter with our Fastly customer id"
-  type        = string
-}
-
 variable "fastly_aws_account_id" {
   # See https://docs.fastly.com/en/guides/creating-an-aws-iam-role-for-fastly-logging
   description = "The AWS account ID that Fastly uses to write logs"
