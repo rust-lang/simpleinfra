@@ -48,6 +48,7 @@ fn main(request: Request) -> Result<Response, Error> {
 fn init_logging(config: &Config) {
     Logger::builder()
         .max_level(LevelFilter::Debug)
+        .endpoint(config.datadog_request_logs_endpoint.clone())
         .endpoint(config.s3_request_logs_endpoint.clone())
         .default_endpoint(config.s3_service_logs_endpoint.clone())
         .echo_stdout(true)
