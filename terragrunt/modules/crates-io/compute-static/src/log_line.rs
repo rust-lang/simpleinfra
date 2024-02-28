@@ -16,11 +16,10 @@ pub enum LogLine {
 #[derive(Debug, Builder, Serialize)]
 pub struct LogLineV1 {
     #[builder(default = "default_source()")]
-    source: &'static str,
-    app: String,
+    ddsource: &'static str,
+    ddtags: String,
     service: String,
-    env: String,
-    host: String,
+    hostname: String,
     #[serde(with = "time::serde::rfc3339")]
     date_time: OffsetDateTime,
     url: String,
