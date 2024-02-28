@@ -17,7 +17,10 @@ pub enum LogLine {
 pub struct LogLineV1 {
     #[builder(default = "default_source()")]
     source: &'static str,
+    app: String,
     service: String,
+    env: String,
+    host: String,
     #[serde(with = "time::serde::rfc3339")]
     date_time: OffsetDateTime,
     url: String,

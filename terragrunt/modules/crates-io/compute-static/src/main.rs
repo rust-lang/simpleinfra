@@ -57,7 +57,10 @@ fn init_logging(config: &Config) {
 /// Collect data for the logs from the request
 fn collect_request(config: &Config, request: &Request) -> LogLineV1Builder {
     LogLineV1Builder::default()
-        .service(config.service_name.clone())
+        .app(config.datadog_app.clone())
+        .service(config.datadog_service.clone())
+        .env(config.datadog_env.clone())
+        .host(config.datadog_host.clone())
         .date_time(OffsetDateTime::now_utc())
         .url(request.get_url_str().into())
         .ip(request.get_client_ip_addr())
