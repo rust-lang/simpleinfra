@@ -11,3 +11,8 @@ Group=ssl-read-keys
 # afterwards. It will be owned by the user and group defined above.
 RuntimeDirectory=acme-challenges
 RuntimeDirectoryMode=0755
+
+# Sometimes the renew can fail, such as when the Let's Encrypt servers
+# are overloaded. Give it a little break and try again.
+Restart=on-failure
+RestartSec=1m
