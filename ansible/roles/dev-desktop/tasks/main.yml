@@ -7,6 +7,7 @@
 - include_tasks: usermod.yml
   with_items: "{{ vars_user_config }}"
   when: vars_user_config is not none and vars_user_config | length > 0
+- include_tasks: cleanup.yml
 - include_tasks: team_login.yml
 - include_tasks: github.yml
 - include_tasks: motd.yml
