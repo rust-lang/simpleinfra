@@ -59,7 +59,6 @@ fn init_logging(config: &Config) {
 /// Collect data for the logs from the request
 fn collect_request(config: &Config, request: &Request) -> LogLineV1Builder {
     let http_details = HttpDetailsBuilder::default()
-        .method(request.get_method().to_string())
         .protocol(http_version_to_string(request.get_version()))
         .referer(
             request
@@ -93,6 +92,7 @@ fn collect_request(config: &Config, request: &Request) -> LogLineV1Builder {
         .host(request.get_url().host().map(|s| s.to_string()))
         .http(http_details)
         .ip(request.get_client_ip_addr())
+        .method(Some(request.get_method().to_string()))
         .url(request.get_url_str().into())
         .tls(tls_details)
         .to_owned();

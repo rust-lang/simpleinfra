@@ -27,6 +27,7 @@ pub struct LogLineV1 {
     host: Option<String>,
     http: Option<HttpDetails>,
     ip: Option<IpAddr>,
+    method: Option<String>,
     status: Option<u16>,
     tls: Option<TlsDetails>,
     url: String,
@@ -38,7 +39,6 @@ fn default_source() -> &'static str {
 
 #[derive(Clone, Debug, Builder, Serialize)]
 pub struct HttpDetails {
-    method: String,
     protocol: Option<String>,
     referer: Option<String>,
     useragent: Option<String>,
