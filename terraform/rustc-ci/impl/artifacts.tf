@@ -150,12 +150,8 @@ resource "aws_s3_bucket_inventory" "artifacts" {
   }
 }
 
-data "aws_iam_openid_connect_provider" "gha" {
-  url = "https://token.actions.githubusercontent.com"
-}
-
-resource "aws_iam_role" "oidc" {
-  name = "${var.iam_prefix}--role"
+resource "aws_iam_role" "try_builds" {
+  name = "${var.iam_prefix}--try-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -164,29 +160,11 @@ resource "aws_iam_role" "oidc" {
         Effect = "Allow"
         Action = "sts:AssumeRoleWithWebIdentity"
         Principal = {
-          Federated = "cognito-identity.amazonaws.com"
+          Federated = "arn:aws:iam::890664054962:oidc-provider/token.actions.githubusercontent.com"
         }
         Condition = {
           StringEquals = {
-            "cognito-identity.amazonaws.com:aud" = "${aws_cognito_identity_pool.main.id}"
-            // This forces the caller to set the session name according to the caller's run & sha
-            "sts:RoleSessionName"       = "$${aws:RequestTag/run_id}@$${aws:RequestTag/sha}"
-            "aws:RequestTag/repository" = "${var.source_repo}"
-            // For now only allow new bors & try builds
-            "aws:RequestTag/ref"        = "refs/heads/automation/bors/try"
-            "aws:RequestTag/event_name" = "push"
-          }
-        }
-      },
-      {
-        Effect = "Allow"
-        Action = "sts:TagSession"
-        Principal = {
-          Federated = "cognito-identity.amazonaws.com"
-        }
-        Condition = {
-          StringEquals = {
-            "cognito-identity.amazonaws.com:aud" = "${aws_cognito_identity_pool.main.id}"
+            "token.actions.githubusercontent.com:sub" = "repo:${var.repo}:ref:refs/heads/automation/bors/try"
           }
         }
       }
@@ -202,8 +180,10 @@ resource "aws_iam_role" "oidc" {
           Sid    = "ArtifactsBucketWrite"
           Effect = "Allow"
           Resource = [
-            "${aws_s3_bucket.artifacts.arn}/rustc-builds/$${aws:PrincipalTag/sha}/*",
-            "${aws_s3_bucket.artifacts.arn}/rustc-builds-alt/$${aws:PrincipalTag/sha}/*",
+            "${aws_s3_bucket.artifacts.arn}/rustc-builds-try",
+            "${aws_s3_bucket.artifacts.arn}/rustc-builds-try/*",
+            "${aws_s3_bucket.artifacts.arn}/rustc-builds-try-alt",
+            "${aws_s3_bucket.artifacts.arn}/rustc-builds-try-alt/*",
           ]
           Action = [
             "s3:GetObject",
