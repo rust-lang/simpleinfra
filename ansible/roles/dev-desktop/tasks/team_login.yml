@@ -13,7 +13,7 @@
 
 - name: Set up the team login cron job
   template:
-    src: crontab_append
+    src: cron_team_login.j2
     dest: /etc/cron.d/team_login
   # if the cron job is running right now, keep retrying until it finishes
   register: task_result

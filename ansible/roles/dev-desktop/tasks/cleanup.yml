@@ -1,0 +1,18 @@
+---
+- name: Copy cleanup script
+  template:
+    src: clean-unused-checkouts.sh
+    dest: /etc/cron.cleanup_disk_space
+    owner: root
+    group: root
+    mode: 0744
+
+- name: Set up the cleanup cron job
+  template:
+    src: cron_cleanup_disk_space.j2
+    dest: /etc/cron.d/cleanup_disk_space
+  # if the cron job is running right now, keep retrying until it finishes
+  register: cleanup_cron_result
+  until: cleanup_cron_result is not failed
+  retries: 10
+  delay: 5
