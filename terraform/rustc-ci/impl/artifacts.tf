@@ -164,7 +164,7 @@ resource "aws_iam_role" "try_builds" {
         }
         Condition = {
           StringEquals = {
-            "token.actions.githubusercontent.com:sub" = "repo:${var.repo}:ref:refs/heads/automation/bors/try"
+            "token.actions.githubusercontent.com:sub" = "repo:${var.source_repo}:ref:refs/heads/automation/bors/try"
           }
         }
       }
