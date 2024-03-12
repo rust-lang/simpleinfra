@@ -81,13 +81,7 @@ resource "aws_ssoadmin_permission_set" "read_only_access" {
 
 resource "aws_ssoadmin_managed_policy_attachment" "read_only_access" {
   instance_arn       = local.instance_arn
-  managed_policy_arn = "arn:aws:iam::aws:policy/job-function/ViewOnlyAccess"
-  permission_set_arn = aws_ssoadmin_permission_set.read_only_access.arn
-}
-
-resource "aws_ssoadmin_managed_policy_attachment" "cloudwatch_readonly" {
-  instance_arn       = local.instance_arn
-  managed_policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsReadOnlyAccess"
+  managed_policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
   permission_set_arn = aws_ssoadmin_permission_set.read_only_access.arn
 }
 
@@ -124,11 +118,15 @@ locals {
       account : aws_organizations_account.crates_io_staging,
       groups : [
         { group : aws_identitystore_group.infra-admins,
-        permissions : [aws_ssoadmin_permission_set.view_only_access, aws_ssoadmin_permission_set.administrator_access] },
+          permissions : [
+            aws_ssoadmin_permission_set.view_only_access,
+            aws_ssoadmin_permission_set.read_only_access,
+            aws_ssoadmin_permission_set.administrator_access
+        ] },
         { group : aws_identitystore_group.infra,
-        permissions : [aws_ssoadmin_permission_set.view_only_access, aws_ssoadmin_permission_set.administrator_access] },
+        permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
         { group : aws_identitystore_group.crates_io,
-        permissions : [aws_ssoadmin_permission_set.view_only_access] },
+        permissions : [aws_ssoadmin_permission_set.read_only_access] },
       ]
     },
     # crates-io Production
@@ -136,11 +134,15 @@ locals {
       account : aws_organizations_account.crates_io_prod,
       groups : [
         { group : aws_identitystore_group.infra-admins,
-        permissions : [aws_ssoadmin_permission_set.view_only_access, aws_ssoadmin_permission_set.administrator_access] },
+          permissions : [
+            aws_ssoadmin_permission_set.view_only_access,
+            aws_ssoadmin_permission_set.read_only_access,
+            aws_ssoadmin_permission_set.administrator_access
+        ] },
         { group : aws_identitystore_group.infra,
-        permissions : [aws_ssoadmin_permission_set.view_only_access] },
+        permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
         { group : aws_identitystore_group.crates_io,
-        permissions : [aws_ssoadmin_permission_set.view_only_access] },
+        permissions : [aws_ssoadmin_permission_set.read_only_access] },
       ]
     },
     # docs-rs Staging

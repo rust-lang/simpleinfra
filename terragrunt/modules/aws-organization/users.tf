@@ -3,6 +3,7 @@ locals {
     billing : aws_identitystore_group.billing
     infra : aws_identitystore_group.infra
     infra-admins : aws_identitystore_group.infra-admins
+    crates-io : aws_identitystore_group.crates_io
   }
 
   # Expand var.users into collection of group memberships associations
