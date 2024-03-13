@@ -1,4 +1,55 @@
 locals {
+  users = {
+    "adam" = {
+      login = "adamharvey@rustfoundation.org"
+      name  = "Adam Harvey"
+    }
+    "admin" = {
+      login = "admin@rust-lang.org"
+      name  = "Rust Admin"
+    }
+    "jdn" = {
+      login = "jandavidnose@rustfoundation.org"
+      name  = "Jan David Nose"
+    }
+    "joel" = {
+      login = "joelmarcey@rustfoundation.org"
+      name  = "Joel Marcey"
+    }
+    "mark" = {
+      login = "mark.simulacrum@gmail.com"
+      name  = "Mark Rousskov"
+    }
+    "nell" = {
+      login = "nells@microsoft.com"
+      name  = "Nell Shamrell-Harrington"
+    }
+    "paullenz" = {
+      login = "paullenz@rustfoundation.org"
+      name  = "Paul Lenz"
+    }
+    "peixin" = {
+      login = "peixin.hou@gmail.com"
+      name  = "Peixin Hou"
+    }
+    "pietro" = {
+      login = "pietro@pietroalbini.org"
+      name  = "Pietro Albini"
+    }
+    "rustfoundation" = {
+      login = "infra@rustfoundation.org"
+      name  = "Rust Foundation Infrastructure"
+    }
+    "seth" = {
+      login = "smarkle.aws@gmail.com"
+      name  = "Seth Markle"
+    }
+    "tobias" = {
+      login = "tobiasbieniek@rustfoundation.org"
+      name  = "Tobias Bieniek"
+    }
+  }
+
   # This is a list of all users from all teams. When a user is part of multiple teams, this list will contain multiple
   # entries for that user (one for each team). These entries will have different roles.
   #

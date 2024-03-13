@@ -1,13 +1,7 @@
 locals {
   crates_io = {
-    "adam" = {
-      login = "adamharvey@rustfoundation.org"
-      name  = "Adam Harvey"
-    }
-    "tobias" = {
-      login = "tobiasbieniek@rustfoundation.org"
-      name  = "Tobias Bieniek"
-    }
+    "adam"   = local.users.adam
+    "tobias" = local.users.tobias
   }
 }
 
