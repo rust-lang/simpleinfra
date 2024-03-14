@@ -1,3 +1,6 @@
 ---
 
 dummy_certs: false
+
+vars_ssl_renew_number_of_retries: 10
+vars_ssl_renew_retry_delay: 5
