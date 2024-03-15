@@ -5,5 +5,9 @@ Description=Renew SSL certificates each week
 OnCalendar=weekly
 Persistent=true
 
+# Add a bit of randomness to avoid hitting the Let's Encrypt servers
+# at the exact same time the entire world is doing this.
+RandomizedDelaySec=5m
+
 [Install]
 WantedBy=timers.target
