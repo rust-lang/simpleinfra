@@ -19,3 +19,8 @@ vars_playground_env_cors_enabled: 1
 vars_playground_env_ui_address: 127.0.0.1
 vars_playground_env_ui_port: 8080
 vars_playground_env_ui_root_path: "{{ vars_playground_artifacts_path }}/build"
+
+# The playground peaks at a bit less than 2000 open file descriptors
+# over a normal week but `2560` resulted in sporadic errors, so there
+# must be many non-WebSocket connections.
+vars_playground_number_connections: 5120

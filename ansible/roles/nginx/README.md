@@ -9,6 +9,10 @@ this role as well.
 ```yaml
 - role: nginx
 
+  # The number of worker connections. [optional]
+  # https://nginx.org/en/docs/ngx_core_module.html#worker_connections
+  worker_connections: 123
+
   # Configures reverse proxies with HTTPS termination. [optional]
   proxied:
       # The domain to proxy from
