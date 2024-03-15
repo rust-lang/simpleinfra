@@ -18,6 +18,7 @@ locals {
     "paullenz"      = [aws_iam_group.foundation.name],
     "shepmaster"    = [aws_iam_group.infra_deploy_playground.name, aws_iam_group.infra_team.name],
     "oli-obk"       = [aws_iam_group.infra_deploy_staging_dev_desktop.name],
+    "LawnGnome"     = [aws_iam_group.crates_io.name],
   }
 }
 
