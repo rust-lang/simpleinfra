@@ -54,7 +54,7 @@ resource "aws_cloudfront_origin_request_policy" "docs_rs" {
   headers_config {
     header_behavior = "whitelist"
     headers {
-      items = ["User-Agent"]
+      items = ["User-Agent", "Referer"]
     }
   }
 
