@@ -8,6 +8,10 @@ locals {
       login = "admin@rust-lang.org"
       name  = "Rust Admin"
     }
+    "jakub" = {
+      login = "berykubik@gmail.com"
+      name  = "Jakub Beránek"
+    }
     "jdn" = {
       login = "jandavidnose@rustfoundation.org"
       name  = "Jan David Nose"
@@ -64,6 +68,7 @@ locals {
     { for name, user in local.crates_io : name => merge(user, { roles = [datadog_role.crates_io.name] }) },
     { for name, user in local.foundation : name => merge(user, { roles = [datadog_role.foundation.name] }) },
     { for name, user in local.foundation_board : name => merge(user, { roles = [datadog_role.board_member.name] }) },
+    { for name, user in local.infra : name => merge(user, { roles = [datadog_role.infra.name] }) },
     { for name, user in local.infra_admins : name => merge(user, { roles = ["Datadog Admin Role"] }) },
   ]
 
