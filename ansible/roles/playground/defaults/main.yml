@@ -12,6 +12,7 @@ vars_playground_repository_url: https://github.com/rust-lang/rust-playground.git
 
 vars_playground_checkout_path: "{{ vars_playground_home_path }}/rust-playground"
 vars_playground_update_path: "{{ vars_playground_home_path }}/update.sh"
+vars_playground_gc_path: "{{ vars_playground_home_path }}/gc.sh"
 vars_playground_artifacts_path: "{{ vars_playground_home_path }}/playground-artifacts"
 vars_playground_executable_path: "{{ vars_playground_artifacts_path }}/ui"
 

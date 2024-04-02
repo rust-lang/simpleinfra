@@ -154,6 +154,33 @@
     state: started
     enabled: true
 
+- name: Configure garbage collection script
+  template:
+    src: gc.sh
+    dest: "{{ vars_playground_gc_path }}"
+    mode: 0755
+  notify: start-playground-gc
+
+- name: Configure garbage collection script service
+  template:
+    src: playground-gc.service
+    dest: /etc/systemd/system/playground-gc.service
+    mode: 0644
+  notify: start-playground-gc
+
+- name: Configure garbage collection script service timer
+  template:
+    src: playground-gc.timer
+    dest: /etc/systemd/system/playground-gc.timer
+    mode: 0644
+  notify: restart-playground-gc-timer
+
+- name: Start and enable garbage collection script service timer
+  systemd:
+    name: playground-gc.timer
+    state: started
+    enabled: true
+
 - name: Configure playground service
   template:
     src: playground.service
