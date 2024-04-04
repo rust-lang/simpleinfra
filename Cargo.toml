@@ -1,4 +1,7 @@
 [workspace]
+# Opt-in to the new feature resolver introduced in Rust 1.51 and Edition 2021.
+# https://doc.rust-lang.org/cargo/reference/resolver.html#resolver-versions
+resolver = "2"
 members = [
     "setup-deploy-keys",
     "ansible/roles/dev-desktop/files/team_login",
