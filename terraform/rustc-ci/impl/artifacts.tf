@@ -180,10 +180,10 @@ resource "aws_iam_role" "try_builds" {
           Sid    = "ArtifactsBucketWrite"
           Effect = "Allow"
           Resource = [
-            "${aws_s3_bucket.artifacts.arn}/rustc-builds-try",
-            "${aws_s3_bucket.artifacts.arn}/rustc-builds-try/*",
-            "${aws_s3_bucket.artifacts.arn}/rustc-builds-try-alt",
-            "${aws_s3_bucket.artifacts.arn}/rustc-builds-try-alt/*",
+            "${aws_s3_bucket.artifacts.arn}/rustc-builds",
+            "${aws_s3_bucket.artifacts.arn}/rustc-builds/*",
+            "${aws_s3_bucket.artifacts.arn}/rustc-builds-alt",
+            "${aws_s3_bucket.artifacts.arn}/rustc-builds-alt/*",
           ]
           Action = [
             "s3:GetObject",
