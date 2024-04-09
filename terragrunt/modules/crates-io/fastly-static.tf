@@ -106,11 +106,9 @@ resource "fastly_service_dictionary_items" "compute_static" {
 
   items = {
     "cloudfront-url" : local.cloudfront_domain_name
-    "datadog-app" : "crates.io"
     "datadog-env" : var.env
     "datadog-host" : var.static_domain_name
     "datadog-request-logs-endpoint" : "datadog-${local.request_logs_endpoint}"
-    "datadog-service" : "static.crates.io"
     "s3-fallback-host" : local.fallback_host_name
     "s3-primary-host" : local.primary_host_name
     "s3-request-logs-endpoint" : "s3-${local.request_logs_endpoint}"

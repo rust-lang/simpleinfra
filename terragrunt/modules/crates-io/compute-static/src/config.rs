@@ -15,9 +15,6 @@ const FALLBACK_HOST: &str = "s3-fallback-host";
 // Name of the dictionary item with the TTL for the static bucket
 const STATIC_TTL: &str = "static-ttl";
 
-// Name of the directory item with the Datadog app tag
-const DATADOG_APP: &str = "datadog-app";
-
 // Name of the directory item with the Datadog environment tag
 const DATADOG_ENV: &str = "datadog-env";
 
@@ -26,9 +23,6 @@ const DATADOG_HOST: &str = "datadog-host";
 
 // Name of the directory item with the Datadog logging endpoint for requests
 const DATADOG_REQUEST_LOGS_ENDPOINT: &str = "datadog-request-logs-endpoint";
-
-// Name of the directory item with the Datadog service tag
-const DATADOG_SERVICE: &str = "datadog-service";
 
 // Name of the directory item with the S3 logging endpoint for requests
 const S3_REQUEST_LOGS_ENDPOINT: &str = "s3-request-logs-endpoint";
@@ -42,11 +36,9 @@ pub struct Config {
     pub fallback_host: String,
     pub static_ttl: u32,
     pub cloudfront_url: String,
-    pub datadog_app: String,
     pub datadog_env: String,
     pub datadog_host: String,
     pub datadog_request_logs_endpoint: String,
-    pub datadog_service: String,
     pub s3_request_logs_endpoint: String,
     pub s3_service_logs_endpoint: String,
 }
@@ -85,29 +77,21 @@ impl Config {
             .expect("failed to get endpoint for service logs from dictionary");
 
         // Look up the tags for Datadog
-        let datadog_app = dictionary
-            .get(DATADOG_APP)
-            .expect("failed to get Datadog app tag from dictionary");
         let datadog_env = dictionary
             .get(DATADOG_ENV)
             .expect("failed to get Datadog environment tag from dictionary");
         let datadog_host = dictionary
             .get(DATADOG_HOST)
             .expect("failed to get Datadog host tag from dictionary");
-        let datadog_service = dictionary
-            .get(DATADOG_SERVICE)
-            .expect("failed to get Datadog service tag from dictionary");
 
         Self {
             primary_host,
             fallback_host,
             static_ttl,
             cloudfront_url,
-            datadog_app,
             datadog_env,
             datadog_host,
             datadog_request_logs_endpoint,
-            datadog_service,
             s3_request_logs_endpoint,
             s3_service_logs_endpoint,
         }

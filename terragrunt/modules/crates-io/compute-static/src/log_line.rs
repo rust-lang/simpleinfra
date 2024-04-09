@@ -18,7 +18,7 @@ pub struct LogLineV1 {
     #[builder(default = "default_source()")]
     ddsource: &'static str,
     ddtags: String,
-    service: String,
+    service: &'static str,
     bytes: Option<usize>,
     content_type: Option<String>,
     #[serde(with = "time::serde::rfc3339")]

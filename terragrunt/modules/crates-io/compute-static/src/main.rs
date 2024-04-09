@@ -14,6 +14,9 @@ use crate::log_line::{HttpDetailsBuilder, LogLine, LogLineV1Builder, TlsDetailsB
 mod config;
 mod log_line;
 
+const DATADOG_APP: &str = "crates.io";
+const DATADOG_SERVICE: &str = "static.crates.io";
+
 #[fastly::main]
 fn main(request: Request) -> Result<Response, Error> {
     let config = Config::from_dictionary();
@@ -82,11 +85,8 @@ fn collect_request(config: &Config, request: &Request) -> LogLineV1Builder {
         .ok();
 
     let log_line = LogLineV1Builder::default()
-        .ddtags(format!(
-            "app:{},env:{}",
-            config.datadog_app, config.datadog_env
-        ))
-        .service(config.datadog_service.clone())
+        .ddtags(format!("app:{},env:{}", DATADOG_APP, config.datadog_env))
+        .service(DATADOG_SERVICE)
         .date_time(OffsetDateTime::now_utc())
         .edge_location(var("FASTLY_POP").ok())
         .host(request.get_url().host().map(|s| s.to_string()))
