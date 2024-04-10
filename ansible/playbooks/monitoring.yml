@@ -189,12 +189,6 @@
               labels:
                 dispatch: pagerduty-cratesio
 
-            - alert: SlowDownloads
-              expr: histogram_quantile(0.99, sum by (le) (rate(cratesio_instance_response_times_bucket{job="cratesio_heroku_metrics",app="crates-io",endpoint="/api/v1/crates/:crate_id/:version/download"}[30s]))) >= 1
-              for: 1m
-              labels:
-                dispatch: pagerduty-cratesio
-
         - name: docsrs
           rules:
             - alert: DocsRsDown
