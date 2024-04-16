@@ -63,5 +63,11 @@ inputs = {
       email = "tobias@bieniek.cloud"
       groups = ["crates-io"]
     }
+    "adam" = {
+      given_name = "Adam"
+      family_name = "Harvey"
+      email = "adam@adamharvey.name"
+      groups = ["crates-io"]
+    }
   }
 }
