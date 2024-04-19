@@ -61,7 +61,7 @@ resource "aws_db_instance" "shared" {
   backup_retention_period      = 3
   storage_type                 = "gp2"
   engine                       = "postgres"
-  engine_version               = "14.2"
+  engine_version               = "16.1"
   instance_class               = "db.t4g.micro"
   identifier                   = "shared"
   username                     = "root"
@@ -75,10 +75,4 @@ resource "aws_db_instance" "shared" {
 
   publicly_accessible    = true
   vpc_security_group_ids = [aws_security_group.rust_prod_db.id]
-
-  lifecycle {
-    ignore_changes = [
-      latest_restorable_time
-    ]
-  }
 }
