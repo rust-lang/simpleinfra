@@ -1,5 +1,5 @@
 data "aws_ssm_parameter" "fastly_customer_id" {
-  name = var.fastly_customer_id_ssm_parameter
+  name = "/${var.env}/crates-io/fastly/customer-id"
 }
 
 resource "aws_iam_role" "fastly_assume_role" {

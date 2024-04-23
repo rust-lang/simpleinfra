@@ -92,11 +92,6 @@ variable "static_fastly_weight" {
   type        = number
 }
 
-variable "fastly_customer_id_ssm_parameter" {
-  description = "Name of the SSM parameter with our Fastly customer id"
-  type        = string
-}
-
 variable "fastly_aws_account_id" {
   # See https://docs.fastly.com/en/guides/creating-an-aws-iam-role-for-fastly-logging
   description = "The AWS account ID that Fastly uses to write logs"
@@ -107,4 +102,12 @@ variable "cdn_log_event_queue_arn" {
   # See the `crates-io-logs` module
   description = "ARN of the SQS queue that receives S3 notifications for CDN logs"
   type        = string
+}
+
+variable "env" {
+  type = string
+  validation {
+    condition     = contains(["staging", "prod"], var.env)
+    error_message = "The environment must be 'staging' or 'prod'."
+  }
 }

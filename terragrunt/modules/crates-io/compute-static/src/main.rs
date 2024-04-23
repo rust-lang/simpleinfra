@@ -1,17 +1,21 @@
-use fastly::http::{Method, StatusCode};
+use fastly::http::{Method, StatusCode, Version};
 use fastly::{Error, Request, Response};
 use log::{info, warn, LevelFilter};
 use log_fastly::Logger;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use serde_json::json;
+use std::env::var;
 use time::OffsetDateTime;
 
 use crate::config::Config;
-use crate::log_line::{LogLine, LogLineV1Builder};
+use crate::log_line::{HttpDetailsBuilder, LogLine, LogLineV1Builder, TlsDetailsBuilder};
 
 mod config;
 mod log_line;
+
+const DATADOG_APP: &str = "crates.io";
+const DATADOG_SERVICE: &str = "static.crates.io";
 
 #[fastly::main]
 fn main(request: Request) -> Result<Response, Error> {
@@ -24,7 +28,7 @@ fn main(request: Request) -> Result<Response, Error> {
     }
 
     init_logging(&config);
-    let mut log = collect_request(&request);
+    let mut log = collect_request(&config, &request);
 
     let has_origin_header = request.get_header("Origin").is_some();
     let mut response = handle_request(&config, request);
@@ -48,20 +52,52 @@ fn main(request: Request) -> Result<Response, Error> {
 fn init_logging(config: &Config) {
     Logger::builder()
         .max_level(LevelFilter::Debug)
-        .endpoint(config.request_logs_endpoint.clone())
-        .default_endpoint(config.service_logs_endpoint.clone())
+        .endpoint(config.datadog_request_logs_endpoint.clone())
+        .endpoint(config.s3_request_logs_endpoint.clone())
+        .default_endpoint(config.s3_service_logs_endpoint.clone())
         .echo_stdout(true)
         .init();
 }
 
 /// Collect data for the logs from the request
-fn collect_request(request: &Request) -> LogLineV1Builder {
-    LogLineV1Builder::default()
+fn collect_request(config: &Config, request: &Request) -> LogLineV1Builder {
+    let http_details = HttpDetailsBuilder::default()
+        .protocol(http_version_to_string(request.get_version()))
+        .referer(
+            request
+                .get_header("Referer")
+                .and_then(|s| s.to_str().ok())
+                .map(|s| s.to_string()),
+        )
+        .useragent(
+            request
+                .get_header("User-Agent")
+                .and_then(|s| s.to_str().ok())
+                .map(|s| s.to_string()),
+        )
+        .build()
+        .ok();
+
+    let tls_details = TlsDetailsBuilder::default()
+        .cipher(request.get_tls_cipher_openssl_name())
+        .protocol(request.get_tls_protocol())
+        .build()
+        .ok();
+
+    let log_line = LogLineV1Builder::default()
+        .ddtags(format!("app:{},env:{}", DATADOG_APP, config.datadog_env))
+        .service(DATADOG_SERVICE)
         .date_time(OffsetDateTime::now_utc())
-        .url(request.get_url_str().into())
+        .edge_location(var("FASTLY_POP").ok())
+        .host(request.get_url().host().map(|s| s.to_string()))
+        .http(http_details)
         .ip(request.get_client_ip_addr())
         .method(Some(request.get_method().to_string()))
-        .to_owned()
+        .url(request.get_url_str().into())
+        .tls(tls_details)
+        .to_owned();
+
+    log_line
 }
 
 /// Handle the request
@@ -205,6 +241,7 @@ fn collect_response(
     if let Ok(response) = response {
         log_line
             .bytes(response.get_content_length())
+            .content_type(response.get_content_type().map(|s| s.to_string()))
             .status(Some(response.get_status().as_u16()))
             .to_owned()
     } else {
@@ -217,12 +254,31 @@ fn build_and_send_log(log_line: LogLineV1Builder, config: &Config) {
     match log_line.build() {
         Ok(log) => {
             let versioned_log = LogLine::V1(log);
-            info!(target: &config.request_logs_endpoint, "{}", json!(versioned_log).to_string())
+
+            [
+                &config.datadog_request_logs_endpoint,
+                &config.s3_request_logs_endpoint,
+            ]
+            .iter()
+            .for_each(|endpoint| {
+                info!(target: endpoint, "{}", json!(versioned_log).to_string());
+            });
         }
         Err(error) => {
             warn!("failed to serialize request log: {error}");
         }
     };
+}
+
+fn http_version_to_string(version: Version) -> Option<String> {
+    match version {
+        Version::HTTP_09 => Some("HTTP/0.9".into()),
+        Version::HTTP_10 => Some("HTTP/1.0".into()),
+        Version::HTTP_11 => Some("HTTP/1.1".into()),
+        Version::HTTP_2 => Some("HTTP/2".into()),
+        Version::HTTP_3 => Some("HTTP/3".into()),
+        _ => None,
+    }
 }
 
 #[cfg(test)]

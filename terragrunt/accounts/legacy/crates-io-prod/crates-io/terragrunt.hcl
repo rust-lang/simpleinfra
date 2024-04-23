@@ -8,6 +8,8 @@ include {
 }
 
 inputs = {
+  env = "prod"
+
   webapp_domain_name = "crates.io"
   static_domain_name = "static.crates.io"
   index_domain_name  = "index.crates.io"
@@ -26,8 +28,6 @@ inputs = {
 
   static_cloudfront_weight = 5
   static_fastly_weight = 95
-
-  fastly_customer_id_ssm_parameter = "/prod/crates-io/fastly/customer-id"
 
   cdn_log_event_queue_arn = "arn:aws:sqs:us-west-1:365596307002:cdn-log-event-queue"
 }
