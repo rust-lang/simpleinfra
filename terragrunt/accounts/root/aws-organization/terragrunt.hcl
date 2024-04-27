@@ -25,7 +25,7 @@ inputs = {
       given_name  = "Mark",
       family_name = "Rousskov"
       email       = "mark.simulacrum@gmail.com"
-      groups      = ["infra", "infra-admins"]
+      groups      = ["infra", "infra-admins", "triagebot"]
     }
     "rylev" = {
       given_name  = "Ryan",
@@ -68,6 +68,18 @@ inputs = {
       family_name = "Harvey"
       email = "adam@adamharvey.name"
       groups = ["crates-io"]
+    }
+    "ehuss" = {
+      given_name = "Eric"
+      family_name = "Huss"
+      email = "eric@huss.org"
+      groups = ["triagebot"]
+    }
+    "spastorino" = {
+      given_name = "Santiago"
+      family_name = "Pastorino"
+      email = "spastorino@gmail.com"
+      groups = ["triagebot"]
     }
   }
 }
