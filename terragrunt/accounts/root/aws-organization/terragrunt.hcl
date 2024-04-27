@@ -75,10 +75,10 @@ inputs = {
       email = "eric@huss.org"
       groups = ["triagebot"]
     }
-    "spastorino" = {
-      given_name = "Santiago"
-      family_name = "Pastorino"
-      email = "spastorino@gmail.com"
+    "apiraino" = {
+      given_name = "apiraino"
+      family_name = "n/a"
+      email = "apiraino@protonmail.com"
       groups = ["triagebot"]
     }
   }
