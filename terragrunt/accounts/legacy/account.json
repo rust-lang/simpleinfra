@@ -1,6 +1,10 @@
 {
     "aws": {
         "profile": null,
-        "region": "us-west-1"
+        "regions": [
+            {
+                "region": "us-west-1"
+            }
+        ]
     }
 }

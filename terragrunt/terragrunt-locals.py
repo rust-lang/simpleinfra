@@ -56,19 +56,24 @@ def calculate_remote_state_key(account_json_file, terragrunt_dir):
 
 
 def calculate_providers_content(account_json):
-    if account_json["aws"]["profile"] is not None:
-        return f"""
+    providers = ""
+
+    for region in account_json["aws"]["regions"]:
+        body = f'  region = "{region["region"]}"'
+
+        if account_json["aws"]["profile"] is not None:
+            body += f'\n  profile = "{account_json["aws"]["profile"]}"'
+
+        if "alias" in region:
+            body += f'\n  alias = "{region["alias"]}"'
+
+        providers += f"""
 provider "aws" {{
-  profile = "{account_json["aws"]["profile"]}"
-  region = "{account_json["aws"]["region"]}"
+{body}
 }}
 """
-    else:
-        return f"""
-provider "aws" {{
-  region = "{account_json["aws"]["region"]}"
-}}
-"""
+
+    return providers
 
 
 def profile_args(account_json):
