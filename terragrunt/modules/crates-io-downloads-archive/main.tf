@@ -1,4 +1,6 @@
 resource "aws_s3_bucket" "downloads_archive" {
+  provider = aws.us-east-1
+
   bucket = var.downloads_archive_bucket_name
 }
 
