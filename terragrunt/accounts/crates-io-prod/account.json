@@ -1,6 +1,10 @@
 {
     "aws": {
         "profile": "crates-io-prod",
-        "region": "us-west-1"
+        "regions": [
+            {
+                "region": "us-west-1"
+            }
+        ]
     }
 }

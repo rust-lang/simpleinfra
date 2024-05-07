@@ -1,6 +1,10 @@
 {
     "aws": {
         "profile": "rust-root",
-        "region": "us-east-1"
+        "regions": [
+            {
+                "region": "us-east-1"
+            }
+        ]
     }
 }
