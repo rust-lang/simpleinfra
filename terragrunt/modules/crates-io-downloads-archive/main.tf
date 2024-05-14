@@ -23,6 +23,6 @@ data "aws_iam_policy_document" "downloads_archive_write" {
       "s3:PutObject",
     ]
 
-    resources = [aws_s3_bucket.downloads_archive.arn]
+    resources = ["${aws_s3_bucket.downloads_archive.arn}/*"]
   }
 }
