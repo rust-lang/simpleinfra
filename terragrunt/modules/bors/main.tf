@@ -70,7 +70,7 @@ resource "aws_iam_role" "gha" {
         }
         Condition = {
           StringLike = {
-            "token.actions.githubusercontent.com:sub" : "repo:rust-lang/bors:ref:refs/heads/staging"
+            "token.actions.githubusercontent.com:sub" : "repo:rust-lang/bors:ref:refs/heads/main"
           }
           StringEquals = {
             "token.actions.githubusercontent.com:aud" : "sts.amazonaws.com"
