@@ -294,7 +294,7 @@ resource "aws_ecs_task_definition" "bors" {
           valueFrom = data.aws_ssm_parameter.app_key.arn
         },
         {
-          name      = "DATABASE"
+          name      = "DATABASE_URL"
           valueFrom = aws_ssm_parameter.db_endpoint.arn
         }
       ]
