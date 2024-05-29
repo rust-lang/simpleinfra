@@ -234,7 +234,7 @@ locals {
       account : aws_organizations_account.bors_staging,
       groups : [
         { group : aws_identitystore_group.infra,
-        permissions : [aws_ssoadmin_permission_set.read_only_access] },
+        permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
         { group : aws_identitystore_group.infra-admins,
         permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
       ]
