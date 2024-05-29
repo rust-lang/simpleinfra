@@ -294,7 +294,7 @@ resource "aws_ecs_task_definition" "bors" {
           valueFrom = data.aws_ssm_parameter.app_key.arn
         },
         {
-          name      = "DATABASE"
+          name      = "DATABASE_URL"
           valueFrom = aws_ssm_parameter.db_endpoint.arn
         }
       ]
@@ -440,7 +440,7 @@ data "aws_vpc" "default" {
 resource "aws_db_instance" "primary" {
   db_name                 = "bors"
   engine                  = "postgres"
-  engine_version          = "15.3"
+  engine_version          = "15.5"
   instance_class          = "db.t4g.micro"
   backup_retention_period = 7
 
