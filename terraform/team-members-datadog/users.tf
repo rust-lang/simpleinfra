@@ -52,6 +52,10 @@ locals {
       login = "tobiasbieniek@rustfoundation.org"
       name  = "Tobias Bieniek"
     }
+    "walter" = {
+      login = "walterpearce@rustfoundation.org"
+      name  = "Walter Pearce"
+    }
   }
 
   # This is a list of all users from all teams. When a user is part of multiple teams, this list will contain multiple
