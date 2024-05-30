@@ -69,6 +69,7 @@ locals {
   #     { "alice" = { login = "Alice", email = "alice@example.com", roles = ["Foundation Staff"] } },
   #   ]
   _do_not_use_all_teams = [
+    { for name, user in local.crater : name => merge(user, { roles = [datadog_role.crater.name] }) },
     { for name, user in local.crates_io : name => merge(user, { roles = [datadog_role.crates_io.name] }) },
     { for name, user in local.foundation : name => merge(user, { roles = [datadog_role.foundation.name] }) },
     { for name, user in local.foundation_board : name => merge(user, { roles = [datadog_role.board_member.name] }) },
