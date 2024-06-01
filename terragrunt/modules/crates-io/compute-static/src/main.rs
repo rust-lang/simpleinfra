@@ -117,6 +117,8 @@ fn handle_request(config: &Config, mut request: Request) -> Result<Response, Err
     // Database dump is too big to cache on Fastly
     if request.get_url_str().ends_with("db-dump.tar.gz") {
         redirect_to_cloudfront(config, "db-dump.tar.gz")
+    } else if request.get_url_str().ends_with("db-dump.zip") {
+        redirect_to_cloudfront(config, "db-dump.zip")
     } else {
         send_request_to_s3(config, &request)
     }
