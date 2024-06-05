@@ -10,6 +10,8 @@ exports.handler = (event, context, callback) => {
         request.uri = '/i686-pc-windows-msvc/rustup-init.exe';
     } else if (request.uri === '/x86_64') {
         request.uri = '/x86_64-pc-windows-msvc/rustup-init.exe';
+    } else if (request.uri === '/aarch64') {
+        request.uri = '/aarch64-pc-windows-msvc/rustup-init.exe';
     }
     callback(null, request);
 };
