@@ -2,6 +2,12 @@ locals {
   human_readable_name = replace(var.domain_name, ".", "-")
 }
 
+resource "aws_cloudfront_function" "viewer_request" {
+  name    = "${local.human_readable_name}--viewer-request"
+  runtime = "cloudfront-js-1.0"
+  code    = file("${path.module}/lambdas/viewer-request/index.js")
+}
+
 resource "aws_cloudfront_response_headers_policy" "content_disposition" {
   name    = local.human_readable_name
   comment = "Set the Content-Disposition header for ${var.domain_name}"
@@ -50,10 +56,9 @@ resource "aws_cloudfront_distribution" "distribution" {
       }
     }
 
-    lambda_function_association {
-      event_type   = "origin-request"
-      lambda_arn   = module.origin_request.version_arn
-      include_body = false
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.viewer_request.arn
     }
   }
 
