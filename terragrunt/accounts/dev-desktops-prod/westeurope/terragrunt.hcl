@@ -22,7 +22,7 @@ inputs = {
   instances = {
     "dev-desktop-eu-2" = {
       instance_type = "Standard_F32s_v2"
-      storage       = 1000
+      storage       = 2048
     }
   }
 }
