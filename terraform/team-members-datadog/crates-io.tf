@@ -13,6 +13,8 @@ resource "datadog_role" "crates_io" {
       data.datadog_permissions.all.permissions.logs_read_index_data,
       data.datadog_permissions.all.permissions.logs_read_data,
       data.datadog_permissions.all.permissions.logs_live_tail,
+      data.datadog_permissions.all.permissions.logs_write_pipelines,
+      data.datadog_permissions.all.permissions.logs_write_processors,
       data.datadog_permissions.all.permissions.logs_read_archives,
       data.datadog_permissions.all.permissions.dashboards_write,
     ])
