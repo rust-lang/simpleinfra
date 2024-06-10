@@ -116,7 +116,9 @@ fn handle_request(config: &Config, mut request: Request) -> Result<Response, Err
 
     // Database dump is too big to cache on Fastly
     if request.get_url_str().ends_with("db-dump.tar.gz") {
-        redirect_db_dump_to_cloudfront(config)
+        redirect_to_cloudfront(config, "db-dump.tar.gz")
+    } else if request.get_url_str().ends_with("db-dump.zip") {
+        redirect_to_cloudfront(config, "db-dump.zip")
     } else {
         send_request_to_s3(config, &request)
     }
@@ -192,8 +194,8 @@ fn rewrite_download_urls(request: &mut Request) {
 ///
 /// As of early 2023, certain files are too large to be served through Fastly. One of those is the
 /// database dump, which gets redirected to CloudFront.
-fn redirect_db_dump_to_cloudfront(config: &Config) -> Result<Response, Error> {
-    let url = format!("https://{}/db-dump.tar.gz", config.cloudfront_url);
+fn redirect_to_cloudfront(config: &Config, path: &str) -> Result<Response, Error> {
+    let url = format!("https://{}/{path}", config.cloudfront_url);
     Ok(Response::temporary_redirect(url))
 }
 
