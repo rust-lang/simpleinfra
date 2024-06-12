@@ -1,0 +1,17 @@
+name: Upload metrics artifact
+description: Upload collected [cpu] metrics to GitHub artifact to later upload to S3 bucket from a trusted runner
+
+inputs:
+  metrics-filepath:
+    description: Comma or space separated list of metrics files to be uploaded to GitHub artifact
+    required: true
+    default: build/cpu-usage.csv
+
+runs:
+  using: composite
+  steps:
+    - name: Upload metrics artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Upload metrics
+        path: ${{ github.workspace }}/${{ inputs.metrics-filepath }}
