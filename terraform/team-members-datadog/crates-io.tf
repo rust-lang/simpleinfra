@@ -1,7 +1,9 @@
 locals {
   crates_io = {
-    "adam"   = local.users.adam
-    "tobias" = local.users.tobias
+    "adam"     = local.users.adam
+    "carol"    = local.users.carols10cents
+    "jtgeibel" = local.users.jtgeibel
+    "tobias"   = local.users.tobias
   }
 }
 
@@ -16,6 +18,7 @@ resource "datadog_role" "crates_io" {
       data.datadog_permissions.all.permissions.logs_write_pipelines,
       data.datadog_permissions.all.permissions.logs_write_processors,
       data.datadog_permissions.all.permissions.logs_read_archives,
+      data.datadog_permissions.all.permissions.logs_write_processors,
       data.datadog_permissions.all.permissions.dashboards_write,
     ])
 

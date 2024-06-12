@@ -8,6 +8,22 @@ locals {
       login = "admin@rust-lang.org"
       name  = "Rust Admin"
     }
+    "andrei_listochkin" = {
+      login = "andrei.listochkin@ferrous-systems.com"
+      name  = "Andrei Listochkin"
+    }
+    "carols10cents" = {
+      login = "carol.nichols@gmail.com"
+      name  = "Carol Nichols"
+    }
+    "felix_gilcher" = {
+      login = "felix.gilcher@ferrous-systems.com"
+      name  = "Felix Gilcher"
+    }
+    "florian_gilcher" = {
+      login = "florian.gilcher@ferrous-systems.com"
+      name  = "Florian Gilcher"
+    }
     "jakub" = {
       login = "berykubik@gmail.com"
       name  = "Jakub Beránek"
@@ -19,6 +35,10 @@ locals {
     "joel" = {
       login = "joelmarcey@rustfoundation.org"
       name  = "Joel Marcey"
+    }
+    "jtgeibel" = {
+      login = "jtgeibel@gmail.com"
+      name  = "Justin Geibel"
     }
     "mark" = {
       login = "mark.simulacrum@gmail.com"
@@ -40,9 +60,17 @@ locals {
       login = "pietro@pietroalbini.org"
       name  = "Pietro Albini"
     }
+    "pietro_albini" = {
+      login = "pietro.albini@ferrous-systems.com"
+      name  = "Pietro Albini"
+    }
     "rustfoundation" = {
       login = "infra@rustfoundation.org"
       name  = "Rust Foundation Infrastructure"
+    }
+    "sebastian_ziebell" = {
+      login = "sebastian.ziebell@ferrous-systems.com"
+      name  = "Sebastian Ziebell"
     }
     "seth" = {
       login = "smarkle.aws@gmail.com"
@@ -51,6 +79,10 @@ locals {
     "tobias" = {
       login = "tobiasbieniek@rustfoundation.org"
       name  = "Tobias Bieniek"
+    }
+    "tshepang_mbambo" = {
+      login = "tshepang.mbambo@ferrous-systems.com"
+      name  = "Tshepang Mbambo"
     }
     "walter" = {
       login = "walterpearce@rustfoundation.org"
@@ -71,6 +103,7 @@ locals {
   _do_not_use_all_teams = [
     { for name, user in local.crater : name => merge(user, { roles = [datadog_role.crater.name] }) },
     { for name, user in local.crates_io : name => merge(user, { roles = [datadog_role.crates_io.name] }) },
+    { for name, user in local.crates_io_oncall : name => merge(user, { roles = [datadog_role.crates_io_oncall.name] }) },
     { for name, user in local.foundation : name => merge(user, { roles = [datadog_role.foundation.name] }) },
     { for name, user in local.foundation_board : name => merge(user, { roles = [datadog_role.board_member.name] }) },
     { for name, user in local.infra : name => merge(user, { roles = [datadog_role.infra.name] }) },
