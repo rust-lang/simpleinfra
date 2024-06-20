@@ -30,3 +30,22 @@ resource "aws_iam_user_policy" "upload_builds" {
   user   = module.aws_iam_user.user_name
   policy = data.aws_iam_policy_document.upload_builds.json
 }
+
+data "aws_iam_policy_document" "legacy_ci" {
+  statement {
+    sid    = "WriteToDevStatic"
+    effect = "Allow"
+
+    actions = [
+      "s3:*",
+    ]
+
+    resources = ["arn:aws:s3:::dev-static-rust-lang-org/rustup/*"]
+  }
+}
+
+resource "aws_iam_user_policy" "legacy_ci" {
+  name   = "legacy-ci"
+  user   = module.aws_iam_user.user_name
+  policy = data.aws_iam_policy_document.legacy_ci.json
+}
