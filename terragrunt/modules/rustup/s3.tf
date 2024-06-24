@@ -6,46 +6,29 @@ resource "aws_s3_bucket" "builds" {
   bucket = "rustup-builds"
 }
 
-module "aws_iam_user" {
-  source = "../gha-iam-user"
+module "ci_role" {
+  source = "../gha-oidc-role"
   org    = "rust-lang"
   repo   = "rustup"
+  branch = "master"
 }
 
-data "aws_iam_policy_document" "upload_builds" {
-  statement {
-    sid    = "WriteToRustupBuilds"
-    effect = "Allow"
-
-    actions = [
-      "s3:PutObject",
+resource "aws_iam_policy" "upload_builds" {
+  name = "upload-rustup-builds"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "WriteToRustupBuilds"
+        Effect   = "Allow"
+        Action   = ["s3:PutObject"]
+        Resource = ["${aws_s3_bucket.builds.arn}/*"]
+      }
     ]
-
-    resources = ["${aws_s3_bucket.builds.arn}/*"]
-  }
+  })
 }
 
-resource "aws_iam_user_policy" "upload_builds" {
-  name   = "upload-rustup-builds"
-  user   = module.aws_iam_user.user_name
-  policy = data.aws_iam_policy_document.upload_builds.json
-}
-
-data "aws_iam_policy_document" "legacy_ci" {
-  statement {
-    sid    = "WriteToDevStatic"
-    effect = "Allow"
-
-    actions = [
-      "s3:*",
-    ]
-
-    resources = ["arn:aws:s3:::dev-static-rust-lang-org/rustup/*"]
-  }
-}
-
-resource "aws_iam_user_policy" "legacy_ci" {
-  name   = "legacy-ci"
-  user   = module.aws_iam_user.user_name
-  policy = data.aws_iam_policy_document.legacy_ci.json
+resource "aws_iam_role_policy_attachment" "ci_upload_builds" {
+  role       = module.ci_role.role.id
+  policy_arn = aws_iam_policy.upload_builds.arn
 }
