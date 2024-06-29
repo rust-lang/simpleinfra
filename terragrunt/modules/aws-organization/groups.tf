@@ -92,6 +92,21 @@ resource "aws_ssoadmin_managed_policy_attachment" "read_only_access" {
   permission_set_arn = aws_ssoadmin_permission_set.read_only_access.arn
 }
 
+resource "aws_ssoadmin_permission_set_inline_policy" "no_kms" {
+  inline_policy      = data.aws_iam_policy_document.no_kms.json
+  instance_arn       = local.instance_arn
+  permission_set_arn = aws_ssoadmin_permission_set.read_only_access.arn
+}
+
+data "aws_iam_policy_document" "no_kms" {
+  statement {
+    sid       = "DropKMSDecrypt"
+    effect    = "Deny"
+    actions   = ["kms:Decrypt"]
+    resources = ["*"]
+  }
+}
+
 // Triagebot team read-only access into the legacy account.
 resource "aws_ssoadmin_permission_set" "triagebot_access" {
   instance_arn = local.instance_arn
@@ -245,6 +260,8 @@ locals {
       groups : [
         { group : aws_identitystore_group.infra-admins,
         permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
+        { group : aws_identitystore_group.infra,
+        permissions : [aws_ssoadmin_permission_set.read_only_access] },
       ]
     },
   ]
