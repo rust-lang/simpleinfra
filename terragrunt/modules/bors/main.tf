@@ -377,7 +377,7 @@ resource "aws_lb_listener" "primary" {
 }
 
 resource "aws_acm_certificate" "primary" {
-  domain_name       = "bors-staging.rust-lang.net"
+  domain_name       = var.domain
   validation_method = "DNS"
 
   lifecycle {
@@ -386,7 +386,7 @@ resource "aws_acm_certificate" "primary" {
 }
 
 data "aws_route53_zone" "net" {
-  name         = "bors-staging.rust-lang.net"
+  name         = var.domain
   private_zone = false
 }
 
@@ -414,7 +414,7 @@ resource "aws_acm_certificate_validation" "primary" {
 
 resource "aws_route53_record" "lb" {
   zone_id = data.aws_route53_zone.net.zone_id
-  name    = "bors-staging.rust-lang.net"
+  name    = var.domain
   type    = "A"
 
   alias {
@@ -489,4 +489,8 @@ resource "aws_vpc_security_group_egress_rule" "rds_egress_anywhere_v6" {
   from_port   = -1
   ip_protocol = -1
   to_port     = -1
+}
+
+variable "domain" {
+  description = "domain to use"
 }
