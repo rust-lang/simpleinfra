@@ -9,4 +9,5 @@ include {
 
 inputs = {
   domain = "bors-staging.rust-lang.net"
+  gh_app_id = "343095"
 }

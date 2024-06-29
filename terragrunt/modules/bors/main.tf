@@ -272,7 +272,7 @@ resource "aws_ecs_task_definition" "bors" {
       environment = [
         {
           name  = "APP_ID"
-          value = "343095"
+          value = "${var.gh_app_id}"
         },
         {
           name  = "RUST_LOG"
@@ -493,4 +493,8 @@ resource "aws_vpc_security_group_egress_rule" "rds_egress_anywhere_v6" {
 
 variable "domain" {
   description = "domain to use"
+}
+
+variable "gh_app_id" {
+  description = "GitHub App ID"
 }
