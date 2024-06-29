@@ -70,7 +70,7 @@ resource "aws_iam_role" "gha" {
         }
         Condition = {
           StringLike = {
-            "token.actions.githubusercontent.com:sub" : "repo:rust-lang/bors:ref:refs/heads/main"
+            "token.actions.githubusercontent.com:sub" : "${var.trusted_sub}"
           }
           StringEquals = {
             "token.actions.githubusercontent.com:aud" : "sts.amazonaws.com"
@@ -497,4 +497,8 @@ variable "domain" {
 
 variable "gh_app_id" {
   description = "GitHub App ID"
+}
+
+variable "trusted_sub" {
+  description = "GitHub OIDC claim"
 }
