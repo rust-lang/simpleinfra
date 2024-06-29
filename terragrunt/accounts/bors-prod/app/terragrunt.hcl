@@ -8,5 +8,5 @@ include {
 }
 
 inputs = {
-  domain = "bors-staging.rust-lang.net"
+  domain = "bors-prod.rust-lang.net"
 }
