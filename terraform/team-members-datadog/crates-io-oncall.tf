@@ -6,6 +6,7 @@ locals {
     "pietro_albini"     = local.users.pietro_albini
     "sebastian_ziebell" = local.users.sebastian_ziebell
     "thepang_mbambo"    = local.users.tshepang_mbambo
+    "lukas_wirth"       = local.users.lukas_wirth
   }
 }
 
