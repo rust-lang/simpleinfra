@@ -40,6 +40,10 @@ locals {
       login = "jtgeibel@gmail.com"
       name  = "Justin Geibel"
     }
+    "lukas_wirth" = {
+      login = "lukas.wirth@ferrous-systems.com"
+      name  = "Lukas Wirth"
+    }
     "mark" = {
       login = "mark.simulacrum@gmail.com"
       name  = "Mark Rousskov"
