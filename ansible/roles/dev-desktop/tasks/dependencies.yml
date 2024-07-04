@@ -53,6 +53,7 @@
       - mold
       - neovim
       - parallel
+      - sapling # see https://sapling-scm.com/ for more information
       # Necessary for building rr
       - capnproto
       - libcapnp-dev
