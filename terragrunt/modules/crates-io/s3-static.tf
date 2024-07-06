@@ -31,6 +31,16 @@ resource "aws_s3_bucket" "static" {
     }
   }
 
+  lifecycle_rule {
+    id      = "disable-feeds-versioning"
+    enabled = true
+    prefix  = "rss/"
+
+    versioning {
+      enabled = false
+    }
+  }
+
   lifecycle {
     ignore_changes = [
       replication_configuration,
