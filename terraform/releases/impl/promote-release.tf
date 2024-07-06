@@ -33,6 +33,13 @@ resource "aws_codebuild_project" "promote_release" {
   build_timeout = 120
   service_role  = aws_iam_role.promote_release.arn
 
+  // This CodeBuild project is marked as public to allow release team members
+  // without AWS access (and interested members of the community) to follow the
+  // release as it progresses. Doing so in CodeBuild requires defining a role
+  // with permission to access the logs.
+  project_visibility   = "PUBLIC_READ"
+  resource_access_role = aws_iam_role.promote_release_public_access.arn
+
   source {
     type      = "NO_SOURCE"
     buildspec = <<-EOF
@@ -262,6 +269,38 @@ resource "aws_iam_role_policy" "promote_release" {
           data.aws_ssm_parameter.fastly_api_token.arn,
           data.aws_ssm_parameter.fastly_service_id.arn,
         ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role" "promote_release_public_access" {
+  name = "codebuild--promote-release--${var.name}--public-access"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "sts:AssumeRole"
+        Principal = {
+          Service = "codebuild.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "promote_release_public_access" {
+  role = aws_iam_role.promote_release_public_access.name
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "AllowLogs"
+        Effect   = "Allow"
+        Action   = "logs:GetLogEvents"
+        Resource = "${aws_cloudwatch_log_group.promote_release.arn}:*"
       }
     ]
   })
