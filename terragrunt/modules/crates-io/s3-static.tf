@@ -31,13 +31,15 @@ resource "aws_s3_bucket" "static" {
     }
   }
 
+  // Delete old RSS feeds as eagerly as possible, without deleting live ones.
   lifecycle_rule {
-    id      = "disable-feeds-versioning"
+    id      = "purge-old-rss-feeds"
     enabled = true
     prefix  = "rss/"
 
-    versioning {
-      enabled = false
+    abort_incomplete_multipart_upload_days = 1
+    noncurrent_version_expiration {
+      days = 1
     }
   }
 
