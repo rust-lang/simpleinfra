@@ -1,4 +1,4 @@
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 jobs:
   rust:
@@ -24,6 +24,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
+
+      - name: Ensure the terraform files are semantically valid
+        run: terraform validate
 
       - name: Ensure the terraform files are formatted correctly
         run: terraform fmt -check -diff -recursive
