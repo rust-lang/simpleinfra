@@ -42,6 +42,13 @@ resource "aws_identitystore_group" "triagebot" {
   description  = "The triagebot maintainers"
 }
 
+resource "aws_identitystore_group" "release" {
+  identity_store_id = local.identity_store_id
+
+  display_name = "release"
+  description  = "The release team"
+}
+
 # The different permission sets a group may have assigned to it
 
 resource "aws_ssoadmin_permission_set" "administrator_access" {
@@ -156,6 +163,69 @@ resource "aws_ssoadmin_permission_set_inline_policy" "triagebot_access" {
   permission_set_arn = aws_ssoadmin_permission_set.triagebot_access.arn
 }
 
+// Release team permission to start a new release
+
+resource "aws_ssoadmin_permission_set" "start_release" {
+  instance_arn = local.instance_arn
+  name         = "StartRelease"
+}
+
+resource "aws_ssoadmin_permission_set_inline_policy" "start_release" {
+  instance_arn       = local.instance_arn
+  permission_set_arn = aws_ssoadmin_permission_set.start_release.arn
+
+  inline_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "lambda:InvokeFunction"
+        Resource = "arn:aws:lambda:us-west-1:890664054962:function:start-release"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "codebuild:StopBuild",
+        ]
+        Resource = [
+          "arn:aws:codebuild:us-west-1:890664054962:project/promote-release--dev",
+          "arn:aws:codebuild:us-west-1:890664054962:project/promote-release--prod",
+        ]
+      },
+      {
+        // This is a safeguard to ensure members of the release team can never
+        // start any CodeBuild job directly, but rather have to go through the
+        // lambda. This is because the StartBuild permission not only allows
+        // starting the build (which would be fine), but also override any part
+        // of the build definition, including the executed steps.
+        Effect   = "Deny"
+        Action   = "codebuild:StartBuild"
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          // Subset of CloudwatchReadOnlyAccess
+          // See https://docs.aws.amazon.com/aws-managed-policy/latest/reference/CloudWatchReadOnlyAccess.html
+          "logs:Get*",
+          "logs:List*",
+          "logs:StartQuery",
+          "logs:Describe*",
+          "logs:FilterLogEvents",
+          "logs:StartLiveTail",
+          "logs:StopLiveTail",
+        ]
+        Resource = [
+          "arn:aws:logs:us-west-1:890664054962:log-group:/dev/promote-release",
+          "arn:aws:logs:us-west-1:890664054962:log-group:/dev/promote-release:*",
+          "arn:aws:logs:us-west-1:890664054962:log-group:/prod/promote-release",
+          "arn:aws:logs:us-west-1:890664054962:log-group:/prod/promote-release:*",
+        ]
+      },
+    ]
+  })
+}
+
 # The assignment of groups to accounts with their respective permission sets
 
 locals {
@@ -184,6 +254,8 @@ locals {
         permissions : [aws_ssoadmin_permission_set.view_only_access] },
         { group : aws_identitystore_group.triagebot,
         permissions : [aws_ssoadmin_permission_set.triagebot_access] },
+        { group : aws_identitystore_group.release,
+        permissions : [aws_ssoadmin_permission_set.start_release] },
       ]
     },
     # crates-io Staging

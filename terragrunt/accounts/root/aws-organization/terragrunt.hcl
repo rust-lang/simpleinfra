@@ -19,13 +19,13 @@ inputs = {
       given_name  = "Pietro",
       family_name = "Albini"
       email       = "pietro@pietroalbini.org"
-      groups      = ["infra", "infra-admins"]
+      groups      = ["infra", "infra-admins", "release"]
     }
     "simulacrum" = {
       given_name  = "Mark",
       family_name = "Rousskov"
       email       = "mark.simulacrum@gmail.com"
-      groups      = ["infra", "infra-admins", "triagebot"]
+      groups      = ["infra", "infra-admins", "release", "triagebot"]
     }
     "rylev" = {
       given_name  = "Ryan",
