@@ -185,7 +185,6 @@ resource "aws_ssoadmin_permission_set_inline_policy" "start_release" {
       {
         Effect = "Allow"
         Action = [
-          "codebuild:BatchGetBuild",
           "codebuild:StopBuild",
         ]
         Resource = [
