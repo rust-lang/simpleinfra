@@ -185,8 +185,6 @@ resource "aws_ssoadmin_permission_set_inline_policy" "start_release" {
       {
         Effect = "Allow"
         Action = [
-          // This must NOT include codebuild:StartBuild, starting builds must
-          // be done through the lambda.
           "codebuild:BatchGetBuild",
           "codebuild:StopBuild",
         ]
@@ -194,6 +192,16 @@ resource "aws_ssoadmin_permission_set_inline_policy" "start_release" {
           "arn:aws:codebuild:us-west-1:890664054962:project/promote-release--dev",
           "arn:aws:codebuild:us-west-1:890664054962:project/promote-release--prod",
         ]
+      },
+      {
+        // This is a safeguard to ensure members of the release team can never
+        // start any CodeBuild job directly, but rather have to go through the
+        // lambda. This is because the StartBuild permission not only allows
+        // starting the build (which would be fine), but also override any part
+        // of the build definition, including the executed steps.
+        Effect   = "Deny"
+        Action   = "codebuild:StartBuild"
+        Resource = "*"
       },
       {
         Effect = "Allow"
