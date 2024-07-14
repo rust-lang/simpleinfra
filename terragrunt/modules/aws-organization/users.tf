@@ -5,6 +5,7 @@ locals {
     infra-admins : aws_identitystore_group.infra-admins
     crates-io : aws_identitystore_group.crates_io
     triagebot : aws_identitystore_group.triagebot
+    release : aws_identitystore_group.release
   }
 
   # Expand var.users into collection of group memberships associations
