@@ -90,7 +90,7 @@ resource "aws_cloudfront_distribution" "webapp" {
 
   default_cache_behavior {
     target_origin_id       = "ec2"
-    allowed_methods        = ["GET", "HEAD", "OPTIONS", "POST"]
+    allowed_methods        = ["GET", "HEAD", "OPTIONS", "DELETE", "PATCH", "POST", "PUT"]
     cached_methods         = ["GET", "HEAD", "OPTIONS"]
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
