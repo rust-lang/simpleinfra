@@ -7,6 +7,7 @@ locals {
     "pietroalbini"  = [aws_iam_group.infra_admins.name],
     "simulacrum"    = [aws_iam_group.infra_admins.name],
     "jdn"           = [aws_iam_group.infra_admins.name],
+    "marcoieni"     = [aws_iam_group.infra_admins.name],
     "technetos"     = [aws_iam_group.mods_discord.name],
     "carols10cents" = [aws_iam_group.crates_io.name],
     "jtgeibel"      = [aws_iam_group.crates_io.name],
