@@ -3,6 +3,7 @@ locals {
     "adam"           = local.users.adam
     "jdn"            = local.users.jdn
     "joel"           = local.users.joel
+    "marcoieni"      = local.users.marcoieni
     "paullenz"       = local.users.paullenz
     "rustfoundation" = local.users.rustfoundation
     "tobias"         = local.users.tobias

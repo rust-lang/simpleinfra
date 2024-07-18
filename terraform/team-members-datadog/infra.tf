@@ -1,10 +1,11 @@
 locals {
   infra = {
-    "admin"  = local.users.admin
-    "jakub"  = local.users.jakub
-    "jdn"    = local.users.jdn
-    "mark"   = local.users.mark
-    "pietro" = local.users.pietro
+    "admin"     = local.users.admin
+    "jakub"     = local.users.jakub
+    "jdn"       = local.users.jdn
+    "marcoieni" = local.users.marcoieni
+    "mark"      = local.users.mark
+    "pietro"    = local.users.pietro
   }
 }
 
