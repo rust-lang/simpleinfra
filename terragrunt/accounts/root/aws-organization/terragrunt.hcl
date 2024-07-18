@@ -81,5 +81,11 @@ inputs = {
       email = "apiraino@protonmail.com"
       groups = ["triagebot"]
     }
+    "marcoieni" = {
+      given_name  = "Marco",
+      family_name = "Ieni"
+      email       = "marcoieni@rustfoundation.org"
+      groups      = ["infra", "infra-admins"]
+    }
   }
 }
