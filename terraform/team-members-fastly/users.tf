@@ -12,6 +12,11 @@ locals {
       role  = "superuser"
 
     }
+    "marcoieni" = {
+      login = "marcoieni@rustfoundation.org"
+      name  = "Marco Ieni"
+      role  = "superuser"
+    }
     "mark" = {
       login = "mark.simulacrum@gmail.com"
       name  = "Mark Rousskov"
