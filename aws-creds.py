@@ -72,10 +72,7 @@ def load_mfa_device():
 
     serial = None
     for device in mfa_out["MFADevices"]:
-        # Only TOTP devices are supported
         user = device["UserName"]
-        if not device["SerialNumber"].endswith(f":mfa/{user}"):
-            continue
 
         # Only a single TOTP device is supported
         if serial is None:
