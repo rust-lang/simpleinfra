@@ -27,12 +27,6 @@ inputs = {
       email       = "mark.simulacrum@gmail.com"
       groups      = ["infra", "infra-admins", "release", "triagebot"]
     }
-    "rylev" = {
-      given_name  = "Ryan",
-      family_name = "Levick"
-      email       = "me@ryanlevick.com"
-      groups      = ["infra"]
-    }
     "shepmaster" = {
       given_name  = "Jake",
       family_name = "Goulding",
