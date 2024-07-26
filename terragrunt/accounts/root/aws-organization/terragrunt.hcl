@@ -81,5 +81,17 @@ inputs = {
       email       = "marcoieni@rustfoundation.org"
       groups      = ["infra", "infra-admins"]
     }
+    "boxyuwu" = {
+      given_name  = "Boxy"
+      family_name = "UwU"
+      email       = "rust@boxyuwu.dev"
+      groups      = ["release"]
+    }
+    "cuviper" = {
+      given_name  = "Josh"
+      family_name = "Stone"
+      email       = "cuviper@gmail.com"
+      groups      = ["release"]
+    }
   }
 }
