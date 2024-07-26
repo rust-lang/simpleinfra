@@ -3,7 +3,6 @@
 
 locals {
   users = {
-    "jynelson"      = [aws_iam_group.docs_rs.name, aws_iam_group.infra_team.name],
     "pietroalbini"  = [aws_iam_group.infra_admins.name],
     "simulacrum"    = [aws_iam_group.infra_admins.name],
     "jdn"           = [aws_iam_group.infra_admins.name],
@@ -12,7 +11,6 @@ locals {
     "carols10cents" = [aws_iam_group.crates_io.name],
     "jtgeibel"      = [aws_iam_group.crates_io.name],
     "Turbo87"       = [aws_iam_group.crates_io.name],
-    "rylev"         = [aws_iam_group.rustc_perf.name, aws_iam_group.infra_team.name],
     "JoelMarcey"    = [aws_iam_group.foundation.name],
     "rebeccarumbul" = [aws_iam_group.foundation.name],
     "abibroom"      = [aws_iam_group.foundation.name],
