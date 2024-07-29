@@ -58,7 +58,6 @@
             # List of instances to scrape for system metrics
             - targets:
               - "{{ inventory_hostname }}:9100"
-              - ci-arm-1.infra.rust-lang.org:9100
               - crater.infra.rust-lang.org:9100
               - docsrs.infra.rust-lang.org:9100
               - bastion.infra.rust-lang.org:9100
