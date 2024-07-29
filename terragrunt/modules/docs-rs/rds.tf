@@ -61,6 +61,12 @@ resource "aws_db_instance" "db" {
 
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
   performance_insights_enabled    = true
+
+  lifecycle {
+    ignore_changes = [
+      engine_version,
+    ]
+  }
 }
 
 resource "aws_ssm_parameter" "connection_url" {
