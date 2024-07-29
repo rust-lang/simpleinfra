@@ -62,7 +62,7 @@ into composable _modules_.
 
 Modules at the root of the `modules` directory are called _services_ and define
 an app or service within our infrastructure. For example, we have a module for
-our [dev desktops](./modules/dev-desktops-azure) that contains every piece of 
+our [dev desktops](./modules/dev-desktops-azure) that contains every piece of
 infrastructure that is required to run one or more instances on Azure.
 
 _Services_ can be deployed multiple times. Each deployment is a concrete
@@ -82,7 +82,7 @@ a TLS certificate for a list of domain names.
 We have two tools to define dependencies between pieces of our infrastructure:
 
   1. With [Terragrunt], we can define [dependencies](https://terragrunt.gruntwork.io/docs/features/execute-terraform-commands-on-multiple-modules-at-once/#dependencies-between-modules)
-     between [_states_](#accounts). 
+     between [_states_](#accounts).
   2. A [Terraform] module can include other modules.
 
 ### State
@@ -139,9 +139,9 @@ Each account in `./accounts` has a `account.json` file that contains the name of
 the respective profile. In the above example, `./account/root/account.json` sets
 the profile name to `rust-root`.
 
-The `sso_account_id` can be found in the web interface of AWS SSO. Open the
-`sso_start_url` in a browser, log in, and you'll see a list of accounts with
-their respective account ids.
+The `sso_account_id` can be found in the [web interface](https://rust-lang.awsapps.com/start/#/?tab=accounts)
+of AWS SSO. Open the `sso_start_url` in a browser, log in, and you'll see a list
+of accounts with their respective account ids.
 
 ### Run Terragrunt
 
