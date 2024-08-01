@@ -157,5 +157,14 @@ You can then `cd` into the corresponding service within the `accounts` directory
 and run `terragrunt plan` to see the plan terraform will apply and
 `terragrunt apply` to actually apply the plan.
 
+## AWS CLI
+
+If you get a 403 when you run commands with the AWS CLI,
+append the `--profile <profile>` flag to the command. For example:
+
+```sh
+aws s3 cp s3://staging-crates-io-downloads-archive/2023-11-11.csv . --profile crates-io-staging
+```
+
 [terraform]: https://www.terraform.io/
 [terragrunt]: https://terragrunt.gruntwork.io/
