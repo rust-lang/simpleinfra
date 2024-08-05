@@ -1,7 +1,8 @@
 resource "aws_s3_bucket" "downloads_archive" {
   provider = aws.us-east-1
 
-  bucket = var.downloads_archive_bucket_name
+  bucket        = var.downloads_archive_bucket_name
+  force_destroy = true
 }
 
 data "aws_iam_user" "heroku_access" {
