@@ -31,6 +31,8 @@ module "monitorbot" {
     container_port = 80
     domains        = ["monitorbot.infra.rust-lang.org"]
 
+    prometheus = null
+
     health_check_path     = "/"
     health_check_interval = 5
     health_check_timeout  = 2
