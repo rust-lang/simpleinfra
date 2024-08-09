@@ -113,6 +113,7 @@ fn handle_request(config: &Config, mut request: Request) -> Result<Response, Err
     set_ttl(config, &mut request);
     rewrite_urls_with_plus_character(&mut request);
     rewrite_download_urls(&mut request);
+    rewrite_version_downloads_urls(&mut request);
 
     // Database dump is too big to cache on Fastly
     if request.get_url_str().ends_with("db-dump.tar.gz") {
@@ -164,6 +165,22 @@ fn rewrite_urls_with_plus_character(request: &mut Request) {
 
     if path.contains('+') {
         let new_path = path.replace('+', "%2B");
+        url.set_path(&new_path);
+    }
+}
+
+/// Rewrite `/archive/version-downloads/` URLs to `/archive/version-downloads/index.html`
+///
+/// In this way, users can see what files are available for download.
+fn rewrite_version_downloads_urls(request: &mut Request) {
+    let url = request.get_url_mut();
+    let path = url.path();
+
+    if path == "/archive/version-downloads/" {
+        let new_path = format!("{path}index.html");
+        url.set_path(&new_path);
+    } else if path == "/archive/version-downloads" {
+        let new_path = format!("{path}/index.html");
         url.set_path(&new_path);
     }
 }
