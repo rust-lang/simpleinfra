@@ -51,7 +51,7 @@
       - lld
       - lldb
       - mold
-      - neovim
+      - neovim # upgrade to version 0.9 
       - parallel
       # Necessary for building rr
       - capnproto
