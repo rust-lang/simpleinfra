@@ -5,6 +5,12 @@ function handler(event) {
     // See more: https://github.com/rust-lang/crates.io/issues/4891
     if (request.uri.includes("+")) {
         request.uri = request.uri.replace("+", "%2B");
+    } else if (request.uri === '/archive/version-downloads/') {
+        request.uri += 'index.html';
+        return request;
+    } else if (request.uri === '/archive/version-downloads') {
+        request.uri += '/index.html';
+        return request;
     }
 
     // cargo versions before 1.24 don't support placeholders in the `dl` field
