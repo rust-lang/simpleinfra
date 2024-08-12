@@ -20,6 +20,7 @@ locals {
     "rylev-ip-2",
     "jdn",
     "guillaumegomez",
+    "marcoieni",
   ]
 }
 

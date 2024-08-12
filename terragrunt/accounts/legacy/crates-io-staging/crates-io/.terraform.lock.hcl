@@ -5,6 +5,7 @@ provider "registry.terraform.io/fastly/fastly" {
   version     = "5.0.0"
   constraints = "5.0.0"
   hashes = [
+    "h1:9E2Fj277L+xx7zI7bNHa2iXat/WY6s4au2v1x6u4yjo=",
     "h1:Q7RTj5hwsrfvuRxVrvc2opR2I85pZ+KqC6vUhnEfTE8=",
     "zh:22e09df92cf4fc6880afff94c092bd7ab1f93fb2c5ae2b75414494de033c85b9",
     "zh:251e7ec86eb5f1cb91bdfc2fe581eb048ca8d2df41f701407f6f072a268a8fa3",
@@ -25,9 +26,10 @@ provider "registry.terraform.io/fastly/fastly" {
 
 provider "registry.terraform.io/hashicorp/aws" {
   version     = "4.45.0"
-  constraints = "~> 4.32"
+  constraints = "~> 4.20"
   hashes = [
     "h1:AKX4R3U+kBpQB5oU08kSrzl5CLsMhbK+BKZVrwYDXZQ=",
+    "h1:J/XjRsEJIpxi+mczXQfnH3nvfACv3LRDtrthQJCIibY=",
     "zh:22da03786f25658a000d1bcc28c780816a97e7e8a1f59fff6eee7d452830e95e",
     "zh:2543be56eee0491eb0c79ca1c901dcbf71da26625961fe719f088263fef062f4",
     "zh:31a1da1e3beedfd88c3c152ab505bdcf330427f26b75835885526f7bb75c4857",
@@ -50,6 +52,7 @@ provider "registry.terraform.io/hashicorp/external" {
   version = "2.2.3"
   hashes = [
     "h1:648ZjJR81c2W1OLtYmUQa9/1rGr3vvZSuX9dR1ucGWY=",
+    "h1:uvOYRWcVIqOZSl8YjjaB18yZFz1AWIt2CnK7O45rckg=",
     "zh:184ecd339d764de845db0e5b8a9c87893dcd0c9d822167f73658f89d80ec31c9",
     "zh:2661eaca31d17d6bbb18a8f673bbfe3fe1b9b7326e60d0ceb302017003274e3c",
     "zh:2c0a180f6d1fc2ba6e03f7dfc5f73b617e45408681f75bca75aa82f3796df0e4",
