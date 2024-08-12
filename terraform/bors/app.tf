@@ -30,8 +30,6 @@ module "bors" {
     container_port = 80
     domains        = concat([var.domain_name], var.legacy_domain_names)
 
-    prometheus = null
-
     health_check_path     = "/health"
     health_check_interval = 60
     health_check_timeout  = 50
