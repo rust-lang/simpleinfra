@@ -41,8 +41,9 @@ resource "aws_cloudfront_distribution" "builds" {
   }
 
   origin {
-    origin_id   = "builds"
-    domain_name = aws_s3_bucket.builds.bucket_regional_domain_name
+    origin_id                = "builds"
+    domain_name              = aws_s3_bucket.builds.bucket_regional_domain_name
+    origin_access_control_id = aws_cloudfront_origin_access_control.builds.id
   }
 
   restrictions {
@@ -50,4 +51,12 @@ resource "aws_cloudfront_distribution" "builds" {
       restriction_type = "none"
     }
   }
+}
+
+resource "aws_cloudfront_origin_access_control" "builds" {
+  name                              = "rustup-builds"
+  description                       = var.builds_domain_name
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
 }
