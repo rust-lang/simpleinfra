@@ -13,6 +13,32 @@ module "ci_role" {
   branch = "master"
 }
 
+resource "aws_s3_bucket_policy" "cloudfront" {
+  provider = aws.us-east-1
+
+  bucket = aws_s3_bucket.builds.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowCloudFrontReadOnlyAccess"
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudfront.amazonaws.com"
+        }
+        Action   = ["s3:GetObject"]
+        Resource = ["${aws_s3_bucket.builds.arn}/*"]
+        Condition = {
+          StringEquals = {
+            "AWS:SourceArn" = aws_cloudfront_distribution.builds.arn
+          }
+        }
+      }
+    ]
+  })
+}
+
 resource "aws_iam_policy" "upload_builds" {
   name = "upload-rustup-builds"
   policy = jsonencode({
