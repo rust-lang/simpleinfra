@@ -13,3 +13,4 @@
 - include_tasks: motd.yml
 - include_tasks: scripts.yml
 - include_tasks: fix_llvm_55575.yml
+- include_tasks: earlyoom.yml
