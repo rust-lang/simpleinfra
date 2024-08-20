@@ -1,4 +1,5 @@
-use fastly::http::{Method, StatusCode, Version};
+use fastly::convert::ToHeaderValue;
+use fastly::http::{header, Method, StatusCode, Version};
 use fastly::{Error, Request, Response};
 use log::{info, warn, LevelFilter};
 use log_fastly::Logger;
@@ -16,6 +17,7 @@ mod log_line;
 
 const DATADOG_APP: &str = "crates.io";
 const DATADOG_SERVICE: &str = "static.crates.io";
+const VERSION_DOWNLOADS: &str = "/archive/version-downloads/";
 
 #[fastly::main]
 fn main(request: Request) -> Result<Response, Error> {
@@ -110,9 +112,17 @@ fn handle_request(config: &Config, mut request: Request) -> Result<Response, Err
         return Ok(response);
     }
 
+    if request.get_url().path() == "/archive/version-downloads" {
+        let mut destination = request.get_url().clone();
+        destination.set_path(VERSION_DOWNLOADS);
+
+        return Ok(permanent_redirect(destination));
+    }
+
     set_ttl(config, &mut request);
     rewrite_urls_with_plus_character(&mut request);
     rewrite_download_urls(&mut request);
+    rewrite_version_downloads_urls(&mut request);
 
     // Database dump is too big to cache on Fastly
     if request.get_url_str().ends_with("db-dump.tar.gz") {
@@ -122,6 +132,12 @@ fn handle_request(config: &Config, mut request: Request) -> Result<Response, Err
     } else {
         send_request_to_s3(config, &request)
     }
+}
+
+fn permanent_redirect(destination: impl ToHeaderValue) -> Response {
+    Response::new()
+        .with_status(StatusCode::PERMANENT_REDIRECT)
+        .with_header(header::LOCATION, destination)
 }
 
 /// Limit HTTP methods
@@ -164,6 +180,19 @@ fn rewrite_urls_with_plus_character(request: &mut Request) {
 
     if path.contains('+') {
         let new_path = path.replace('+', "%2B");
+        url.set_path(&new_path);
+    }
+}
+
+/// Rewrite `/archive/version-downloads/` URLs to `/archive/version-downloads/index.html`
+///
+/// In this way, users can see what files are available for download.
+fn rewrite_version_downloads_urls(request: &mut Request) {
+    let url = request.get_url_mut();
+    let path = url.path();
+
+    if path == VERSION_DOWNLOADS {
+        let new_path = format!("{path}index.html");
         url.set_path(&new_path);
     }
 }
