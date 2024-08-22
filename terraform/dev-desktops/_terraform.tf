@@ -6,7 +6,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.59"
+      version = "~> 4.67"
     }
   }
 
@@ -29,18 +29,15 @@ data "terraform_remote_state" "shared" {
 }
 
 provider "aws" {
-  profile = "default"
-  region  = "us-west-1"
+  region = "us-west-1"
 }
 
 provider "aws" {
-  alias   = "eu-central-1"
-  profile = "default"
-  region  = "eu-central-1"
+  alias  = "eu-central-1"
+  region = "eu-central-1"
 }
 
 provider "aws" {
-  alias   = "us-east-1"
-  profile = "default"
-  region  = "us-east-1"
+  alias  = "us-east-1"
+  region = "us-east-1"
 }
