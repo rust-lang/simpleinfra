@@ -49,8 +49,8 @@ resource "aws_iam_group_policy" "rustc_perf" {
         ]
         Resource = [
           "arn:aws:logs:${data.aws_arn.logs.region}:${data.aws_arn.logs.account}:log-group:*",
-          data.aws_cloudwatch_log_group.rustc_perf_web.arn,
-          "${data.aws_cloudwatch_log_group.rustc_perf_web.arn}:log-stream:*",
+          "${data.aws_cloudwatch_log_group.rustc_perf_web.arn}:*",
+          "${data.aws_cloudwatch_log_group.rustc_perf_web.arn}:*:log-stream:*",
         ]
       },
     ]
