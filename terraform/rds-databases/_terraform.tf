@@ -6,7 +6,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.59"
+      version = "~> 4.67"
     }
     postgresql = {
       source  = "cyrilgdn/postgresql"
@@ -37,8 +37,7 @@ data "terraform_remote_state" "shared" {
 }
 
 provider "aws" {
-  profile = "default"
-  region  = "us-west-1"
+  region = "us-west-1"
 }
 
 provider "postgresql" {
