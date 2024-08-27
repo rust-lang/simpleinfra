@@ -4,11 +4,11 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.20"
+      version = "~> 4.67"
     }
     dns = {
       source  = "hashicorp/dns"
-      version = "~> 2.2.0"
+      version = "~> 3.4.1"
     }
     tls = {
       source  = "hashicorp/tls"
