@@ -6,6 +6,7 @@ resource "azurerm_public_ip" "v4" {
   location            = var.location
   allocation_method   = "Dynamic"
   domain_name_label   = each.key
+  sku                 = "Basic"
 
   tags = {
     Name = "dev-desktops"

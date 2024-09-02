@@ -6,6 +6,7 @@ locals {
     "pietroalbini",
     "simulacrum",
     "jdn",
+    "marcoieni",
   ]
 }
 
