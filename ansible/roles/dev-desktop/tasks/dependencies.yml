@@ -59,6 +59,12 @@
       - zsh
     state: present
 
+# we don't need it because we don't need to send emails
+- name: Uninstall postfix
+  apt:
+    name: postfix
+    state: absent
+
 - name: Uninstall fish from apt
   apt:
     name: fish
