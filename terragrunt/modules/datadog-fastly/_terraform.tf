@@ -4,15 +4,15 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.32"
+      version = "~> 5.64"
     }
     datadog = {
       source  = "datadog/datadog"
-      version = "3.28.0"
+      version = "3.43.1"
     }
     fastly = {
       source  = "fastly/fastly"
-      version = "5.2.2"
+      version = "5.13.0"
     }
   }
 }

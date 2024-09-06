@@ -42,7 +42,7 @@ resource "aws_cloudfront_distribution" "builds" {
 
   origin {
     origin_id                = "builds"
-    domain_name              = aws_s3_bucket.builds.bucket_regional_domain_name
+    domain_name              = aws_s3_bucket.builds.bucket_domain_name
     origin_access_control_id = aws_cloudfront_origin_access_control.builds.id
   }
 

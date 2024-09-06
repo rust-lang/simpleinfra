@@ -2,12 +2,12 @@ terraform {
   required_providers {
     aws = {
       source                = "hashicorp/aws"
-      version               = "~> 4.20"
+      version               = "~> 5.64"
       configuration_aliases = [aws.us-east-1, aws.eu-west-1]
     }
     fastly = {
       source  = "fastly/fastly"
-      version = "5.0.0"
+      version = "5.13.0"
     }
   }
 }

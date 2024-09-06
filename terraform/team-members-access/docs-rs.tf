@@ -141,8 +141,8 @@ resource "aws_iam_group_policy" "docs_rs" {
           "logs:DescribeLogStreams",
         ]
         Resource = [
-          data.aws_cloudwatch_log_group.docs_rs_web.arn,
-          "${data.aws_cloudwatch_log_group.docs_rs_web.arn}:log-stream:*",
+          "${data.aws_cloudwatch_log_group.docs_rs_web.arn}:*",
+          "${data.aws_cloudwatch_log_group.docs_rs_web.arn}:*:log-stream:*",
         ]
       },
     ]
