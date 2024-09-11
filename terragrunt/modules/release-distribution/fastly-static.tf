@@ -118,6 +118,12 @@ resource "fastly_service_vcl" "static" {
   logging_datadog {
     name  = "datadog"
     token = data.aws_ssm_parameter.datadog_api_key.value
+
+    format = templatefile("${path.module}/fastly-log-format.tftpl", {
+      dd_app       = "releases",
+      dd_env       = var.environment,
+      service_name = var.static_domain_name,
+    })
   }
 
   logging_s3 {
