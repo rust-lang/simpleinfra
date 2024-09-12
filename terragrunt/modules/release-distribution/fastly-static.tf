@@ -120,9 +120,9 @@ resource "fastly_service_vcl" "static" {
     token = data.aws_ssm_parameter.datadog_api_key.value
 
     format = templatefile("${path.module}/fastly-log-format.tftpl", {
+      service_name = "static.rust-lang.org"
       dd_app       = "releases",
       dd_env       = var.environment,
-      service_name = var.static_domain_name,
     })
   }
 
