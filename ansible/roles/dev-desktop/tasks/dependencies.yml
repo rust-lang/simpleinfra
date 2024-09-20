@@ -16,6 +16,7 @@
       - clang
       - cmake
       - gcc-mingw-w64-x86-64 # Allows running `x check --target x86_64-pc-windows-gnu`
+      - earlyoom # Earlyoom kills processes using too much memory before they can cause trouble.
       - jq
       - libssl-dev
       - llvm
@@ -42,7 +43,7 @@
       - libgbm1
       - libpango-1.0-0
       - libcairo2
-      - libasound2
+      - libasound2t64
       - libatspi2.0-0
       - libelf-dev  # Allows building tools that link against libelf
       - libsecret-1-dev # used by cargo
@@ -58,6 +59,12 @@
       - libcapnp-dev
       - zsh
     state: present
+
+# we don't need it because we don't need to send emails
+- name: Uninstall postfix
+  apt:
+    name: postfix
+    state: absent
 
 - name: Uninstall fish from apt
   apt:

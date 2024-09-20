@@ -5,6 +5,8 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import os
+import platform
 
 BASE_PATH = pathlib.Path(__file__).resolve().parent
 VENV_PATH = BASE_PATH / ".venv"
@@ -74,7 +76,13 @@ def run_playbook(args):
             ansible_args += ["-u", args.user]
         if args.start_at_task is not None:
             ansible_args += ["--start-at-task", args.start_at_task]
-        res = subprocess.run(ansible_args, cwd=str(tempdir))
+
+        env = os.environ.copy()
+        # Set environment variable if running on macOS to avoid python crash
+        if platform.system() == "Darwin":
+            env["OBJC_DISABLE_INITIALIZE_FORK_SAFETY"] = "true"
+
+        res = subprocess.run(ansible_args, cwd=str(tempdir), env=env)
         if res.returncode != 0:
             exit(1)
     finally:

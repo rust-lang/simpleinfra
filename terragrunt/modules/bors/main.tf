@@ -298,6 +298,12 @@ resource "aws_ecs_task_definition" "bors" {
           valueFrom = aws_ssm_parameter.db_endpoint.arn
         }
       ]
+
+      healthCheck = {
+        command     = ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+        timeout     = 10
+        startPeriod = 10
+      }
     }
   ])
 }
