@@ -43,7 +43,7 @@
       - libgbm1
       - libpango-1.0-0
       - libcairo2
-      - libasound2
+      - libasound2t64
       - libatspi2.0-0
       - libelf-dev  # Allows building tools that link against libelf
       - libsecret-1-dev # used by cargo
