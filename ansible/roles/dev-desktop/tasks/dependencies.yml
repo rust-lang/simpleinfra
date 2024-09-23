@@ -52,6 +52,7 @@
       - lld
       - lldb
       - mold
+      - gdb
       - neovim
       - parallel
       # Necessary for building rr
