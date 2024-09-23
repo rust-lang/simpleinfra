@@ -6,8 +6,12 @@ locals {
 
   dictionary_name = "compute_static"
 
-  request_logs_endpoint = "s3-request-logs"
-  service_logs_endpoint = "s3-service-logs"
+  request_logs_endpoint = "request-logs"
+  service_logs_endpoint = "service-logs"
+}
+
+data "aws_ssm_parameter" "datadog_token" {
+  name = "/${var.env}/crates-io/fastly/datadog-token"
 }
 
 data "external" "package" {
@@ -64,7 +68,7 @@ resource "fastly_service_compute" "static" {
   }
 
   logging_s3 {
-    name        = local.request_logs_endpoint
+    name        = "s3-${local.request_logs_endpoint}"
     bucket_name = aws_s3_bucket.logs.bucket
 
     s3_iam_role = aws_iam_role.fastly_assume_role.arn
@@ -75,7 +79,7 @@ resource "fastly_service_compute" "static" {
   }
 
   logging_s3 {
-    name        = local.service_logs_endpoint
+    name        = "s3-${local.service_logs_endpoint}"
     bucket_name = aws_s3_bucket.logs.bucket
 
     s3_iam_role = aws_iam_role.fastly_assume_role.arn
@@ -83,6 +87,11 @@ resource "fastly_service_compute" "static" {
     path        = "/fastly-logs/${var.static_domain_name}/"
 
     compression_codec = "zstd"
+  }
+
+  logging_datadog {
+    name  = "datadog-${local.request_logs_endpoint}"
+    token = data.aws_ssm_parameter.datadog_token.value
   }
 }
 
@@ -97,11 +106,14 @@ resource "fastly_service_dictionary_items" "compute_static" {
 
   items = {
     "cloudfront-url" : local.cloudfront_domain_name
-    "s3-primary-host" : local.primary_host_name
+    "datadog-env" : var.env
+    "datadog-host" : var.static_domain_name
+    "datadog-request-logs-endpoint" : "datadog-${local.request_logs_endpoint}"
     "s3-fallback-host" : local.fallback_host_name
+    "s3-primary-host" : local.primary_host_name
+    "s3-request-logs-endpoint" : "s3-${local.request_logs_endpoint}"
+    "s3-service-logs-endpoint" : "s3-${local.service_logs_endpoint}"
     "static-ttl" : var.static_ttl
-    "request-logs-endpoint" : local.request_logs_endpoint
-    "service-logs-endpoint" : local.service_logs_endpoint
   }
 }
 

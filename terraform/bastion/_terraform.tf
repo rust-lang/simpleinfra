@@ -6,11 +6,11 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.59"
+      version = "~> 5.64"
     }
     dns = {
       source  = "hashicorp/dns"
-      version = "~> 3.2"
+      version = "~> 3.4"
     }
   }
 
@@ -24,8 +24,7 @@ terraform {
 }
 
 provider "aws" {
-  profile = "default"
-  region  = "us-west-1"
+  region = "us-west-1"
 }
 
 data "terraform_remote_state" "shared" {

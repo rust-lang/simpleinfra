@@ -2,6 +2,7 @@
 
 import getpass
 import json
+import os
 import pathlib
 import subprocess
 import sys
@@ -27,7 +28,9 @@ def main():
     serial = cached(MFA_CACHE_PATH, lambda: load_mfa_device())
     eprint(f"using MFA device with serial ID {serial}")
 
-    code = getpass.getpass("TOTP code: ")
+    code = os.getenv("TOTP_CODE")
+    if not code:
+        code = getpass.getpass("TOTP code: ")
 
     env = get_session_token(SESSION_DURATION, serial, code)
     dump_env_bash(env)
@@ -72,10 +75,7 @@ def load_mfa_device():
 
     serial = None
     for device in mfa_out["MFADevices"]:
-        # Only TOTP devices are supported
         user = device["UserName"]
-        if not device["SerialNumber"].endswith(f":mfa/{user}"):
-            continue
 
         # Only a single TOTP device is supported
         if serial is None:

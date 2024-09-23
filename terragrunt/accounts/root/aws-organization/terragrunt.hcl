@@ -19,19 +19,13 @@ inputs = {
       given_name  = "Pietro",
       family_name = "Albini"
       email       = "pietro@pietroalbini.org"
-      groups      = ["infra", "infra-admins"]
+      groups      = ["infra", "infra-admins", "release"]
     }
     "simulacrum" = {
       given_name  = "Mark",
       family_name = "Rousskov"
       email       = "mark.simulacrum@gmail.com"
-      groups      = ["infra", "infra-admins"]
-    }
-    "rylev" = {
-      given_name  = "Ryan",
-      family_name = "Levick"
-      email       = "me@ryanlevick.com"
-      groups      = ["infra"]
+      groups      = ["infra", "infra-admins", "release", "triagebot"]
     }
     "shepmaster" = {
       given_name  = "Jake",
@@ -62,6 +56,42 @@ inputs = {
       family_name = "Bieniek"
       email = "tobias@bieniek.cloud"
       groups = ["crates-io"]
+    }
+    "adam" = {
+      given_name = "Adam"
+      family_name = "Harvey"
+      email = "adam@adamharvey.name"
+      groups = ["crates-io"]
+    }
+    "ehuss" = {
+      given_name = "Eric"
+      family_name = "Huss"
+      email = "eric@huss.org"
+      groups = ["triagebot"]
+    }
+    "apiraino" = {
+      given_name = "apiraino"
+      family_name = "n/a"
+      email = "apiraino@protonmail.com"
+      groups = ["triagebot"]
+    }
+    "marcoieni" = {
+      given_name  = "Marco",
+      family_name = "Ieni"
+      email       = "marcoieni@rustfoundation.org"
+      groups      = ["infra", "infra-admins"]
+    }
+    "boxyuwu" = {
+      given_name  = "Boxy"
+      family_name = "UwU"
+      email       = "rust@boxyuwu.dev"
+      groups      = ["release"]
+    }
+    "cuviper" = {
+      given_name  = "Josh"
+      family_name = "Stone"
+      email       = "cuviper@gmail.com"
+      groups      = ["release"]
     }
   }
 }

@@ -1,6 +1,10 @@
 {
     "aws": {
         "profile": "bors-prod",
-        "region": "us-east-2"
+        "regions": [
+            {
+                "region": "us-east-2"
+            }
+        ]
     }
 }

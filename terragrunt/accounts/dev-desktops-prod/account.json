@@ -1,6 +1,10 @@
 {
     "aws": {
         "profile": "dev-desktops-prod",
-        "region": "us-east-1"
+        "regions": [
+            {
+                "region": "us-east-1"
+            }
+        ]
     }
 }

@@ -7,7 +7,7 @@ module "lambda_doc_router" {
   name       = "${local.name}--doc-router"
   source_dir = "lambdas/doc-router"
   handler    = "index.handler"
-  runtime    = "nodejs16.x"
+  runtime    = "nodejs20.x"
   role_arn   = data.aws_iam_role.cloudfront_lambda.arn
 }
 

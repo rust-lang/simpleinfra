@@ -18,17 +18,17 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.20"
+      version = "~> 5.65"
     }
 
     google = {
       source  = "hashicorp/google"
-      version = "~> 4.23"
+      version = "~> 6.0.1"
     }
 
     dns = {
       source  = "hashicorp/dns"
-      version = "~> 3.2.3"
+      version = "~> 3.4.1"
     }
   }
 

@@ -6,15 +6,15 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.20"
+      version = "~> 5.64"
     }
     external = {
       source  = "hashicorp/external"
-      version = "~> 1.2.0"
+      version = "~> 2.3.3"
     }
     github = {
       source  = "integrations/github"
-      version = "~> 4.14"
+      version = "~> 6.2.3"
     }
   }
 
@@ -42,4 +42,3 @@ data "terraform_remote_state" "shared" {
     region = "us-west-1"
   }
 }
-

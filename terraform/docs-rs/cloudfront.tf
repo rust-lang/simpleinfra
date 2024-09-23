@@ -54,7 +54,7 @@ resource "aws_cloudfront_origin_request_policy" "docs_rs" {
   headers_config {
     header_behavior = "whitelist"
     headers {
-      items = ["User-Agent"]
+      items = ["User-Agent", "Referer"]
     }
   }
 
@@ -90,7 +90,7 @@ resource "aws_cloudfront_distribution" "webapp" {
 
   default_cache_behavior {
     target_origin_id       = "ec2"
-    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
+    allowed_methods        = ["GET", "HEAD", "OPTIONS", "DELETE", "PATCH", "POST", "PUT"]
     cached_methods         = ["GET", "HEAD", "OPTIONS"]
     compress               = true
     viewer_protocol_policy = "redirect-to-https"

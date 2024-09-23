@@ -1,6 +1,0 @@
-{
-    "aws": {
-        "profile": "sync-team-prod",
-        "region": "us-east-2"
-    }
-}

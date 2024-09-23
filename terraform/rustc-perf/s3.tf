@@ -7,6 +7,31 @@ module "static_website" {
   domain_name            = "perf-data.rust-lang.org"
   origin_domain_name     = aws_s3_bucket.bucket.bucket_regional_domain_name
   origin_access_identity = aws_cloudfront_origin_access_identity.bucket.cloudfront_access_identity_path
+  response_policy_id     = aws_cloudfront_response_headers_policy.response_policy.id
+}
+
+resource "aws_cloudfront_response_headers_policy" "response_policy" {
+  name    = "RustcPerfPolicy"
+  comment = "Policy for RustcPerf website"
+
+  security_headers_config {
+    content_type_options {
+      override = true
+    }
+    frame_options {
+      frame_option = "DENY"
+      override     = true
+    }
+    xss_protection {
+      protection = true
+      mode_block = true
+      override   = true
+    }
+    referrer_policy {
+      referrer_policy = "no-referrer"
+      override        = true
+    }
+  }
 }
 
 resource "aws_iam_user" "s3" {

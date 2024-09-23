@@ -79,6 +79,21 @@ resource "fastly_service_vcl" "static" {
     VCL
   }
 
+  # When a new version of rustup is released, the release script invalidates
+  # the CloudFront cache for `/rustup/*` and any object that is tagged with
+  # the `rustup` key on Fastly.
+  # See https://github.com/rust-lang/rustup/blob/master/ci/sync-dist.py for
+  # details.
+  snippet {
+    name    = "set cache key for rustup"
+    type    = "fetch"
+    content = <<-VCL
+      if (req.url ~ "^\/rustup\/") {
+        set beresp.http.Surrogate-Key = "rustup";
+      }
+    VCL
+  }
+
   snippet {
     name    = "redirect rustup.sh to rustup.rs"
     type    = "error"
@@ -103,6 +118,12 @@ resource "fastly_service_vcl" "static" {
   logging_datadog {
     name  = "datadog"
     token = data.aws_ssm_parameter.datadog_api_key.value
+
+    format = templatefile("${path.module}/fastly-log-format.tftpl", {
+      service_name = "static.rust-lang.org"
+      dd_app       = "releases",
+      dd_env       = var.environment,
+    })
   }
 
   logging_s3 {

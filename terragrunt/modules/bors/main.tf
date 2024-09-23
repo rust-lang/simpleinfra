@@ -70,7 +70,7 @@ resource "aws_iam_role" "gha" {
         }
         Condition = {
           StringLike = {
-            "token.actions.githubusercontent.com:sub" : "repo:rust-lang/bors:ref:refs/heads/staging"
+            "token.actions.githubusercontent.com:sub" : "${var.trusted_sub}"
           }
           StringEquals = {
             "token.actions.githubusercontent.com:aud" : "sts.amazonaws.com"
@@ -272,7 +272,7 @@ resource "aws_ecs_task_definition" "bors" {
       environment = [
         {
           name  = "APP_ID"
-          value = "343095"
+          value = "${var.gh_app_id}"
         },
         {
           name  = "RUST_LOG"
@@ -294,10 +294,16 @@ resource "aws_ecs_task_definition" "bors" {
           valueFrom = data.aws_ssm_parameter.app_key.arn
         },
         {
-          name      = "DATABASE"
+          name      = "DATABASE_URL"
           valueFrom = aws_ssm_parameter.db_endpoint.arn
         }
       ]
+
+      healthCheck = {
+        command     = ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+        timeout     = 10
+        startPeriod = 10
+      }
     }
   ])
 }
@@ -377,7 +383,7 @@ resource "aws_lb_listener" "primary" {
 }
 
 resource "aws_acm_certificate" "primary" {
-  domain_name       = "bors-staging.rust-lang.net"
+  domain_name       = var.domain
   validation_method = "DNS"
 
   lifecycle {
@@ -386,7 +392,7 @@ resource "aws_acm_certificate" "primary" {
 }
 
 data "aws_route53_zone" "net" {
-  name         = "bors-staging.rust-lang.net"
+  name         = var.domain
   private_zone = false
 }
 
@@ -414,7 +420,7 @@ resource "aws_acm_certificate_validation" "primary" {
 
 resource "aws_route53_record" "lb" {
   zone_id = data.aws_route53_zone.net.zone_id
-  name    = "bors-staging.rust-lang.net"
+  name    = var.domain
   type    = "A"
 
   alias {
@@ -440,7 +446,7 @@ data "aws_vpc" "default" {
 resource "aws_db_instance" "primary" {
   db_name                 = "bors"
   engine                  = "postgres"
-  engine_version          = "15.3"
+  engine_version          = "15.5"
   instance_class          = "db.t4g.micro"
   backup_retention_period = 7
 
@@ -489,4 +495,16 @@ resource "aws_vpc_security_group_egress_rule" "rds_egress_anywhere_v6" {
   from_port   = -1
   ip_protocol = -1
   to_port     = -1
+}
+
+variable "domain" {
+  description = "domain to use"
+}
+
+variable "gh_app_id" {
+  description = "GitHub App ID"
+}
+
+variable "trusted_sub" {
+  description = "GitHub OIDC claim"
 }

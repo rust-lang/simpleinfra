@@ -4,11 +4,11 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.32"
+      version = "~> 5.64"
     }
     fastly = {
       source  = "fastly/fastly"
-      version = "5.0.0"
+      version = "5.13.0"
     }
   }
 }

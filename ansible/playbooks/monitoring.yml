@@ -58,7 +58,6 @@
             # List of instances to scrape for system metrics
             - targets:
               - "{{ inventory_hostname }}:9100"
-              - ci-arm-1.infra.rust-lang.org:9100
               - crater.infra.rust-lang.org:9100
               - docsrs.infra.rust-lang.org:9100
               - bastion.infra.rust-lang.org:9100
@@ -186,12 +185,6 @@
             - alert: HerokuRouterError
               expr: sum by (code) (increase(heroku_router_errors[1m])) > 100
               for: 5m
-              labels:
-                dispatch: pagerduty-cratesio
-
-            - alert: SlowDownloads
-              expr: histogram_quantile(0.99, sum by (le) (rate(cratesio_instance_response_times_bucket{job="cratesio_heroku_metrics",app="crates-io",endpoint="/api/v1/crates/:crate_id/:version/download"}[30s]))) >= 1
-              for: 1m
               labels:
                 dispatch: pagerduty-cratesio
 
