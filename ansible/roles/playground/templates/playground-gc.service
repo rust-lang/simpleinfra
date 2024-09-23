@@ -1,0 +1,10 @@
+#
+# {{ ansible_managed }}
+#
+
+[Unit]
+Description=Garbage collect dead playground containers
+
+[Service]
+Type=oneshot
+ExecStart={{ vars_playground_gc_path }}

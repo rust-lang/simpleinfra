@@ -12,6 +12,7 @@ vars_playground_repository_url: https://github.com/rust-lang/rust-playground.git
 
 vars_playground_checkout_path: "{{ vars_playground_home_path }}/rust-playground"
 vars_playground_update_path: "{{ vars_playground_home_path }}/update.sh"
+vars_playground_gc_path: "{{ vars_playground_home_path }}/gc.sh"
 vars_playground_artifacts_path: "{{ vars_playground_home_path }}/playground-artifacts"
 vars_playground_executable_path: "{{ vars_playground_artifacts_path }}/ui"
 
@@ -19,3 +20,8 @@ vars_playground_env_cors_enabled: 1
 vars_playground_env_ui_address: 127.0.0.1
 vars_playground_env_ui_port: 8080
 vars_playground_env_ui_root_path: "{{ vars_playground_artifacts_path }}/build"
+
+# The playground peaks at a bit less than 2000 open file descriptors
+# over a normal week but `2560` resulted in sporadic errors, so there
+# must be many non-WebSocket connections.
+vars_playground_number_connections: 5120

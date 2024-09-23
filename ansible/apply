@@ -76,6 +76,10 @@ def run_playbook(args):
             ansible_args += ["-u", args.user]
         if args.start_at_task is not None:
             ansible_args += ["--start-at-task", args.start_at_task]
+        if args.check:
+            ansible_args += ["--check"]
+        if args.diff:
+            ansible_args += ["--diff"]
 
         env = os.environ.copy()
         # Set environment variable if running on macOS to avoid python crash
@@ -99,6 +103,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "--start-at-task", help="start at a task with the provided name",
         default=None,
+    )
+    parser.add_argument(
+        "--check", help="perform an Ansible check run",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--diff", help="perform an Ansible diff run",
+        action="store_true",
     )
     args = parser.parse_args()
 

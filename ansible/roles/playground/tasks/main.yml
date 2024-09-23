@@ -1,5 +1,16 @@
 ---
 
+# Create a Systemd slice to manage resources (Memory, CPU) across the
+# processes spawned by the playground.
+
+- name: Configure playground slice
+  template:
+    src: playground.slice
+    dest: /etc/systemd/system/playground.slice
+    mode: 0644
+
+# --------------------
+
 - name: Add Docker APT repository GPG key
   apt_key:
     state: present
@@ -29,6 +40,30 @@
     dest: /etc/docker/daemon.json
     mode: 0600
   notify: restart-docker
+
+- name: Add Docker to the Playground slice
+  file:
+    path: /etc/systemd/system/docker.service.d
+    state: directory
+
+- name: Add Docker to the Playground slice
+  template:
+    src: docker-override.conf
+    dest: /etc/systemd/system/docker.service.d/override.conf
+    mode: 0600
+  notify: restart-docker
+
+- name: Add ContainerD to the Playground slice
+  file:
+    path: /etc/systemd/system/containerd.service.d
+    state: directory
+
+- name: Add ContainerD to the Playground slice
+  template:
+    src: containerd-override.conf
+    dest: /etc/systemd/system/containerd.service.d/override.conf
+    mode: 0600
+  notify: restart-containerd
 
 # --------------------
 
@@ -116,6 +151,33 @@
 - name: Start and enable update script service timer
   systemd:
     name: playground-update.timer
+    state: started
+    enabled: true
+
+- name: Configure garbage collection script
+  template:
+    src: gc.sh
+    dest: "{{ vars_playground_gc_path }}"
+    mode: 0755
+  notify: start-playground-gc
+
+- name: Configure garbage collection script service
+  template:
+    src: playground-gc.service
+    dest: /etc/systemd/system/playground-gc.service
+    mode: 0644
+  notify: start-playground-gc
+
+- name: Configure garbage collection script service timer
+  template:
+    src: playground-gc.timer
+    dest: /etc/systemd/system/playground-gc.timer
+    mode: 0644
+  notify: restart-playground-gc-timer
+
+- name: Start and enable garbage collection script service timer
+  systemd:
+    name: playground-gc.timer
     state: started
     enabled: true
 

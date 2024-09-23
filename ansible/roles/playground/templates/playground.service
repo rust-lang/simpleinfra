@@ -6,6 +6,10 @@
 Description=The Rust Playground
 
 [Service]
+Slice=playground.slice
+
+Restart=on-failure
+
 Environment=TMPDIR={{ vars_playground_mountpoint_path }}
 Environment=RUST_LOG=info
 Environment=PLAYGROUND_CORS_ENABLED={{ vars_playground_env_cors_enabled }}
@@ -18,6 +22,8 @@ Environment=PLAYGROUND_SERVER_AXUM=1
 WorkingDirectory={{ vars_playground_artifacts_path }}
 
 ExecStart={{ vars_playground_executable_path }}
+
+LimitNOFILE={{ vars_playground_number_connections }}
 
 [Install]
 WantedBy=multi-user.target
