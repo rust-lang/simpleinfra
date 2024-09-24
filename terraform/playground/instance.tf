@@ -5,6 +5,13 @@ resource "aws_eip" "playground" {
   }
 }
 
+resource "aws_eip" "playground2" {
+  domain = "vpc"
+  tags = {
+    Name = "playground2"
+  }
+}
+
 data "dns_a_record_set" "monitoring" {
   host = "monitoring.infra.rust-lang.org"
 }
@@ -103,8 +110,21 @@ resource "aws_eip_association" "playground" {
   allocation_id        = aws_eip.playground.id
 }
 
+resource "aws_eip_association" "playground2" {
+  network_interface_id = aws_network_interface.playground.id
+  allocation_id        = aws_eip.playground2.id
+}
+
 data "aws_route53_zone" "rust_lang_org" {
   name = "rust-lang.org"
+}
+
+resource "aws_route53_record" "playground2" {
+  zone_id = data.aws_route53_zone.rust_lang_org.id
+  name    = "play-2.infra.rust-lang.org"
+  type    = "A"
+  records = [aws_eip.playground2.public_ip]
+  ttl     = 60
 }
 
 resource "aws_route53_record" "playground" {
@@ -170,6 +190,21 @@ data "aws_ami" "ubuntu" {
   }
 }
 
+data "aws_ami" "ubuntu24" {
+  most_recent = true
+  owners      = ["099720109477"] # Canonical
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
 resource "aws_iam_instance_profile" "playground" {
   name = "playground"
   role = aws_iam_role.playground.name
@@ -197,6 +232,36 @@ resource "aws_instance" "playground" {
 
   tags = {
     Name = "play-1"
+  }
+
+  lifecycle {
+    # Don't recreate the instance automatically when the AMI changes.
+    ignore_changes = [ami]
+  }
+}
+
+resource "aws_instance" "playground2" {
+  ami                     = data.aws_ami.ubuntu24.id
+  instance_type           = "c5a.large"
+  key_name                = data.terraform_remote_state.shared.outputs.master_ec2_key_pair
+  iam_instance_profile    = aws_iam_instance_profile.playground.name
+  ebs_optimized           = true
+  disable_api_termination = true
+  monitoring              = false
+
+  root_block_device {
+    volume_type           = "gp3"
+    volume_size           = 100
+    delete_on_termination = true
+  }
+
+  network_interface {
+    network_interface_id = aws_network_interface.playground.id
+    device_index         = 0
+  }
+
+  tags = {
+    Name = "play-2"
   }
 
   lifecycle {
