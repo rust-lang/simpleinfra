@@ -1,4 +1,4 @@
-// ECS deployment and CI integration of bors.
+// ECS deployment and CI integration of monitorbot.
 
 module "monitorbot" {
   source         = "../shared/modules/ecs-app"
