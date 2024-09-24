@@ -115,6 +115,26 @@ resource "fastly_service_vcl" "static" {
     VCL
   }
 
+  snippet {
+    # This was an abandoned copy of Rust 1.17.0-era docs; redirect to current docs
+    name    = "redirect /doc/master to /stable"
+    type    = "error"
+    content = <<-VCL
+      if (req.url ~ "^\/doc/master(\/|$)")?$") {
+        set obj.status = 301;
+        set obj.response = "Moved permanently";
+        set obj.http.Location = regsub(req.url, "^\/doc\/master", "https://doc.rust-lang.org/stable");
+
+        synthetic {"
+      #!/bin/bash
+      echo "The documentation now lives under doc.rust-lang.org"
+        "};
+
+        return (deliver);
+      }
+    VCL
+  }
+
   logging_datadog {
     name  = "datadog"
     token = data.aws_ssm_parameter.datadog_api_key.value
