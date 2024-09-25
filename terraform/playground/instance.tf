@@ -105,13 +105,18 @@ resource "aws_network_interface" "playground" {
   security_groups = [aws_security_group.playground.id]
 }
 
+resource "aws_network_interface" "playground2" {
+  subnet_id       = data.terraform_remote_state.shared.outputs.prod_vpc.public_subnets[0]
+  security_groups = [aws_security_group.playground.id]
+}
+
 resource "aws_eip_association" "playground" {
   network_interface_id = aws_network_interface.playground.id
   allocation_id        = aws_eip.playground.id
 }
 
 resource "aws_eip_association" "playground2" {
-  network_interface_id = aws_network_interface.playground.id
+  network_interface_id = aws_network_interface.playground2.id
   allocation_id        = aws_eip.playground2.id
 }
 
