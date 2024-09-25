@@ -261,7 +261,7 @@ resource "aws_instance" "playground2" {
   }
 
   network_interface {
-    network_interface_id = aws_network_interface.playground.id
+    network_interface_id = aws_network_interface.playground2.id
     device_index         = 0
   }
 
