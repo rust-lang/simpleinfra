@@ -266,7 +266,8 @@ resource "aws_instance" "playground2" {
   }
 
   tags = {
-    Name = "play-2"
+    Name    = "play-2"
+    Service = "playground"
   }
 
   lifecycle {
