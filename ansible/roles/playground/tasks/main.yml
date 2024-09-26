@@ -116,10 +116,18 @@
     repo: "{{ vars_playground_repository_url }}"
     dest: "{{ vars_playground_checkout_path }}"
 
-- name: Install awscli
+- name: Install aws (Ubuntu < 24)
   apt:
     name: awscli
     state: present
+  when: ansible_distribution_version is version('24', '<')
+
+- name: Install aws (Ubuntu >= 24)
+  community.general.snap:
+    name: aws-cli
+    classic: true
+    state: present
+  when: ansible_distribution_version is version('24', '>=')
 
 - name: Allow update script to restart playground
   template:
