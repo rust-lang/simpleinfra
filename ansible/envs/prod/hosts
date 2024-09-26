@@ -10,6 +10,7 @@ crater-azure-2.infra.rust-lang.org
 
 [playground]
 play-1.infra.rust-lang.org
+play-2.infra.rust-lang.org
 
 [dev-desktop]
 dev-desktop-eu-1.infra.rust-lang.org
