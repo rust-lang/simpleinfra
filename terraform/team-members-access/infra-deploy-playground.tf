@@ -38,7 +38,6 @@ resource "aws_iam_group_policy" "infra_deploy_playground" {
         ],
         "Condition" : {
           "StringEquals" : {
-            "ec2:osuser" : "shep",
             "ec2:ResourceTag/Service" : "playground"
           }
         }
