@@ -44,10 +44,21 @@ aws ec2-instance-connect send-ssh-public-key \
     --instance-id $HOST_INSTANCE_ID \
     --instance-os-user $USER \
     --ssh-public-key file://$PATH_TO_PUBLIC_KEY
+    --region $REGION
 ```
 
 You will then have 60 seconds to kick off the `./apply` script before the
 public key is removed again.
+
+> [!NOTE]
+> If the server is an fresh Ubuntu instance, use `ubuntu` as `$USER`, and
+> run ansible with the `-u ubuntu` flag.
+> E.g.:
+>
+> ```sh
+> $ aws ec2-instance-connect send-ssh-public-key [...] --instance-os-user 'ubuntu' [...]
+> $ ./apply prod playground -u ubuntu
+> ```
 
 ## Environments
 
