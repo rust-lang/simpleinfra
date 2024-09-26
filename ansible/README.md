@@ -57,7 +57,7 @@ public key is removed again.
 >
 > ```sh
 > $ aws ec2-instance-connect send-ssh-public-key [...] --instance-os-user 'ubuntu' [...]
-> $ ./apply prod playground -u ubuntu
+> $ ./apply [...] -u ubuntu
 > ```
 
 ## Environments
