@@ -52,6 +52,11 @@ resource "aws_iam_group_policy" "infra_deploy_playground" {
         "Resource" : [
           "arn:aws:ec2:*:*:instance/*",
         ],
+        "Condition" : {
+          "StringEquals" : {
+            "ec2:ResourceTag/Service" : "playground"
+          }
+        }
       }
     ]
   })
