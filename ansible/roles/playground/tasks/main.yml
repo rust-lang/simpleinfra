@@ -65,6 +65,13 @@
 
 # --------------------
 
+- name: Install atop
+  apt:
+    name: atop
+    state: present
+
+# --------------------
+
 # Set up a partition with limited space to avoid temporary
 # input/output files consuming all of the space on the primary
 # partition.
