@@ -131,16 +131,16 @@
           scheme: https
           static_configs:
             - targets:
-              - play-1.rust-lang.org:443
-              - play-2.rust-lang.org:443
+              - play-1.infra.rust-lang.org:443
+              - play-2.infra.rust-lang.org:443
 
         - job_name: playground-docker
           metrics_path: /docker-metrics
           scheme: https
           static_configs:
             - targets:
-              - play-1.rust-lang.org:443
-              - play-2.rust-lang.org:443
+              - play-1.infra.rust-lang.org:443
+              - play-2.infra.rust-lang.org:443
 
         - job_name: cratesio_heroku_metrics
           scheme: https
