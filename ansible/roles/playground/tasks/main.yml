@@ -72,6 +72,16 @@
 
 # --------------------
 
+# We don't send emails; having postfix installed causes some
+# monitoring failures.
+
+- name: Uninstall postfix
+  apt:
+    name: postfix
+    state: absent
+
+# --------------------
+
 # Set up a partition with limited space to avoid temporary
 # input/output files consuming all of the space on the primary
 # partition.
