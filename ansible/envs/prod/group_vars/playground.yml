@@ -6,8 +6,6 @@ ssm_playground: "{{ lookup('aws_ssm', '/prod/ansible/playground/', region='us-we
 vars_extra_sudo_users:
   - shep
 
-vars_playground_domain: play-1.infra.rust-lang.org
-
 vars_playground_s3_bucket: rust-playground-artifacts
 
 vars_playground_env_github_token: "{{ ssm_playground['github-token'] }}"

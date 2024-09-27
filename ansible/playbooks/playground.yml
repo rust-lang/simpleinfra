@@ -17,14 +17,17 @@
       dummy_certs: "{{ vars_letsencrypt_dummy_certs }}"
       email: admin@rust-lang.org
       domains:
-        - "{{ vars_playground_domain }}"
+        - "{{ inventory_hostname }}"
 
     - role: nginx
       worker_connections: "{{ vars_playground_number_connections }}"
       proxied:
-        - domain: "{{ vars_playground_domain }}"
+        - domain: "{{ inventory_hostname }}"
           to: "http://127.0.0.1:{{ vars_playground_env_ui_port }}"
           websockets:
             - '/websocket'
+          extra_locations:
+            - path: '/docker-metrics'
+              to: 'http://127.0.0.1:9323/metrics'
 
     - role: playground
