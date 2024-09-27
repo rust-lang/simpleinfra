@@ -131,7 +131,8 @@
           scheme: https
           static_configs:
             - targets:
-              - play.rust-lang.org:443
+              - play-1.rust-lang.org:443
+              - play-2.rust-lang.org:443
 
         - job_name: cratesio_heroku_metrics
           scheme: https
