@@ -35,5 +35,16 @@ echo "    curl https://sh.rustup.rs -sSf | sh"
         return redirect('https://sh.rustup.rs', body, callback);
     }
 
+    // Links to `/doc/master/*` are probably from old external sources, so send
+    // them back through the doc site to take advantage of any helpful error
+    // handling that may be defined there
+    if (request.uri.startsWith('/doc/master')) {
+        // The slice method is used to remove the '/doc/master' prefix from the
+        // URI. 11 is the length of '/doc/master'.
+        const newUri = 'https://doc.rust-lang.org/stable' + request.uri.slice(11);
+        const body = "The documentation now lives under doc.rust-lang.org";
+        return redirect(newUri, body, callback);
+    }
+
     callback(null, request);
 };
