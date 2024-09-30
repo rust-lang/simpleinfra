@@ -21,6 +21,7 @@ locals {
     "jdn",
     "guillaumegomez",
     "marcoieni",
+    "ubuntu",
   ]
 }
 
