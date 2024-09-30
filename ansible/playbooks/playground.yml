@@ -14,6 +14,8 @@
         - playground
 
     - role: datadog.datadog
+      tags:
+        - monitoring
       vars:
         datadog_api_key: "{{ vars_datadog_api_key }}"
         datadog_site: "datadoghq.com"
@@ -43,3 +45,5 @@
               to: 'http://127.0.0.1:9323/metrics'
 
     - role: playground
+      tags:
+        - application
