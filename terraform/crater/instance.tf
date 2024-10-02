@@ -51,6 +51,13 @@ resource "aws_eip" "crater" {
   }
 }
 
+resource "aws_eip" "crater2" {
+  domain = "vpc"
+  tags = {
+    Name = "crater2"
+  }
+}
+
 data "dns_a_record_set" "monitoring" {
   host = "monitoring.infra.rust-lang.org"
 }
@@ -136,9 +143,19 @@ resource "aws_network_interface" "crater" {
   security_groups = [aws_security_group.crater.id]
 }
 
+resource "aws_network_interface" "crater2" {
+  subnet_id       = data.terraform_remote_state.shared.outputs.prod_vpc.public_subnets[0]
+  security_groups = [aws_security_group.crater.id]
+}
+
 resource "aws_eip_association" "crater" {
   network_interface_id = aws_network_interface.crater.id
   allocation_id        = aws_eip.crater.id
+}
+
+resource "aws_eip_association" "crater2" {
+  network_interface_id = aws_network_interface.crater2.id
+  allocation_id        = aws_eip.crater2.id
 }
 
 data "aws_route53_zone" "rust_lang_org" {
@@ -148,6 +165,14 @@ data "aws_route53_zone" "rust_lang_org" {
 resource "aws_route53_record" "crater" {
   zone_id = data.aws_route53_zone.rust_lang_org.id
   name    = "crater.infra.rust-lang.org"
+  type    = "A"
+  records = [aws_eip.crater.public_ip]
+  ttl     = 60
+}
+
+resource "aws_route53_record" "crater2" {
+  zone_id = data.aws_route53_zone.rust_lang_org.id
+  name    = "crater2.infra.rust-lang.org"
   type    = "A"
   records = [aws_eip.crater.public_ip]
   ttl     = 60
@@ -222,6 +247,21 @@ resource "aws_iam_role_policy_attachment" "ci_pull" {
 
 // Create the EC2 instance itself.
 
+data "aws_ami" "ubuntu24" {
+  most_recent = true
+  owners      = ["099720109477"] # Canonical
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-*-24.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
 data "aws_ami" "ubuntu" {
   most_recent = true
   owners      = ["099720109477"] # Canonical
@@ -264,6 +304,36 @@ resource "aws_instance" "crater" {
 
   tags = {
     Name = "crater"
+  }
+
+  lifecycle {
+    # Don't recreate the instance automatically when the AMI changes.
+    ignore_changes = [ami]
+  }
+}
+
+resource "aws_instance" "crater2" {
+  ami                     = data.aws_ami.ubuntu24.id
+  instance_type           = "m6a.large"
+  key_name                = data.terraform_remote_state.shared.outputs.master_ec2_key_pair
+  iam_instance_profile    = aws_iam_instance_profile.crater.name
+  ebs_optimized           = true
+  disable_api_termination = true
+  monitoring              = false
+
+  root_block_device {
+    volume_type           = "gp3"
+    volume_size           = 100
+    delete_on_termination = true
+  }
+
+  network_interface {
+    network_interface_id = aws_network_interface.crater2.id
+    device_index         = 0
+  }
+
+  tags = {
+    Name = "crater2"
   }
 
   lifecycle {
