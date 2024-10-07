@@ -44,7 +44,7 @@ data "aws_route53_zone" "rust_lang_org" {
 
 resource "aws_route53_record" "bastion" {
   zone_id = data.aws_route53_zone.rust_lang_org.id
-  name    = "bastion1.infra.rust-lang.org"
+  name    = "bastion.infra.rust-lang.org"
   type    = "A"
   records = [aws_eip.bastion.public_ip]
   ttl     = 300
@@ -52,9 +52,9 @@ resource "aws_route53_record" "bastion" {
 
 resource "aws_route53_record" "bastion2" {
   zone_id = data.aws_route53_zone.rust_lang_org.id
-  name    = "bastion.infra.rust-lang.org"
+  name    = "bastion2.infra.rust-lang.org"
   type    = "A"
-  records = [aws_eip.bastion.public_ip]
+  records = [aws_eip.bastion2.public_ip]
   ttl     = 300
 }
 
