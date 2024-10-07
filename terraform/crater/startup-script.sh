@@ -5,7 +5,12 @@ set -euo pipefail
 mkdir -p /opt
 cd /opt
 sudo apt update
-sudo apt install -y vim jq docker.io awscli
+sudo apt install -y vim jq docker.io unzip
+
+# Install aws cli per instructions (https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
 
 sudo systemctl unmask docker.service
 sudo systemctl start docker.service
