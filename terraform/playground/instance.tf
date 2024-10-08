@@ -13,6 +13,10 @@ data "dns_a_record_set" "bastion" {
   host = "bastion.infra.rust-lang.org"
 }
 
+data "dns_a_record_set" "bastion2" {
+  host = "bastion2.infra.rust-lang.org"
+}
+
 resource "aws_security_group" "playground" {
   vpc_id      = data.terraform_remote_state.shared.outputs.prod_vpc.id
   name        = "rust-prod-playground"
@@ -33,6 +37,28 @@ resource "aws_security_group" "playground" {
 
   dynamic "ingress" {
     for_each = toset(data.dns_a_record_set.bastion.addrs)
+    content {
+      from_port   = -1
+      to_port     = -1
+      protocol    = "icmp"
+      cidr_blocks = ["${ingress.value}/32"]
+      description = "ICMP from the bastion"
+    }
+  }
+
+  dynamic "ingress" {
+    for_each = toset(data.dns_a_record_set.bastion2.addrs)
+    content {
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = ["${ingress.value}/32"]
+      description = "SSH from the bastion"
+    }
+  }
+
+  dynamic "ingress" {
+    for_each = toset(data.dns_a_record_set.bastion2.addrs)
     content {
       from_port   = -1
       to_port     = -1
