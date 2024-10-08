@@ -36,7 +36,7 @@ AGENT_TOKEN=$(aws --region us-west-1 \
     --name /prod/ansible/crater-gcp-2/crater-token \
     --with-decryption)
 
-eval $(aws ecr get-login --no-include-email --region us-west-1)
+aws ecr get-login-password --region us-west-1 | docker login --username AWS --password-stdin
 
 docker pull ${docker_url}
 
