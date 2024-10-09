@@ -20,13 +20,7 @@ for D in rust*; do
   if [ -d "$D" ]; then
     pushd "$D"
 
-    bootstrap_version=$(grep 'pub const VERSION' src/bootstrap/lib.rs | grep -o '[0-9]*')
-
-    if [ "$bootstrap_version" -gt 2 ]; then
-      stages=(stage1-sysroot stage2-sysroot)
-    else
-      stages=(stage1 stage2)
-    fi
+    stages=(stage1 stage2)
 
     for stage in "${stages[@]}"; do
       directory="build/${target}/${stage}"
