@@ -70,9 +70,8 @@ exports.handler = (event, context, callback) => {
     if (/^(\d+)\.(\d+).(\d+)\/(.*)/.test(request.uri)) {
         return callback(null, request);
     }
-    // Include patch version 0 if only minor version is provided
-    // Todo("Forward to latest patch version if possible")
-    const minor_versioned_pattern = /^(\d+)\.(\d+)\/(.*)/
+    // Include patch version 0 if minor versioned documentation is requested
+    const minor_versioned_pattern = /^\/?(\d+)\.(\d+)\/(.*)/
     if (minor_versioned_pattern.test(request.uri)) {
         const patched_uri = request.uri.replace(minor_versioned_pattern, "$1.$2.0/$3");
         return temp_redirect(patched_uri, callback);
