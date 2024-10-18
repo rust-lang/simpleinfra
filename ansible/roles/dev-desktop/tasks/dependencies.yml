@@ -136,7 +136,9 @@
 
 - name: Install Node
   apt:
-    name: nodejs
+    name: 
+      - nodejs
+      - npm
     state: present
     update_cache: yes
 
