@@ -33,6 +33,8 @@
       - "linux-tools-{{ kernel.stdout }}"
       - "linux-tools-{{ kernel_flavor.stdout }}"
       - libatk1.0-0 # Allows running `x test rustdoc-gui`
+      - libnss3
+      - libnspr4
       - libatk-bridge2.0-0
       - libcups2
       - libxkbcommon0
