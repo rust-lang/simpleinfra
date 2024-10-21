@@ -12,3 +12,4 @@
 - include_tasks: github.yml
 - include_tasks: motd.yml
 - include_tasks: scripts.yml
+- include_tasks: services.yml
