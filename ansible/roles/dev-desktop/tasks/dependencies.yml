@@ -16,7 +16,6 @@
       - clang
       - cmake
       - gcc-mingw-w64-x86-64 # Allows running `x check --target x86_64-pc-windows-gnu`
-      - earlyoom # Earlyoom kills processes using too much memory before they can cause trouble.
       - jq
       - libssl-dev
       - llvm
@@ -115,15 +114,20 @@
       - linux-image-extra-virtual
   when: kernel_flavor.stdout == "generic"
 
-- name: Install rustup in userspace for root
-  shell: |
-    set -eu
-    RUSTUP_VERSION=1.24.3
-    RUSTUP_SHA="a3cb081f88a6789d104518b30d4aa410009cd08c3822a1226991d6cf0442a0f8"
-    curl --proto '=https' --tlsv1.2 -sSf -O \
-      https://raw.githubusercontent.com/rust-lang/rustup/${RUSTUP_VERSION}/rustup-init.sh
-    echo "${RUSTUP_SHA}  rustup-init.sh" | sha256sum --check --
-    sh rustup-init.sh --default-toolchain nightly -y --component rust-src
+- name: Download Rustup installer
+  ansible.builtin.get_url:
+    url: "https://raw.githubusercontent.com/rust-lang/rustup/{{ vars_rustup_version }}/rustup-init.sh"
+    dest: /tmp/rustup-init.sh
+    mode: 0744
+    checksum: "sha256:{{ vars_rustup_checksum }}"
+
+- name: Install Rustup in userspace for root
+  ansible.builtin.command: /tmp/rustup-init.sh --default-toolchain nightly -y --component rust-src
+
+- name: Clean up Rustup installer
+  ansible.builtin.file:
+    path: /tmp/rustup-init.sh
+    state: absent
 
 - name: Check if Node is installed
   command: node --version

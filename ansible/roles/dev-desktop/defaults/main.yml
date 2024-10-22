@@ -1,4 +1,6 @@
 ---
+vars_rustup_version: "1.27.1"
+vars_rustup_checksum: "32a680a84cf76014915b3f8aa44e3e40731f3af92cd45eb0fcc6264fd257c428"
 
 vars_team_login_path: "/root/team_login"
 allow_ssh_extra_groups: "dev-desktop-allow-ssh"

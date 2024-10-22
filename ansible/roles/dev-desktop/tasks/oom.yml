@@ -1,0 +1,15 @@
+---
+# earlyoom kills processes using too much memory before they can cause trouble.
+- name: Install earlyoom
+  ansible.builtin.apt:
+    name: earlyoom
+    state: present
+
+# The staging instance is so small that earlyoom prevents Ansible from executing
+# the playbook successfully.
+- name: Disable earlyoom on staging
+  ansible.builtin.service:
+    name: earlyoom
+    enabled: no
+    state: stopped
+  when: ansible_hostname == "dev-desktop-staging"
