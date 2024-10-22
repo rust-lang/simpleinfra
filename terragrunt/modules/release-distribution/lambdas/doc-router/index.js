@@ -66,9 +66,15 @@ exports.handler = (event, context, callback) => {
         return temp_redirect('https://www.rust-lang.org/learn', callback);
     }
 
-    // Forward versioned documentation as-is.
-    if (/^\/\d/.test(request.uri)) {
+    // Forward patch versioned documentation as-is.
+    if (/^\/(\d+)\.(\d+).(\d+)\/(.*)/.test(request.uri)) {
         return callback(null, request);
+    }
+    // Include patch version 0 if minor versioned documentation is requested
+    const minor_versioned_pattern = /^\/(\d+)\.(\d+)\/(.*)/
+    if (minor_versioned_pattern.test(request.uri)) {
+        const patched_uri = request.uri.replace(minor_versioned_pattern, "/$1.$2.0/$3");
+        return temp_redirect(patched_uri, callback);
     }
 
     for (let i = 0; i < CRATE_REDIRECTS.length; i++) {
