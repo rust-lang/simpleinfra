@@ -4,10 +4,6 @@ bastion.infra.rust-lang.org
 [monitoring]
 monitoring.infra.rust-lang.org
 
-[crater]
-crater-azure-1.infra.rust-lang.org
-crater-azure-2.infra.rust-lang.org
-
 [playground]
 play-2.infra.rust-lang.org
 
