@@ -1,7 +1,0 @@
----
-
-# Fetch all the group params from AWS SSM
-ssm_crater_azure_2: "{{ lookup('aws_ssm', '/prod/ansible/crater-azure-2/', region='us-west-1', shortnames=true, bypath=true, recursive=true) }}"
-
-vars_crater_token: "{{ ssm_crater_azure_2['crater-token'] }}"
-vars_crater_threads: 15
