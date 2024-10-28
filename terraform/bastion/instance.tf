@@ -2,6 +2,11 @@
 
 // Associate an elastic IP to the instance.
 
+// Some resources are named as "bastion2" because when we updated from ubuntu 20 to ubuntu 24
+// we created a new instance (bastion2) and kept the old one (bastion) around for a while.
+// When you migrate to a new bastion instance (e.g. to update to ubuntu 26),
+// you can name the new resources as "bastion" (instead of "bastion3"), to go back to the original name.
+
 resource "aws_eip" "bastion2" {
   domain = "vpc"
   tags = {
