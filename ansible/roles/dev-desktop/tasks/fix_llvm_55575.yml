@@ -6,13 +6,13 @@
 
 - name: Find all lldb Python files
   ansible.builtin.find:
-    paths: /usr/lib/llvm-14/lib/python3.10/dist-packages/lldb
+    paths: /usr/lib/llvm-14/lib/python3.12/dist-packages/lldb
     file_type: file
   register: lldb_python_files
 
 - name: Find all lldb Python modules
   ansible.builtin.find:
-    paths: /usr/lib/llvm-14/lib/python3.10/dist-packages/lldb
+    paths: /usr/lib/llvm-14/lib/python3.12/dist-packages/lldb
     file_type: directory
   register: lldb_python_directories
 
@@ -26,5 +26,5 @@
 - name: Fix lldb-server-14.0.0
   ansible.builtin.file:
     src: /usr/lib/llvm-14/bin/lldb-server
-    dest: /usr/bin/lldb-server-14.0.0
+    dest: /usr/bin/lldb-server-14.0.6
     state: link
