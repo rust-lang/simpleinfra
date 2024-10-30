@@ -3,6 +3,8 @@
 # lldb 14 fails to load Python modules due to a wrong path. The workaround for
 # this issue is to symlink the modules to the path that lldb expects.
 # https://github.com/llvm/llvm-project/issues/55575
+#
+# This fix can be removed once we move to llvm 16
 
 - name: Find all lldb Python files
   ansible.builtin.find:
