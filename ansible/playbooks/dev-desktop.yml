@@ -17,7 +17,6 @@
         datadog_api_key: "{{ vars_datadog_api_key }}"
         datadog_site: "datadoghq.com"
 
-        datadog_agent_version: "7.56.2"
         datadog_config:
           tags:
             - "env:{{ vars_environment }}"
