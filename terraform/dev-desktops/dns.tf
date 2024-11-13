@@ -1,3 +1,7 @@
+data "aws_route53_zone" "rust_lang_org" {
+  name = "rust-lang.org"
+}
+
 resource "aws_route53_record" "dev_desktop_eu_2" {
   zone_id = data.aws_route53_zone.rust_lang_org.id
   name    = "dev-desktop-eu-2.infra.rust-lang.org"
