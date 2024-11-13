@@ -4,9 +4,20 @@
   apt:
     name:
       - docker.io
-      # Needed to pull images from ECR:
-      - awscli
     state: present
+
+# Install AWS to pull images from ECR
+- name: Install aws (Ubuntu < 24)
+  apt:
+    name: awscli
+    state: present
+  when: ansible_distribution_version is version('24', '<')
+- name: Install aws (Ubuntu >= 24)
+  community.general.snap:
+    name: aws-cli
+    classic: true
+    state: present
+  when: ansible_distribution_version is version('24', '>=')
 
 - name: unmask docker.service
   systemd:
