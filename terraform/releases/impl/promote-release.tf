@@ -30,7 +30,7 @@ resource "aws_cloudwatch_log_group" "promote_release" {
 resource "aws_codebuild_project" "promote_release" {
   name          = "promote-release--${var.name}"
   description   = "Execute the release process in the ${var.name} environment."
-  build_timeout = 120
+  build_timeout = 240
   service_role  = aws_iam_role.promote_release.arn
 
   source {
@@ -49,7 +49,7 @@ resource "aws_codebuild_project" "promote_release" {
   }
 
   environment {
-    compute_type                = "BUILD_GENERAL1_2XLARGE"
+    compute_type                = "BUILD_GENERAL1_XLARGE"
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "SERVICE_ROLE"
     image                       = var.promote_release_ecr_repo.url
