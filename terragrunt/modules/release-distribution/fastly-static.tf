@@ -48,6 +48,16 @@ resource "fastly_service_vcl" "static" {
   }
 
   snippet {
+    name    = "detect doc/master requests"
+    type    = "recv"
+    content = <<-VCL
+      if (req.url ~ "^\/doc\/master\/") {
+        error 619 "redirect";
+      }
+    VCL
+  }
+
+  snippet {
     name    = "enable segmented caching"
     type    = "recv"
     content = <<-VCL
@@ -120,7 +130,7 @@ resource "fastly_service_vcl" "static" {
     name    = "redirect /doc/master to /stable"
     type    = "error"
     content = <<-VCL
-      if (req.url ~ "^\/doc/master(\/|$)")?$") {
+      if (obj.status == 619 && obj.response == "redirect") {
         set obj.status = 301;
         set obj.response = "Moved permanently";
         set obj.http.Location = regsub(req.url, "^\/doc\/master", "https://doc.rust-lang.org/stable");
