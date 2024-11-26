@@ -1,4 +1,5 @@
 {
+  "metrics-addr": "127.0.0.1:9323",
   "cgroup-parent": "playground.slice",
   "log-driver": "local",
   "storage-driver": "overlay2"

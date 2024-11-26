@@ -19,4 +19,10 @@ this role as well.
     - domain: subdomain.example.com
       # The destination to proxy to
       to: http://localhost:8000
+      # Additional `location` directives to proxy, beyond the default `/` location [optional]
+      extra_locations:
+          # The location to respond to
+        - path: /my/awesome/location
+          # The URL to proxy to
+          to: http:127.0.0.1:9999/something
 ```

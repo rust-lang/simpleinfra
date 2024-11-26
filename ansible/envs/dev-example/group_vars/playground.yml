@@ -1,7 +1,5 @@
 ---
 
-vars_playground_domain: example.com
-
 vars_playground_s3_bucket: bucket-name
 
 vars_playground_aws:

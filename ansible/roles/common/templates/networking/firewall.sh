@@ -6,14 +6,14 @@ set -euo pipefail
 IFS=$'\n\t'
 
 # Check if ip6tables is supported by the machine
-if which ip6tables >/dev/null 2>&1 && /sbin/ip6tables -L >/dev/null 2>&1; then
+if which ip6tables >/dev/null 2>&1 && /usr/sbin/ip6tables -L >/dev/null 2>&1; then
     IPv6=true
-    COMMANDS=( "/sbin/iptables" "/sbin/ip6tables" )
+    COMMANDS=( "/usr/sbin/iptables" "/usr/sbin/ip6tables" )
 
     echo "Operating on the following protocols: ipv4, ipv6"
 else
     IPv6=false
-    COMMANDS=( "/sbin/iptables" )
+    COMMANDS=( "/usr/sbin/iptables" )
 
     echo "Operating on the following protocols: ipv4"
 fi
@@ -31,12 +31,12 @@ cmd() {
 }
 
 cmd4() {
-    "/sbin/iptables" $@
+    "/usr/sbin/iptables" $@
 }
 
 cmd6() {
     if "${IPv6}"; then
-        "/sbin/ip6tables" $@
+        "/usr/sbin/ip6tables" $@
     fi
 }
 

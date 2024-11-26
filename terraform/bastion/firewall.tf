@@ -1,40 +1,10 @@
 // The resources in this file control who has access to the bastion server.
 
-locals {
-  // Users allowed to connect to the bastion through SSH. Each user needs to
-  // have the CIDR of the static IP they want to connect from stored in AWS SSM
-  // Parameter Store (us-west-1), in a string key named:
-  //
-  //     /prod/bastion/allowed-ips/${user}
-  //
-  allowed_users = [
-    "aidanhs",
-    "joshua",
-    "pietro",
-    "shep",
-    "simulacrum",
-    "technetos",
-    "nemo157",
-    "syphar",
-    "rylev",
-    "rylev-ip-2",
-    "jdn",
-    "guillaumegomez",
-    "marcoieni",
-  ]
-}
-
-// Security group to prevent unauthorized access to the bastion.
-
 data "dns_a_record_set" "monitoring" {
   host = "monitoring.infra.rust-lang.org"
 }
 
-data "aws_ssm_parameter" "allowed_ips" {
-  for_each = toset(local.allowed_users)
-  name     = "/prod/bastion/allowed-ips/${each.value}"
-}
-
+// Security group to prevent unauthorized access to the bastion.
 resource "aws_security_group" "bastion" {
   vpc_id      = data.terraform_remote_state.shared.outputs.prod_vpc.id
   name        = "rust-prod-bastion"
@@ -52,31 +22,23 @@ resource "aws_security_group" "bastion" {
     }
   }
 
-  // SSH access from the allowed users
-  dynamic "ingress" {
-    for_each = toset(local.allowed_users)
-    content {
-      from_port   = 22
-      to_port     = 22
-      protocol    = "tcp"
-      cidr_blocks = [data.aws_ssm_parameter.allowed_ips[ingress.value].value]
-      description = "SSH access for ${ingress.value}"
-    }
+  ingress {
+    from_port        = 22
+    to_port          = 22
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+    description      = "SSH access from the world"
   }
 
-  // Ping access from allowed users
-  dynamic "ingress" {
-    for_each = toset(local.allowed_users)
-    content {
-      from_port   = 8
-      to_port     = -1
-      protocol    = "icmp"
-      cidr_blocks = [data.aws_ssm_parameter.allowed_ips[ingress.value].value]
-      description = "Ping access for ${ingress.value}"
-    }
+  ingress {
+    from_port        = 8
+    to_port          = -1
+    protocol         = "icmp"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+    description      = "Ping access from the world"
   }
-
-  // Allow outgoing connections
 
   egress {
     from_port   = 0

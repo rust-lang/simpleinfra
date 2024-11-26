@@ -99,7 +99,7 @@ resource "google_compute_health_check" "tcp_health" {
 
 data "google_compute_image" "ubuntu_minimal" {
   project = "ubuntu-os-cloud"
-  family  = "ubuntu-minimal-2204-lts"
+  family  = "ubuntu-minimal-2404-lts-amd64"
 }
 
 resource "google_compute_network" "crater" {

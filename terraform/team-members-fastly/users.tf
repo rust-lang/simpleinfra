@@ -1,16 +1,19 @@
 locals {
   users = {
+    "abi" = {
+      login = "abibroom@rustfoundation.org"
+      name  = "Abi Broom"
+      role  = "billing"
+    }
     "jdn" = {
       login = "jandavidnose@rustfoundation.org"
       name  = "Jan David Nose"
       role  = "superuser"
-
     }
     "joel" = {
       login = "joelmarcey@rustfoundation.org"
       name  = "Joel Marcey"
       role  = "superuser"
-
     }
     "marcoieni" = {
       login = "marcoieni@rustfoundation.org"
@@ -21,6 +24,11 @@ locals {
       login = "mark.simulacrum@gmail.com"
       name  = "Mark Rousskov"
       role  = "superuser"
+    }
+    "paul" = {
+      login = "paullenz@rustfoundation.org"
+      name  = "Paul Lenz"
+      role  = "billing"
     }
     "pietro" = {
       login = "pietro@pietroalbini.org"

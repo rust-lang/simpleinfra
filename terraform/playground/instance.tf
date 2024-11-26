@@ -1,7 +1,7 @@
-resource "aws_eip" "playground" {
-  vpc = true
+resource "aws_eip" "playground2" {
+  domain = "vpc"
   tags = {
-    Name = "playground"
+    Name = "playground2"
   }
 }
 
@@ -93,25 +93,25 @@ resource "aws_security_group" "playground" {
   }
 }
 
-resource "aws_network_interface" "playground" {
+resource "aws_network_interface" "playground2" {
   subnet_id       = data.terraform_remote_state.shared.outputs.prod_vpc.public_subnets[0]
   security_groups = [aws_security_group.playground.id]
 }
 
-resource "aws_eip_association" "playground" {
-  network_interface_id = aws_network_interface.playground.id
-  allocation_id        = aws_eip.playground.id
+resource "aws_eip_association" "playground2" {
+  network_interface_id = aws_network_interface.playground2.id
+  allocation_id        = aws_eip.playground2.id
 }
 
 data "aws_route53_zone" "rust_lang_org" {
   name = "rust-lang.org"
 }
 
-resource "aws_route53_record" "playground" {
+resource "aws_route53_record" "playground2" {
   zone_id = data.aws_route53_zone.rust_lang_org.id
-  name    = "play-1.infra.rust-lang.org"
+  name    = "play-2.infra.rust-lang.org"
   type    = "A"
-  records = [aws_eip.playground.public_ip]
+  records = [aws_eip.playground2.public_ip]
   ttl     = 60
 }
 
@@ -155,13 +155,13 @@ resource "aws_iam_role" "playground" {
 
 // Create the EC2 instance itself.
 
-data "aws_ami" "ubuntu" {
+data "aws_ami" "ubuntu24" {
   most_recent = true
   owners      = ["099720109477"] # Canonical
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
   }
 
   filter {
@@ -175,8 +175,8 @@ resource "aws_iam_instance_profile" "playground" {
   role = aws_iam_role.playground.name
 }
 
-resource "aws_instance" "playground" {
-  ami                     = data.aws_ami.ubuntu.id
+resource "aws_instance" "playground2" {
+  ami                     = data.aws_ami.ubuntu24.id
   instance_type           = "c5a.large"
   key_name                = data.terraform_remote_state.shared.outputs.master_ec2_key_pair
   iam_instance_profile    = aws_iam_instance_profile.playground.name
@@ -191,12 +191,13 @@ resource "aws_instance" "playground" {
   }
 
   network_interface {
-    network_interface_id = aws_network_interface.playground.id
+    network_interface_id = aws_network_interface.playground2.id
     device_index         = 0
   }
 
   tags = {
-    Name = "play-1"
+    Name    = "play-2"
+    Service = "playground"
   }
 
   lifecycle {
@@ -219,7 +220,7 @@ resource "aws_cloudwatch_metric_alarm" "reboot" {
   treat_missing_data  = "ignore"
 
   dimensions = {
-    InstanceId = aws_instance.playground.id
+    InstanceId = aws_instance.playground2.id
   }
 
   actions_enabled = true

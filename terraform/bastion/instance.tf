@@ -3,7 +3,7 @@
 // Associate an elastic IP to the instance.
 
 resource "aws_eip" "bastion" {
-  vpc = true
+  domain = "vpc"
   tags = {
     Name = "bastion"
   }
@@ -35,13 +35,13 @@ resource "aws_route53_record" "bastion" {
 
 // Create the EC2 instance itself.
 
-data "aws_ami" "ubuntu_bionic" {
+data "aws_ami" "ubuntu24" {
   most_recent = true
   owners      = ["099720109477"] # Canonical
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
   }
 
   filter {
@@ -51,7 +51,7 @@ data "aws_ami" "ubuntu_bionic" {
 }
 
 resource "aws_instance" "bastion" {
-  ami                     = data.aws_ami.ubuntu_bionic.id
+  ami                     = data.aws_ami.ubuntu24.id
   instance_type           = "t3a.micro"
   key_name                = data.terraform_remote_state.shared.outputs.master_ec2_key_pair
   ebs_optimized           = true
@@ -70,7 +70,8 @@ resource "aws_instance" "bastion" {
   }
 
   tags = {
-    Name = "bastion"
+    Name    = "bastion"
+    Service = "bastion"
   }
 
   lifecycle {

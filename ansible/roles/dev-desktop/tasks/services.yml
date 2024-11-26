@@ -1,0 +1,9 @@
+---
+
+- name: Disable the apport service
+  ansible.builtin.systemd:
+    enabled: false
+    state: stopped
+    name: apport.service
+  # Not all of our hosts actually have this, just ignore it if it fails.
+  ignore_errors: true

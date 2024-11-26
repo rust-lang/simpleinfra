@@ -11,17 +11,15 @@
 
 # --------------------
 
-- name: Add Docker APT repository GPG key
-  apt_key:
-    state: present
-    keyserver: "https://download.docker.com/linux/{{ ansible_distribution|lower }}/gpg"
-    id: 7EA0A9C3F273FCD8
-
 - name: Add Docker APT repository
-  apt_repository:
-    repo: "deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution|lower }} {{ ansible_distribution_release }} stable"
-    state: present
-    update_cache: true
+  deb822_repository:
+    name: docker
+    types: deb
+    uris: 'https://download.docker.com/linux/{{ ansible_distribution|lower }}'
+    suites: '{{ ansible_distribution_release }}'
+    components: stable
+    architectures: amd64
+    signed_by: "https://download.docker.com/linux/{{ ansible_distribution|lower }}/gpg"
 
 - name: Install Docker
   apt:
@@ -64,6 +62,23 @@
     dest: /etc/systemd/system/containerd.service.d/override.conf
     mode: 0600
   notify: restart-containerd
+
+# --------------------
+
+- name: Install atop
+  apt:
+    name: atop
+    state: present
+
+# --------------------
+
+# We don't send emails; having postfix installed causes some
+# monitoring failures.
+
+- name: Uninstall postfix
+  apt:
+    name: postfix
+    state: absent
 
 # --------------------
 
@@ -116,10 +131,18 @@
     repo: "{{ vars_playground_repository_url }}"
     dest: "{{ vars_playground_checkout_path }}"
 
-- name: Install awscli
+- name: Install aws (Ubuntu < 24)
   apt:
     name: awscli
     state: present
+  when: ansible_distribution_version is version('24', '<')
+
+- name: Install aws (Ubuntu >= 24)
+  community.general.snap:
+    name: aws-cli
+    classic: true
+    state: present
+  when: ansible_distribution_version is version('24', '>=')
 
 - name: Allow update script to restart playground
   template:

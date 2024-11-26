@@ -30,6 +30,33 @@ resource "aws_iam_group_policy" "infra_deploy_playground" {
           "arn:aws:ssm:us-west-1:890664054962:parameter/staging/ansible/all/*",
         ]
       },
+      {
+        "Effect" : "Allow",
+        "Action" : "ec2-instance-connect:SendSSHPublicKey",
+        "Resource" : [
+          "arn:aws:ec2:*:*:instance/*",
+        ],
+        "Condition" : {
+          "StringEquals" : {
+            "ec2:ResourceTag/Service" : "playground"
+          }
+        }
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ec2:DescribeInstances",
+          "ec2:DescribeVpcs"
+        ],
+        "Resource" : [
+          "arn:aws:ec2:*:*:instance/*",
+        ],
+        "Condition" : {
+          "StringEquals" : {
+            "ec2:ResourceTag/Service" : "playground"
+          }
+        }
+      }
     ]
   })
 }

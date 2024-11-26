@@ -5,7 +5,12 @@ set -euo pipefail
 mkdir -p /opt
 cd /opt
 sudo apt update
-sudo apt install -y vim jq docker.io awscli
+sudo apt install -y vim jq docker.io unzip
+
+# Install aws cli per instructions (https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
 
 sudo systemctl unmask docker.service
 sudo systemctl start docker.service
@@ -31,7 +36,7 @@ AGENT_TOKEN=$(aws --region us-west-1 \
     --name /prod/ansible/crater-gcp-2/crater-token \
     --with-decryption)
 
-eval $(aws ecr get-login --no-include-email --region us-west-1)
+aws ecr get-login-password --region us-west-1 | docker login --username AWS --password-stdin ${docker_url}
 
 docker pull ${docker_url}
 
