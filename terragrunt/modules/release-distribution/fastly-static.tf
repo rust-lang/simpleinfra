@@ -135,11 +135,6 @@ resource "fastly_service_vcl" "static" {
         set obj.response = "Moved permanently";
         set obj.http.Location = regsub(req.url, "^\/doc\/master", "https://doc.rust-lang.org/stable");
 
-        synthetic {"
-      #!/bin/bash
-      echo "The documentation now lives under doc.rust-lang.org"
-        "};
-
         return (deliver);
       }
     VCL
