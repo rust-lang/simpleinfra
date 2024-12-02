@@ -48,7 +48,7 @@ resource "fastly_service_vcl" "static" {
   }
 
   snippet {
-    name    = "detect doc/master requests"
+    name    = "detect doc-master requests"
     type    = "recv"
     content = <<-VCL
       if (req.url ~ "^\/doc\/master\/") {
@@ -127,7 +127,7 @@ resource "fastly_service_vcl" "static" {
 
   snippet {
     # This was an abandoned copy of Rust 1.17.0-era docs; redirect to current docs
-    name    = "redirect /doc/master to /stable"
+    name    = "redirect doc-master to stable"
     type    = "error"
     content = <<-VCL
       if (obj.status == 619 && obj.response == "redirect") {
