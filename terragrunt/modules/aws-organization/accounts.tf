@@ -41,3 +41,8 @@ resource "aws_organizations_account" "bors_prod" {
   name  = "bors-prod"
   email = "admin+bors-prod@rust-lang.org"
 }
+
+resource "aws_organizations_account" "ci_staging" {
+  name  = "ci-staging"
+  email = "admin+ci-staging@rust-lang.org"
+}
