@@ -1,0 +1,10 @@
+{
+    "aws": {
+        "profile": "ci-staging",
+        "regions": [
+            {
+                "region": "us-east-2"
+            }
+        ]
+    }
+}
