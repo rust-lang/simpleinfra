@@ -95,15 +95,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     for entry in std::fs::read_dir(KEY_DIR)? {
         let entry = entry?;
         let path = entry.path();
-        if !path.is_file() {
-            if let Some(extension) = path.extension() {
-                if extension == "keys" {
-                    if let Some(stem) = path.file_stem() {
-                        if let Some(stem) = stem.to_str() {
-                            if stem.starts_with("gh-") && !users.contains(stem) {
-                                std::fs::remove_file(path)?;
-                            }
-                        }
+        if path.is_file() {
+            if let Some(stem) = path.file_stem() {
+                if let Some(stem) = stem.to_str() {
+                    if stem.starts_with("gh-") && !users.contains(stem) {
+                        std::fs::remove_file(path)?;
                     }
                 }
             }
