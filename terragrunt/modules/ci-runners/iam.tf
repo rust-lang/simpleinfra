@@ -32,7 +32,8 @@ resource "aws_iam_role_policy" "codebuild_policy" {
           "codeconnections:GetConnection"
         ]
         Resource = [
-          var.code_connection_arn
+          var.rust_lang_code_connection_arn,
+          var.rust_lang_ci_code_connection_arn
         ]
       }
     ]
