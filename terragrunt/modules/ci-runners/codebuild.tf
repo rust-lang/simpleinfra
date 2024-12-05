@@ -43,9 +43,12 @@ resource "aws_codebuild_project" "ubuntu_small" {
 
   source {
     type = "GITHUB"
-    // Dummy repository.
-    // TODO: can we put the real repos even if we use github app?
-    location        = "https://github.com/rust-lang/infra-team.git"
+    // test repository
+    location        = "https://github.com/rust-lang/aws-runners-test"
     git_clone_depth = 1
+
+    git_submodules_config {
+      fetch_submodules = false
+    }
   }
 }
