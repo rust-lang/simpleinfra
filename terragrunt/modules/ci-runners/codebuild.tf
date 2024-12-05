@@ -52,3 +52,50 @@ resource "aws_codebuild_project" "ubuntu_small" {
     }
   }
 }
+
+resource "aws_codebuild_project" "ubuntu_24_4c" {
+  name         = "ubuntu-24-4c"
+  service_role = aws_iam_role.codebuild_role.arn
+
+  artifacts {
+    type = "NO_ARTIFACTS"
+  }
+
+  cache {
+    type = "NO_CACHE"
+    // TODO: evaluate if it's worth adding cache
+    // modes = ["LOCAL_DOCKER_LAYER_CACHE", "LOCAL_SOURCE_CACHE"]
+  }
+
+  environment {
+    compute_type = "BUILD_GENERAL1_MEDIUM"
+    // ubuntu
+    image                       = "aws/codebuild/standard:7.0-24.10.29"
+    type                        = "LINUX_CONTAINER"
+    image_pull_credentials_type = "CODEBUILD"
+
+    // Whether to enable running the Docker daemon.
+    // The Rust CI uses Docker to build linux artifacts,
+    // so we need this if the target is linux.
+    privileged_mode = true
+  }
+
+  // Disable cloudwatch logs for cost saving.
+  // Logs are available in GitHub Actions.
+  logs_config {
+    cloudwatch_logs {
+      status = "DISABLED"
+    }
+  }
+
+  source {
+    type = "GITHUB"
+    // test repository
+    location        = "https://github.com/rust-lang-ci/rust"
+    git_clone_depth = 1
+
+    git_submodules_config {
+      fetch_submodules = false
+    }
+  }
+}
