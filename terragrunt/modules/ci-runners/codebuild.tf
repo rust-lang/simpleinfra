@@ -53,8 +53,8 @@ resource "aws_codebuild_project" "ubuntu_small" {
   }
 }
 
-resource "aws_codebuild_project" "ubuntu_24_4c" {
-  name         = "ubuntu-24-4c"
+resource "aws_codebuild_project" "ubuntu_22_4c" {
+  name         = "ubuntu-22-4c"
   service_role = aws_iam_role.codebuild_role.arn
 
   artifacts {
@@ -71,7 +71,7 @@ resource "aws_codebuild_project" "ubuntu_24_4c" {
 
   environment {
     compute_type = "BUILD_GENERAL1_MEDIUM"
-    // ubuntu
+    // ubuntu 22
     image                       = "aws/codebuild/standard:7.0-24.10.29"
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
