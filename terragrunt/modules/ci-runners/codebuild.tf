@@ -67,6 +67,8 @@ resource "aws_codebuild_project" "ubuntu_24_4c" {
     // modes = ["LOCAL_DOCKER_LAYER_CACHE", "LOCAL_SOURCE_CACHE"]
   }
 
+  build_timeout = 60 * 6 // 6 hours
+
   environment {
     compute_type = "BUILD_GENERAL1_MEDIUM"
     // ubuntu
