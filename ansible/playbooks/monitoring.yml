@@ -215,6 +215,13 @@
                 summary: "No successful docs.rs builds in the last hour"
                 description: "no documentation builds were successful in the last hour."
 
+            - alert: DiskFull
+              expr: node_filesystem_avail_bytes{job="node",instance="docsrs.infra.rust-lang.org:9100", mountpoint="/"} / node_filesystem_size_bytes{job="node",instance="docsrs.infra.rust-lang.org:9100",mountpoint="/"} < 0.10
+              for: 1m
+              annotations:
+                summary: "Filesystem is full"
+                description: "There is less than 10% disk space left on disk."
+
             - alert: DocsRsQueueLocked
               expr: docsrs_queue_is_locked{job="docsrs"} == 1
               for: 1m
