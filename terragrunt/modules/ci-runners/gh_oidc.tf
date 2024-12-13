@@ -35,3 +35,23 @@ resource "aws_iam_role" "github_actions_ci_role" {
     ]
   })
 }
+
+# Allow GitHub Actions to authenticate to AWS ECR Public Gallery
+resource "aws_iam_role_policy" "github_actions_ecr_policy" {
+  name = "ecr-auth-policy"
+  role = aws_iam_role.github_actions_ci_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr-public:GetAuthorizationToken",
+          "sts:GetServiceBearerToken"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
