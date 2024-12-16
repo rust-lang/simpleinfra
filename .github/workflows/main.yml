@@ -29,6 +29,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install terraform cli
+        uses: hashicorp/setup-terraform@v3
+
       - name: Ensure the terraform files are formatted correctly
         run: terraform fmt -check -diff -recursive
 
