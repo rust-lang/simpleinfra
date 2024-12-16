@@ -7,9 +7,9 @@ on:
 jobs:
   rust:
     name: Rust projects
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4
 
       - name: Install Rust stable
         run: rustup update stable && rustup default stable
@@ -25,18 +25,21 @@ jobs:
 
   terraform:
     name: Terraform configuration
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4
+
+      - name: Install terraform cli
+        uses: hashicorp/setup-terraform@v3
 
       - name: Ensure the terraform files are formatted correctly
         run: terraform fmt -check -diff -recursive
 
   actions-js:
     name: GitHub Actions (JS)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: 16
