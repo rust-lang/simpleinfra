@@ -10,7 +10,7 @@ module "monitorbot" {
 
   cpu              = 256
   memory           = 512
-  tasks_count      = 1
+  tasks_count      = 0 # TODO: currently broken, avoid restarting it constantly
   platform_version = "1.4.0"
 
   environment = {
