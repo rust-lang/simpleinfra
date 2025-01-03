@@ -52,6 +52,7 @@
       - emacs
       - lld
       - lldb
+      - m4
       - mold
       - gdb
       - neovim
