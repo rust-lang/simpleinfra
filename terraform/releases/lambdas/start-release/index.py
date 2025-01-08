@@ -51,6 +51,9 @@ def handler(event, context):
                 },
             )
 
+        case "publish-rust-prod-beta":
+            return run_build("promote-release", "prod", "beta")
+
         case "publish-rust-prod-stable":
             return run_build("promote-release", "prod", "stable")
 
