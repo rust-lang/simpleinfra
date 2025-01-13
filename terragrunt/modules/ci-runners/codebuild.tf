@@ -168,7 +168,7 @@ resource "aws_codebuild_project" "ubuntu_22_36c" {
   build_timeout = 60 * 6 // 6 hours
 
   environment {
-    compute_type = "BUILD_GENERAL1_2XLARGE"
+    compute_type = "BUILD_GENERAL1_XLARGE"
     // ubuntu 22
     image                       = "aws/codebuild/standard:7.0-24.10.29"
     type                        = "LINUX_CONTAINER"
