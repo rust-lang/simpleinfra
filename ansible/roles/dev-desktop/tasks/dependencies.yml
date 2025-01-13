@@ -50,6 +50,7 @@
       - libsecret-1-dev # used by cargo
       - libfuse3-dev
       - emacs
+      - flex # Allows running `x build gcc`
       - lld
       - lldb
       - m4
