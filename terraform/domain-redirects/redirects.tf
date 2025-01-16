@@ -75,21 +75,6 @@ module "arewewebyet_org" {
   permanent = true
 }
 
-module "rustfoundation_org" {
-  source = "./impl"
-  providers = {
-    aws       = aws
-    aws.east1 = aws.east1
-  }
-
-  to_host = "foundation.rust-lang.org"
-  from = [
-    "rustfoundation.org",
-    "www.rustfoundation.org",
-  ]
-  permanent = false
-}
-
 // https://github.com/rust-lang/docs.rs/issues/1210
 module "docs_rs_metadata" {
   source = "./impl"
