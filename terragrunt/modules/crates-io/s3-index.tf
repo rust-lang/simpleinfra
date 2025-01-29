@@ -1,8 +1,11 @@
 resource "aws_s3_bucket" "index" {
   bucket = var.index_bucket_name
+}
 
-  versioning {
-    enabled = true
+resource "aws_s3_bucket_versioning" "index" {
+  bucket = aws_s3_bucket.index.bucket
+  versioning_configuration {
+    status = "Enabled"
   }
 }
 
