@@ -32,20 +32,6 @@ module "docs_rs" {
   permanent = true
 }
 
-module "rustconf_com" {
-  source = "./impl"
-  providers = {
-    aws       = aws
-    aws.east1 = aws.east1
-  }
-
-  to_host = "rustconf.com"
-  from = [
-    "www.rustconf.com"
-  ]
-  permanent = true
-}
-
 module "cfp_rustconf_com" {
   source = "./impl"
   providers = {

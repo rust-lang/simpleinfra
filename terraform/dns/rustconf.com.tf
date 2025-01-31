@@ -11,7 +11,8 @@ module "rustconf_com" {
   ttl     = 300
 
   A = {
-    "@" = ["185.124.108.132"],
+    "@"   = ["141.193.213.10", "141.193.213.11"],
+    "www" = ["141.193.213.10", "141.193.213.11"],
   }
 
   CNAME = {
@@ -22,6 +23,7 @@ module "rustconf_com" {
     "2020" = ["tildeio.github.io"],
     "2021" = ["rustconf-2021.netlify.app"],
     "2022" = ["rustconf-2022.netlify.app"],
+    "2024" = ["wp.wpenginepowered.com"],
   }
 
   MX = {
@@ -29,7 +31,8 @@ module "rustconf_com" {
   }
 
   TXT = {
-    "@"             = [local.mailgun_spf],
-    "k1._domainkey" = ["k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC6AVUUbCl/Ofx/ceeWryb4v//f/Sr5UGrRt4ibA4UY2JQ3Db++KEBsdur5qAxC9eiWeAbYQyfQhFGagbmLjyxd1eNepzAIPesz81U0hodsLCaKs7OHkLrQJcTRxVYwucL5rBXVLdAhg7A1veVeN1xiqh8HmEull5vYsmOknf6mtwIDAQAB"],
+    "@"                   = [local.mailgun_spf],
+    "_cf-custom-hostname" = ["060cc15f-2d51-4f19-b095-dfbb3eab7ca4"],
+    "k1._domainkey"       = ["k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC6AVUUbCl/Ofx/ceeWryb4v//f/Sr5UGrRt4ibA4UY2JQ3Db++KEBsdur5qAxC9eiWeAbYQyfQhFGagbmLjyxd1eNepzAIPesz81U0hodsLCaKs7OHkLrQJcTRxVYwucL5rBXVLdAhg7A1veVeN1xiqh8HmEull5vYsmOknf6mtwIDAQAB"],
   }
 }
