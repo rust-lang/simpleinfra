@@ -59,9 +59,9 @@ resource "aws_db_instance" "shared" {
   allocated_storage            = 20
   max_allocated_storage        = 500
   backup_retention_period      = 3
-  storage_type                 = "gp2"
+  storage_type                 = "gp3"
   engine                       = "postgres"
-  engine_version               = "16.1"
+  engine_version               = "16.3"
   instance_class               = "db.t4g.micro"
   identifier                   = "shared"
   username                     = "root"
