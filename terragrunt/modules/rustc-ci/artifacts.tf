@@ -3,6 +3,7 @@ locals {
 
   rustc_builds     = "rustc-builds"
   rustc_builds_alt = "rustc-builds-alt"
+  iam_prefix = "rustc-ci--rust-lang--rust"
 
   s3_policy = jsonencode({
     Version = "2012-10-17"
@@ -110,7 +111,7 @@ module "artifacts_user" {
   org  = "rust-lang"
   repo = "rust"
 
-  user_name  = "rustc-ci--rust-lang--rust--artifacts"
+  user_name  = "${locals.iam_prefix}--artifacts"
   env_prefix = "ARTIFACTS"
 }
 
@@ -162,7 +163,7 @@ resource "aws_s3_bucket_inventory" "artifacts" {
 }
 
 resource "aws_iam_role" "try_builds" {
-  name = "rustc-ci--rust-lang--rust--try-role"
+  name = "${locals.iam_prefix}--try-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
