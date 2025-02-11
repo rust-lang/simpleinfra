@@ -1,6 +1,4 @@
 locals {
-  bucket_name = "rust-lang-ci2"
-
   rustc_builds     = "rustc-builds"
   rustc_builds_alt = "rustc-builds-alt"
   iam_prefix = "rustc-ci--rust-lang--rust"
@@ -49,11 +47,11 @@ locals {
 import {
   to = aws_s3_bucket.artifacts
   # id retrieved with `terraform state show`.
-  id = local.bucket_name
+  id = "rust-lang-ci2"
 }
 
 resource "aws_s3_bucket" "artifacts" {
-  bucket = local.bucket_name
+  bucket = "rust-lang-ci2"
 
 }
 
@@ -128,14 +126,14 @@ resource "aws_s3_bucket_acl" "artifacts" {
 }
 
 module "artifacts_cdn" {
-  source = "../../shared/modules/static-website"
+  source = "../static-website"
   providers = {
     aws = aws.east1
   }
 
   domain_name        = "ci-artifacts.rust-lang.org"
   origin_domain_name = aws_s3_bucket.artifacts.bucket_regional_domain_name
-  response_policy_id = var.response_policy_id
+  response_policy_id = data.terraform_remote_state.shared.outputs.mdbook_response_policy
 }
 
 data "aws_s3_bucket" "inventories" {
