@@ -172,7 +172,7 @@ resource "aws_iam_role" "try_builds" {
         }
         Condition = {
           StringEquals = {
-            "token.actions.githubusercontent.com:sub" = "repo:rust-lang/rust:ref:refs/heads/automation/bors/try"
+            "token.actions.githubusercontent.com:sub" = "repo:rust-lang/${var.repo}:ref:refs/heads/automation/bors/try"
           }
         }
       }
