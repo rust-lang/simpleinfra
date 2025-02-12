@@ -14,7 +14,6 @@ locals {
           "${aws_s3_bucket.artifacts.arn}/${local.rustc_builds}/*",
           "${aws_s3_bucket.artifacts.arn}/${local.rustc_builds_alt}",
           "${aws_s3_bucket.artifacts.arn}/${local.rustc_builds_alt}/*",
-
         ]
         Action = [
           "s3:GetObject",
