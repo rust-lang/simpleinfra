@@ -1,7 +1,7 @@
 locals {
   rustc_builds     = "rustc-builds"
   rustc_builds_alt = "rustc-builds-alt"
-  iam_prefix = "rustc-ci--rust-lang--rust"
+  iam_prefix       = "rustc-ci--rust-lang--rust"
 
   s3_policy = jsonencode({
     Version = "2012-10-17"
