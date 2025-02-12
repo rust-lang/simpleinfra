@@ -51,7 +51,6 @@ import {
 
 resource "aws_s3_bucket" "artifacts" {
   bucket = "rust-lang-ci2"
-
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "example" {
