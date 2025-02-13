@@ -108,5 +108,5 @@ module "caches_cdn" {
 
   domain_name        = "ci-caches.rust-lang.org"
   origin_domain_name = aws_s3_bucket.caches.bucket_regional_domain_name
-  response_policy_id = data.terraform_remote_state.shared.outputs.mdbook_response_policy
+  response_policy_id = aws_cloudfront_response_headers_policy.s3.id
 }
