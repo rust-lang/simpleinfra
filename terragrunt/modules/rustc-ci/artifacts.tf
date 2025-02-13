@@ -1,7 +1,7 @@
 locals {
   rustc_builds     = "rustc-builds"
   rustc_builds_alt = "rustc-builds-alt"
-  iam_prefix       = "rustc-ci--rust-lang--rust"
+  iam_prefix       = "rustc-ci--rust-lang--${var.repo}"
 
   s3_policy = jsonencode({
     Version = "2012-10-17"
@@ -48,7 +48,7 @@ resource "aws_s3_bucket" "artifacts" {
   bucket = var.artifacts_bucket != null ? var.artifacts_bucket : "rust-lang-ci2"
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "lifecycle_configuration" {
+resource "aws_s3_bucket_lifecycle_configuration" "artifacts_lifecycle" {
   bucket = aws_s3_bucket.artifacts.id
 
   rule {
@@ -100,7 +100,7 @@ module "artifacts_user" {
   source = "../gha-iam-user"
 
   org  = "rust-lang"
-  repo = "rust"
+  repo = var.repo
 
   user_name  = "${locals.iam_prefix}--artifacts"
   env_prefix = "ARTIFACTS"
