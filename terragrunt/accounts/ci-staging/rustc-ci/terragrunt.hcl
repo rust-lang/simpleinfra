@@ -8,5 +8,5 @@ include {
 }
 
 inputs = {
-  repo              = "bors-kindergarten"
+  repo = "bors-kindergarten"
 }
