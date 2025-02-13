@@ -8,7 +8,7 @@ include {
 }
 
 inputs = {
-  repo              = "rust"
-  caches_bucket     = "rust-lang-ci-sccache2"
-  artifacts_bucket  = "rust-lang-ci2"
+  repo             = "rust"
+  caches_bucket    = "rust-lang-ci-sccache2"
+  artifacts_bucket = "rust-lang-ci2"
 }
