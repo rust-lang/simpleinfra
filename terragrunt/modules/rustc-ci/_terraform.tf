@@ -41,3 +41,23 @@ variable "caches_bucket" {
     error_message = "The caches_bucket variable must not be empty when specified."
   }
 }
+
+variable "artifacts_domain" {
+  description = "Domain name for the CloudFront distribution in front of the artifacts bucket."
+  type        = string
+  default     = null
+  validation {
+    condition     = var.artifacts_domain == null || length(var.artifacts_domain) > 0
+    error_message = "The artifacts_domain variable must not be empty when specified."
+  }
+}
+
+variable "caches_domain" {
+  description = "Domain name for the CloudFront distribution in front of the caches bucket."
+  type        = string
+  default     = null
+  validation {
+    condition     = var.caches_domain == null || length(var.caches_domain) > 0
+    error_message = "The caches_domain variable must not be empty when specified."
+  }
+}

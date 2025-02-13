@@ -106,7 +106,7 @@ resource "aws_s3_bucket_acl" "caches" {
 module "caches_cdn" {
   source = "../static-website"
 
-  domain_name        = "ci-caches.rust-lang.org"
+  domain_name        = var.caches_domain != null ? var.caches_domain : "${var.repo}-ci-caches.rust-lang.org"
   origin_domain_name = aws_s3_bucket.caches.bucket_regional_domain_name
   response_policy_id = aws_cloudfront_response_headers_policy.s3.id
 }

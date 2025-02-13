@@ -122,7 +122,7 @@ resource "aws_s3_bucket_acl" "artifacts" {
 module "artifacts_cdn" {
   source = "../static-website"
 
-  domain_name        = "ci-artifacts.rust-lang.org"
+  domain_name        = var.artifacts_domain != null ? var.artifacts_domain : "${var.repo}-ci-artifacts.rust-lang.org"
   origin_domain_name = aws_s3_bucket.artifacts.bucket_regional_domain_name
   response_policy_id = aws_cloudfront_response_headers_policy.s3.id
 }
