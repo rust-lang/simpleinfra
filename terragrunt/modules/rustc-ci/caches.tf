@@ -102,11 +102,9 @@ resource "aws_s3_bucket_acl" "caches" {
   acl    = "public-read"
 }
 
+# TODO: probably this should be imported
 module "caches_cdn" {
   source = "../static-website"
-  providers = {
-    aws = aws.east1
-  }
 
   domain_name        = "ci-caches.rust-lang.org"
   origin_domain_name = aws_s3_bucket.caches.bucket_regional_domain_name

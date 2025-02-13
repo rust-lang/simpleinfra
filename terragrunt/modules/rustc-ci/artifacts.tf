@@ -118,11 +118,9 @@ resource "aws_s3_bucket_acl" "artifacts" {
   acl    = "public-read"
 }
 
+# TODO: probably this should be imported
 module "artifacts_cdn" {
   source = "../static-website"
-  providers = {
-    aws = aws.east1
-  }
 
   domain_name        = "ci-artifacts.rust-lang.org"
   origin_domain_name = aws_s3_bucket.artifacts.bucket_regional_domain_name
