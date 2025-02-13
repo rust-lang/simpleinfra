@@ -43,17 +43,12 @@ locals {
   })
 }
 
-import {
-  to = aws_s3_bucket.artifacts
-  # id retrieved with `terraform state show`.
-  id = "rust-lang-ci2"
-}
-
+# For rust-lang this was imported.
 resource "aws_s3_bucket" "artifacts" {
-  bucket = "rust-lang-ci2"
+  bucket = var.artifacts_bucket != null ? var.artifacts_bucket : "rust-lang-ci2"
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "example" {
+resource "aws_s3_bucket_lifecycle_configuration" "lifecycle_configuration" {
   bucket = aws_s3_bucket.artifacts.id
 
   rule {
