@@ -102,7 +102,7 @@ module "artifacts_user" {
   org  = "rust-lang"
   repo = var.repo
 
-  user_name  = "${locals.iam_prefix}--artifacts"
+  user_name  = "${local.iam_prefix}--artifacts"
   env_prefix = "ARTIFACTS"
 }
 
@@ -152,7 +152,7 @@ resource "aws_s3_bucket_inventory" "artifacts" {
 }
 
 resource "aws_iam_role" "try_builds" {
-  name = "${locals.iam_prefix}--try-role"
+  name = "${local.iam_prefix}--try-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
