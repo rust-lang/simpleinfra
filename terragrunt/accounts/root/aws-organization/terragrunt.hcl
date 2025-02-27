@@ -49,7 +49,7 @@ inputs = {
       given_name = "Jakub"
       family_name = "Beránek"
       email = "berykubik@gmail.com"
-      groups = ["infra"]
+      groups = ["infra", "triagebot"]
     }
     "tobias" = {
       given_name = "Tobias"
