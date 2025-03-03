@@ -209,7 +209,17 @@ resource "aws_iam_role_policy" "promote_release" {
           "${aws_s3_bucket.static.arn}/doc/*",
           "${aws_s3_bucket.static.arn}/dist",
           "${aws_s3_bucket.static.arn}/dist/*",
-
+        ]
+      },
+      {
+        Sid    = "BucketsReadDelete"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObjectAcl",
+          "s3:GetObject",
+          "s3:DeleteObject",
+        ]
+        Resource = [
           // Artifacts bucket
           "${data.aws_s3_bucket.artifacts.arn}/rustc-builds",
           "${data.aws_s3_bucket.artifacts.arn}/rustc-builds/*",
