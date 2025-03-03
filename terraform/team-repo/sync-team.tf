@@ -20,7 +20,7 @@ resource "aws_codebuild_project" "sync_team" {
       phases:
         build:
           commands:
-            - sync-team --live
+            - sync-team apply
       EOF
   }
 
