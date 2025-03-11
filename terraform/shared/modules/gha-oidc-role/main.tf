@@ -25,7 +25,9 @@ resource "aws_iam_role" "ci_role" {
         }
         Condition = {
           StringEquals = {
-            "token.actions.githubusercontent.com:sub" = "repo:${var.org}/${var.repo}:ref:refs/heads/${var.branch}"
+            "token.actions.githubusercontent.com:sub" = (var.environment != null ?
+              "repo:${var.org}/${var.repo}:environment:${var.environment}" :
+            "repo:${var.org}/${var.repo}:ref:refs/heads/${var.branch}")
           }
         }
       }
@@ -46,4 +48,11 @@ variable "repo" {
 variable "branch" {
   type        = string
   description = "The branch of the repository allowed to assume the role"
+  default     = null
+}
+
+variable "environment" {
+  type        = string
+  description = "The GitHub environment allowed to assume the role"
+  default     = null
 }

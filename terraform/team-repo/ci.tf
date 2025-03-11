@@ -11,10 +11,10 @@ module "ecr" {
 // and to invoke the lambda function that runs sync-team.
 
 module "ci_sync_team" {
-  source = "../shared/modules/gha-oidc-role"
-  org    = "rust-lang"
-  repo   = "sync-team"
-  branch = "master"
+  source      = "../shared/modules/gha-oidc-role"
+  org         = "rust-lang"
+  repo        = "sync-team"
+  environment = "deploy"
 }
 
 // IAM role used by rust-lang/team's CI to invoke the lambda function that
