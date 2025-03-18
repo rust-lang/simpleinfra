@@ -1,11 +1,3 @@
-// Manual steps required after provisioning a project:
-// - Connect the GitHub App of the organization, indicating the repositories.
-// - Set webhooks with event type `WORKFLOW_JOB_QUEUED` in the filter group.
-//
-// These manual steps are required because the terraform provider is missing
-// support for GitHub Actions runners.
-// See https://github.com/hashicorp/terraform-provider-aws/issues/39011
-
 module "ubuntu_22_2c" {
   source = "../../modules/codebuild-project"
 
