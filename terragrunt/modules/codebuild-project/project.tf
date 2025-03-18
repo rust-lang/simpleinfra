@@ -50,3 +50,14 @@ resource "aws_codebuild_project" "ubuntu_project" {
     }
   }
 }
+
+resource "aws_codebuild_webhook" "ubuntu_project_webhook" {
+  project_name = aws_codebuild_project.ubuntu_project.name
+  build_type   = "BUILD"
+  filter_group {
+    filter {
+      type    = "EVENT"
+      pattern = "WORKFLOW_JOB_QUEUED"
+    }
+  }
+}
