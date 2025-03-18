@@ -12,7 +12,7 @@ module "ubuntu_22_2c" {
   name         = "ubuntu-22-2c"
   service_role = aws_iam_role.codebuild_role.arn
   compute_type = "BUILD_GENERAL1_SMALL"
-  repository   = "rust-lang/aws-runners-test"
+  repository   = var.repository
 }
 
 module "ubuntu_22_4c" {
@@ -21,7 +21,7 @@ module "ubuntu_22_4c" {
   name         = "ubuntu-22-4c"
   service_role = aws_iam_role.codebuild_role.arn
   compute_type = "BUILD_GENERAL1_MEDIUM"
-  repository   = "rust-lang-ci/rust"
+  repository   = var.repository
 }
 
 module "ubuntu_22_8c" {
@@ -30,7 +30,7 @@ module "ubuntu_22_8c" {
   name         = "ubuntu-22-8c"
   service_role = aws_iam_role.codebuild_role.arn
   compute_type = "BUILD_GENERAL1_LARGE"
-  repository   = "rust-lang-ci/rust"
+  repository   = var.repository
 }
 
 module "ubuntu_22_36c" {
@@ -39,5 +39,5 @@ module "ubuntu_22_36c" {
   name         = "ubuntu-22-36c"
   service_role = aws_iam_role.codebuild_role.arn
   compute_type = "BUILD_GENERAL1_XLARGE"
-  repository   = "rust-lang-ci/rust"
+  repository   = var.repository
 }
