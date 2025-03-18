@@ -43,5 +43,10 @@ resource "aws_codebuild_project" "ubuntu_project" {
     git_submodules_config {
       fetch_submodules = false
     }
+
+    auth {
+      type     = "CODECONNECTIONS"
+      resource = var.code_connection_arn
+    }
   }
 }
