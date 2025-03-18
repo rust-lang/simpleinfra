@@ -21,3 +21,7 @@ variable "repository" {
     error_message = "The repository must be in the format 'owner/repo'."
   }
 }
+
+variable "code_connection_arn" {
+  description = "Arn of the GitHub CodeConnection for the GitHub organization."
+}
