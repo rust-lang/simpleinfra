@@ -6,10 +6,10 @@
 // support for GitHub Actions runners.
 // See https://github.com/hashicorp/terraform-provider-aws/issues/39011
 
-module "ubuntu_small" {
+module "ubuntu_22_2c" {
   source = "../../modules/codebuild-project"
 
-  name         = "ubuntu-small"
+  name         = "ubuntu-22-2c"
   service_role = aws_iam_role.codebuild_role.arn
   compute_type = "BUILD_GENERAL1_SMALL"
   repository   = "rust-lang/aws-runners-test"
