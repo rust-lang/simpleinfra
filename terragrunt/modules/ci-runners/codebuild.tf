@@ -5,7 +5,7 @@ module "ubuntu_22_2c" {
   service_role        = aws_iam_role.codebuild_role.arn
   compute_type        = "BUILD_GENERAL1_SMALL"
   repository          = var.repository
-  code_connection_arn = var.code_connection_arn
+  code_connection_arn = aws_codeconnections_connection.github_connection.arn
 }
 
 module "ubuntu_22_4c" {
@@ -15,7 +15,7 @@ module "ubuntu_22_4c" {
   service_role        = aws_iam_role.codebuild_role.arn
   compute_type        = "BUILD_GENERAL1_MEDIUM"
   repository          = var.repository
-  code_connection_arn = var.code_connection_arn
+  code_connection_arn = aws_codeconnections_connection.github_connection.arn
 }
 
 module "ubuntu_22_8c" {
@@ -25,7 +25,7 @@ module "ubuntu_22_8c" {
   service_role        = aws_iam_role.codebuild_role.arn
   compute_type        = "BUILD_GENERAL1_LARGE"
   repository          = var.repository
-  code_connection_arn = var.code_connection_arn
+  code_connection_arn = aws_codeconnections_connection.github_connection.arn
 }
 
 module "ubuntu_22_36c" {
@@ -35,5 +35,5 @@ module "ubuntu_22_36c" {
   service_role        = aws_iam_role.codebuild_role.arn
   compute_type        = "BUILD_GENERAL1_XLARGE"
   repository          = var.repository
-  code_connection_arn = var.code_connection_arn
+  code_connection_arn = aws_codeconnections_connection.github_connection.arn
 }

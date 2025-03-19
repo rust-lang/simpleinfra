@@ -31,7 +31,7 @@ resource "aws_iam_role_policy" "codebuild_policy" {
           "codeconnections:GetConnectionToken",
           "codeconnections:GetConnection"
         ]
-        Resource = [var.code_connection_arn]
+        Resource = [aws_codeconnections_connection.github_connection.arn]
       }
     ]
   })
