@@ -17,7 +17,7 @@ resource "aws_codebuild_project" "ubuntu_project" {
   environment {
     compute_type = var.compute_type
     // ubuntu
-    image                       = "aws/codebuild/standard:7.0-24.10.29"
+    image                       = "aws/codebuild/standard:7.0-25.01.30"
     type                        = "LINUX_CONTAINER"
     image_pull_credentials_type = "CODEBUILD"
 
