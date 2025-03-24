@@ -18,6 +18,7 @@
         - shep  # play.rust-lang.org
         - technetos  # RDS access to the discord-mods-bot database
         - rylev # RDS access to rustc-perf
+        - kobzol # RDS access to bors
 
     - role: datadog.datadog
       vars:
