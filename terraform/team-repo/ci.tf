@@ -21,10 +21,10 @@ module "ci_sync_team" {
 // runs sync-team.
 
 module "ci_team" {
-  source = "../shared/modules/gha-oidc-role"
-  org    = "rust-lang"
-  repo   = "team"
-  branch = "master"
+  source      = "../shared/modules/gha-oidc-role"
+  org         = "rust-lang"
+  repo        = "team"
+  environment = "deploy"
 }
 
 // Policies that allow the sync-team role to interact with ECR
