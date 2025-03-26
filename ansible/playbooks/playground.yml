@@ -13,6 +13,20 @@
       avoid_removing_docker_users:
         - playground
 
+    - role: datadog.datadog
+      tags:
+        - monitoring
+      vars:
+        datadog_api_key: "{{ vars_datadog_api_key }}"
+        datadog_site: "datadoghq.com"
+
+        datadog_config:
+          tags:
+            - "env:{{ vars_environment }}"
+            - "service:playground"
+          process_config:
+            enabled: "true"
+
     - role: letsencrypt
       dummy_certs: "{{ vars_letsencrypt_dummy_certs }}"
       email: admin@rust-lang.org
@@ -31,3 +45,5 @@
               to: 'http://127.0.0.1:9323/metrics'
 
     - role: playground
+      tags:
+        - application
