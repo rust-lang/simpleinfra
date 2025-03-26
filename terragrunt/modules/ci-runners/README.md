@@ -15,6 +15,8 @@ Manual steps required to configure CI runners:
   click on a codebuild project (2c or 4c, etc.) and connect the AWS account
   to the GitHub app manually. If successful, you should see the following message:
   `Your account is successfully connected by using an AWS managed GitHub App.`
+- Ask the AWS support to increase the default 45 minutes timeout for the
+  CodeBuild projects on new AWS accounts.
 
 ## Delay
 
