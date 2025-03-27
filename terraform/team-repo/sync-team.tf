@@ -72,20 +72,6 @@ resource "aws_codebuild_project" "sync_team" {
   }
 }
 
-// CloudWatch rule to run the synchronization every day.
-
-resource "aws_cloudwatch_event_rule" "start_daily" {
-  name                = "cloudbuild--sync-team"
-  description         = "Run the sync-team CodeBuild every day."
-  schedule_expression = "cron(0 * * * ? *)"
-}
-
-resource "aws_cloudwatch_event_target" "start_daily" {
-  rule     = aws_cloudwatch_event_rule.start_daily.name
-  arn      = aws_codebuild_project.sync_team.arn
-  role_arn = aws_iam_role.start_execution.arn
-}
-
 // IAM Role that CodeBuild will assume when running the build. The role will
 // grant access to write the logs, read parameters and pull the ECR image.
 
