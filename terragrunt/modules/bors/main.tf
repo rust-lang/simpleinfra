@@ -468,6 +468,14 @@ resource "aws_security_group" "rds" {
   name        = "rds"
   description = "Allow necessary communication for rds database"
   vpc_id      = data.aws_vpc.default.id
+
+  ingress {
+      from_port       = 5432
+      to_port         = 5432
+      protocol        = "tcp"
+      security_groups = [data.aws_security_group.bastion.id]
+      description     = "Connections from the bastion"
+    }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ingress_ecs" {
