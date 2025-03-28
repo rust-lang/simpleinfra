@@ -5,6 +5,11 @@ locals {
       name  = "Abi Broom"
       role  = "billing"
     }
+    "adam" = {
+      login = "adamharvey@rustfoundation.org"
+      name  = "Adam Harvey"
+      role  = "user"
+    }
     "jdn" = {
       login = "jandavidnose@rustfoundation.org"
       name  = "Jan David Nose"
@@ -44,6 +49,11 @@ locals {
       login = "infra@rustfoundation.org"
       name  = "Rust Foundation Infrastructure"
       role  = "superuser"
+    }
+    "tobias" = {
+      login = "tobiasbieniek@rustfoundation.org"
+      name  = "Tobias Bieniek"
+      role  = "user"
     }
   }
 }
