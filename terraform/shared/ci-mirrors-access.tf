@@ -11,8 +11,8 @@ resource "aws_iam_role" "foo" {
           Federated = aws_iam_openid_connect_provider.github_actions.arn
         }
         Condition = {
-          StringLike = {
-            "token.actions.githubusercontent.com:sub" = "repo:rust-lang/ci-mirrors:ref:refs/heads/gh-readonly-queue/main/*"
+          StringEquals = {
+            "token.actions.githubusercontent.com:sub" = "repo:rust-lang/ci-mirrors:environment:upload"
           }
         }
       }
