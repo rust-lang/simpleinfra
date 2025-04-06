@@ -26,8 +26,20 @@ resource "aws_iam_role" "foo" {
       Statement = [
         {
           Effect   = "Allow"
-          Action   = ["s3:GetObject", "s3:PutObject"]
+          Action   = "s3:GetObject"
           Resource = "${aws_s3_bucket.rust_lang_ci_mirrors.arn}/*"
+        },
+        {
+          Effect   = "Allow"
+          Action   = "s3:PutObject"
+          Resource = "${aws_s3_bucket.rust_lang_ci_mirrors.arn}/*"
+          Condition = {
+            StringEquals = {
+              // Enforce that the `if-none-match: *` header is provided when uploading a new file,
+              // ensuring CI can never override an existing file.
+              "s3:if-none-match" = "*"
+            }
+          }
         },
       ]
     })
