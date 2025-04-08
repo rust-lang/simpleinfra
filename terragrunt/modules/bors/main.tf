@@ -446,9 +446,12 @@ data "aws_vpc" "default" {
 resource "aws_db_instance" "primary" {
   db_name                 = "bors"
   engine                  = "postgres"
-  engine_version          = "15.5"
+  engine_version          = "15.8"
   instance_class          = "db.t4g.micro"
   backup_retention_period = 7
+
+  # Make the instance accessible from outside the VPC
+  publicly_accessible = true
 
   vpc_security_group_ids = [aws_security_group.rds.id]
 
@@ -468,6 +471,17 @@ resource "aws_security_group" "rds" {
   name        = "rds"
   description = "Allow necessary communication for rds database"
   vpc_id      = data.aws_vpc.default.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "bastion" {
+  security_group_id = aws_security_group.rds.id
+
+  from_port   = 5432
+  to_port     = 5432
+  ip_protocol = "tcp"
+  # Bastion is in the legacy AWS account, so we hardcode its IP address.
+  cidr_ipv4   = "13.57.121.61/32"
+  description = "Connections from the bastion"
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ingress_ecs" {
