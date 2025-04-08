@@ -450,7 +450,8 @@ resource "aws_db_instance" "primary" {
   instance_class          = "db.t4g.micro"
   backup_retention_period = 7
 
-  # Make the instance accessible from outside the VPC
+  # Make the instance accessible from outside the VPC.
+  # This is needed because bastion is in the legacy AWS account.
   publicly_accessible = true
 
   vpc_security_group_ids = [aws_security_group.rds.id]
