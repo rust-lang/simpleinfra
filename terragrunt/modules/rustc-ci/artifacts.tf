@@ -127,7 +127,8 @@ module "artifacts_cdn" {
   response_policy_id = aws_cloudfront_response_headers_policy.s3.id
 }
 
-data "aws_s3_bucket" "inventories" {
+# TODO: this should be imported for the prod environment
+resource "aws_s3_bucket" "inventories" {
   bucket = "rust-inventories"
 }
 
@@ -144,7 +145,7 @@ resource "aws_s3_bucket_inventory" "artifacts" {
   }
   destination {
     bucket {
-      bucket_arn = data.aws_s3_bucket.inventories.arn
+      bucket_arn = aws_s3_bucket.inventories.arn
       prefix     = aws_s3_bucket.artifacts.id
       format     = "CSV"
     }
