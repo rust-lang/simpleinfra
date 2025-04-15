@@ -27,7 +27,7 @@ variable "artifacts_bucket" {
   type        = string
   default     = null
   validation {
-    condition     = var.artifacts_bucket == null || length(var.artifacts_bucket) > 0
+    condition     = var.artifacts_bucket == null ? true : length(var.artifacts_bucket) > 0
     error_message = "The artifacts_bucket variable must not be empty when specified."
   }
 }
@@ -37,7 +37,7 @@ variable "caches_bucket" {
   type        = string
   default     = null
   validation {
-    condition     = var.caches_bucket == null || length(var.caches_bucket) > 0
+    condition     = var.caches_bucket == null ? true : length(var.caches_bucket) > 0
     error_message = "The caches_bucket variable must not be empty when specified."
   }
 }
@@ -47,7 +47,7 @@ variable "artifacts_domain" {
   type        = string
   default     = null
   validation {
-    condition     = var.artifacts_domain == null || length(var.artifacts_domain) > 0
+    condition     = var.artifacts_domain == null ? true : length(var.artifacts_domain) > 0
     error_message = "The artifacts_domain variable must not be empty when specified."
   }
 }
@@ -57,7 +57,7 @@ variable "caches_domain" {
   type        = string
   default     = null
   validation {
-    condition     = var.caches_domain == null || length(var.caches_domain) > 0
+    condition     = var.caches_domain == null ? true : length(var.caches_domain) > 0
     error_message = "The caches_domain variable must not be empty when specified."
   }
 }
