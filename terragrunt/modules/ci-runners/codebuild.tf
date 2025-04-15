@@ -1,201 +1,39 @@
-// Manual steps required after provisioning a project:
-// - Connect the GitHub App of the organization, indicating the repositories.
-// - Set webhooks with event type `WORKFLOW_JOB_QUEUED` in the filter group.
-//
-// These manual steps are required because the terraform provider is missing
-// support for GitHub Actions runners.
-// See https://github.com/hashicorp/terraform-provider-aws/issues/39011
+module "ubuntu_22_2c" {
+  source = "../../modules/codebuild-project"
 
-resource "aws_codebuild_project" "ubuntu_small" {
-  name         = "ubuntu-small"
-  service_role = aws_iam_role.codebuild_role.arn
-
-  artifacts {
-    type = "NO_ARTIFACTS"
-  }
-
-  cache {
-    type = "NO_CACHE"
-    // TODO: evaluate if it's worth adding cache
-    // modes = ["LOCAL_DOCKER_LAYER_CACHE", "LOCAL_SOURCE_CACHE"]
-  }
-
-  environment {
-    compute_type = "BUILD_GENERAL1_SMALL"
-    // ubuntu
-    image                       = "aws/codebuild/standard:7.0-24.10.29"
-    type                        = "LINUX_CONTAINER"
-    image_pull_credentials_type = "CODEBUILD"
-
-    // Whether to enable running the Docker daemon.
-    // The Rust CI uses Docker to build linux artifacts,
-    // so we need this if the target is linux.
-    privileged_mode = true
-  }
-
-  // Disable cloudwatch logs for cost saving.
-  // Logs are available in GitHub Actions.
-  logs_config {
-    cloudwatch_logs {
-      status = "DISABLED"
-    }
-  }
-
-  source {
-    type = "GITHUB"
-    // test repository
-    location        = "https://github.com/rust-lang/aws-runners-test"
-    git_clone_depth = 1
-
-    git_submodules_config {
-      fetch_submodules = false
-    }
-  }
+  name                = "ubuntu-22-2c"
+  service_role        = aws_iam_role.codebuild_role.arn
+  compute_type        = "BUILD_GENERAL1_SMALL"
+  repository          = var.repository
+  code_connection_arn = aws_codeconnections_connection.github_connection.arn
 }
 
-resource "aws_codebuild_project" "ubuntu_22_4c" {
-  name         = "ubuntu-22-4c"
-  service_role = aws_iam_role.codebuild_role.arn
+module "ubuntu_22_4c" {
+  source = "../../modules/codebuild-project"
 
-  artifacts {
-    type = "NO_ARTIFACTS"
-  }
-
-  cache {
-    type = "NO_CACHE"
-    // TODO: evaluate if it's worth adding cache
-    // modes = ["LOCAL_DOCKER_LAYER_CACHE", "LOCAL_SOURCE_CACHE"]
-  }
-
-  build_timeout = 60 * 6 // 6 hours
-
-  environment {
-    compute_type = "BUILD_GENERAL1_MEDIUM"
-    // ubuntu 22
-    image                       = "aws/codebuild/standard:7.0-24.10.29"
-    type                        = "LINUX_CONTAINER"
-    image_pull_credentials_type = "CODEBUILD"
-
-    // Whether to enable running the Docker daemon.
-    // The Rust CI uses Docker to build linux artifacts,
-    // so we need this if the target is linux.
-    privileged_mode = true
-  }
-
-  // Disable cloudwatch logs for cost saving.
-  // Logs are available in GitHub Actions.
-  logs_config {
-    cloudwatch_logs {
-      status = "DISABLED"
-    }
-  }
-
-  source {
-    type = "GITHUB"
-    // test repository
-    location        = "https://github.com/rust-lang-ci/rust"
-    git_clone_depth = 1
-
-    git_submodules_config {
-      fetch_submodules = false
-    }
-  }
+  name                = "ubuntu-22-4c"
+  service_role        = aws_iam_role.codebuild_role.arn
+  compute_type        = "BUILD_GENERAL1_MEDIUM"
+  repository          = var.repository
+  code_connection_arn = aws_codeconnections_connection.github_connection.arn
 }
 
-resource "aws_codebuild_project" "ubuntu_22_8c" {
-  name         = "ubuntu-22-8c"
-  service_role = aws_iam_role.codebuild_role.arn
+module "ubuntu_22_8c" {
+  source = "../../modules/codebuild-project"
 
-  artifacts {
-    type = "NO_ARTIFACTS"
-  }
-
-  cache {
-    type = "NO_CACHE"
-    // TODO: evaluate if it's worth adding cache
-    // modes = ["LOCAL_DOCKER_LAYER_CACHE", "LOCAL_SOURCE_CACHE"]
-  }
-
-  build_timeout = 60 * 6 // 6 hours
-
-  environment {
-    compute_type = "BUILD_GENERAL1_LARGE"
-    // ubuntu 22
-    image                       = "aws/codebuild/standard:7.0-24.10.29"
-    type                        = "LINUX_CONTAINER"
-    image_pull_credentials_type = "CODEBUILD"
-
-    // Whether to enable running the Docker daemon.
-    // The Rust CI uses Docker to build linux artifacts,
-    // so we need this if the target is linux.
-    privileged_mode = true
-  }
-
-  // Disable cloudwatch logs for cost saving.
-  // Logs are available in GitHub Actions.
-  logs_config {
-    cloudwatch_logs {
-      status = "DISABLED"
-    }
-  }
-
-  source {
-    type = "GITHUB"
-    // test repository
-    location        = "https://github.com/rust-lang-ci/rust"
-    git_clone_depth = 1
-
-    git_submodules_config {
-      fetch_submodules = false
-    }
-  }
+  name                = "ubuntu-22-8c"
+  service_role        = aws_iam_role.codebuild_role.arn
+  compute_type        = "BUILD_GENERAL1_LARGE"
+  repository          = var.repository
+  code_connection_arn = aws_codeconnections_connection.github_connection.arn
 }
 
-resource "aws_codebuild_project" "ubuntu_22_36c" {
-  name         = "ubuntu-22-36c"
-  service_role = aws_iam_role.codebuild_role.arn
+module "ubuntu_22_36c" {
+  source = "../../modules/codebuild-project"
 
-  artifacts {
-    type = "NO_ARTIFACTS"
-  }
-
-  cache {
-    type = "NO_CACHE"
-    // TODO: evaluate if it's worth adding cache
-    // modes = ["LOCAL_DOCKER_LAYER_CACHE", "LOCAL_SOURCE_CACHE"]
-  }
-
-  build_timeout = 60 * 6 // 6 hours
-
-  environment {
-    compute_type = "BUILD_GENERAL1_XLARGE"
-    // ubuntu 22
-    image                       = "aws/codebuild/standard:7.0-24.10.29"
-    type                        = "LINUX_CONTAINER"
-    image_pull_credentials_type = "CODEBUILD"
-
-    // Whether to enable running the Docker daemon.
-    // The Rust CI uses Docker to build linux artifacts,
-    // so we need this if the target is linux.
-    privileged_mode = true
-  }
-
-  // Disable cloudwatch logs for cost saving.
-  // Logs are available in GitHub Actions.
-  logs_config {
-    cloudwatch_logs {
-      status = "DISABLED"
-    }
-  }
-
-  source {
-    type = "GITHUB"
-    // test repository
-    location        = "https://github.com/rust-lang-ci/rust"
-    git_clone_depth = 1
-
-    git_submodules_config {
-      fetch_submodules = false
-    }
-  }
+  name                = "ubuntu-22-36c"
+  service_role        = aws_iam_role.codebuild_role.arn
+  compute_type        = "BUILD_GENERAL1_XLARGE"
+  repository          = var.repository
+  code_connection_arn = aws_codeconnections_connection.github_connection.arn
 }

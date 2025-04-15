@@ -76,6 +76,10 @@ def run_playbook(args):
             ansible_args += ["-u", args.user]
         if args.start_at_task is not None:
             ansible_args += ["--start-at-task", args.start_at_task]
+        if args.tags is not None:
+            ansible_args += ["--tags", args.tags]
+        if args.skip_tags is not None:
+            ansible_args += ["--skip-tags", args.skip_tags]
         if args.check:
             ansible_args += ["--check"]
         if args.diff:
@@ -104,6 +108,14 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--start-at-task", help="start at a task with the provided name",
+        default=None,
+    )
+    parser.add_argument(
+        "--tags", help="run only these tags",
+        default=None,
+    )
+    parser.add_argument(
+        "--skip-tags", help="do not run these tags",
         default=None,
     )
     parser.add_argument(

@@ -61,9 +61,9 @@ exports.handler = (event, context, callback) => {
     const request = event.Records[0].cf.request;
     console.log("request.uri = " + request.uri);
 
-    // Redirect `/` to the rust-lang.org website
+    // Redirect `/` to the /stable/ page
     if (request.uri === '/' || request.uri === '/index.html') {
-        return temp_redirect('https://www.rust-lang.org/learn', callback);
+        return temp_redirect('/stable/', callback);
     }
 
     // Forward patch versioned documentation as-is.

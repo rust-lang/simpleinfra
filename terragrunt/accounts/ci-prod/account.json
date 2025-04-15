@@ -1,0 +1,10 @@
+{
+    "aws": {
+        "profile": "ci-prod",
+        "regions": [
+            {
+                "region": "us-east-2"
+            }
+        ]
+    }
+}

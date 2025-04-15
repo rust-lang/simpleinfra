@@ -65,10 +65,12 @@
 
 # --------------------
 
-- name: Install atop
+# Previously installed, removing due to
+# https://rachelbythebay.com/w/2025/03/25/atop/
+- name: Uninstall atop
   apt:
     name: atop
-    state: present
+    state: absent
 
 # --------------------
 
