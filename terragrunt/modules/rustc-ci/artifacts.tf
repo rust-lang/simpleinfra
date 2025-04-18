@@ -127,7 +127,7 @@ module "artifacts_cdn" {
   response_policy_id = aws_cloudfront_response_headers_policy.s3.id
 }
 
-# TODO: this should be imported for the prod environment
+# In the prod environment, this was imported
 resource "aws_s3_bucket" "inventories" {
   bucket = "rust-inventories"
 }
