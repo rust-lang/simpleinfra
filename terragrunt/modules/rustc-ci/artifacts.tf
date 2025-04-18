@@ -132,6 +132,7 @@ resource "aws_s3_bucket" "inventories" {
   bucket = "rust-inventories"
 }
 
+# In the prod environment, this was imported
 resource "aws_s3_bucket_inventory" "artifacts" {
   name    = "all-objects-csv"
   bucket  = aws_s3_bucket.artifacts.id
