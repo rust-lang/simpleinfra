@@ -1,6 +1,6 @@
-# For rust-lang this was imported.
+# For the rust-lang repo (prod environment) this was imported.
 resource "aws_s3_bucket" "caches" {
-  bucket = var.caches_bucket != null ? var.caches_bucket : "rust-lang-ci-sccache2"
+  bucket = var.caches_bucket != null ? var.caches_bucket : "${var.repo}-ci-sccache"
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "caches_lifecycle" {

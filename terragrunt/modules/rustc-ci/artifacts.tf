@@ -45,7 +45,7 @@ locals {
 
 # For the rust-lang repo (prod environment) this was imported.
 resource "aws_s3_bucket" "artifacts" {
-  bucket = var.artifacts_bucket != null ? var.artifacts_bucket : "rust-lang-ci2"
+  bucket = var.artifacts_bucket != null ? var.artifacts_bucket : "${var.repo}-ci-artifacts"
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "artifacts_lifecycle" {

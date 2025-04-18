@@ -23,7 +23,7 @@ variable "repo" {
 }
 
 variable "artifacts_bucket" {
-  description = "ID of the existing S3 bucket to store build artifacts. If unspecified, a new bucket is created."
+  description = "ID of the S3 bucket to store build artifacts. If unspecified, it is automatically generated, based on the repo name."
   type        = string
   default     = null
   validation {
@@ -33,7 +33,7 @@ variable "artifacts_bucket" {
 }
 
 variable "caches_bucket" {
-  description = "ID of the existing S3 bucket to store caches. If unspecified, a new bucket is created."
+  description = "ID of the S3 bucket to store caches. If unspecified, it is automatically generated, based on the repo name."
   type        = string
   default     = null
   validation {
