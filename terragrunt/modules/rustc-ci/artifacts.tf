@@ -102,8 +102,9 @@ module "artifacts_user" {
   org  = "rust-lang"
   repo = var.repo
 
-  user_name  = "${local.iam_prefix}--artifacts"
-  env_prefix = "ARTIFACTS"
+  environment = "bors"
+  user_name   = "${local.iam_prefix}--artifacts"
+  env_prefix  = "ARTIFACTS"
 }
 
 resource "aws_iam_user_policy" "artifacts_write" {

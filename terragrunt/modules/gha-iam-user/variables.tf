@@ -19,3 +19,9 @@ variable "env_prefix" {
   default     = null
   description = "Prefix the environment variables in GitHub Actions should have"
 }
+
+variable "environment" {
+  type        = string
+  default     = null
+  description = "The name of the GitHub environment to use for environment secrets. If omitted, repository secrets will be created."
+}

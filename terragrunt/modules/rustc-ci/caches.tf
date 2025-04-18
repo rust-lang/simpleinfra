@@ -51,8 +51,9 @@ module "caches_user" {
   org  = "rust-lang"
   repo = var.repo
 
-  user_name  = "rustc-ci--rust-lang--caches"
-  env_prefix = "CACHES"
+  environment = "bors"
+  user_name   = "rustc-ci--rust-lang--caches"
+  env_prefix  = "CACHES"
 }
 
 resource "aws_iam_user_policy" "caches_write" {
