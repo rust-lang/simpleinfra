@@ -43,7 +43,7 @@ locals {
   })
 }
 
-# For rust-lang this was imported.
+# For the rust-lang repo (prod environment) this was imported.
 resource "aws_s3_bucket" "artifacts" {
   bucket = var.artifacts_bucket != null ? var.artifacts_bucket : "rust-lang-ci2"
 }
