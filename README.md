@@ -9,7 +9,7 @@ this repo require privileges only infra team members have.
 * [**github-actions**](github-actions/README.md): shared actions for GitHub
   Actions
 * [**setup-deploy-keys**](#setup-deploy-keys): automation for GitHub deploy keys
-* [**terraform**](terraform/shared/README.md): Terraform configuration to deploy our
+* [**terraform**](terraform/README.md): Terraform configuration to deploy our
   cloud resources
 * [**with-rust-key**](#with-rust-key): execute commands using the Rust release
   signing key
