@@ -35,6 +35,13 @@ resource "aws_identitystore_group" "crates_io" {
   description  = "The crates.io team"
 }
 
+resource "aws_identitystore_group" "metrics_initiative" {
+  identity_store_id = local.identity_store_id
+
+  display_name = "metrics-initiative"
+  description  = "The metrics-initiative team"
+}
+
 resource "aws_identitystore_group" "triagebot" {
   identity_store_id = local.identity_store_id
 
@@ -345,6 +352,18 @@ locals {
         { group : aws_identitystore_group.infra-admins,
         permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
         { group : aws_identitystore_group.infra,
+        permissions : [aws_ssoadmin_permission_set.read_only_access] },
+      ]
+    },
+    # metrics initiative prod
+    {
+      account : aws_organizations_account.metrics_initiative_prod,
+      groups : [
+        { group : aws_identitystore_group.infra-admins,
+        permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
+        { group : aws_identitystore_group.infra,
+        permissions : [aws_ssoadmin_permission_set.read_only_access] },
+        { group : aws_identitystore_group.metrics_initiative,
         permissions : [aws_ssoadmin_permission_set.read_only_access] },
       ]
     },

@@ -1,11 +1,12 @@
 locals {
   groups = {
     billing : aws_identitystore_group.billing
+    crates-io : aws_identitystore_group.crates_io
     infra : aws_identitystore_group.infra
     infra-admins : aws_identitystore_group.infra-admins
-    crates-io : aws_identitystore_group.crates_io
-    triagebot : aws_identitystore_group.triagebot
+    metrics-initiative : aws_identitystore_group.metrics_initiative
     release : aws_identitystore_group.release
+    triagebot : aws_identitystore_group.triagebot
   }
 
   # Expand var.users into collection of group memberships associations
