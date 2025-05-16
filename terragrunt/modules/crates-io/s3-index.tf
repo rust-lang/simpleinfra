@@ -4,6 +4,14 @@ resource "aws_s3_bucket" "index" {
   versioning {
     enabled = true
   }
+
+  // Allow browsers to fetch index files from JavaScript.
+  cors_rule {
+    allowed_methods = ["GET"]
+    allowed_headers = ["*"]
+    allowed_origins = ["*"]
+    max_age_seconds = 3000
+  }
 }
 
 resource "aws_s3_bucket_policy" "index" {
