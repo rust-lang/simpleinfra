@@ -93,5 +93,11 @@ inputs = {
       email       = "cuviper@gmail.com"
       groups      = ["release"]
     }
+    "Urgau" = {
+      given_name  = "Urgau"
+      family_name = "n/a"
+      email       = "urgau@numericable.fr"
+      groups      = ["triagebot"]
+    }
   }
 }
