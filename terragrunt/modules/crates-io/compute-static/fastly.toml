@@ -9,4 +9,4 @@ name = "compute-static"
 service_id = ""
 
 [scripts]
-  build = "cargo build --bin compute-static --release --target wasm32-wasi --color always"
+build = "cargo build --bin compute-static --release --target wasm32-wasip1 --color always"
