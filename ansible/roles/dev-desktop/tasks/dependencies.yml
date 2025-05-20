@@ -63,7 +63,7 @@
       - capnproto
       - libcapnp-dev
       - zsh
-      # Needed to build libgccjit(for running `cg_gcc` on architectures other than x86)
+      # The following 4 packages are needed to build libgccjit(for running `cg_gcc` on architectures other than x86)
       - libmpfr-dev
       - libgmp-dev
       - libmpc3
