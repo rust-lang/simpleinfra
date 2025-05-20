@@ -63,6 +63,11 @@
       - capnproto
       - libcapnp-dev
       - zsh
+      # The following 4 packages are needed to build libgccjit(for running `cg_gcc` on architectures other than x86)
+      - libmpfr-dev
+      - libgmp-dev
+      - libmpc3
+      - libmpc-dev
     state: present
 
 # we don't need it because we don't need to send emails
