@@ -99,5 +99,11 @@ inputs = {
       email       = "jlusby42@gmail.com"
       groups      = ["metrics-initiative"]
     }
+    "Urgau" = {
+      given_name  = "Urgau"
+      family_name = "n/a"
+      email       = "urgau@numericable.fr"
+      groups      = ["triagebot"]
+    }
   }
 }
