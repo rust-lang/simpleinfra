@@ -1,7 +1,7 @@
 resource "aws_grafana_workspace" "grafana" {
   name = var.workspace_name
 
-  account_access_type = "CURRENT_ACCOUNT"
+  account_access_type      = "CURRENT_ACCOUNT"
   authentication_providers = ["AWS_SSO"]
 
   // IAM roles and IAM policy attachments are generated automatically
@@ -29,7 +29,7 @@ resource "aws_iam_role" "assume" {
 
 resource "aws_grafana_role_association" "admins" {
   workspace_id = aws_grafana_workspace.grafana.id
-  role = "ADMIN"
+  role         = "ADMIN"
 
   user_ids = ["44a894b8-d021-705c-5624-3e4485917fa0"]
 }
