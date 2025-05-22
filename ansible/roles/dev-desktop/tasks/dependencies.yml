@@ -68,6 +68,11 @@
       - libgmp-dev
       - libmpc3
       - libmpc-dev
+      # Necessary for kani
+      - bison
+      - zlib1g
+      - zlib1g-dev
+      - unzip
     state: present
 
 # we don't need it because we don't need to send emails
