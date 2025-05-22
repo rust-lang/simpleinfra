@@ -93,5 +93,11 @@ inputs = {
       email       = "cuviper@gmail.com"
       groups      = ["release"]
     }
+    "yaahc" = {
+      given_name  = "Jane"
+      family_name = "Losare-Lusby"
+      email       = "jlusby42@gmail.com"
+      groups      = ["metrics-initiative"]
+    }
   }
 }

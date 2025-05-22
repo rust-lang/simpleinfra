@@ -51,3 +51,8 @@ resource "aws_organizations_account" "ci_prod" {
   name  = "ci-prod"
   email = "admin+ci-prod@rust-lang.org"
 }
+
+resource "aws_organizations_account" "metrics_initiative_prod" {
+  name  = "metrics-initiative-prod"
+  email = "admin+metrics-initiative-prod@rust-lang.org"
+}

@@ -1,0 +1,10 @@
+{
+    "aws": {
+        "profile": "metrics-initiative-prod",
+        "regions": [
+            {
+                "region": "us-east-2"
+            }
+        ]
+    }
+}
