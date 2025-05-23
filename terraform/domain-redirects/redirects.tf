@@ -76,3 +76,15 @@ module "docs_rs_metadata" {
   ]
   permanent = true
 }
+
+module "rustlings" {
+  source = "./impl"
+  providers = {
+    aws       = aws
+    aws.east1 = aws.east1
+  }
+
+  to_host   = "rustlings.rust-lang.org"
+  from      = ["rustlings.cool"]
+  permanent = true
+}
