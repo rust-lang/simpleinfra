@@ -14,6 +14,7 @@
       - apt-file  # Allows showing the contents of packages which aren't installed
       - build-essential
       - clang
+      - clang-19 # For clang-19 C toolchain, as `clang` ATM is still clang-18.
       - cmake
       - gcc-mingw-w64-x86-64 # Allows running `x check --target x86_64-pc-windows-gnu`
       - jq
