@@ -42,28 +42,56 @@ terraform {
 
 resource "aws_s3_bucket" "redirect" {
   bucket = "rust-http-redirect-${substr(sha1("${var.to_host}|${var.to_path}"), 0, 7)}"
-  acl    = "public-read"
+}
 
-  website {
-    # If redirect_all_requests_to (which conflicts with routing_rules and
-    # doesn't allow choosing the response code) is not present AWS requires
-    # index_document to be present unfortunately.
-    #
-    # This object is missing from the bucket, but it shouldn't matter as the
-    # routing_rules below unconditionally redirects all requests
-    index_document = "missing-object-but-this-field-is-required-by-s3"
+resource "aws_s3_bucket_website_configuration" "redirect" {
+  bucket = aws_s3_bucket.redirect.id
 
-    routing_rules = jsonencode([
-      {
-        Redirect = {
-          HostName             = var.to_host
-          ReplaceKeyPrefixWith = var.to_path
-          Protocol             = "https"
-          HttpRedirectCode     = var.permanent ? "301" : "302"
-        }
-      }
-    ])
+  # If redirect_all_requests_to (which conflicts with routing_rules and
+  # doesn't allow choosing the response code) is not present AWS requires
+  # index_document to be present unfortunately.
+  #
+  # This object is missing from the bucket, but it shouldn't matter as the
+  # routing_rules below unconditionally redirects all requests
+  index_document {
+    suffix = "missing-object-but-this-field-is-required-by-s3"
   }
+
+  routing_rule {
+    redirect {
+      host_name               = var.to_host
+      replace_key_prefix_with = var.to_path
+      protocol                = "https"
+      http_redirect_code      = var.permanent ? "301" : "302"
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "redirect" {
+  bucket = aws_s3_bucket.redirect.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = ["s3:GetObject"]
+        Resource  = ["${aws_s3_bucket.redirect.arn}/*"]
+      }
+    ]
+  })
+
+  // By default AWS enables public access block, which causes this bucket policy to fail creation.
+  // Create an explicit dependency, to ensure we always disable public access block first.
+  depends_on = [aws_s3_bucket_public_access_block.redirect]
+}
+
+resource "aws_s3_bucket_public_access_block" "redirect" {
+  bucket                  = aws_s3_bucket.redirect.id
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
 }
 
 // CloudFront distribution used to cache the redirects near the users and to
@@ -109,7 +137,7 @@ resource "aws_cloudfront_distribution" "redirect" {
 
   origin {
     origin_id   = "main"
-    domain_name = aws_s3_bucket.redirect.website_endpoint
+    domain_name = aws_s3_bucket_website_configuration.redirect.website_endpoint
 
     custom_origin_config {
       http_port              = 80
