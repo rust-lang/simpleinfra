@@ -30,6 +30,12 @@ resource "fastly_service_compute" "docs_rs" {
     address       = local.origin
     override_host = local.origin
 
+    # https://www.fastly.com/documentation/guides/getting-started/hosts/shielding/
+    # caveats:
+    # https://www.fastly.com/documentation/guides/getting-started/hosts/shielding/#caveats-of-shielding
+    # this is the "san jose" shield location, closest to our origin in us-west1 (north california)
+    shield = "sjc-ca-us"
+
     use_ssl = false
     port    = 80
   }
