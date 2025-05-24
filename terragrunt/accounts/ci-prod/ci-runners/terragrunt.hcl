@@ -8,6 +8,6 @@ include {
 }
 
 inputs = {
-  code_connection_name = "prod-gh-connection"
+  code_connection_name = "rust-lang-prod-gh-connection"
   repository           = "rust-lang/rust"
 }
