@@ -73,6 +73,11 @@
       - zlib1g
       - zlib1g-dev
       - unzip
+      # Necessary for jless
+      - libxcb1-dev
+      - libxcb-render0-dev
+      - libxcb-shape0-dev
+      - libxcb-xfixes0-dev
     state: present
 
 # we don't need it because we don't need to send emails
