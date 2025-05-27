@@ -1,32 +1,11 @@
-module "ubuntu_22_2c" {
-  source = "../../modules/codebuild-project"
+# Codebuild has a separate webhook target per runner type,
+# and it has to receive webhooks about all jobs starting.
+# So adding projects results in more webhooks sent from GitHub to AWS.
 
-  name                = "ubuntu-22-2c"
-  service_role        = aws_iam_role.codebuild_role.arn
-  compute_type        = "BUILD_GENERAL1_SMALL"
-  repository          = var.repository
-  code_connection_arn = aws_codeconnections_connection.github_connection.arn
-}
+# AWS has a webhook rate limit on the number of build requests that can be made per second, and in the auto build we start many builds in parallel.
 
-module "ubuntu_22_4c" {
-  source = "../../modules/codebuild-project"
-
-  name                = "ubuntu-22-4c"
-  service_role        = aws_iam_role.codebuild_role.arn
-  compute_type        = "BUILD_GENERAL1_MEDIUM"
-  repository          = var.repository
-  code_connection_arn = aws_codeconnections_connection.github_connection.arn
-}
-
-module "ubuntu_22_8c" {
-  source = "../../modules/codebuild-project"
-
-  name                = "ubuntu-22-8c"
-  service_role        = aws_iam_role.codebuild_role.arn
-  compute_type        = "BUILD_GENERAL1_LARGE"
-  repository          = var.repository
-  code_connection_arn = aws_codeconnections_connection.github_connection.arn
-}
+# Check out https://github.com/rust-lang/rust/settings/hooks if jobs don't start. It might be that
+# you are being rate limited by AWS.
 
 module "ubuntu_22_36c" {
   source = "../../modules/codebuild-project"
