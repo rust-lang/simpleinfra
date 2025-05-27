@@ -26,3 +26,5 @@ vars_user_config:
     shell: /usr/bin/fish
   - username: gh-syphar
     shell: /usr/bin/fish
+  - username: gh-jhpratt
+    shell: /usr/bin/zsh
