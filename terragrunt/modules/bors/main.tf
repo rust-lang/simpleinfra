@@ -446,9 +446,11 @@ data "aws_vpc" "default" {
 resource "aws_db_instance" "primary" {
   db_name                 = "bors"
   engine                  = "postgres"
-  engine_version          = "15.8"
+  engine_version          = "16.9"
   instance_class          = "db.t4g.micro"
   backup_retention_period = 7
+
+  allow_major_version_upgrade = true
 
   # Make the instance accessible from outside the VPC.
   # This is needed because bastion is in the legacy AWS account.
