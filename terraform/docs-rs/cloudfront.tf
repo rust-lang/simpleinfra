@@ -110,6 +110,15 @@ resource "aws_cloudfront_distribution" "webapp" {
       origin_ssl_protocols   = ["TLSv1.2"]
     }
 
+    origin_shield {
+      enabled = true
+      # the docs.rs webserver is in `us-west-1` but origin shield
+      # isn't available there.
+      # So we enable it in `us-west-2` instead, following the documentation.
+      # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/origin-shield.html
+      origin_shield_region = "us-west-2"
+    }
+
     custom_header {
       name  = "X-Origin-Auth"
       value = random_password.origin_auth.result
