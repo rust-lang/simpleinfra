@@ -17,6 +17,7 @@
       - cmake
       - gcc-mingw-w64-x86-64 # Allows running `x check --target x86_64-pc-windows-gnu`
       - jq
+      - tidy # Format and diff html for rustdoc
       - cvise
       - libssl-dev
       - llvm
