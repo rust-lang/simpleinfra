@@ -12,7 +12,7 @@ resource "aws_iam_role" "invalidate_forge" {
         }
         Condition = {
           StringEquals = {
-            "token.actions.githubusercontent.com:sub" = "repo:rust-lang/rust-forge:ref:refs/heads/master"
+            "token.actions.githubusercontent.com:sub" = "repo:rust-lang/rust-forge:environment:github-pages"
           }
         }
       }
