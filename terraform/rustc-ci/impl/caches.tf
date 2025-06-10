@@ -50,62 +50,6 @@ resource "aws_s3_bucket_public_access_block" "caches" {
   restrict_public_buckets = true
 }
 
-module "caches_user" {
-  source = "../../shared/modules/gha-iam-user"
-
-  org  = split("/", var.repo)[0]
-  repo = split("/", var.repo)[1]
-
-  user_name  = "${var.iam_prefix}--caches"
-  env_prefix = "CACHES"
-}
-
-resource "aws_iam_access_key" "caches_legacy" {
-  user = module.caches_user.user_name
-}
-
-resource "aws_iam_user_policy" "caches_write" {
-  name = "caches-write"
-  user = module.caches_user.user_name
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "CachesBucketWrite"
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:DeleteObject",
-          "s3:PutObject",
-          "s3:PutObjectAcl",
-        ]
-        Resource = [
-          "${aws_s3_bucket.caches.arn}",
-          "${aws_s3_bucket.caches.arn}/*",
-        ]
-      },
-      {
-        Sid    = "CachesBucketList"
-        Effect = "Allow"
-        Action = [
-          "s3:ListBucket"
-        ]
-        Resource = "${aws_s3_bucket.caches.arn}"
-      },
-      {
-        Sid    = "HeadBuckets"
-        Effect = "Allow"
-        Action = [
-          "s3:HeadBucket",
-          "s3:GetBucketLocation",
-        ]
-        Resource = "*"
-      },
-    ]
-  })
-}
-
 module "caches_cdn" {
   for_each = toset(var.caches_domain == null ? [] : ["true"])
 

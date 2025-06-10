@@ -55,63 +55,6 @@ resource "aws_s3_bucket_public_access_block" "artifacts" {
   restrict_public_buckets = true
 }
 
-module "artifacts_user" {
-  source = "../../shared/modules/gha-iam-user"
-
-  org  = split("/", var.repo)[0]
-  repo = split("/", var.repo)[1]
-
-  user_name  = "${var.iam_prefix}--artifacts"
-  env_prefix = "ARTIFACTS"
-}
-
-resource "aws_iam_access_key" "artifacts_legacy" {
-  user = module.artifacts_user.user_name
-}
-
-resource "aws_iam_user_policy" "artifacts_write" {
-  name = "artifacts-write"
-  user = module.artifacts_user.user_name
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "ArtifactsBucketWrite"
-        Effect = "Allow"
-        Resource = [
-          "${aws_s3_bucket.artifacts.arn}/rustc-builds",
-          "${aws_s3_bucket.artifacts.arn}/rustc-builds/*",
-          "${aws_s3_bucket.artifacts.arn}/rustc-builds-alt",
-          "${aws_s3_bucket.artifacts.arn}/rustc-builds-alt/*",
-        ]
-        Action = [
-          "s3:GetObject",
-          "s3:DeleteObject",
-          "s3:PutObject",
-          "s3:PutObjectAcl",
-        ]
-      },
-      {
-        Sid      = "ArtifactsBucketList"
-        Effect   = "Allow"
-        Resource = "${aws_s3_bucket.artifacts.arn}"
-        Action = [
-          "s3:ListBucket",
-        ],
-      },
-      {
-        Sid      = "HeadBuckets",
-        Effect   = "Allow",
-        Resource = "*"
-        Action = [
-          "s3:HeadBucket",
-          "s3:GetBucketLocation",
-        ],
-      },
-    ]
-  })
-}
 
 module "artifacts_cdn" {
   for_each = toset(var.artifacts_domain == null ? [] : ["true"])
