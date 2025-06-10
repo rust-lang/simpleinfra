@@ -34,6 +34,9 @@ resource "aws_cloudfront_cache_policy" "docs_rs" {
           "CloudFront-Forwarded-Proto",
           // Allow detecting the domain name from the webapp
           "Host",
+          // allow detecting supported compression algorithms,
+          // also cache the response based on them.
+          "Accept-Encoding",
         ]
       }
     }
