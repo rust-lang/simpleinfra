@@ -49,16 +49,3 @@ resource "aws_s3_bucket_public_access_block" "caches" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
-
-module "caches_cdn" {
-  for_each = toset(var.caches_domain == null ? [] : ["true"])
-
-  source = "../../shared/modules/static-website"
-  providers = {
-    aws = aws.east1
-  }
-
-  domain_name        = var.caches_domain
-  origin_domain_name = aws_s3_bucket.caches.bucket_regional_domain_name
-  response_policy_id = var.response_policy_id
-}
