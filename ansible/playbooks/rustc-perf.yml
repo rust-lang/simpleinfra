@@ -1,0 +1,21 @@
+---
+
+- hosts: rustc-perf
+  become: yes
+  become_user: root
+
+  roles:
+    - role: common
+      sudo_users: "{{ global_sudo_users }}"
+
+    - role: datadog.datadog
+      vars:
+        datadog_api_key: "{{ vars_datadog_api_key }}"
+        datadog_site: "datadoghq.com"
+
+        datadog_config:
+          tags:
+            - "env:{{ vars_environment }}"
+            - "service:rustc-perf"
+          process_config:
+            enabled: "true"
