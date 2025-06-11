@@ -6,7 +6,7 @@
 
   roles:
     - role: common
-      sudo_users: "{{ global_sudo_users }}"
+      sudo_users: "{{ global_sudo_users + vars_extra_sudo_users }}"
 
     - role: datadog.datadog
       vars:
