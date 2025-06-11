@@ -15,3 +15,6 @@ dev-desktop-us-2.infra.rust-lang.org
 
 [crater-server]
 crater.infra.rust-lang.org
+
+[rustc-perf]
+rustc-perf-one.infra.rust-lang.org

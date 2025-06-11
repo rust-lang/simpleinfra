@@ -1,0 +1,4 @@
+---
+
+vars_extra_sudo_users:
+  - "kobzol"
