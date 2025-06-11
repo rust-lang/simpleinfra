@@ -53,6 +53,16 @@ resource "aws_iam_group_policy" "rustc_perf" {
           "${data.aws_cloudwatch_log_group.rustc_perf_web.arn}:*:log-stream:*",
         ]
       },
+      // Parameters read by Ansible during deployment.
+      {
+        Effect = "Allow"
+        Action = ["ssm:GetParameters", "ssm:GetParametersByPath"]
+        Resource = [
+          "arn:aws:ssm:us-west-1:890664054962:parameter/prod/ansible/all/*",
+          "arn:aws:ssm:us-west-1:890664054962:parameter/prod/ansible/rustc-perf/*",
+          "arn:aws:ssm:us-west-1:890664054962:parameter/staging/ansible/all/*",
+        ]
+      },
     ]
   })
 }
