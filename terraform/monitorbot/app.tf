@@ -14,7 +14,7 @@ module "monitorbot" {
   platform_version = "1.4.0"
 
   environment = {
-    MONITORBOT_RUNNERS_REPOS               = "rust-lang-ci/rust"
+    MONITORBOT_RUNNERS_REPOS               = "rust-lang/rust"
     MONITORBOT_GH_RATE_LIMIT_STATS_REFRESH = 40
   }
 
