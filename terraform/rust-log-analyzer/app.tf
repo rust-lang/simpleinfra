@@ -16,7 +16,7 @@ module "rla" {
   environment = {
     CI_REPO     = "rust-lang/rust"
     CI_PROVIDER = "actions"
-    EXTRA_ARGS  = "--secondary-repo rust-lang-ci/rust"
+    EXTRA_ARGS  = ""
     GITHUB_USER = "rust-log-analyzer"
     INDEX_FILE  = "s3://${aws_s3_bucket.storage.id}/rust-lang/rust/actions.idx"
     RLA_LOG     = "rla_server=trace,rust_log_analyzer=trace"
