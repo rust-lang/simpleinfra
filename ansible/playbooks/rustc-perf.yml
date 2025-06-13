@@ -18,4 +18,161 @@
             - "env:{{ vars_environment }}"
             - "service:rustc-perf"
           process_config:
-            enabled: "true"
+            enabled: "false"
+
+  tasks:
+    # Create user account used for benchmarking
+    - name: Create the 'collector' user
+      user:
+        name: collector
+        shell: /bin/bash
+        create_home: yes
+
+    # Setup build dependencies
+    - name: install apt packages
+      apt:
+        name:
+          # For compilation of C/C++ dependencies and linking
+          - build-essential
+          - pkg-config
+          - cmake
+          - libssl-dev
+          # For `perf` and `cpupower` to work
+          - linux-tools-generic
+          - linux-cloud-tools-generic
+        state: present
+
+    # Install rustup/rustc/cargo
+    - name: check if cargo is installed
+      become: yes
+      become_user: collector
+      shell: |
+        test -f ~/.cargo/env && . ~/.cargo/env && command -v cargo
+      register: cargo_exists
+      ignore_errors: yes
+
+    - name: Download Installer
+      when: cargo_exists is failed
+      become: yes
+      become_user: collector
+      get_url:
+        url: https://sh.rustup.rs
+        dest: /tmp/sh.rustup.rs
+        mode: '0755'
+        force: 'yes'
+
+    - name: install rust/cargo
+      become: yes
+      become_user: collector
+      when: cargo_exists is failed
+      shell: /tmp/sh.rustup.rs -y
+
+    # Configure profiling and low-noise parameters
+    - name: Set kernel.perf_event_paranoid to -1 to enable profiling
+      sysctl:
+        name: kernel.perf_event_paranoid
+        value: -1
+        state: present
+        sysctl_set: yes
+        reload: yes
+
+    - name: Disable watchdog to reduce interrupts and noise
+      sysctl:
+        name: kernel.nmi_watchdog
+        value: 0
+        state: present
+        sysctl_set: yes
+        reload: yes
+
+    - name: Disable ASLR to reduce noise
+      sysctl:
+        name: kernel.randomize_va_space
+        value: 0
+        state: present
+        sysctl_set: yes
+        reload: yes
+
+    - name: Discourage swapping
+      sysctl:
+        name: vm.swappiness
+        value: 10
+        state: present
+        sysctl_set: yes
+        reload: yes
+
+    - name: Create systemd service to disable hyper-threading and frequency scaling
+      copy:
+        dest: /etc/systemd/system/low-noise.service
+        content: |
+          [Unit]
+          Description=Disable hyper-threading and frequency scaling at boot
+          After=multi-user.target
+
+          [Service]
+          Type=oneshot
+          ExecStart=/bin/sh -c 'echo off > /sys/devices/system/cpu/smt/control; cpupower frequency-set -g performance'
+          RemainAfterExit=yes
+
+          [Install]
+          WantedBy=multi-user.target
+      become: yes
+
+    - name: Enable low-noise service
+      systemd:
+        name: low-noise.service
+        enabled: yes
+        daemon_reload: yes
+      become: yes
+
+    # Periodically clean old entries in /tmp
+    - name: Configure systemd-tmpfiles to clean old /tmp dirs
+      copy:
+        dest: /etc/tmpfiles.d/tmp-clean.conf
+        content: |
+          D /tmp 1777 root root 7d
+        mode: '0644'
+        owner: root
+        group: root
+      become: yes
+
+    - name: Ensure systemd-tmpfiles-clean.timer is enabled
+      systemd:
+        name: systemd-tmpfiles-clean.timer
+        enabled: yes
+        state: started
+      become: yes
+
+    # Configure the rustc-perf service
+    - name: Checkout rustc-perf
+      ansible.builtin.git:
+        # The version isn't important, as the benchmarking script will auto-update itself
+        repo: "https://github.com/rust-lang/rustc-perf.git"
+        dest: /home/collector/rustc-perf
+      become: yes
+      become_user: collector
+
+    - name: Create systemd service to run rustc-perf
+      copy:
+        dest: /etc/systemd/system/collector.service
+        content: |
+          [Unit]
+          Description=rustc-perf collector
+          After=network.target
+
+          [Service]
+          ExecStart=/home/collector/rustc-perf/run.sh
+          WorkingDirectory=/home/collector/rustc-perf
+          User=collector
+          Group=collector
+          Restart=always
+
+          [Install]
+          WantedBy=multi-user.target
+      become: yes
+
+    - name: Enable collector service
+      systemd:
+        name: collector.service
+        enabled: yes
+        daemon_reload: yes
+      become: yes
