@@ -1,0 +1,13 @@
+---
+
+# The default configuration of unattended-upgrades is to install security updates only.
+- name: install the unattended-upgrades package
+  apt:
+    name: unattended-upgrades
+    state: present
+
+- name: ensure unattended-upgrades is running and enabled
+  service:
+    name: unattended-upgrades
+    state: started
+    enabled: yes
