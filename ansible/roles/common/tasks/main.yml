@@ -9,3 +9,4 @@
 - include_tasks: papertrail.yml
 - include_tasks: cleanup.yml
 - include_tasks: services.yml
+- include_tasks: unattended-upgrades.yml

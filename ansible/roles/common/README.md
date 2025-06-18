@@ -58,3 +58,37 @@ want to preserve.
   # If the URL is missing logs will not be shipped to Papertrail.
   papertrail_url: logsN.papertrailapp.com:NNNNN
 ```
+
+## Unattended Upgrades
+
+Unattended-upgrades is a package that allows automatic installation of security updates on Debian-based systems.
+The `unattended-upgrades.yml` task configures unattended-upgrades to ensure that security updates are applied automatically.
+
+This service is enabled by default on Ubuntu, but the task ensures it wasn't
+disabled.
+
+### Monitoring
+
+Log files:
+
+- `/var/log/dpkg.log`
+- `/var/log/unattended-upgrades/`
+
+Check the status of unattended-upgrades with:
+
+```bash
+sudo systemctl status unattended-upgrades
+```
+
+### Tips
+
+To test the outcome of unattended-upgrades without making any changes, you can run the following command:
+
+```bash
+sudo unattended-upgrades --dry-run --debug
+```
+
+### Docs
+
+- [Ubuntu help](https://help.ubuntu.com/community/AutomaticSecurityUpdates)
+- [Debian wiki](https://wiki.debian.org/UnattendedUpgrades)
