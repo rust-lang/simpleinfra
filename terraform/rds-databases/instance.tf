@@ -16,6 +16,15 @@ resource "aws_db_subnet_group" "public" {
 # All of this security group stuff should go away once we migrate bastion to the
 # prod vpc (vs. the legacy vpc).
 
+data "terraform_remote_state" "rustc_perf" {
+  backend = "s3"
+  config = {
+    bucket = "rust-terraform"
+    key    = "simpleinfra/rustc-perf.tfstate"
+    region = "us-west-1"
+  }
+}
+
 data "aws_security_group" "bastion" {
   vpc_id = data.terraform_remote_state.shared.outputs.prod_vpc.id
   name   = "rust-prod-bastion"
@@ -43,11 +52,13 @@ resource "aws_security_group" "rust_prod_db" {
   }
 
   ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = ["159.69.58.186/32"]
-    description = "Connections from rustc-perf collection server"
+    from_port = 5432
+    to_port   = 5432
+    protocol  = "tcp"
+    cidr_blocks = [
+      for ip in data.terraform_remote_state.rustc_perf.outputs.rustc_perf_ips : "${ip}/32"
+    ]
+    description = "Connections from rustc-perf collection servers"
   }
 
   tags = {
