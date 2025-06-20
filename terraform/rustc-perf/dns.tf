@@ -17,3 +17,10 @@ resource "aws_route53_record" "one" {
   records = ["144.76.186.39"]
   ttl     = 300
 }
+
+output "rustc_perf_ips" {
+  value = [
+    tolist(aws_route53_record.legacy.records)[0],
+    tolist(aws_route53_record.one.records)[0]
+  ]
+}
