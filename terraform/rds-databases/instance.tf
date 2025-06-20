@@ -46,8 +46,8 @@ resource "aws_security_group" "rust_prod_db" {
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    cidr_blocks = ["159.69.58.186/32"]
-    description = "Connections from rustc-perf collection server"
+    cidr_blocks = ["144.76.186.39/32", "159.69.58.186/32"]
+    description = "Connections from rustc-perf collection servers"
   }
 
   tags = {
@@ -61,8 +61,8 @@ resource "aws_db_instance" "shared" {
   backup_retention_period      = 3
   storage_type                 = "gp3"
   engine                       = "postgres"
-  engine_version               = "16.3"
-  instance_class               = "db.t4g.micro"
+  engine_version               = "16.8"
+  instance_class               = "db.m7g.large"
   identifier                   = "shared"
   username                     = "root"
   password                     = random_password.shared_root.result
