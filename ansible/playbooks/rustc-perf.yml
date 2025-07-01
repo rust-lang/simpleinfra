@@ -37,10 +37,32 @@
           - pkg-config
           - cmake
           - libssl-dev
+          - unzip
           # For `perf` and `cpupower` to work
           - linux-tools-generic
           - linux-cloud-tools-generic
         state: present
+
+    # Install AWS CLI binary that is used to upload self-profile artifacts to S3
+    - name: Install AWS CLI v2
+      block:
+        - name: Download AWS CLI v2 zip file
+          get_url:
+            url: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+            dest: "/tmp/awscliv2.zip"
+            mode: '0644'
+
+        - name: Extract AWS CLI v2 zip file
+          unarchive:
+            src: "/tmp/awscliv2.zip"
+            dest: "/tmp"
+            remote_src: yes
+
+        - name: Install AWS CLI v2
+          command: /tmp/aws/install
+          become: yes
+          args:
+            creates: /usr/local/bin/aws
 
     # Install rustup/rustc/cargo
     - name: check if cargo is installed
