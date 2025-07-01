@@ -209,6 +209,7 @@ resource "aws_iam_role_policy" "promote_release" {
           "${aws_s3_bucket.static.arn}/doc/*",
           "${aws_s3_bucket.static.arn}/dist",
           "${aws_s3_bucket.static.arn}/dist/*",
+          "${aws_s3_bucket.static.arn}/manifests.txt",
 
           // Artifacts bucket
           "${data.aws_s3_bucket.artifacts.arn}/rustc-builds",
