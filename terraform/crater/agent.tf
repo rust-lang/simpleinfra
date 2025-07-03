@@ -1,13 +1,5 @@
 // This file contains the configuration for Crater agents
 
-resource "aws_iam_user" "agent_outside_aws" {
-  name = "crater-agent--outside-aws"
-}
-
-resource "aws_iam_access_key" "agent_outside_aws" {
-  user = aws_iam_user.agent_outside_aws.name
-}
-
 resource "aws_iam_role" "agent" {
   name = "crater-agent"
 
@@ -19,14 +11,6 @@ resource "aws_iam_role" "agent" {
       "Sid": "AssumeRoleEC2",
       "Principal": {
         "Service": "ec2.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole",
-      "Effect": "Allow"
-    },
-    {
-      "Sid": "AssumeRoleCraterAgentOutsideAWS",
-      "Principal": {
-        "AWS": "${aws_iam_user.agent_outside_aws.arn}"
       },
       "Action": "sts:AssumeRole",
       "Effect": "Allow"
