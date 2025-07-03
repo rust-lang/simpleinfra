@@ -253,7 +253,7 @@ resource "aws_instance" "crater" {
 
   root_block_device {
     volume_type           = "gp3"
-    volume_size           = 100
+    volume_size           = 150
     delete_on_termination = true
   }
 
