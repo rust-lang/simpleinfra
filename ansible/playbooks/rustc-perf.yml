@@ -158,6 +158,16 @@
         replace: '#\1\2\3swap\4'
         backup: yes
 
+    - name: Get current systemd default
+      ansible.builtin.command: "systemctl get-default"
+      changed_when: false
+      register: systemdefault
+
+    - name: Set default boot target to multi-user target
+      ansible.builtin.command: "systemctl set-default multi-user.target"
+      when: "'multi-user' not in systemdefault.stdout"
+      changed_when: true
+
     # Periodically clean old entries in /tmp
     - name: Configure systemd-tmpfiles to clean old /tmp dirs
       copy:
