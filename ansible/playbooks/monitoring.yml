@@ -180,8 +180,10 @@
                 summary: "Filesystem {{ '{{ $labels.mountpoint }}' }} on {{ '{{ $labels.instance }}' }} is full"
                 description: "There is less than 10% disk space left on the mount point {{ '{{ $labels.mountpoint }}' }} (device {{ '{{ $labels.device }}' }}) of the instance {{ '{{ $labels.instance }}' }}."
 
+            # This alert is disabled because Crater is expected to
+            # use a lot of RAM.
             - alert: TooMuchRamUsage
-              expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes < 0.2
+              expr: node_memory_MemAvailable_bytes{instance!~"crater\\.infra\\.rust-lang\\.org.*"} / node_memory_MemTotal_bytes{instance!~"crater\\.infra\\.rust-lang\\.org.*"} < 0.2
               for: 1m
               annotations:
                 summary: "High RAM usage on {{ '{{ $labels.instance }}' }}"
