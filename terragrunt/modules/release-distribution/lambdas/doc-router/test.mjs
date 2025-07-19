@@ -1,13 +1,18 @@
+// A test that asserts that the redirects work correctly.
+// It can be run with
+// node --test test.mjs
+
 import { test } from "node:test";
 import assert from "node:assert";
 import lambda from "./index.js";
 
 function invokeHandler(uri) {
-  return new Promise((res) => {
-    const cb = (_, response) => {
-      res(response);
+  return new Promise((resolve) => {
+    const callback = (_, response) => {
+      resolve(response);
     };
 
+    // Invoke the lambda handler with an event containing the request URI
     lambda.handler(
       {
         Records: [
@@ -21,7 +26,7 @@ function invokeHandler(uri) {
         ],
       },
       undefined,
-      cb
+      callback
     );
   });
 }
@@ -29,8 +34,8 @@ function invokeHandler(uri) {
 test("example expected redirects", async (t) => {
   const redirects = [
     // root
-    { from: "/", to: "https://www.rust-lang.org/learn" },
-    { from: "/index.html", to: "https://www.rust-lang.org/learn" },
+    { from: "/", to: "/stable/" },
+    { from: "/index.html", to: "/stable/" },
     // crate redirects
     { from: "/regex", to: "https://docs.rs/regex" },
     { from: "/log", to: "https://docs.rs/log" },
@@ -67,4 +72,9 @@ test("example expected redirects", async (t) => {
 test("ensure the default rewrite to /stable", async (t) => {
   const request = await invokeHandler("/std");
   assert.strictEqual(request.uri, "/stable/std");
+});
+
+test("ensure no infinite redirect for /doc[^/]", async (t) => {
+  const request = await invokeHandler("/docs/std");
+  assert.strictEqual(request.uri, "/stable/docs/std");
 });
