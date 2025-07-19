@@ -104,7 +104,7 @@ exports.handler = (event, context, callback) => {
     }
 
     // Docs used to be under /doc, so redirect those for now
-    if (request.uri.startsWith('/doc')) {
+    if (request.uri.startsWith('/doc/')) {
         return redirect(request.uri.slice(4), callback);
     }
 

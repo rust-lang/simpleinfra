@@ -68,3 +68,8 @@ test("ensure the default rewrite to /stable", async (t) => {
   const request = await invokeHandler("/std");
   assert.strictEqual(request.uri, "/stable/std");
 });
+
+test("ensure no infinite redirect for /doc[^/]", async (t) => {
+  const request = await invokeHandler("/docs/std");
+  assert.strictEqual(request.uri, "/stable/docs/std");
+});
