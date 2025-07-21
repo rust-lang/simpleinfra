@@ -281,6 +281,10 @@ resource "aws_ecs_task_definition" "bors" {
         {
           name  = "CMD_PREFIX",
           value = "@bors2"
+        },
+        {
+          name  = "WEB_URL",
+          value = "https://${var.domain}"
         }
       ]
 
