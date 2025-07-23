@@ -30,3 +30,5 @@ vars_user_config:
     shell: /usr/bin/zsh
   - username: gh-fee1-dead
     shell: /usr/bin/fish
+  - username: gh-tiif
+    shell: /usr/bin/fish
