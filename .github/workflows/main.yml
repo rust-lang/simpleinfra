@@ -56,3 +56,15 @@ jobs:
               popd
             fi
           done
+
+  javascript-tests:
+    name: JavaScript Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 24
+      - name: Run tests
+        run: |
+          node --test terragrunt/modules/release-distribution/lambdas/doc-router/test.mjs
