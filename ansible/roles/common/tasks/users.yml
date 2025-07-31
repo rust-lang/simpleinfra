@@ -56,6 +56,8 @@
 # Apparently Ansible doesn't have a native way to do this, so this generates a
 # list of people to remove from the groups and then iterate over it to actually
 # remove them.
+# Among other things, this role removes unmanaged users from the SSH group so
+# that they can’t log in to bastion anymore.
 - name: remove old group memberships
   command: "gpasswd -d {{ item.member | quote }} {{ item.group | quote }}"
   loop: "{{ to_remove }}"
