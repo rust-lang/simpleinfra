@@ -2,7 +2,6 @@
 
 This module creates a `shared` RDS instance that contains three databases:
 
-- `discord-mods-bot`
 - `triagebot`
 - `rustc_perf`
 
