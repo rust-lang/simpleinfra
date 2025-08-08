@@ -42,6 +42,12 @@ resource "postgresql_grant" "rw_self_tables" {
     "TRUNCATE",
     "UPDATE",
   ])
+
+  # Workaround to avoid terraform detecting unwanted changes that would cause downtime.
+  # See: https://github.com/cyrilgdn/terraform-provider-postgresql/issues/197
+  lifecycle {
+    ignore_changes = [privileges]
+  }
 }
 
 resource "postgresql_grant" "rw_self_sequence" {
@@ -56,6 +62,12 @@ resource "postgresql_grant" "rw_self_sequence" {
     "UPDATE",
     "USAGE",
   ])
+
+  # Workaround to avoid terraform detecting unwanted changes that would cause downtime.
+  # See: https://github.com/cyrilgdn/terraform-provider-postgresql/issues/197
+  lifecycle {
+    ignore_changes = [privileges]
+  }
 }
 
 resource "postgresql_database" "databases" {
