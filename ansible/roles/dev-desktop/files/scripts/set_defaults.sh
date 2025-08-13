@@ -8,8 +8,8 @@ IFS=$'\n\t'
 for D in rust*; do
     if [ -d "${D}" ]; then
         pushd "${D}" || exit
-          if [[ ! -f config.toml ]]; then
-            ln -s ~/config.toml .
+          if [[ ! -f bootstrap.toml ]]; then
+            ln -s ~/bootstrap.toml .
           fi
         popd || exit
     fi
