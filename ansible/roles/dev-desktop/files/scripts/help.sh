@@ -7,5 +7,5 @@ echo "new_worktree.sh      | creates a worktree (shallow copy of the main git ch
 echo "detach_merged_prs.sh | invokes \"git pull --fast-forward-only\" on all worktrees and detaches those that are equal to the \"master\" branch"
 echo ""
 echo "# Rarer commands:"
-echo "set_defaults.sh      | connects the global config.toml with all worktrees. Use this when your setup is broken"
+echo "set_defaults.sh      | connects the global bootstrap.toml with all worktrees. Use this when your setup is broken"
 echo "setup_rust.sh        | Clone your fork of rust-lang/rust, compile, and then link it"
