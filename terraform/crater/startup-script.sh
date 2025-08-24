@@ -42,6 +42,11 @@ docker pull ${docker_url}
 
 mkdir -p /var/lib/crater-agent-workspace
 
+# Mount the local SSD as the Crater workspace
+sudo mkfs.ext4 -F /dev/disk/by-id/google-local-nvme-ssd-0
+sudo mount /dev/disk/by-id/google-local-nvme-ssd-0 /var/lib/crater-agent-workspace
+sudo chmod a+rwx /var/lib/crater-agent-workspace
+
 curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/update-script \
     -o /opt/update.sh \
     -H "Metadata-Flavor: Google"
