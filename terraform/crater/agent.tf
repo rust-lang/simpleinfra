@@ -121,8 +121,17 @@ resource "google_compute_instance_template" "agent" {
     auto_delete  = true
     boot         = true
     source_image = data.google_compute_image.ubuntu_minimal.self_link
-    disk_size_gb = 100
+    disk_size_gb = 30
     disk_type    = "pd-balanced"
+  }
+
+  disk {
+    auto_delete  = true
+    boot         = false
+    disk_size_gb = 375
+    interface    = "NVME"
+    disk_type    = "local-ssd"
+    type         = "SCRATCH"
   }
 
   scheduling {
@@ -163,7 +172,7 @@ resource "google_compute_region_autoscaler" "agents" {
   for_each = local.groups
   region   = each.value.region
 
-  name   = "crater-autoscaler-${each.key}"
+  name   = "crater-autoscaler-v2-${each.key}"
   target = google_compute_region_instance_group_manager.agents["${each.key}"].id
 
   autoscaling_policy {
@@ -182,7 +191,7 @@ resource "google_compute_region_autoscaler" "agents" {
 
 resource "google_compute_region_instance_group_manager" "agents" {
   for_each = local.groups
-  name     = "crater-agents-${each.key}"
+  name     = "crater-agents-v2-${each.key}"
   region   = each.value.region
 
   base_instance_name = "crater-agent"
@@ -203,7 +212,10 @@ resource "google_compute_region_instance_group_manager" "agents" {
     most_disruptive_allowed_action = "REPLACE"
     minimal_action                 = "REPLACE"
     replacement_method             = "RECREATE"
+    instance_redistribution_type   = "NONE"
   }
+
+  distribution_policy_target_shape = "BALANCED"
 
   lifecycle {
     create_before_destroy = true
