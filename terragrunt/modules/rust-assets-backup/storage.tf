@@ -21,8 +21,8 @@ resource "google_storage_bucket" "backup_buckets" {
   }
 
   labels = {
-    purpose     = "rust-assets-backup"
-    source      = each.key
-    managed-by  = "terraform"
+    purpose    = "rust-assets-backup"
+    source     = each.key
+    managed-by = "terraform"
   }
 }
