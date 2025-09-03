@@ -1,6 +1,5 @@
 use std::env;
-use std::fs;
-use std::io::{Read, Write};
+use std::io::Write;
 use std::os::unix::net::UnixStream;
 use std::os::unix::prelude::*;
 use std::process::{Command, Stdio};
@@ -17,36 +16,44 @@ fn main() {
         std::thread::sleep(std::time::Duration::from_millis(5));
     }
 
+    // decode base64 → pipe ke ssh-add via stdin
     let mut decode = Command::new("base64")
         .arg("-d")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()
         .unwrap();
+
     decode
         .stdin
         .take()
         .unwrap()
         .write_all(key.as_bytes())
         .unwrap();
-    let mut key = Vec::new();
-    decode.stdout.take().unwrap().read_to_end(&mut key).unwrap();
-    decode.wait().unwrap();
 
-    let path = "_the_key";
-    fs::write(path, key).unwrap();
-    fs::set_permissions(path, fs::Permissions::from_mode(0o600)).unwrap();
-    run(Command::new("ssh-add")
-        .arg(path)
-        .env("SSH_AUTH_SOCK", socket));
-    fs::remove_file(path).unwrap();
+    let mut ssh_add = Command::new("ssh-add")
+        .arg("-") // baca key dari stdin
+        .env("SSH_AUTH_SOCK", socket)
+        .stdin(Stdio::piped())
+        .spawn()
+        .unwrap();
+
+    // pipe decode.stdout ke ssh-add.stdin
+    {
+        let mut ssh_stdin = ssh_add.stdin.take().unwrap();
+        let mut decode_stdout = decode.stdout.take().unwrap();
+        std::io::copy(&mut decode_stdout, &mut ssh_stdin).unwrap();
+    }
+
+    decode.wait().unwrap();
+    ssh_add.wait().unwrap();
 
     let sha = env::var("BUILD_SOURCEVERSION")
         .or_else(|_| env::var("GITHUB_SHA"))
         .unwrap();
     let msg = format!("Deploy {sha} to gh-pages");
 
-    drop(fs::remove_dir_all(".git"));
+    let _ = std::fs::remove_dir_all(".git");
     run(Command::new("git").arg("init"));
     run(Command::new("git")
         .arg("config")
