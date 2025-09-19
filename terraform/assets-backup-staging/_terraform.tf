@@ -5,4 +5,9 @@ terraform {
       version = "~> 7.3"
     }
   }
+
+  backend "gcs" {
+    bucket = "assets-backup-staging-tf-state"
+    prefix = "terraform/state"
+  }
 }
