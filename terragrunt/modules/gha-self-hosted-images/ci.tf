@@ -35,9 +35,12 @@ resource "aws_iam_role_policy" "ci" {
         Resource = "${aws_s3_bucket.storage.arn}/latest"
       },
       {
-        Effect   = "Allow"
-        Action   = "s3:PutObject"
-        Resource = "${aws_s3_bucket.storage.arn}/images/*"
+        Effect = "Allow"
+        Action = "s3:PutObject"
+        Resource = [
+          "${aws_s3_bucket.storage.arn}/executor/*",
+          "${aws_s3_bucket.storage.arn}/images/*",
+        ]
         Condition = {
           StringEquals = {
             // Enforce that the `if-none-match: *` header is provided when uploading a new file,
