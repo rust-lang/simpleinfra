@@ -1,0 +1,33 @@
+[package]
+name = "aws-url-list-lambda"
+version = "0.1.0"
+edition = "2021"
+description = "AWS Lambda (Rust) that lists S3 bucket contents and emits a TSV URL list compatible with Google Storage Transfer Service (TsvHttpData-1.0)."
+license = "MIT OR Apache-2.0"
+
+[lib]
+name = "url_list_lambda"
+path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "aws-url-list-lambda"
+path = "src/main.rs"
+
+[dependencies]
+aws-config = "1"
+aws-sdk-s3 = { version = "1", default-features = false, features = ["rt-tokio", "rustls"] }
+lambda_runtime = "0.11"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }
+futures-util = "0.3"
+urlencoding = "2"
+
+[dev-dependencies]
+assert_fs = "1"
+insta = { version = "1", features = ["redactions"] }
+maplit = "1"

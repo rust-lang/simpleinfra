@@ -5,4 +5,5 @@ resolver = "2"
 members = [
     "setup-deploy-keys",
     "ansible/roles/dev-desktop/files/team_login",
+    "aws-url-list-lambda",
 ]
