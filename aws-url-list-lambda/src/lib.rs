@@ -41,14 +41,22 @@ fn object_url(bucket: &str, key: &str, base_url: &Option<String>) -> String {
     } else {
         // Default to virtual-hosted–style URL
         // https://{bucket}.s3.amazonaws.com/{key}
-        format!("https://{}.s3.amazonaws.com/{}", bucket, encode_path_preserving_slashes(key))
+        format!(
+            "https://{}.s3.amazonaws.com/{}",
+            bucket,
+            encode_path_preserving_slashes(key)
+        )
     }
 }
 
 /// Generate TSV content according to Google Storage Transfer TSV spec.
 /// - First line: TsvHttpData-1.0
 /// - Then rows sorted lexicographically by URL (UTF-8), tab-separated: URL [size] [md5]
-pub fn generate_tsv_from_objects(bucket: &str, objects: Vec<Object>, base_url: Option<String>) -> String {
+pub fn generate_tsv_from_objects(
+    bucket: &str,
+    objects: Vec<Object>,
+    base_url: Option<String>,
+) -> String {
     let mut rows: Vec<(String, Option<i64>)> = objects
         .into_iter()
         .filter_map(|o| {
@@ -107,8 +115,7 @@ pub async fn generate_tsv_from_bucket(s3: &S3Client, mut input: JobInput) -> Res
 
     if let Some(key) = input.output_key.take() {
         let out_bucket = input.output_bucket.unwrap_or_else(|| input.bucket.clone());
-        s3
-            .put_object()
+        s3.put_object()
             .bucket(&out_bucket)
             .key(&key)
             .body(ByteStream::from(tsv.clone().into_bytes()))
@@ -136,19 +143,32 @@ mod tests {
         let tsv = generate_tsv_from_objects(bucket, objects, None);
         let lines: Vec<_> = tsv.lines().collect();
         assert_eq!(lines[0], "TsvHttpData-1.0");
-        assert_eq!(lines[1], "https://example-bucket.s3.amazonaws.com/a.txt\t10");
+        assert_eq!(
+            lines[1],
+            "https://example-bucket.s3.amazonaws.com/a.txt\t10"
+        );
         assert_eq!(lines[2], "https://example-bucket.s3.amazonaws.com/b.txt\t5");
-    assert_eq!(lines[3], "https://example-bucket.s3.amazonaws.com/nested/file.bin\t0");
+        assert_eq!(
+            lines[3],
+            "https://example-bucket.s3.amazonaws.com/nested/file.bin\t0"
+        );
     }
 
     #[test]
     fn base_url_override() {
         let bucket = "dev-static-rust-lang-org";
         let objects = vec![obj("path/with space.txt", 12)];
-        let tsv = generate_tsv_from_objects(bucket, objects, Some("https://dev-static.rust-lang.org".into()));
+        let tsv = generate_tsv_from_objects(
+            bucket,
+            objects,
+            Some("https://dev-static.rust-lang.org".into()),
+        );
         let lines: Vec<_> = tsv.lines().collect();
         assert_eq!(lines[0], "TsvHttpData-1.0");
         // Keys are percent-encoded in URLs even with base_url
-        assert_eq!(lines[1], "https://dev-static.rust-lang.org/path/with%20space.txt\t12");
+        assert_eq!(
+            lines[1],
+            "https://dev-static.rust-lang.org/path/with%20space.txt\t12"
+        );
     }
 }

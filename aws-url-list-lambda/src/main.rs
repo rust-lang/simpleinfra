@@ -21,8 +21,24 @@ struct Event(JobInput);
 async fn handler(event: LambdaEvent<Event>) -> Result<String, Error> {
     let config = aws_config::load_defaults(aws_config::BehaviorVersion::latest()).await;
     let s3 = aws_sdk_s3::Client::new(&config);
-    let JobInput { bucket, prefix, base_url, output_bucket, output_key } = event.payload.0;
+    let JobInput {
+        bucket,
+        prefix,
+        base_url,
+        output_bucket,
+        output_key,
+    } = event.payload.0;
 
-    let tsv = generate_tsv_from_bucket(&s3, JobInput { bucket, prefix, base_url, output_bucket, output_key }).await?;
+    let tsv = generate_tsv_from_bucket(
+        &s3,
+        JobInput {
+            bucket,
+            prefix,
+            base_url,
+            output_bucket,
+            output_key,
+        },
+    )
+    .await?;
     Ok(tsv)
 }
