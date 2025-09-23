@@ -1,22 +1,15 @@
 use lambda_runtime::{tracing::info, Error, LambdaEvent};
-use serde_json::Value as JsonValue;
+use serde::Deserialize;
 
-pub(crate) async fn function_handler(event: LambdaEvent<JsonValue>) -> Result<(), Error> {
+#[derive(Debug, Deserialize)]
+pub struct EventPayload {
+    pub bucket: String,
+}
+
+pub(crate) async fn function_handler(event: LambdaEvent<EventPayload>) -> Result<(), Error> {
     let payload = event.payload;
 
-    // Try both shapes:
-    // 1) Top-level: { "bucket": "..." }
-    // 2) CloudWatch/EventBridge envelope: { "detail": { "bucket": "..." }, ... }
-    let bucket = payload
-        .get("bucket")
-        .or_else(|| {
-            payload.get("detail").and_then(|d| {
-                info!("got bucket from detail");
-                d.get("bucket")
-            })
-        })
-        .and_then(|v| v.as_str())
-        .ok_or("missing bucket in the payload")?;
+    let bucket = payload.bucket.as_str();
 
     info!(payload=?payload, bucket, "Received event");
     // Also print to stdout for easy CloudWatch Logs grepping
@@ -31,18 +24,10 @@ mod tests {
     use lambda_runtime::{Context, LambdaEvent};
 
     #[tokio::test]
-    async fn test_event_handler_detail() {
-        let e = serde_json::json!({
-            "detail": { "bucket": "my-bucket-name" }
-        });
-        let event = LambdaEvent::new(e, Context::default());
-        let response = function_handler(event).await.unwrap();
-        assert_eq!((), response);
-    }
-
-    #[tokio::test]
-    async fn test_event_handler_top_level() {
-        let e = serde_json::json!({ "bucket": "top-level-bucket" });
+    async fn test_event_handler() {
+        let e = EventPayload {
+            bucket: "top-level-bucket".to_string(),
+        };
         let event = LambdaEvent::new(e, Context::default());
         let response = function_handler(event).await.unwrap();
         assert_eq!((), response);
