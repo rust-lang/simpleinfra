@@ -2441,6 +2441,7 @@ dependencies = [
  "aws-sdk-s3",
  "aws_lambda_events",
  "lambda_runtime",
+ "serde",
  "serde_json",
  "tokio",
 ]
