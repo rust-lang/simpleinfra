@@ -11,7 +11,7 @@ resource "aws_cloudwatch_event_target" "test_event_lambda" {
   arn       = module.lambda.function_arn
 
   input = jsonencode({
-    bucket = "hello"
+    bucket = "staging-crates-io"
   })
 }
 
