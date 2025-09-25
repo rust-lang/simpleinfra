@@ -12,7 +12,7 @@ module "backup" {
     crates-io = {
       bucket_name = "crates-io"
       # cloudfront-static.crates.io
-      cloudfront_id     = "d1e8qr2bsg2yo9"
+      cloudfront_id     = "d19xqa3lc3clo8"
       description       = "Production crates-io bucket"
       aws_access_key_id = "AKIA46X5W6CZJH2GD7UE"
     }
