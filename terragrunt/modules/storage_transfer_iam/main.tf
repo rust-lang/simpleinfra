@@ -1,9 +1,6 @@
 # This module configures the IAM user and policies for Google Storage Transfer Service.
 # see https://cloud.google.com/storage-transfer/docs/s3-cloudfront.
 
-locals {
-  ssm_parameter_prefix = "/${var.environment}/gcp-backup/storage-transfer/${var.iam_prefix}"
-}
 # IAM user for Google Storage Transfer Service
 resource "aws_iam_user" "storage_transfer" {
   name = "${var.iam_prefix}--storage-transfer"
