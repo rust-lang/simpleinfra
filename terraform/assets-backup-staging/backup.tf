@@ -18,7 +18,7 @@ module "backup" {
     }
     static-rust-lang-org = {
       bucket_name = "dev-static-rust-lang-org"
-      # dev-static.rust-lang.org
+      # cloudfront-dev-static.rust-lang.org
       cloudfront_id     = "d29bglnmyg6h72"
       description       = "Development Rust releases"
       aws_access_key_id = "AKIA46X5W6CZC6PEZ36Z"
