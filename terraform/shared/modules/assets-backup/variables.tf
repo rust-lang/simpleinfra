@@ -11,10 +11,21 @@ variable "region" {
 variable "source_buckets" {
   description = "Map of source AWS S3 buckets to backup"
   type = map(object({
-    bucket_name       = string
-    cloudfront_domain = string
-    description       = string
+    bucket_name   = string
+    cloudfront_id = string
+    description   = string
+    # ID of the AWS access key that Google Storage Transfer uses to authenticate for AWS S3 access
+    aws_access_key_id = string
   }))
+}
+
+variable "environment" {
+  description = "Environment (prod or dev)"
+  type        = string
+  validation {
+    condition     = contains(["prod", "dev"], var.environment)
+    error_message = "Environment must be either 'prod' or 'dev'."
+  }
 }
 
 # variable "admins" {
