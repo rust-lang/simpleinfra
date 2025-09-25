@@ -5,7 +5,7 @@
 
 # Store access key secret in SSM Parameter Store with access key ID in the path
 resource "aws_ssm_parameter" "storage_transfer_access_key" {
-  name        = "/${var.environment}/gcp-backup/storage-transfer/${var.iam_prefix}/access_key/${aws_iam_access_key.storage_transfer.id}"
+  name        = "/${var.environment}/gcp-backup/storage-transfer/${var.iam_prefix}/access-key/${aws_iam_access_key.storage_transfer.id}"
   description = "Secret Access Key for Storage Transfer Service"
   type        = "SecureString"
   value       = aws_iam_access_key.storage_transfer.secret
