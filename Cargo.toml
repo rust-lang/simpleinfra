@@ -5,5 +5,4 @@ resolver = "2"
 members = [
     "setup-deploy-keys",
     "ansible/roles/dev-desktop/files/team_login",
-    "terragrunt/modules/s3-tsv/s3-tsv-lambda",
 ]
