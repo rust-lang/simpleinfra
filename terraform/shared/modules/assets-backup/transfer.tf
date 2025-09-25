@@ -21,8 +21,7 @@ resource "google_storage_transfer_job" "backup_transfer" {
     }
 
     transfer_options {
-      delete_objects_from_source_after_transfer  = false
-      overwrite_objects_already_existing_in_sink = true
+      delete_objects_from_source_after_transfer = false
     }
   }
 
