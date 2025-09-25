@@ -2,7 +2,7 @@
 resource "google_storage_bucket" "backup_buckets" {
   for_each = var.source_buckets
 
-  name     = "backup-${each.key}"
+  name     = "${lower(var.environment) == "prod" ? "gcp-" : ""}backup-${each.key}"
   location = var.region
   project  = var.project_id
 
