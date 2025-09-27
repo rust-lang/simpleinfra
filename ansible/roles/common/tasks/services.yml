@@ -1,17 +1,18 @@
 ---
 
+- name: Populate service facts
+  service_facts:
+
 - name: Disable the fwupd-refresh timer
   ansible.builtin.systemd:
     enabled: false
     state: stopped
     name: fwupd-refresh.timer
-  # Not all of our hosts actually have this, just ignore it if it fails.
-  ignore_errors: true
+  when: ansible_facts.services['fwupd-refresh.service'] is defined
 
 - name: Disable the fwupd-refresh service
   ansible.builtin.systemd:
     enabled: false
     state: stopped
     name: fwupd-refresh.service
-  # Not all of our hosts actually have this, just ignore it if it fails.
-  ignore_errors: true
+  when: ansible_facts.services['fwupd-refresh.service'] is defined
