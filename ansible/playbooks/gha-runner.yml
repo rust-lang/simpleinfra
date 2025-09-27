@@ -1,0 +1,44 @@
+---
+
+- hosts: gha-runner
+  become: yes
+  become_user: root
+
+  roles:
+
+    - role: common
+      papertrail_url: "{{ vars_papertrail_url }}"
+      collect_metrics_from: "{{ global_collect_metrics_from }}"
+      sudo_users: "{{ global_sudo_users }}"
+
+    - role: datadog.datadog
+      tags:
+        - monitoring
+      vars:
+        datadog_api_key: "{{ vars_datadog_api_key }}"
+        datadog_site: "datadoghq.com"
+
+        datadog_config:
+          tags:
+            - "env:{{ vars_environment }}"
+            - "service:gha-runner"
+          process_config:
+            enabled: "true"
+
+    - role: gha-runner
+
+      github_client_id: "{{ vars_gha_runner_github_client_id }}"
+      github_private_key: "{{ vars_gha_runner_github_private_key }}"
+      github_org: rust-lang
+      runner_group_id: 8
+
+      instance_groups:
+        - count: 1
+          spec:
+            label: gha-self-hosted-x86_64-linux-16c
+            image: ubuntu-x86_64
+            arch: x86_64
+            cpu-cores: 16
+            ram: 48G
+            root-disk: 200G
+            timeout-seconds: 14400 # 4 hours

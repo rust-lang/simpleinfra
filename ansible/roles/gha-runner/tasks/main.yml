@@ -1,0 +1,51 @@
+---
+
+- name: Install QEMU
+  apt:
+    name: qemu-system
+    state: present
+
+- name: write the GitHub App private key in a location discoverable by systemd
+  copy:
+    content: "{{ github_private_key }}\n"
+    dest: /etc/credstore/github-private-key
+    mode: 0600
+  notify:
+    - reload-systemd
+  # TODO: restart runners
+
+- name: create directory containing instance specs
+  file:
+    path: /etc/gha-instance-specs
+    state: directory
+
+- name: upload executor launcher
+  copy:
+    src: gha-vm.sh
+    dest: /usr/local/bin/gha-vm
+    mode: 0755
+  notify:
+    - reload-systemd
+  # TODO: restart runners
+
+- name: write instance specs
+  copy:
+    content: "{{ item.spec | to_json }}\n"
+    dest: "/etc/gha-instance-specs/{{ item.spec.label }}.json"
+  loop: "{{ instance_groups }}"
+  loop_control:
+    label: "{{ item.spec.label }}"
+  notify:
+    - reload-systemd
+  # TODO: restart runners
+
+- name: write systemd services
+  template:
+    src: gha-vm.service
+    dest: "/etc/systemd/system/gha-vm-{{ item.spec.label }}@.service"
+  loop: "{{ instance_groups }}"
+  loop_control:
+    label: "{{ item.spec.label }}"
+  notify:
+    - reload-systemd
+  # TODO: restart runners

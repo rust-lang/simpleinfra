@@ -19,3 +19,6 @@ crater.infra.rust-lang.org
 [rustc-perf]
 rustc-perf-one.infra.rust-lang.org
 rustc-perf-two.infra.rust-lang.org
+
+[gha-runner]
+gha-x86-64-linux-1.infra.rust-lang.org

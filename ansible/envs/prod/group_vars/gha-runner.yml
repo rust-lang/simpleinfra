@@ -1,0 +1,7 @@
+---
+
+# Fetch all the group params from AWS SSM
+ssm_gha_runner: "{{ lookup('aws_ssm', '/prod/ansible/gha-runner/', region='us-west-1', shortnames=true, bypath=true, recursive=true) }}"
+
+vars_gha_runner_github_client_id: "{{ ssm_gha_runner['github-client-id'] }}"
+vars_gha_runner_github_private_key: "{{ ssm_gha_runner['github-private-key'] }}"

@@ -1,0 +1,113 @@
+#
+# {{ ansible_managed }}
+#
+
+# Systemd variables used in this unit:
+# %d: directory containing the credentials loaded with LoadCredential=.
+# %C: cache directory root, *without* the subdirectory defined in CacheDirectory=.
+# %i: "instance name", aka the part after @ when invoking the unit.
+
+[Unit]
+Description=Start a GitHub Actions runner for instance type {{ item.spec.label }}
+
+Requires=network-online.target
+After=network-online.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+# The gha-vm script will download the latest version of the binary and execute it.
+ExecStart=/usr/local/bin/gha-vm \
+    --github-client-id {{ github_client_id }} \
+    --github-private-key %d/github-private-key \
+    --github-org {{ github_org }} \
+    --runner-group-id {{ runner_group_id }} \
+    --images-cache-dir %C/gha-vm/{{ item.spec.label }}/%i \
+    --no-shutdown-after-job \
+    --ssh-port 2222 \
+    /etc/gha-instance-specs/{{ item.spec.label }}.json
+
+# Load the GitHub private key from /etc/credstore/github-private-key (only accessible by root), and
+# make it available securely to the service.
+LoadCredential=github-private-key
+
+# The executor will intentionally exit when a build finishes. Restart the build in that case.
+#Restart=on-success
+
+# Create a per-instance cache directory. Note that gha-vm doesn't support sharing the same cache
+# across instances of it, that's why we are creating a separate one each time.
+#
+# Systemd gracefully handles the cache directory even in the presence of DynamicUser=true, making
+# sure it is fully accessible for every ephemeral uid attached to this unit.
+CacheDirectory=gha-vm/{{ item.spec.label }}/%i
+CacheDirectoryMode=0700
+
+# Allow access to hardware acceleration for VMs.
+SupplementaryGroups=kvm
+
+# Send the initial SIGTERM only to the main process, and then send the final SIGKILL to all
+# processes in the cgroup.
+KillMode=mixed
+
+# The executor handles this in a special way: it will only stop the VM if there is no job running.
+KillSignal=SIGTERM
+
+# Put a hard timeout of 12 hours to wait for the executor to stop, after which a SIGKILL is sent.
+# This is intentionally extremely high, as the executor will refuse to stop if there is a job
+# currently running. The limit allows a broken executor to still stop *eventually*.
+TimeoutStopSec=12h
+
+# Hardening options
+# =================
+#
+# See `man systemd.exec` for more details about these options.
+
+# Create an ephemeral, anonymous user and group when starting this service. The user will be deleted
+# as soon as the service exits. With this, a VM escape will not lead to any user permission.
+DynamicUser=true
+
+# Prevent elevating privileges (for example with setuid binaries).
+#NoNewPrivileges=true
+
+# Create a separate tmpfs dedicated to this service for /tmp and /var/tmp, isolating the service
+# from the global /tmp and any other services's. Implied by DynamicUser=true.
+#PrivateTmp=disconnected
+
+# Restrict access to almost all of /dev, except for pseudo devices like /dev/urandom and the
+# explicitly allowed /dev/kvm (needed for virtualization).
+#PrivateDevices=true
+#DeviceAllow=/dev/kvm
+
+# Prevent accessing other processes's System V IPCs. gha-vm doesn't use any so it doesn't hurt to
+# enable this I guess.
+#PrivateIPC=true
+
+# Prevent changing the hostname.
+#ProtectHostname=true
+
+# Prevent changing the system clock.
+#ProtectClock=true
+
+# Prevent any access to /home, /root and /run/user.
+#ProtectHome=true
+
+# Prevent access to kernel facilities. This shouldn't be allowed for non-root users anyway, but
+# enable them just to be sure.
+#ProtectKernelTunables=true
+#ProtectKernelLogs=true
+
+# Prevent creating cgroups.
+#ProtectControlGroups=true
+
+# Only show processes owned by the service user in /proc.
+#ProtectProc=invisible
+
+# Make the whole filesystem read-only, except for /tmp, /var/tmp, and directories configured by
+# systemd (for example CacheDirectory=). Implied by DynamicUser=true
+#ProtectSystem=strict
+
+# Prevent creating any kind of namespace.
+#RestrictNamespaces=true
+
+# TODO: figure out networking 
