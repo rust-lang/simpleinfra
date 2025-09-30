@@ -11,7 +11,10 @@ variable "region" {
 variable "source_buckets" {
   description = "Map of source AWS S3 buckets to backup"
   type = map(object({
-    bucket_name   = string
+    # Name of the AWS S3 bucket you want to backup
+    bucket_name = string
+    # ID of the CloudFront distribution associated with the S3 bucket.
+    # We use CloudFront to save on S3 data transfer costs.
     cloudfront_id = string
     description   = string
     # ID of the AWS access key that Google Storage Transfer uses to authenticate for AWS S3 access
