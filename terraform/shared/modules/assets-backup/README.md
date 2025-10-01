@@ -16,3 +16,10 @@ To backup a new bucket, you need to:
    ```
 
    Env is `prod` or `dev`.
+
+## How to apply
+
+1. Install the [gcloud CLI](https://cloud.google.com/sdk/docs/install).
+2. Login to GCP: `gcloud auth application-default login`.
+3. Run `cd terraform/assets-backup-prod` or `cd terraform/assets-backup-staging`.
+4. Run `terraform apply`.
