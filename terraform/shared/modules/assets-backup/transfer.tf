@@ -37,5 +37,12 @@ resource "google_storage_transfer_job" "backup_transfer" {
       month = 12
       day   = 31
     }
+    # Pick a specific start time to avoid conflicting with other automated tasks
+    start_time_of_day {
+      hours   = 6
+      minutes = 24
+      seconds = 0
+      nanos   = 0
+    }
   }
 }
