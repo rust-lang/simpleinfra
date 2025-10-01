@@ -1,0 +1,352 @@
+{
+  "summary": {
+    "total_sample_files": 30,
+    "error_summary": {
+      "FAILED_PRECONDITION": 20,
+      "PERMISSION_DENIED": 5,
+      "INVALID_ARGUMENT": 5
+    },
+    "bucket_summary": {
+      "crates-io": {
+        "FAILED_PRECONDITION": 10,
+        "PERMISSION_DENIED": 5
+      },
+      "static-rust-lang-org": {
+        "FAILED_PRECONDITION": 10,
+        "INVALID_ARGUMENT": 5
+      }
+    }
+  },
+  "failed_files": [
+    {
+      "operation": "transferOperations/transferJobs-transfer-crates-io-8112795250505597565",
+      "job_name": "transferJobs/transfer-crates-io",
+      "bucket": "crates-io",
+      "url": "s3://crates-io/rss/crates/agape_layout.xml",
+      "error_code": "FAILED_PRECONDITION",
+      "error_details": [
+        "Received an invalid response from S3."
+      ],
+      "total_errors_this_type": 337
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-crates-io-8112795250505597565",
+      "job_name": "transferJobs/transfer-crates-io",
+      "bucket": "crates-io",
+      "url": "s3://crates-io/og-images/aeronet_io.png",
+      "error_code": "FAILED_PRECONDITION",
+      "error_details": [
+        "Received an invalid response from S3."
+      ],
+      "total_errors_this_type": 337
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-crates-io-8112795250505597565",
+      "job_name": "transferJobs/transfer-crates-io",
+      "bucket": "crates-io",
+      "url": "s3://crates-io/rss/crates/apollo-composition.xml",
+      "error_code": "FAILED_PRECONDITION",
+      "error_details": [
+        "Received an invalid response from S3."
+      ],
+      "total_errors_this_type": 337
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-crates-io-8112795250505597565",
+      "job_name": "transferJobs/transfer-crates-io",
+      "bucket": "crates-io",
+      "url": "s3://crates-io/rss/crates/aeronet_replicon.xml",
+      "error_code": "FAILED_PRECONDITION",
+      "error_details": [
+        "Received an invalid response from S3."
+      ],
+      "total_errors_this_type": 337
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-crates-io-8112795250505597565",
+      "job_name": "transferJobs/transfer-crates-io",
+      "bucket": "crates-io",
+      "url": "s3://crates-io/rss/crates/aeronet_webtransport.xml",
+      "error_code": "FAILED_PRECONDITION",
+      "error_details": [
+        "Received an invalid response from S3."
+      ],
+      "total_errors_this_type": 337
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-static-rust-lang-org-205732933237355629",
+      "job_name": "transferJobs/transfer-static-rust-lang-org",
+      "bucket": "static-rust-lang-org",
+      "url": "s3://static-rust-lang-org/dist/2015-01-20/index.html",
+      "error_code": "FAILED_PRECONDITION",
+      "error_details": [
+        "PreconditionFailed: At least one of the pre-conditions you specified did not hold (HostId=+P6vX0koMp3L3Hwo4cLsrPG6tO3xKj4EBpaaie9Z0OwzjKjvaR94hKVO787z7zDaEB3xUdvW1fo=,RequestId=WVMXVPE8K50QD2G7)"
+      ],
+      "total_errors_this_type": 5997
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-static-rust-lang-org-205732933237355629",
+      "job_name": "transferJobs/transfer-static-rust-lang-org",
+      "bucket": "static-rust-lang-org",
+      "url": "s3://static-rust-lang-org/dist/2015-02-28/index.html",
+      "error_code": "FAILED_PRECONDITION",
+      "error_details": [
+        "PreconditionFailed: At least one of the pre-conditions you specified did not hold (HostId=wyJ16POqdOGgmcGsC2OsKOCO9viYyDpzgZqMYtErgZ5i8kHm2LOR5dyc46Q2vBHwFMVFO9HQyqQ=,RequestId=WVMN1QKPBW62QKHE)"
+      ],
+      "total_errors_this_type": 5997
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-static-rust-lang-org-205732933237355629",
+      "job_name": "transferJobs/transfer-static-rust-lang-org",
+      "bucket": "static-rust-lang-org",
+      "url": "s3://static-rust-lang-org/dist/2014-12-31/index.html",
+      "error_code": "FAILED_PRECONDITION",
+      "error_details": [
+        "PreconditionFailed: At least one of the pre-conditions you specified did not hold (HostId=zqK6O9YENagazTtmnVpibsBxg4SvI6k69uV9zzd0RcgNSz5WPvpylWUTJxUWrPn/onZbBviFt5yEFNKXWsWQ0lAUKrKRl7sI,RequestId=WVMS3CNAKDG7RR7F)"
+      ],
+      "total_errors_this_type": 5997
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-static-rust-lang-org-205732933237355629",
+      "job_name": "transferJobs/transfer-static-rust-lang-org",
+      "bucket": "static-rust-lang-org",
+      "url": "s3://static-rust-lang-org/dist/2015-01-29/index.html",
+      "error_code": "FAILED_PRECONDITION",
+      "error_details": [
+        "PreconditionFailed: At least one of the pre-conditions you specified did not hold (HostId=dC254whjspE5ZvHhQ5cmfbyqnYJuZ5/eKCaxFG4foFAgnaf7Rt6Ex3z0rLPxGL6D1n9mlUnbqbpgwRQjvagv5cZvbfcED0rMSUGGvRvBBeg=,RequestId=WVMV9NZWF6QTK0K8)"
+      ],
+      "total_errors_this_type": 5997
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-static-rust-lang-org-205732933237355629",
+      "job_name": "transferJobs/transfer-static-rust-lang-org",
+      "bucket": "static-rust-lang-org",
+      "url": "s3://static-rust-lang-org/dist/2014-11-16/index.html",
+      "error_code": "FAILED_PRECONDITION",
+      "error_details": [
+        "PreconditionFailed: At least one of the pre-conditions you specified did not hold (HostId=ThxqijekLaQkIfX+72nxaz+0LysgpP5gLvVkQHnoLOMO4EhenohQSAl00JwKU5T6U7Uu9UI0S1A=,RequestId=WVMTNFFF83XG05TD)"
+      ],
+      "total_errors_this_type": 5997
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-crates-io-14989467690258957078",
+      "job_name": "transferJobs/transfer-crates-io",
+      "bucket": "crates-io",
+      "url": "s3://crates-io/og-images/gh-stats.png",
+      "error_code": "PERMISSION_DENIED",
+      "error_details": [
+        "AccessDenied: Access Denied (HostId=aXWpJvYiXOSllEunjq/PD9ke54VzJn+PsvUkMxyZSapfON/3aC9S8oX7nh0s++lAAsLd8N8Iq0WwAl6iq6tbV9AyL7faBL6o,RequestId=YFX9J4SPGRZ2EKEW)"
+      ],
+      "total_errors_this_type": 6
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-crates-io-14989467690258957078",
+      "job_name": "transferJobs/transfer-crates-io",
+      "bucket": "crates-io",
+      "url": "s3://crates-io/crates/gh-stats/gh-stats-0.1.2.crate",
+      "error_code": "PERMISSION_DENIED",
+      "error_details": [
+        "AccessDenied: Access Denied (HostId=zJvQM4/qbF/XBGhG4VDM4EejpJY/We9unbeATiGVW6TEvcnD/E/jFeIkOdLDAQDKDHeJbuN8Pdg=,RequestId=WCA2C9H9477T1X0Z)"
+      ],
+      "total_errors_this_type": 6
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-crates-io-14989467690258957078",
+      "job_name": "transferJobs/transfer-crates-io",
+      "bucket": "crates-io",
+      "url": "s3://crates-io/crates/gh-stats/gh-stats-0.1.3.crate",
+      "error_code": "PERMISSION_DENIED",
+      "error_details": [
+        "AccessDenied: Access Denied (HostId=Xn8xO4KjbeaO954NzcOvWoILgOsuv0RhX6sGA/dQf/GeUno+LEDxHfkRVGekvYIJog1xvL7Sntc=,RequestId=Y8J2JSQBCXMHD8R5)"
+      ],
+      "total_errors_this_type": 6
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-crates-io-14989467690258957078",
+      "job_name": "transferJobs/transfer-crates-io",
+      "bucket": "crates-io",
+      "url": "s3://crates-io/readmes/moonup/moonup-0.3.1.html",
+      "error_code": "PERMISSION_DENIED",
+      "error_details": [
+        "AccessDenied: Access Denied (HostId=AsnK2BqkR8peFZ5b3nZP7SYoCc5M3RyPB6eQwEGro5+kQ/0YYSh6iinBNYDf8QAdPX0Z+O0iyGE=,RequestId=Q6R9EE0DKG7QJGAM)"
+      ],
+      "total_errors_this_type": 6
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-crates-io-14989467690258957078",
+      "job_name": "transferJobs/transfer-crates-io",
+      "bucket": "crates-io",
+      "url": "s3://crates-io/readmes/toni-macros/toni-macros-0.1.1.html",
+      "error_code": "PERMISSION_DENIED",
+      "error_details": [
+        "AccessDenied: Access Denied (HostId=yrtlZQN+3dM/pDlC96/eqzTOJwkZ4v0IecUHW5KiEG21mojzp+WaCoP8HhWx9TIv7IJV/qRYdis=,RequestId=Q6RCCW1SS5P07KE2)"
+      ],
+      "total_errors_this_type": 6
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-crates-io-14989467690258957078",
+      "job_name": "transferJobs/transfer-crates-io",
+      "bucket": "crates-io",
+      "url": "s3://crates-io/rss/crates/MyGui.xml",
+      "error_code": "FAILED_PRECONDITION",
+      "error_details": [
+        "Received an invalid response from S3."
+      ],
+      "total_errors_this_type": 124
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-crates-io-14989467690258957078",
+      "job_name": "transferJobs/transfer-crates-io",
+      "bucket": "crates-io",
+      "url": "s3://crates-io/og-images/biodivine-lib-bdd.png",
+      "error_code": "FAILED_PRECONDITION",
+      "error_details": [
+        "Received an invalid response from S3."
+      ],
+      "total_errors_this_type": 124
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-crates-io-14989467690258957078",
+      "job_name": "transferJobs/transfer-crates-io",
+      "bucket": "crates-io",
+      "url": "s3://crates-io/og-images/imagnum.png",
+      "error_code": "FAILED_PRECONDITION",
+      "error_details": [
+        "PreconditionFailed: At least one of the pre-conditions you specified did not hold (HostId=H8H+xZzwLp2Rfmi0Z1ukaQZdaTxujVouVki4Z/fIl89A+Ui4ALwORXXdPapn2XgAOYMVdXZBErTPcuW4pGGoP0NM5qAVOBONfugQG9HE3ss=,RequestId=EGQAFVXZQ4WWCTQG)"
+      ],
+      "total_errors_this_type": 124
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-crates-io-14989467690258957078",
+      "job_name": "transferJobs/transfer-crates-io",
+      "bucket": "crates-io",
+      "url": "s3://crates-io/rss/crates/deep_causality_macros.xml",
+      "error_code": "FAILED_PRECONDITION",
+      "error_details": [
+        "Received an invalid response from S3."
+      ],
+      "total_errors_this_type": 124
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-crates-io-14989467690258957078",
+      "job_name": "transferJobs/transfer-crates-io",
+      "bucket": "crates-io",
+      "url": "s3://crates-io/rss/crates/commucat-federation.xml",
+      "error_code": "FAILED_PRECONDITION",
+      "error_details": [
+        "Received an invalid response from S3."
+      ],
+      "total_errors_this_type": 124
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-static-rust-lang-org-6742344679027984831",
+      "job_name": "transferJobs/transfer-static-rust-lang-org",
+      "bucket": "static-rust-lang-org",
+      "url": "s3://static-rust-lang-org/rustup.sh",
+      "error_code": "INVALID_ARGUMENT",
+      "error_details": [
+        "Received an invalid response from S3."
+      ],
+      "total_errors_this_type": 4759
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-static-rust-lang-org-6742344679027984831",
+      "job_name": "transferJobs/transfer-static-rust-lang-org",
+      "bucket": "static-rust-lang-org",
+      "url": "s3://static-rust-lang-org/doc/master/std/sys/imp/ext/net/UnixStream.t.html",
+      "error_code": "INVALID_ARGUMENT",
+      "error_details": [
+        "Received an invalid response from S3."
+      ],
+      "total_errors_this_type": 4759
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-static-rust-lang-org-6742344679027984831",
+      "job_name": "transferJobs/transfer-static-rust-lang-org",
+      "bucket": "static-rust-lang-org",
+      "url": "s3://static-rust-lang-org/doc/master/std/sync/mutex/struct.Mutex.html",
+      "error_code": "INVALID_ARGUMENT",
+      "error_details": [
+        "Received an invalid response from S3."
+      ],
+      "total_errors_this_type": 4759
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-static-rust-lang-org-6742344679027984831",
+      "job_name": "transferJobs/transfer-static-rust-lang-org",
+      "bucket": "static-rust-lang-org",
+      "url": "s3://static-rust-lang-org/doc/master/std/thread/yield_now.v.html",
+      "error_code": "INVALID_ARGUMENT",
+      "error_details": [
+        "Received an invalid response from S3."
+      ],
+      "total_errors_this_type": 4759
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-static-rust-lang-org-6742344679027984831",
+      "job_name": "transferJobs/transfer-static-rust-lang-org",
+      "bucket": "static-rust-lang-org",
+      "url": "s3://static-rust-lang-org/doc/master/std/sys/imp/ext/io/index.html",
+      "error_code": "INVALID_ARGUMENT",
+      "error_details": [
+        "Received an invalid response from S3."
+      ],
+      "total_errors_this_type": 4759
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-static-rust-lang-org-6742344679027984831",
+      "job_name": "transferJobs/transfer-static-rust-lang-org",
+      "bucket": "static-rust-lang-org",
+      "url": "s3://static-rust-lang-org/dist/2015-04-28/index.html",
+      "error_code": "FAILED_PRECONDITION",
+      "error_details": [
+        "PreconditionFailed: At least one of the pre-conditions you specified did not hold (HostId=+0JMGlip6LW4ksAmUYZsxrKcpcl45eJ5zldVztrtQzlYCPsDcB5FTsWcdtx6CDWpBfKmclB1//c=,RequestId=KSA0NETEX1RTTZ24)"
+      ],
+      "total_errors_this_type": 1239
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-static-rust-lang-org-6742344679027984831",
+      "job_name": "transferJobs/transfer-static-rust-lang-org",
+      "bucket": "static-rust-lang-org",
+      "url": "s3://static-rust-lang-org/dist/2015-04-27/index.html",
+      "error_code": "FAILED_PRECONDITION",
+      "error_details": [
+        "PreconditionFailed: At least one of the pre-conditions you specified did not hold (HostId=+A35KHFKFFxrlWEP9lX2sGBgfCOXjcposuOF0sM7YOvYnSo9Ul6GO/p78KFaTgkOyxEFuhFFbuXWVuhaUNtPgUVThNnD6pBg,RequestId=KSAF1Z5Q8B6G19M2)"
+      ],
+      "total_errors_this_type": 1239
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-static-rust-lang-org-6742344679027984831",
+      "job_name": "transferJobs/transfer-static-rust-lang-org",
+      "bucket": "static-rust-lang-org",
+      "url": "s3://static-rust-lang-org/dist/2015-04-29/index.html",
+      "error_code": "FAILED_PRECONDITION",
+      "error_details": [
+        "PreconditionFailed: At least one of the pre-conditions you specified did not hold (HostId=DwxxO5Bf2NmwKm9576kkBwDNbPvjgVJKcs9rDGXfl+7myoUog5yU8XVoGwWZ/naoS6CtjS1Kymo=,RequestId=A2EBFM93V4GFC26M)"
+      ],
+      "total_errors_this_type": 1239
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-static-rust-lang-org-6742344679027984831",
+      "job_name": "transferJobs/transfer-static-rust-lang-org",
+      "bucket": "static-rust-lang-org",
+      "url": "s3://static-rust-lang-org/dist/2015-04-22/index.html",
+      "error_code": "FAILED_PRECONDITION",
+      "error_details": [
+        "PreconditionFailed: At least one of the pre-conditions you specified did not hold (HostId=tc/i2iGbIwAj24WCSG5A1Zy6S3AcGb6MooO5n5DBHNOSLtLunGmsZFXfRsE6EJMAwiORgiCsgOQ9IWAH7V8e1bes9nYvaOXdt5uEZ2xZl3Q=,RequestId=2NKW6XQ7W47XV8T2)"
+      ],
+      "total_errors_this_type": 1239
+    },
+    {
+      "operation": "transferOperations/transferJobs-transfer-static-rust-lang-org-6742344679027984831",
+      "job_name": "transferJobs/transfer-static-rust-lang-org",
+      "bucket": "static-rust-lang-org",
+      "url": "s3://static-rust-lang-org/dist/2015-04-26/index.html",
+      "error_code": "FAILED_PRECONDITION",
+      "error_details": [
+        "PreconditionFailed: At least one of the pre-conditions you specified did not hold (HostId=mWJFwlkzMaccwDmmjILI1mfK/U0764WO+9d5FNVOgv6RFkRAcM/3R4y3GZWmhAojXtt755pxkqj8V5A77bLyvK8JJlWjQmUK,RequestId=1SAB5RXRJNMKR2RA)"
+      ],
+      "total_errors_this_type": 1239
+    }
+  ]
+}
