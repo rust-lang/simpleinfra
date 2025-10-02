@@ -38,6 +38,7 @@
           - cmake
           - libssl-dev
           - unzip
+          - python3-venv
           # For `perf` and `cpupower` to work
           - linux-tools-generic
           - linux-cloud-tools-generic

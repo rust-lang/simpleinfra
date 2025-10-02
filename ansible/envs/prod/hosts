@@ -18,3 +18,4 @@ crater.infra.rust-lang.org
 
 [rustc-perf]
 rustc-perf-one.infra.rust-lang.org
+rustc-perf-two.infra.rust-lang.org

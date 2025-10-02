@@ -46,7 +46,7 @@ resource "aws_security_group" "rust_prod_db" {
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    cidr_blocks = ["144.76.186.39/32", "159.69.58.186/32"]
+    cidr_blocks = ["144.76.186.39/32", "195.201.172.195/32", "159.69.58.186/32"]
     description = "Connections from rustc-perf collection servers"
   }
 
