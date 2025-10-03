@@ -10,7 +10,7 @@ module "ci_role" {
   source = "../gha-oidc-role"
   org    = "rust-lang"
   repo   = "rustup"
-  branch = "master"
+  branch = "main"
 }
 
 resource "aws_s3_bucket_policy" "cloudfront" {
