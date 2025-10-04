@@ -18,3 +18,18 @@ resource "google_storage_bucket_iam_member" "backup_buckets_transfer_agent_bucke
   role   = "roles/storage.legacyBucketWriter"
   member = "serviceAccount:${data.google_storage_transfer_project_service_account.transfer_service_account.email}"
 }
+
+### Permissions required by the agentless transfer ###
+# See https://cloud.google.com/storage-transfer/docs/iam-cloud
+resource "google_project_iam_member" "transfer_service_agent" {
+  project = var.project_id
+  role    = "roles/storagetransfer.serviceAgent"
+  member  = "serviceAccount:${data.google_storage_transfer_project_service_account.transfer_service_account.email}"
+}
+
+resource "google_project_iam_member" "storage_admin" {
+  project = var.project_id
+  role    = "roles/storage.admin"
+  member  = "serviceAccount:${data.google_storage_transfer_project_service_account.transfer_service_account.email}"
+}
+######################################################

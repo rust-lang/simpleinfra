@@ -6,3 +6,9 @@ terraform {
     }
   }
 }
+
+# Enable Secret Manager API
+resource "google_project_service" "secretmanager" {
+  project = var.project_id
+  service = "secretmanager.googleapis.com"
+}

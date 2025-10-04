@@ -2,7 +2,11 @@
 resource "google_storage_bucket" "backup_buckets" {
   for_each = var.source_buckets
 
-  name     = "backup-${each.key}"
+  # On prod, the original bucket name is prefixed with gcp- to avoid conflicts.
+  # Because in GCP, bucket names need to be globally unique.
+  # Going back, I would have specified the name in the variable directly, instead
+  # of editing the name programmatically here.
+  name     = "${lower(var.environment) == "prod" ? "gcp-" : ""}backup-${each.key}"
   location = var.region
   project  = var.project_id
 

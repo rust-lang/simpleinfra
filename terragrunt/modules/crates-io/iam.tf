@@ -145,3 +145,15 @@ resource "aws_iam_role" "s3_replication" {
     })
   }
 }
+
+module "crates_io_storage_transfer_iam" {
+  source      = "../storage_transfer_iam"
+  environment = var.env == "staging" ? "dev" : var.env
+
+  iam_prefix = var.iam_prefix
+
+  s3_bucket_arns = [
+    aws_s3_bucket.static.arn,
+    "${aws_s3_bucket.static.arn}/*"
+  ]
+}

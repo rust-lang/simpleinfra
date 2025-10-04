@@ -7,8 +7,13 @@ resource "google_storage_transfer_job" "backup_transfer" {
   description = "Transfer for ${each.value.description}"
 
   transfer_spec {
-    http_data_source {
-      list_url = "https://${each.value.cloudfront_domain}/"
+    aws_s3_data_source {
+      bucket_name       = each.value.bucket_name
+      cloudfront_domain = "https://${each.value.cloudfront_id}.cloudfront.net"
+      aws_access_key {
+        access_key_id     = each.value.aws_access_key_id
+        secret_access_key = data.google_secret_manager_secret_version.aws_secret_access_key[each.key].secret_data
+      }
     }
 
     gcs_data_sink {
@@ -16,8 +21,7 @@ resource "google_storage_transfer_job" "backup_transfer" {
     }
 
     transfer_options {
-      delete_objects_from_source_after_transfer  = false
-      overwrite_objects_already_existing_in_sink = true
+      delete_objects_from_source_after_transfer = false
     }
   }
 
@@ -32,6 +36,13 @@ resource "google_storage_transfer_job" "backup_transfer" {
       year  = 2099
       month = 12
       day   = 31
+    }
+    # Pick a specific start time to avoid conflicting with other automated tasks
+    start_time_of_day {
+      hours   = 6
+      minutes = 24
+      seconds = 0
+      nanos   = 0
     }
   }
 }
