@@ -16,7 +16,7 @@ fn main() {
 
     let mut sock_path = env::temp_dir();
     sock_path.push("deploy.sock");
-    
+
     let stream = match UnixStream::connect(&sock_path) {
         Ok(s) => s,
         Err(e) => {
@@ -54,7 +54,7 @@ fn main() {
     }
 }
 
-// Helper 
+// Helper
 fn run(cmd: &mut Command) -> String {
     let output = cmd
         .stdout(Stdio::piped())
