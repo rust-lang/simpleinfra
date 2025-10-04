@@ -1,72 +1,79 @@
 use std::env;
 use std::fs;
+use std::io::Write;
 use std::os::unix::net::UnixStream;
 use std::os::unix::prelude::*;
 use std::process::{Command, Stdio};
-use std::io::Write;
 
 fn main() {
     let slug = env::var("BUILD_REPOSITORY_ID")
         .or_else(|_| env::var("GITHUB_REPOSITORY"))
-        .unwrap();
-    let key_b64 = env::var("GITHUB_DEPLOY_KEY").unwrap();
+        .unwrap_or_else(|_| "unknown".to_string());
 
-    let socket = "/tmp/.github-deploy-socket";
-    run(Command::new("ssh-agent").arg("-a").arg(socket));
-    while UnixStream::connect(socket).is_err() {
-        std::thread::sleep(std::time::Duration::from_millis(5));
-    }
+    let msg = env::var("BUILD_SOURCEVERSIONMESSAGE")
+        .or_else(|_| env::var("GITHUB_COMMIT_MESSAGE"))
+        .unwrap_or_else(|_| "Deploy from CI".to_string());
 
-    // Pipe base64-decoded deploy key directly into ssh-add
-    let mut ssh_add = Command::new("ssh-add")
-        .arg("-")
-        .env("SSH_AUTH_SOCK", socket)
-        .stdin(Stdio::piped())
-        .spawn()
-        .expect("failed to spawn ssh-add");
+    let mut sock_path = env::temp_dir();
+    sock_path.push("deploy.sock");
 
-    {
-        let mut child = Command::new("base64")
-            .arg("-d")
-            .stdin(Stdio::piped())
-            .stdout(ssh_add.stdin.take().unwrap())
-            .spawn()
-            .expect("failed to spawn base64");
-
-        child
-            .stdin
-            .as_mut()
-            .unwrap()
-            .write_all(key_b64.as_bytes())
-            .expect("failed to write key to base64 stdin");
-
-        let status = child.wait().expect("failed to wait on base64");
-        if !status.success() {
-            panic!("base64 decoding failed");
+    // Connect ke unix socket
+    let stream = match UnixStream::connect(&sock_path) {
+        Ok(s) => s,
+        Err(e) => {
+            eprintln!("Failed to connect to socket: {}", e);
+            std::process::exit(1);
         }
-    }
+    };
 
-    let status = ssh_add.wait().expect("failed to wait on ssh-add");
-    if !status.success() {
-        panic!("ssh-add failed with exit code {:?}", status.code());
+    let mut stream = stream;
+    let payload = format!("deploy {}", slug);
+    if let Err(e) = stream.write_all(payload.as_bytes()) {
+        eprintln!("Failed to send deploy request: {}", e);
+        std::process::exit(1);
     }
-
-    let sha = env::var("BUILD_SOURCEVERSION")
-        .or_else(|_| env::var("GITHUB_SHA"))
-        .unwrap();
-    let msg = format!("Deploy {sha} to gh-pages");
 
     let _ = fs::remove_dir_all(".git");
     run(Command::new("git").arg("init"));
-    run(Command::new("git").arg("config").arg("user.name").arg("Deploy from CI"));
-    run(Command::new("git").arg("config").arg("user.email").arg(""));
+
+    // --- FIXED CONFIG ---
+    run(Command::new("git")
+        .arg("config")
+        .arg("user.name")
+        .arg("CI Bot"));
+    run(Command::new("git")
+        .arg("config")
+        .arg("user.email")
+        .arg("ci@example.com"));
+
     run(Command::new("git").arg("add").arg("."));
-    run(Command::new("git").arg("commit").arg("-m").arg(&msg));
+
+    // --- Handle no changes ---
+    let status_output = run(Command::new("git").arg("status").arg("--porcelain"));
+    if status_output.trim().is_empty() {
+        println!("No changes to commit, skipping commit.");
+    } else {
+        run(Command::new("git").arg("commit").arg("-m").arg(&msg));
+    }
 }
 
-fn run(cmd: &mut Command) {
-    let status = cmd.status().unwrap();
-    if !status.success() {
-        panic!("command {:?} failed with {:?}", cmd, status.code());
+// Helper buat ngejalanin perintah
+fn run(cmd: &mut Command) -> String {
+    let output = cmd
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .output()
+        .expect("failed to execute command");
+
+    if !output.status.success() {
+        eprintln!(
+            "Command failed: {:?}\nstdout: {}\nstderr: {}",
+            cmd,
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        );
+        std::process::exit(1);
     }
+
+    String::from_utf8_lossy(&output.stdout).to_string()
 }
