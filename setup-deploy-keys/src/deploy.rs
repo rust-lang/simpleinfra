@@ -35,7 +35,6 @@ fn main() {
     let _ = fs::remove_dir_all(".git");
     run(Command::new("git").arg("init"));
 
-    // --- FIXED CONFIG ---
     run(Command::new("git")
         .arg("config")
         .arg("user.name")
