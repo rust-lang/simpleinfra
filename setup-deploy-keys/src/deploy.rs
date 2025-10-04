@@ -16,8 +16,7 @@ fn main() {
 
     let mut sock_path = env::temp_dir();
     sock_path.push("deploy.sock");
-
-    // Connect ke unix socket
+    
     let stream = match UnixStream::connect(&sock_path) {
         Ok(s) => s,
         Err(e) => {
@@ -48,7 +47,6 @@ fn main() {
 
     run(Command::new("git").arg("add").arg("."));
 
-    // --- Handle no changes ---
     let status_output = run(Command::new("git").arg("status").arg("--porcelain"));
     if status_output.trim().is_empty() {
         println!("No changes to commit, skipping commit.");
@@ -57,7 +55,7 @@ fn main() {
     }
 }
 
-// Helper buat ngejalanin perintah
+// Helper 
 fn run(cmd: &mut Command) -> String {
     let output = cmd
         .stdout(Stdio::piped())
