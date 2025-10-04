@@ -2,7 +2,6 @@ use std::env;
 use std::fs;
 use std::io::Write;
 use std::os::unix::net::UnixStream;
-use std::os::unix::prelude::*;
 use std::process::{Command, Stdio};
 
 fn main() {
