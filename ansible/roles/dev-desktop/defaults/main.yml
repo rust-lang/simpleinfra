@@ -32,3 +32,5 @@ vars_user_config:
     shell: /usr/bin/fish
   - username: gh-tiif
     shell: /usr/bin/fish
+  - username: gh-nia-e
+    shell: /usr/bin/zsh
