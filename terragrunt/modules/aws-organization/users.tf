@@ -7,6 +7,7 @@ locals {
     metrics-initiative : aws_identitystore_group.metrics_initiative
     release : aws_identitystore_group.release
     triagebot : aws_identitystore_group.triagebot
+    foundation : aws_identitystore_group.foundation
   }
 
   # Expand var.users into collection of group memberships associations
