@@ -43,7 +43,13 @@ inputs = {
       given_name = "Joel"
       family_name = "Marcey"
       email = "joelmarcey@rustfoundation.org"
-      groups = ["billing"]
+      groups = ["billing", "foundation"]
+    }
+    "walterpearce" = {
+      given_name = "Walter"
+      family_name = "Pearce"
+      email = "walterpearce@rustfoundation.org"
+      groups = ["foundation"]
     }
     "kobzol" = {
       given_name = "Jakub"
