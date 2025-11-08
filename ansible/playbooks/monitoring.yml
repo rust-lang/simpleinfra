@@ -86,6 +86,13 @@
             - targets:
               - docs.rs:443
 
+        - job_name: docsrs-nginx
+          metrics_path: /about/metrics/gwlfgmnhpddteabp/nginx
+          scheme: https
+          static_configs:
+            - targets:
+              - docs.rs:443
+
         - job_name: perfrlo
           metrics_path: /perf/metrics
           scheme: https

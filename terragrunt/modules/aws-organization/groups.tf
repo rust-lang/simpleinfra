@@ -56,6 +56,13 @@ resource "aws_identitystore_group" "release" {
   description  = "The release team"
 }
 
+resource "aws_identitystore_group" "foundation" {
+  identity_store_id = local.identity_store_id
+
+  display_name = "foundation"
+  description  = "Foundation staff"
+}
+
 # The different permission sets a group may have assigned to it
 
 resource "aws_ssoadmin_permission_set" "administrator_access" {
@@ -233,6 +240,51 @@ resource "aws_ssoadmin_permission_set_inline_policy" "start_release" {
   })
 }
 
+// Foundation staff permissions to manage foundation domain names.
+
+resource "aws_ssoadmin_permission_set" "foundation_domains" {
+  instance_arn = local.instance_arn
+  name         = "FoundationDomains"
+}
+
+resource "aws_ssoadmin_permission_set_inline_policy" "foundation_domains" {
+  instance_arn       = local.instance_arn
+  permission_set_arn = aws_ssoadmin_permission_set.foundation_domains.arn
+
+  inline_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "route53:GetHostedZoneCount",
+          "route53:ListHostedZonesByName"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+      {
+        Action = [
+          "route53:GetHostedZone",
+          "route53:ListResourceRecordSets",
+          "route53:ChangeResourceRecordSets"
+        ]
+        Effect = "Allow"
+        Resource = [
+          "arn:aws:route53:::hostedzone/Z09586511TRS6GHW0FZPC", # rust-foundation.com
+          "arn:aws:route53:::hostedzone/Z0959228U6T9PBL0KLAT",  # rust-foundation.net
+          "arn:aws:route53:::hostedzone/Z083357910BVS5OFF9F9K", # rust-foundation.org
+          "arn:aws:route53:::hostedzone/Z06189704SC97VQ930HC",  # rust.foundation
+          "arn:aws:route53:::hostedzone/Z0832784OAW0HU8HSXC6",  # rustfoundation.com
+          "arn:aws:route53:::hostedzone/Z083279813DSO5ADQL7CI", # rustfoundation.net
+          "arn:aws:route53:::hostedzone/Z09748712H3V27RXRFKZ1", # rustfoundation.org
+          "arn:aws:route53:::hostedzone/Z04173281P9OQX2I22PFG", # therustfoundation.com
+          "arn:aws:route53:::hostedzone/Z04105791KDJXQHQC6Y0V", # therustfoundation.org
+        ]
+      }
+    ]
+  })
+}
+
 # The assignment of groups to accounts with their respective permission sets
 
 locals {
@@ -263,6 +315,8 @@ locals {
         permissions : [aws_ssoadmin_permission_set.triagebot_access] },
         { group : aws_identitystore_group.release,
         permissions : [aws_ssoadmin_permission_set.start_release] },
+        { group : aws_identitystore_group.foundation,
+        permissions : [aws_ssoadmin_permission_set.foundation_domains] },
       ]
     },
     # crates-io Staging
