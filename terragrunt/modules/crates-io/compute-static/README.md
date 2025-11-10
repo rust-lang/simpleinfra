@@ -19,20 +19,30 @@ fastly compute build
 
 ## Testing
 
-Testing requires [cargo-nextest](https://nexte.st/docs/installation/pre-built-binaries/), as specified in the [Fastly documentation](https://www.fastly.com/documentation/guides/compute/developer-guides/rust/). You can install it from source with binstall:
+Testing requires [cargo-nextest](https://nexte.st/docs/installation/pre-built-binaries/), as specified in
+the [Fastly documentation](https://www.fastly.com/documentation/guides/compute/developer-guides/rust/). You can install
+it from source with binstall:
+
 ```shell
 cargo install cargo-binstall
 cargo binstall cargo-nextest --secure
 ```
 
 Then, install [Viceroy](https://github.com/fastly/Viceroy) to run the edge function locally:
+
 ```shell
 cargo install --locked viceroy
 ```
 
-Now you can run the tests with:
+Due to the fact Viceroy does not allow easily mocking HTTP requests being sent (
+see [issue](https://github.com/fastly/Viceroy/issues/442)), some tests use a small Python HTTP
+server to work.
+For this reason, a wrapper bash script is provided that runs `cargo nextest run` with the test server active in
+background. You can therefore run the tests with:
+:
+
 ```shell
-cargo nextest run
+./run_tests.sh
 ```
 
 ## Deployment

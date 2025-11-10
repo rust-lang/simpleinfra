@@ -210,7 +210,6 @@ fn add_cors_headers(response: &mut Result<Response, Error>) {
     }
 }
 
-
 /// Finalize the builder and log the line
 fn build_and_send_log(log_line: LogLineV1Builder, config: &Config) {
     match log_line.build() {
@@ -246,10 +245,13 @@ fn http_version_to_string(version: Version) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use fastly::experimental::BackendExt;
+    use fastly::Backend;
 
     fn new_test_config() -> Config {
         Config {
-            primary_host: "test_backend".to_string(),
+            // For tests sending requests to S3, ensure this points at the web server config defined in scripts/test_http_server.py.
+            primary_host: "127.0.0.1:8080".to_string(),
             fallback_host: "fallback_host".to_string(),
             static_ttl: 0,
             cloudfront_url: "cloudfront_url".to_string(),
@@ -291,11 +293,16 @@ mod tests {
     #[test]
     fn test_plus_encoding() {
         // Example taken from the GitHub issue above
-        let mut client_req = Request::get("https://static.crates.io/crates/libgit2-sys/libgit2-sys-0.12.25+1.3.0.crate");
+        let mut client_req = Request::get(
+            "https://static.crates.io/crates/libgit2-sys/libgit2-sys-0.12.25+1.3.0.crate",
+        );
         let config = new_test_config();
 
         rewrite_request(&config, &mut client_req);
-        assert_eq!(client_req.get_path(), "/crates/libgit2-sys/libgit2-sys-0.12.25%2B1.3.0.crate");
+        assert_eq!(
+            client_req.get_path(),
+            "/crates/libgit2-sys/libgit2-sys-0.12.25%2B1.3.0.crate"
+        );
     }
 
     /// Ensures visiting version-downloads with and without a trailing slash properly redirects to the index.html
@@ -304,10 +311,34 @@ mod tests {
         let mut client_req = Request::get("https://static.crates.io/archive/version-downloads/");
         let config = new_test_config();
         rewrite_request(&config, &mut client_req);
-        assert_eq!(client_req.get_path(), "/archive/version-downloads/index.html");
+        assert_eq!(
+            client_req.get_path(),
+            "/archive/version-downloads/index.html"
+        );
 
         let mut client_req = Request::get("https://static.crates.io/archive/version-downloads");
         rewrite_request(&config, &mut client_req);
-        assert_eq!(client_req.get_path(), "/archive/version-downloads/index.html");
+        assert_eq!(
+            client_req.get_path(),
+            "/archive/version-downloads/index.html"
+        );
+    }
+
+    /// Ensures that the request is forwarded to the primary host for normal queries.
+    /// Assumes the tests are being executed with the test HTTP Python server active in background (see README.md).
+    #[test]
+    fn test_handle_request() {
+        let config = new_test_config();
+        Backend::builder(&config.primary_host, &config.primary_host)
+            .finish()
+            .unwrap();
+        let client_req = Request::get(
+            "https://static.crates.io/crates/libgit2-sys/libgit2-sys-0.12.25+1.3.0.crate",
+        );
+        let mut res = handle_request(&config, client_req).unwrap();
+        assert_eq!(res.get_status(), StatusCode::OK);
+        // Assuming the function sent a request to the primary host, verify whether the body is the one set in the test server
+        let body = res.take_body_str();
+        assert_eq!(body, "test_data");
     }
 }
