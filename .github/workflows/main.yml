@@ -23,6 +23,13 @@ jobs:
       - name: Run clippy
         run: cargo clippy --all -- -Dwarnings
 
+      - name: Run compute-static tests
+        working-directory: terragrunt/modules/crates-io/compute-static
+        run: |
+          curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
+          cargo install --locked viceroy --version 0.15.0
+          ./scripts/run_tests.sh
+
   terraform:
     name: Terraform configuration
     runs-on: ubuntu-24.04
