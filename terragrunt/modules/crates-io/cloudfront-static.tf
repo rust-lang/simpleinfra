@@ -99,6 +99,7 @@ resource "aws_cloudfront_distribution" "static" {
 
   tags = {
     TeamAccess = "crates-io"
+    Project    = "crates-io"
   }
 }
 
