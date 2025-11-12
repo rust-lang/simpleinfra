@@ -91,6 +91,11 @@ resource "aws_cloudfront_distribution" "static" {
     bucket          = data.aws_s3_bucket.logs.bucket_regional_domain_name
     prefix          = "cloudfront/${var.static_domain_name}"
   }
+
+  tags = {
+    project     = "release-distribution"
+    environment = var.environment
+  }
 }
 
 resource "aws_route53_record" "cloudfront_static_domain" {
