@@ -75,6 +75,56 @@ resource "random_password" "origin_auth" {
   special = false
 }
 
+// WAF Web ACL for rate limiting
+// Porting nginx rate limiting: 10 req/s with burst of 50
+// WAF uses 5-minute windows, so 10 req/s = 3000 req/5min
+// Setting to 3050 to account for the burst capacity
+resource "aws_wafv2_web_acl" "docs_rs_rate_limit" {
+  provider = aws.east1
+  name     = "docs-rs-rate-limit"
+  scope    = "CLOUDFRONT"
+
+  default_action {
+    allow {}
+  }
+
+  rule {
+    name     = "rate-limit-per-ip"
+    priority = 1
+
+    action {
+      block {
+        custom_response {
+          response_code = 429
+        }
+      }
+    }
+
+    statement {
+      rate_based_statement {
+        limit              = 3050
+        aggregate_key_type = "IP"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "docs-rs-rate-limit"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "docs-rs-waf"
+    sampled_requests_enabled   = true
+  }
+
+  tags = {
+    TeamAccess = "docs-rs"
+  }
+}
+
 resource "aws_cloudfront_distribution" "webapp" {
   comment = local.domain_name
 
@@ -83,6 +133,7 @@ resource "aws_cloudfront_distribution" "webapp" {
   is_ipv6_enabled     = true
   price_class         = "PriceClass_All"
   http_version        = "http2and3"
+  web_acl_id          = aws_wafv2_web_acl.docs_rs_rate_limit.arn
 
   aliases = [local.domain_name]
   viewer_certificate {
