@@ -17,7 +17,7 @@ locals {
       name  = "Jakub Beránek"
     }
     "jdn" = {
-      login = "jandavidnose@rustfoundation.org"
+      login = "jdno@jdno.dev"
       name  = "Jan David Nose"
     }
     "joel" = {
