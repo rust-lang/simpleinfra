@@ -12,7 +12,7 @@ inputs = {
     "jdno" = {
       given_name  = "Jan David",
       family_name = "Nose"
-      email       = "jandavidnose@rustfoundation.org"
+      email       = "jdno@jdno.dev"
       groups      = ["infra", "infra-admins"]
     }
     "pietroalbini" = {

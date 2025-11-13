@@ -11,7 +11,7 @@ locals {
       role  = "user"
     }
     "jdn" = {
-      login = "jandavidnose@rustfoundation.org"
+      login = "jdno@jdno.dev"
       name  = "Jan David Nose"
       role  = "superuser"
     }
