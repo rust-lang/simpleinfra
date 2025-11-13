@@ -44,10 +44,6 @@ locals {
       login = "nells@microsoft.com"
       name  = "Nell Shamrell-Harrington"
     }
-    "paullenz" = {
-      login = "paullenz@rustfoundation.org"
-      name  = "Paul Lenz"
-    }
     "peixin" = {
       login = "peixin.hou@gmail.com"
       name  = "Peixin Hou"

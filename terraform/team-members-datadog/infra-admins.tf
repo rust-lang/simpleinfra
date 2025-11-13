@@ -7,6 +7,7 @@ locals {
     "mark"           = local.users.mark
     "pietro"         = local.users.pietro
     "rustfoundation" = local.users.rustfoundation
+    "walter"         = local.users.walter
   }
 }
 
