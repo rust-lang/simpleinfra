@@ -24,6 +24,7 @@ resource "datadog_role" "infra" {
       data.datadog_permissions.all.permissions.api_keys_read,
       data.datadog_permissions.all.permissions.api_keys_write,
       data.datadog_permissions.all.permissions.user_app_keys,
+      data.datadog_permissions.all.permissions.dbm_read,
     ])
 
     content {

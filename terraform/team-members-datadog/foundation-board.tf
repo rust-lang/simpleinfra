@@ -12,6 +12,7 @@ resource "datadog_role" "board_member" {
   dynamic "permission" {
     for_each = toset([
       data.datadog_permissions.all.permissions.dashboards_write,
+      data.datadog_permissions.all.permissions.dbm_read,
     ])
 
     content {

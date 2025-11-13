@@ -1,11 +1,9 @@
 locals {
   foundation = {
     "adam"           = local.users.adam
-    "jdn"            = local.users.jdn
     "joel"           = local.users.joel
     "jon"            = local.users.jon
     "marcoieni"      = local.users.marcoieni
-    "paullenz"       = local.users.paullenz
     "rustfoundation" = local.users.rustfoundation
     "tobias"         = local.users.tobias
     "walter"         = local.users.walter
@@ -22,6 +20,7 @@ resource "datadog_role" "foundation" {
       data.datadog_permissions.all.permissions.notebooks_write,
       data.datadog_permissions.all.permissions.logs_generate_metrics,
       data.datadog_permissions.all.permissions.metrics_metadata_write,
+      data.datadog_permissions.all.permissions.dbm_read,
     ])
 
     content {
