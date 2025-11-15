@@ -26,8 +26,8 @@ inputs = {
 
   strict_security_headers = true
 
-  static_cloudfront_weight = 5
-  static_fastly_weight = 95
+  static_cloudfront_weight = 1
+  static_fastly_weight = 255
 
   cdn_log_event_queue_arn = "arn:aws:sqs:us-west-1:365596307002:cdn-log-event-queue"
 }
