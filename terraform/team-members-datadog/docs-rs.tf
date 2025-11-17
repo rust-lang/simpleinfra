@@ -1,3 +1,9 @@
+locals {
+  docs_rs = {
+    "syphar" = local.users.syphar
+  }
+}
+
 resource "datadog_role" "docs_rs" {
   name = "docs.rs"
 
@@ -18,4 +24,17 @@ resource "datadog_role" "docs_rs" {
       id = permission.value
     }
   }
+}
+
+resource "datadog_team" "docs_rs" {
+  name        = "docs.rs"
+  description = "The team working on docs.rs"
+  handle      = "docs-rs"
+}
+
+resource "datadog_team_membership" "docs_rs" {
+  for_each = local.docs_rs
+
+  team_id = datadog_team.docs_rs.id
+  user_id = datadog_user.users[each.key].id
 }

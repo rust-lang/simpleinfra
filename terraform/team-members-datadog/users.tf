@@ -60,6 +60,10 @@ locals {
       login = "smarkle.aws@gmail.com"
       name  = "Seth Markle"
     }
+    "syphar" = {
+      login = "denis@cornehl.org"
+      name  = "Denis Cornehl"
+    }
     "tobias" = {
       login = "tobiasbieniek@rustfoundation.org"
       name  = "Tobias Bieniek"
@@ -83,6 +87,7 @@ locals {
   _do_not_use_all_teams = [
     { for name, user in local.crater : name => merge(user, { roles = [datadog_role.crater.name] }) },
     { for name, user in local.crates_io : name => merge(user, { roles = [datadog_role.crates_io.name] }) },
+    { for name, user in local.docs_rs : name => merge(user, { roles = [datadog_role.docs_rs.name] }) },
     { for name, user in local.foundation : name => merge(user, { roles = [datadog_role.foundation.name] }) },
     { for name, user in local.foundation_board : name => merge(user, { roles = [datadog_role.board_member.name] }) },
     { for name, user in local.infra : name => merge(user, { roles = [datadog_role.infra.name] }) },
