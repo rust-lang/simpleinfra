@@ -12,6 +12,10 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.6.2"
     }
+    fastly = {
+      source  = "fastly/fastly"
+      version = "~> 8.4"
+    }
   }
 
   backend "s3" {

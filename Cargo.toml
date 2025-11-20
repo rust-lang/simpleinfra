@@ -5,4 +5,11 @@ resolver = "2"
 members = [
     "setup-deploy-keys",
     "ansible/roles/dev-desktop/files/team_login",
+    "terraform/docs-rs/fastly-compute-docs-rs",
 ]
+
+[profile.fastly-release]
+inherits = "release"
+debug = 1
+codegen-units = 1
+lto = "fat"
