@@ -12,6 +12,10 @@ locals {
       login = "carol.nichols@gmail.com"
       name  = "Carol Nichols"
     }
+    "guillaumegomez" = {
+      login = "guillaume1.gomez@gmail.com"
+      name  = "Guillaume Gomez"
+    }
     "jakub" = {
       login = "berykubik@gmail.com"
       name  = "Jakub Beránek"
