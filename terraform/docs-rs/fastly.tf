@@ -1,7 +1,6 @@
 locals {
   fastly_domain_name   = "fastly.${local.domain_name}"
   static_fastly_weight = 0
-  dictionary_name      = "docs_rs_config"
   secret_store_name    = "docs_rs_secrets"
 }
 
@@ -38,10 +37,6 @@ resource "fastly_service_compute" "docs_rs" {
     ssl_cert_hostname = local.origin
   }
 
-  dictionary {
-    name = local.dictionary_name
-  }
-
   resource_link {
     name        = "docs_rs_secrets"
     resource_id = fastly_secretstore.docs_rs.id
@@ -50,20 +45,6 @@ resource "fastly_service_compute" "docs_rs" {
   package {
     filename         = data.external.package.result.path
     source_code_hash = data.fastly_package_hash.package.hash
-  }
-}
-
-resource "fastly_service_dictionary_items" "docs_rs" {
-  for_each = {
-    for d in fastly_service_compute.docs_rs.dictionary : d.name => d if d.name == local.dictionary_name
-  }
-
-  service_id    = fastly_service_compute.docs_rs.id
-  dictionary_id = each.value.dictionary_id
-  manage_items  = true
-
-  items = {
-    "ttl" : 31536000 # 1 year in seconds
   }
 }
 
