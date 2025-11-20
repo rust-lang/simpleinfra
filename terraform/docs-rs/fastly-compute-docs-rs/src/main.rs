@@ -2,7 +2,7 @@ use fastly::{
     Error, Request, Response, SecretStore,
     http::{
         HeaderName, Method, StatusCode,
-        header::{CACHE_CONTROL, EXPIRES},
+        header::{CACHE_CONTROL, EXPIRES, STRICT_TRANSPORT_SECURITY},
     },
 };
 
@@ -12,6 +12,11 @@ const DOCS_RS_BACKEND: &str = "docs_rs_origin";
 const DOCS_RS_SECRET_STORE: &str = "docs_rs_secrets";
 // Should match the secret item key in terraform
 const ORIGIN_AUTH_KEY: &str = "origin-auth";
+
+const SURROGATE_CONTROL: HeaderName = HeaderName::from_static("surrogate-control");
+const X_ROBOTS_TAG: HeaderName = HeaderName::from_static("x-robots-tag");
+const X_ORIGIN_AUTH: HeaderName = HeaderName::from_static("x-origin-auth");
+const X_COMPRESS_HINT: HeaderName = HeaderName::from_static("x-compress-hint");
 
 #[fastly::main]
 fn main(mut req: Request) -> Result<Response, Error> {
@@ -40,8 +45,7 @@ fn main(mut req: Request) -> Result<Response, Error> {
                 //
                 // Related docs:
                 // https://www.fastly.com/documentation/guides/concepts/edge-state/cache/#controlling-cache-behavior-based-on-backend-response
-                let surrogate_control = HeaderName::from_static("surrogate-control");
-                let has_any_cache_headers = [CACHE_CONTROL, surrogate_control, EXPIRES]
+                let has_any_cache_headers = [CACHE_CONTROL, SURROGATE_CONTROL, EXPIRES]
                     .iter()
                     .any(|header| response_candidate.contains_header(header));
 
@@ -66,14 +70,25 @@ fn main(mut req: Request) -> Result<Response, Error> {
         }
     }
 
-    req.set_header("X-Origin-Auth", origin_auth.as_ref());
+    req.set_header(X_ORIGIN_AUTH, origin_auth.as_ref());
 
     // Send request to backend
     let mut resp = req.send(DOCS_RS_BACKEND)?;
 
+    // set HSTS header
+    resp.set_header(
+        STRICT_TRANSPORT_SECURITY,
+        // FIXME: this should be made configurable for test environments
+        "max-age=31557600",
+    );
+
+    // enable dynamic compression at the edge
+    // https://www.fastly.com/documentation/guides/concepts/compression/#dynamic-compression
+    resp.set_header(X_COMPRESS_HINT, "on");
+
     // Prevent indexing by search engines
     // TODO: remove this when we are ready to go live with fastly
-    resp.set_header("X-Robots-Tag", "noindex, nofollow");
+    resp.set_header(X_ROBOTS_TAG, "noindex, nofollow");
 
     Ok(resp)
 }
