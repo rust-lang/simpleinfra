@@ -32,9 +32,8 @@ resource "fastly_service_compute" "docs_rs" {
     address       = local.origin
     override_host = local.origin
 
-    use_ssl           = false
-    port              = 80
-    ssl_cert_hostname = local.origin
+    use_ssl = false
+    port    = 80
   }
 
   resource_link {
