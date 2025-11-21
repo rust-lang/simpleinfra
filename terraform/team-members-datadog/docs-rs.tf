@@ -1,6 +1,7 @@
 locals {
   docs_rs = {
-    "syphar" = local.users.syphar
+    "guillaumegomez" = local.users.guillaumegomez
+    "syphar"         = local.users.syphar
   }
 }
 
