@@ -44,12 +44,10 @@ fn find_cache_dirs(home: &Path) -> io::Result<Vec<PathBuf>> {
                     if dir.join("target").is_dir() {
                         result.push(dir.join("target"));
                     }
-                } else {
-                    if let Ok(entries) = fs::read_dir(&dir) {
-                        for e in entries.flatten() {
-                            if e.path().is_dir() {
-                                stack.push(e.path());
-                            }
+                } else if let Ok(entries) = fs::read_dir(&dir) {
+                    for e in entries.flatten() {
+                        if e.path().is_dir() {
+                            stack.push(e.path());
                         }
                     }
                 }
