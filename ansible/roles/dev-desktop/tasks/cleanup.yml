@@ -1,11 +1,12 @@
 ---
-- name: Copy cleanup script
-  template:
-    src: clean-unused-checkouts.sh
-    dest: /etc/cron.cleanup_disk_space
+
+- name: Install clean-unused-checkouts binary
+  copy:
+    src: "{{ playbook_dir }}/../../../../setup-deploy-keys/target/release/clean-unused-checkouts"
+    dest: /usr/local/bin/clean-unused-checkouts
     owner: root
     group: root
-    mode: 0744
+    mode: 0755
 
 - name: Set up the cleanup cron job
   template:
