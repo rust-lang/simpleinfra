@@ -1,8 +1,8 @@
-use clap::{Parser};
+use clap::Parser;
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
-use std::time::{SystemTime, Duration};
+use std::time::{Duration, SystemTime};
 
 /// Clean up unused build/target directories in user home directories
 #[derive(Parser, Debug)]
@@ -24,8 +24,8 @@ struct Cli {
 }
 
 fn is_project_dir(dir: &Path) -> bool {
-    (dir.join("x.py").is_file() && dir.join("build").is_dir()) ||
-    (dir.join("Cargo.toml").is_file() && dir.join("target").is_dir())
+    (dir.join("x.py").is_file() && dir.join("build").is_dir())
+        || (dir.join("Cargo.toml").is_file() && dir.join("target").is_dir())
 }
 
 fn find_cache_dirs(home: &Path) -> io::Result<Vec<PathBuf>> {
@@ -81,7 +81,11 @@ fn print_or_delete(dir: &Path, dry_run: bool) {
         let size = get_dir_size(dir);
         match size {
             Ok(bytes) => {
-                println!("{:.2} MiB\t{}", bytes as f64 / 1024.0 / 1024.0, dir.display());
+                println!(
+                    "{:.2} MiB\t{}",
+                    bytes as f64 / 1024.0 / 1024.0,
+                    dir.display()
+                );
             }
             Err(_) => {
                 println!("{}", dir.display());
