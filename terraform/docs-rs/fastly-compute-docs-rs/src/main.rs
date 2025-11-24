@@ -18,6 +18,8 @@ const X_ROBOTS_TAG: HeaderName = HeaderName::from_static("x-robots-tag");
 const X_ORIGIN_AUTH: HeaderName = HeaderName::from_static("x-origin-auth");
 const X_COMPRESS_HINT: HeaderName = HeaderName::from_static("x-compress-hint");
 
+const X_RLNG_SOURCE_CDN: HeaderName = HeaderName::from_static("x-rlng-source-cdn");
+
 #[fastly::main]
 fn main(mut req: Request) -> Result<Response, Error> {
     let secrets = SecretStore::open(DOCS_RS_SECRET_STORE).expect("failed to open secret store");
@@ -71,6 +73,7 @@ fn main(mut req: Request) -> Result<Response, Error> {
     }
 
     req.set_header(X_ORIGIN_AUTH, origin_auth.as_ref());
+    req.set_header(X_RLNG_SOURCE_CDN, "fastly");
 
     // Send request to backend
     let mut resp = req.send(DOCS_RS_BACKEND)?;
