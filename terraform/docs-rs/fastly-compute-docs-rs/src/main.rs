@@ -14,7 +14,6 @@ const DOCS_RS_SECRET_STORE: &str = "docs_rs_secrets";
 const ORIGIN_AUTH_KEY: &str = "origin-auth";
 
 const SURROGATE_CONTROL: HeaderName = HeaderName::from_static("surrogate-control");
-const X_ROBOTS_TAG: HeaderName = HeaderName::from_static("x-robots-tag");
 const X_ORIGIN_AUTH: HeaderName = HeaderName::from_static("x-origin-auth");
 const X_COMPRESS_HINT: HeaderName = HeaderName::from_static("x-compress-hint");
 
@@ -88,10 +87,6 @@ fn main(mut req: Request) -> Result<Response, Error> {
     // enable dynamic compression at the edge
     // https://www.fastly.com/documentation/guides/concepts/compression/#dynamic-compression
     resp.set_header(X_COMPRESS_HINT, "on");
-
-    // Prevent indexing by search engines
-    // TODO: remove this when we are ready to go live with fastly
-    resp.set_header(X_ROBOTS_TAG, "noindex, nofollow");
 
     Ok(resp)
 }
