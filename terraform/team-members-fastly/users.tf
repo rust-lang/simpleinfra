@@ -50,6 +50,11 @@ locals {
       name  = "Rust Foundation Infrastructure"
       role  = "superuser"
     }
+    "syphar" = {
+      login = "denis@cornehl.org"
+      name  = "Denis Cornehl"
+      role  = "user"
+    }
     "tobias" = {
       login = "tobiasbieniek@rustfoundation.org"
       name  = "Tobias Bieniek"
