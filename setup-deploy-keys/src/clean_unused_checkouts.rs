@@ -3,6 +3,7 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, SystemTime};
+use walkdir::WalkDir;
 
 /// Clean up unused projects
 ///
@@ -29,37 +30,53 @@ struct Cli {
     max_age: u32,
 }
 
-fn is_project_dir(dir: &Path) -> bool {
-    (dir.join("x.py").is_file() && dir.join("build").is_dir())
-        || (dir.join("Cargo.toml").is_file() && dir.join("target").is_dir())
-}
-
 fn find_cache_dirs(home: &Path) -> io::Result<Vec<PathBuf>> {
+    // Use WalkDir to perform a safe recursive traversal. By default WalkDir does
+    // not follow symlinks which prevents accidental symlink loops.
     let mut result = Vec::new();
-    for entry in fs::read_dir(home)? {
-        let entry = entry?;
+
+    for entry in WalkDir::new(home).follow_links(false) {
+        let entry = match entry {
+            Ok(e) => e,
+            Err(_) => continue, // skip entries we can't read
+        };
+
         let path = entry.path();
-        if path.is_dir() {
-            // Recursively search for project dirs
-            let mut stack = vec![path];
-            while let Some(dir) = stack.pop() {
-                if is_project_dir(&dir) {
-                    if dir.join("build").is_dir() {
-                        result.push(dir.join("build"));
-                    }
-                    if dir.join("target").is_dir() {
-                        result.push(dir.join("target"));
-                    }
-                } else if let Ok(entries) = fs::read_dir(&dir) {
-                    for e in entries.flatten() {
-                        if e.path().is_dir() {
-                            stack.push(e.path());
-                        }
+        if !entry.file_type().is_dir() {
+            continue;
+        }
+
+        // We're interested in artifact dirs named `build` (python) or
+        // `target` (Rust). When we find one, check the parent directory for the
+        // expected marker files (`x.py` for python projects, `Cargo.toml` for
+        // Rust) before including the artifact directory.
+        if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
+            match name {
+                "build" => {
+                    if path
+                        .parent()
+                        .map(|p| p.join("x.py").is_file())
+                        .unwrap_or(false)
+                    {
+                        result.push(path.to_path_buf());
                     }
                 }
+                "target" => {
+                    if path
+                        .parent()
+                        .map(|p| p.join("Cargo.toml").is_file())
+                        .unwrap_or(false)
+                    {
+                        result.push(path.to_path_buf());
+                    }
+                }
+                _ => {}
             }
         }
     }
+
+    result.sort();
+    result.dedup();
     Ok(result)
 }
 
@@ -147,23 +164,72 @@ mod tests {
 
     #[test]
     fn test_is_project_dir_xpy_build() {
-        let dir = tempdir().unwrap();
-        File::create(dir.path().join("x.py")).unwrap();
-        fs::create_dir(dir.path().join("build")).unwrap();
-        assert!(is_project_dir(dir.path()));
+        let root = tempdir().unwrap();
+        let proj = root.path().join("proj_python");
+        fs::create_dir_all(&proj).unwrap();
+        File::create(proj.join("x.py")).unwrap();
+        fs::create_dir(proj.join("build")).unwrap();
+
+        let found = find_cache_dirs(root.path()).unwrap();
+        assert!(found.iter().any(|p| p.ends_with("proj_python/build")));
     }
 
     #[test]
     fn test_is_project_dir_cargo_target() {
-        let dir = tempdir().unwrap();
-        File::create(dir.path().join("Cargo.toml")).unwrap();
-        fs::create_dir(dir.path().join("target")).unwrap();
-        assert!(is_project_dir(dir.path()));
+        let root = tempdir().unwrap();
+        let proj = root.path().join("proj_rust");
+        fs::create_dir_all(&proj).unwrap();
+        File::create(proj.join("Cargo.toml")).unwrap();
+        fs::create_dir(proj.join("target")).unwrap();
+
+        let found = find_cache_dirs(root.path()).unwrap();
+        assert!(found.iter().any(|p| p.ends_with("proj_rust/target")));
     }
 
     #[test]
     fn test_is_project_dir_false() {
-        let dir = tempdir().unwrap();
-        assert!(!is_project_dir(dir.path()));
+        let root = tempdir().unwrap();
+        let proj = root.path().join("proj_none");
+        fs::create_dir_all(&proj).unwrap();
+        // No marker files or artifact dirs
+        let found = find_cache_dirs(root.path()).unwrap();
+        assert!(found.is_empty());
+    }
+
+    #[test]
+    fn test_print_or_delete_flow() {
+        let root = tempdir().unwrap();
+        let proj = root.path().join("proj_print");
+        let build = proj.join("build");
+        fs::create_dir_all(&build).unwrap();
+        let mut file = File::create(build.join("file.bin")).unwrap();
+        file.write_all(&[0u8; 512]).unwrap();
+
+        // dry-run should not remove
+        print_or_delete(&build, true);
+        assert!(build.exists());
+
+        // actual delete should remove
+        print_or_delete(&build, false);
+        assert!(!build.exists());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_find_cache_dirs_symlink_loop() {
+        use std::os::unix::fs::symlink;
+
+        let root = tempdir().unwrap();
+        let proj = root.path().join("proj_rust_loop");
+        fs::create_dir_all(&proj).unwrap();
+        File::create(proj.join("Cargo.toml")).unwrap();
+        fs::create_dir(proj.join("target")).unwrap();
+
+        // create a symlink that points back to root (possible loop)
+        let loop_link = root.path().join("loop");
+        let _ = symlink(root.path(), &loop_link);
+
+        let found = find_cache_dirs(root.path()).unwrap();
+        assert!(found.iter().any(|p| p.ends_with("proj_rust_loop/target")));
     }
 }
