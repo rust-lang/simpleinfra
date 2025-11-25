@@ -4,7 +4,13 @@ use std::io;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, SystemTime};
 
-/// Clean up unused build/target directories in user home directories
+/// Clean up unused projects
+///
+/// This CLI finds all projects that users have checked out on the dev-desktops and deletes
+/// temporary files if the project has not been modified in a certain number of days.
+///
+/// Specifically, the CLI will look for checkouts of `rust-lang/rust` and delete the `build`
+/// directory. And it will find unused crates and delete the `target` directory.
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Cli {
