@@ -20,11 +20,9 @@ resource "fastly_service_compute" "docs_rs" {
     name = local.fastly_domain_name
   }
 
-  # commenting this to avoid conflicts
-  # TODO: uncomment this
-  # domain {
-  #   name = local.domain_name
-  # }
+  domain {
+    name = local.domain_name
+  }
 
   backend {
     name = "docs_rs_origin"
