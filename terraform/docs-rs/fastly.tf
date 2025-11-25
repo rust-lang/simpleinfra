@@ -86,3 +86,17 @@ resource "aws_route53_record" "fastly_domain" {
   records         = concat(module.fastly_tls_subscription_globalsign.destinations, module.fastly_tls_subscription_globalsign_docs_rs.destinations)
   ttl             = 60
 }
+
+data "fastly_tls_configuration" "docs_rs_tls" {
+  id = module.fastly_tls_subscription_globalsign_docs_rs.tls_configuration_id
+}
+
+resource "aws_route53_record" "webapp_apex" {
+  for_each = toset(["AAAA", "A"])
+  zone_id  = data.aws_route53_zone.webapp.id
+  name     = local.domain_name
+  type     = each.value
+  ttl      = 60
+
+  records = [for dns_record in data.fastly_tls_configuration.docs_rs_tls.dns_records : dns_record.record_value if dns_record.record_type == each.value]
+}
