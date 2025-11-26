@@ -15,3 +15,7 @@ output "destinations" {
   # Prefix address pools for Fastly to enable IPv6 support
   value = [for pool in local.address_pools : "dualstack.${pool}"]
 }
+
+output "tls_configuration_id" {
+  value = fastly_tls_subscription.subscription.configuration_id
+}
