@@ -39,9 +39,9 @@ resource "aws_iam_role_policy" "execution" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "AllowParameterStore"
-        Effect = "Allow"
-        Action = "ssm:GetParameters"
+        Sid      = "AllowParameterStore"
+        Effect   = "Allow"
+        Action   = "ssm:GetParameters"
         Resource = data.aws_ssm_parameter.fastly_api_token.arn
       },
       {
@@ -54,9 +54,9 @@ resource "aws_iam_role_policy" "execution" {
         Resource = "${aws_cloudwatch_log_group.fastly_exporter.arn}:*"
       },
       {
-        Sid    = "ECRAuthentication"
-        Effect = "Allow"
-        Action = "ecr:GetAuthorizationToken"
+        Sid      = "ECRAuthentication"
+        Effect   = "Allow"
+        Action   = "ecr:GetAuthorizationToken"
         Resource = "*"
       }
     ]
