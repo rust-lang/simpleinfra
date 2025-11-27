@@ -163,17 +163,3 @@ data "aws_route53_zone" "webapp" {
   // Convert foo.bar.baz into bar.baz
   name = join(".", reverse(slice(reverse(split(".", local.domain_name)), 0, 2)))
 }
-
-resource "aws_route53_record" "webapp_apex" {
-  for_each = toset(local.domain_is_apex ? ["A", "AAAA"] : [])
-
-  zone_id = data.aws_route53_zone.webapp.id
-  name    = local.domain_name
-  type    = each.value
-
-  alias {
-    name                   = aws_cloudfront_distribution.webapp.domain_name
-    zone_id                = aws_cloudfront_distribution.webapp.hosted_zone_id
-    evaluate_target_health = false
-  }
-}

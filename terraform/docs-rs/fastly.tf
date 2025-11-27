@@ -20,11 +20,9 @@ resource "fastly_service_compute" "docs_rs" {
     name = local.fastly_domain_name
   }
 
-  # commenting this to avoid conflicts
-  # TODO: uncomment this
-  # domain {
-  #   name = local.domain_name
-  # }
+  domain {
+    name = local.domain_name
+  }
 
   backend {
     name = "docs_rs_origin"
@@ -60,8 +58,21 @@ module "fastly_tls_subscription_globalsign" {
 
   domains = [
     local.fastly_domain_name,
-    # TODO: uncomment this
-    # local.domain_name
+  ]
+
+  depends_on = [fastly_service_compute.docs_rs]
+}
+
+# I installed the same module twice because the first time I created it with just one domain
+# and I can't edit it anymore.
+module "fastly_tls_subscription_globalsign_docs_rs" {
+  source = "../fastly-tls-subscription"
+
+  certificate_authority = "globalsign"
+  aws_route53_zone_id   = data.aws_route53_zone.webapp.id
+
+  domains = [
+    local.domain_name,
   ]
 
   depends_on = [fastly_service_compute.docs_rs]
@@ -72,6 +83,20 @@ resource "aws_route53_record" "fastly_domain" {
   type            = "CNAME"
   zone_id         = data.aws_route53_zone.webapp.id
   allow_overwrite = true
-  records         = module.fastly_tls_subscription_globalsign.destinations
+  records         = concat(module.fastly_tls_subscription_globalsign.destinations, module.fastly_tls_subscription_globalsign_docs_rs.destinations)
   ttl             = 60
+}
+
+data "fastly_tls_configuration" "docs_rs_tls" {
+  id = module.fastly_tls_subscription_globalsign_docs_rs.tls_configuration_id
+}
+
+resource "aws_route53_record" "webapp_apex" {
+  for_each = toset(["AAAA", "A"])
+  zone_id  = data.aws_route53_zone.webapp.id
+  name     = local.domain_name
+  type     = each.value
+  ttl      = 60
+
+  records = [for dns_record in data.fastly_tls_configuration.docs_rs_tls.dns_records : dns_record.record_value if dns_record.record_type == each.value]
 }
