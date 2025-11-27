@@ -18,6 +18,7 @@ resource "datadog_role" "docs_rs" {
       data.datadog_permissions.all.permissions.logs_read_archives,
       data.datadog_permissions.all.permissions.dashboards_write,
       data.datadog_permissions.all.permissions.monitors_write,
+      data.datadog_permissions.all.permissions.monitors_downtime,
       data.datadog_permissions.all.permissions.notebooks_write,
       data.datadog_permissions.all.permissions.dbm_read,
     ])
