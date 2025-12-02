@@ -1,7 +1,7 @@
 locals {
-  fastly_domain_name   = "fastly.${local.domain_name}"
-  static_fastly_weight = 0
-  secret_store_name    = "docs_rs_secrets"
+  fastly_domain_name = "fastly.${local.domain_name}"
+  secret_store_name  = "docs_rs_secrets"
+  config_store_name  = "docs_rs_config"
 }
 
 data "external" "package" {
@@ -11,6 +11,32 @@ data "external" "package" {
 
 data "fastly_package_hash" "package" {
   filename = data.external.package.result.path
+}
+
+resource "fastly_configstore" "docs_rs" {
+  name = local.config_store_name
+}
+
+resource "fastly_configstore_entries" "docs_rs" {
+  store_id = fastly_configstore.docs_rs.id
+  entries = {
+    # https://www.fastly.com/documentation/guides/getting-started/hosts/shielding/
+    # caveats:
+    # https://www.fastly.com/documentation/guides/getting-started/hosts/shielding/#caveats-of-shielding
+    # Our compute handler contains fallback logic in case of errors where we would directly
+    # call the origin.
+    # So if things break, just remove this entry.
+
+    # this is the "san jose" shield location, closest to our EC2 server in AWS us-west1 (north california)
+    shield_pop = "sjc-ca-us"
+
+    # max age for HSTS header.
+    # should be less for test / staging environments
+    hsts_max_age = "31557600"
+  }
+
+  # manage config entries only via terraform, manual changes will be overwritten on next apply
+  manage_entries = true
 }
 
 resource "fastly_service_compute" "docs_rs" {
@@ -30,19 +56,18 @@ resource "fastly_service_compute" "docs_rs" {
     address       = local.origin
     override_host = local.origin
 
-    # https://www.fastly.com/documentation/guides/getting-started/hosts/shielding/
-    # caveats:
-    # https://www.fastly.com/documentation/guides/getting-started/hosts/shielding/#caveats-of-shielding
-    # this is the "san jose" shield location, closest to our origin in us-west1 (north california)
-    shield = "sjc-ca-us"
-
     use_ssl = false
     port    = 80
   }
 
   resource_link {
-    name        = "docs_rs_secrets"
+    name        = local.secret_store_name
     resource_id = fastly_secretstore.docs_rs.id
+  }
+
+  resource_link {
+    name        = local.config_store_name
+    resource_id = fastly_configstore.docs_rs.id
   }
 
   package {
