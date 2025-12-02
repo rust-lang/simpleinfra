@@ -1,5 +1,6 @@
 use fastly::{
     Backend, ConfigStore, Error, Request, Response, SecretStore,
+    error::anyhow,
     http::{
         HeaderName, Method, StatusCode,
         header::{CACHE_CONTROL, EXPIRES, STRICT_TRANSPORT_SECURITY},
@@ -20,11 +21,11 @@ const DOCS_RS_CONFIG: &str = "docs_rs_config";
 const SHIELD_POP_KEY: &str = "shield_pop";
 const HSTS_MAX_AGE_KEY: &str = "hsts_max_age";
 
+const FASTLY_CLIENT_IP: HeaderName = HeaderName::from_static("fastly-client-ip");
 const SURROGATE_CONTROL: HeaderName = HeaderName::from_static("surrogate-control");
 const X_ORIGIN_AUTH: HeaderName = HeaderName::from_static("x-origin-auth");
 const X_COMPRESS_HINT: HeaderName = HeaderName::from_static("x-compress-hint");
-
-const X_RLNG_SOURCE_CDN: HeaderName = HeaderName::from_static("x-rlng-source-cdn");
+const X_FORWARDED_HOST: HeaderName = HeaderName::from_static("x-forwarded-host");
 
 #[fastly::main]
 fn main(mut req: Request) -> Result<Response, Error> {
@@ -135,7 +136,37 @@ fn main(mut req: Request) -> Result<Response, Error> {
             .plaintext();
 
         req.set_header(X_ORIGIN_AUTH, origin_auth.as_ref());
-        req.set_header(X_RLNG_SOURCE_CDN, "fastly");
+    }
+
+    if req.get_header(X_FORWARDED_HOST).is_none() {
+        // when the request doesn't have an X-Forwarded-Host header,
+        // set one.
+        // When this is a request on a shield POP, we should already
+        // get the header from the edge POP, so just pass it on.
+        // THe forwarded host (= subdomain) will be needed
+        req.set_header(
+            X_FORWARDED_HOST,
+            req.get_url()
+                .host_str()
+                .ok_or_else(|| anyhow!("missing hostname in request URL"))?
+                .to_owned(),
+        );
+    }
+
+    if req.get_header(FASTLY_CLIENT_IP).is_none() {
+        // when the request doesn't have an Fastly-Client-Ip header, set one.
+        // When this is a request on a shield POP, we should already
+        // get the header from the edge POP, and just pass it on.
+        //
+        // https://www.fastly.com/documentation/reference/http/http-headers/Fastly-Client-IP/
+        // We intentionally choose this simple header instead of X-Forwarded-For, because we only
+        // need the client IP, and not all in between.
+        req.set_header(
+            FASTLY_CLIENT_IP,
+            req.get_client_ip_addr()
+                .ok_or_else(|| anyhow!("this is the client request, it should have an IP address"))?
+                .to_string(),
+        );
     }
 
     // Send request to backend, shield POP or origin
