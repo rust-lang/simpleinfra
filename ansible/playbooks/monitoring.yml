@@ -59,7 +59,6 @@
             - targets:
               - "{{ inventory_hostname }}:9100"
               - crater.infra.rust-lang.org:9100
-              - docsrs.infra.rust-lang.org:9100
               - bastion.infra.rust-lang.org:9100
               - play-2.infra.rust-lang.org:9100
               - dev-desktop-staging.infra.rust-lang.org:9100
@@ -71,27 +70,6 @@
           file_sd_configs:
             - files:
               - /var/lib/prometheus-ecs-discovery/ecs_file_sd.yml
-
-        - job_name: docsrs
-          metrics_path: /about/metrics
-          scheme: https
-          static_configs:
-            - targets:
-              - docs.rs:443
-
-        - job_name: docsrs-builder
-          metrics_path: /about/metrics/instance.builder
-          scheme: https
-          static_configs:
-            - targets:
-              - docs.rs:443
-
-        - job_name: docsrs-nginx
-          metrics_path: /about/metrics/gwlfgmnhpddteabp/nginx
-          scheme: https
-          static_configs:
-            - targets:
-              - docs.rs:443
 
         - job_name: perfrlo
           metrics_path: /perf/metrics
@@ -160,7 +138,6 @@
             - targets:
               - fastly-exporter.infra.rust-lang.org
 
-
       prometheus_rule_groups:
         - name: node
           rules:
@@ -201,87 +178,6 @@
               for: 5m
               labels:
                 dispatch: pagerduty-cratesio
-
-        - name: docsrs
-          rules:
-            - alert: DocsRsDown
-              expr: up{job="docsrs"} == 0
-              for: 1m
-              labels:
-                dispatch: docsrs
-              annotations:
-                summary: "docs.rs is down"
-                description: "Prometheus wasn't able to reach the docs.rs website for more than a minute."
-
-            - alert: NoSuccessfulBuilds
-              expr: max_over_time(docsrs_queued_crates_count{job="docsrs"}[1h]) > 0 and increase(docsrs_successful_builds{job="docsrs"}[1h]) < 1
-              for: 1m
-              labels:
-                dispatch: docsrs
-              annotations:
-                summary: "No successful docs.rs builds in the last hour"
-                description: "no documentation builds were successful in the last hour."
-
-            - alert: DiskFull
-              expr: node_filesystem_avail_bytes{job="node",instance="docsrs.infra.rust-lang.org:9100", mountpoint="/"} / node_filesystem_size_bytes{job="node",instance="docsrs.infra.rust-lang.org:9100",mountpoint="/"} < 0.10
-              for: 1m
-              annotations:
-                summary: "Filesystem is full"
-                description: "There is less than 10% disk space left on disk."
-
-            - alert: DocsRsQueueLocked
-              expr: docsrs_queue_is_locked{job="docsrs"} == 1
-              for: 1m
-              labels:
-                dispatch: docsrs
-              annotations:
-                summary: "docs.rs queue is locked"
-                description: "the build queue is marked as locked for more than a minute."
-
-            - alert: LongQueue
-              expr: docsrs_prioritized_crates_count{job="docsrs"} >= 50
-              for: 12h
-              labels:
-                dispatch: docsrs
-              annotations:
-                summary: "The docs.rs build queue is unreasonably long"
-                description: "There are more than 50 crates in the docs.rs queue, and the situation didn't resolve itself in the past 12 hours. The build queue is available at https://docs.rs/releases/queue"
-
-            - alert: LongDeprioritizedQueue
-              expr: docsrs_queued_crates_count_by_priority{job="docsrs",priority!~"0|20"} >= 1000
-              for: 24h
-              labels:
-                dispatch: docsrs
-              annotations:
-                summary: "The docs.rs deprioritized queue is unreasonably long"
-                description: "There are more than 1000 deprioritized crates in the docs.rs queue, and the situation didn't resolve itself in the 24 hours. The build queue is available at https://docs.rs/releases/queue"
-
-            - alert: HighCpuUsage
-              expr: avg(rate(node_cpu_seconds_total{job="node",instance="docsrs.infra.rust-lang.org:9100",mode="idle"}[10m])) < 0.10
-              for: 30m
-              labels:
-                dispatch: docsrs
-              annotations:
-                summary: "High CPU usage on the docs.rs server"
-                description: "the 10-minute rolling average idle time over a 30-minute period was < 10%, something is wrong. Please check `htop` for which threads consume the CPU. Restarting the server can help then."
-
-            - alert: FailingBuilds
-              expr: increase(docsrs_failed_builds{job="docsrs"}[3h]) / increase(docsrs_total_builds{job="docsrs"}[3h]) > 0.75
-              for: 1m
-              labels:
-                dispatch: docsrs
-              annotations:
-                summary: "Most of the docs.rs builds are failing"
-                description: "More than 75% of the crate builds failed over the past 3 hours. Recent failures are available at https://docs.rs/releases/recent-failures."
-
-            - alert: BrokenDatabase
-              expr: increase(docsrs_failed_db_connections{job="docsrs"}[1m]) > 0
-              for: 1m
-              labels:
-                dispatch: docsrs
-              annotations:
-                summary: "Database connections are failing on docs.rs"
-                description: "In the past minute some database connections failed to be established!"
 
         - name: crater
           rules:
@@ -329,17 +225,6 @@
             match:
               dispatch: pagerduty-cratesio
 
-          - receiver: zulip-docsrs
-            group_by: ['alertname']
-            match:
-              dispatch: docsrs
-
-          - receiver: zulip-docsrs
-            group_by: ['alertname']
-            match:
-              job: node
-              instance: docsrs.infra.rust-lang.org:9100
-
           # Suppress disk full alerts for Crater agents. They're supposed to go
           # near the limit and they're configured to handle things properly,
           # cleaning up unused files when they reach a threshold.
@@ -360,15 +245,6 @@
               text: "{{ '{{ range .Alerts }}**{{ if eq .Status \"firing\" }}Fired{{ else }}Resolved{{ end }}: {{ .Annotations.summary }}**\n{{ .Annotations.description }}\n{{ end }}' }}"
               send_resolved: true
 
-        - name: zulip-docsrs
-          slack_configs:
-            - api_url: "{{ vars_alertmanager_receiver_zulip_docsrs }}"
-              channel: alertmanager
-              title: "{{ '{{ .Alerts.Firing | len }} alerts fired, {{ .Alerts.Resolved | len }} alerts resolved!' }}"
-              title_link: "https://grafana.rust-lang.org"
-              text: "{{ '{{ range .Alerts }}**{{ if eq .Status \"firing\" }}Fired{{ else }}Resolved{{ end }}: {{ .Annotations.summary }}**\n{{ .Annotations.description }}\n{{ end }}' }}"
-              send_resolved: true
-
         - name: pagerduty-cratesio
           pagerduty_configs:
             - service_key: "{{ vars_alertmanager_receiver_pagerduty_cratesio }}"
@@ -377,7 +253,6 @@
 
       grafana_github_teams:
         - 2357301  # rust-lang/infra
-        - 3552538  # rust-lang/docs-rs
         - 2948097  # rust-lang/crates-io
         - 5083043  # rust-lang/crates-io-on-call
 
