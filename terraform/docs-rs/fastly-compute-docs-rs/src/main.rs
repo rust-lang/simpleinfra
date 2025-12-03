@@ -1,6 +1,6 @@
 use fastly::{
     Backend, ConfigStore, Error, Request, Response, SecretStore,
-    error::anyhow,
+    error::Context as _,
     http::{
         HeaderName, Method, StatusCode,
         header::{CACHE_CONTROL, EXPIRES, STRICT_TRANSPORT_SECURITY},
@@ -139,22 +139,22 @@ fn main(mut req: Request) -> Result<Response, Error> {
     }
 
     if req.get_header(X_FORWARDED_HOST).is_none() {
-        // when the request doesn't have an X-Forwarded-Host header,
+        // When the request doesn't have an X-Forwarded-Host header,
         // set one.
         // When this is a request on a shield POP, we should already
         // get the header from the edge POP, so just pass it on.
-        // THe forwarded host (= subdomain) will be needed
+        // The forwarded host (= subdomain) will be needed
         req.set_header(
             X_FORWARDED_HOST,
             req.get_url()
                 .host_str()
-                .ok_or_else(|| anyhow!("missing hostname in request URL"))?
+                .context("missing hostname in request URL")?
                 .to_owned(),
         );
     }
 
     if req.get_header(FASTLY_CLIENT_IP).is_none() {
-        // when the request doesn't have an Fastly-Client-Ip header, set one.
+        // When the request doesn't have an Fastly-Client-Ip header, set one.
         // When this is a request on a shield POP, we should already
         // get the header from the edge POP, and just pass it on.
         //
@@ -164,7 +164,7 @@ fn main(mut req: Request) -> Result<Response, Error> {
         req.set_header(
             FASTLY_CLIENT_IP,
             req.get_client_ip_addr()
-                .ok_or_else(|| anyhow!("this is the client request, it should have an IP address"))?
+                .context("this is the client request, it should have an IP address")?
                 .to_string(),
         );
     }
