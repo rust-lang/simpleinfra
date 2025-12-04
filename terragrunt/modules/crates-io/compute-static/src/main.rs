@@ -245,8 +245,6 @@ fn http_version_to_string(version: Version) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use fastly::experimental::BackendExt;
-    use fastly::Backend;
 
     fn new_test_config() -> Config {
         Config {
@@ -324,21 +322,21 @@ mod tests {
         );
     }
 
-    /// Ensures that the request is forwarded to the primary host for normal queries.
-    /// Assumes the tests are being executed with the test HTTP Python server active in background (see README.md).
+    /// Ensures that only GET and HEAD requests are allowed, and that other methods return .
     #[test]
-    fn test_handle_request() {
-        let config = new_test_config();
-        Backend::builder(&config.primary_host, &config.primary_host)
-            .finish()
-            .unwrap();
-        let client_req = Request::get(
-            "https://static.crates.io/crates/libgit2-sys/libgit2-sys-0.12.25+1.3.0.crate",
-        );
-        let mut res = handle_request(&config, client_req).unwrap();
-        assert_eq!(res.get_status(), StatusCode::OK);
-        // Assuming the function sent a request to the primary host, verify whether the body is the one set in the test server
-        let body = res.take_body_str();
-        assert_eq!(body, "test_data");
+    fn test_limit_http_methods() {
+        let whitelist = [Method::GET, Method::HEAD];
+        let blacklist = [Method::POST, Method::PATCH, Method::PUT, Method::DELETE];
+        for method in whitelist {
+            let client_req = Request::new(method, "http://example.com");
+            assert!(limit_http_methods(&client_req).is_none());
+        }
+        for method in blacklist {
+            let client_req = Request::new(method, "http://example.com");
+            let res = limit_http_methods(&client_req);
+            assert!(res.is_some());
+            // Ensure parity between CloudFront and Fastly
+            assert_eq!(res.unwrap().get_status(), StatusCode::UNAUTHORIZED);
+        }
     }
 }

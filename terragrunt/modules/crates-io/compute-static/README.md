@@ -34,15 +34,10 @@ Then, install [Viceroy](https://github.com/fastly/Viceroy) to run the edge funct
 cargo install --locked viceroy
 ```
 
-Due to the fact Viceroy does not allow easily mocking HTTP requests being sent (
-see [issue](https://github.com/fastly/Viceroy/issues/442)), some tests use a small Python HTTP
-server to work.
-For this reason, a wrapper bash script is provided that runs `cargo nextest run` with the test server active in
-background. You can therefore run the tests with:
-:
+Finally, run the tests:
 
 ```shell
-./run_tests.sh
+cargo nextest run
 ```
 
 ## Deployment
