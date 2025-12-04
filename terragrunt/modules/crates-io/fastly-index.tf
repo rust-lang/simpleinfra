@@ -26,28 +26,16 @@ resource "fastly_service_vcl" "index" {
 
   default_ttl = local.index_default_ttl
 
-  # TODO: uncomment to enable logging
-  # logging_datadog {
-  #   name  = "datadog"
-  #   token = data.aws_ssm_parameter.datadog_api_key.value
+  logging_s3 {
+    name        = "s3-request-logs"
+    bucket_name = aws_s3_bucket.logs.bucket
 
-  #   format = templatefile("index-crates-io/fastly-log-format.tftpl", {
-  #     service_name = "index.crates.io"
-  #     dd_app       = "crates-io-index",
-  #     dd_env       = var.env,
-  #   })
-  # }
+    s3_iam_role = aws_iam_role.fastly_assume_role.arn
+    domain      = "s3.us-west-1.amazonaws.com"
+    path        = "/fastly-requests/${var.index_domain_name}/"
 
-  # logging_s3 {
-  #   name        = "s3-request-logs"
-  #   bucket_name = aws_s3_bucket.logs.bucket
-
-  #   s3_iam_role = aws_iam_role.fastly_assume_role.arn
-  #   domain      = "s3.us-west-1.amazonaws.com"
-  #   path        = "/fastly-requests/${var.index_domain_name}/"
-
-  #   compression_codec = "zstd"
-  # }
+    compression_codec = "zstd"
+  }
 }
 
 module "fastly_tls_subscription_index" {
