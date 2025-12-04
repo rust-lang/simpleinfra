@@ -10,6 +10,8 @@ module "certificate" {
     var.static_domain_name,
     var.index_domain_name,
     local.cloudfront_domain_name,
+    # TODO: add this
+    # local.cloudfront_index_domain_name,
   ]
 
   legacy = true
