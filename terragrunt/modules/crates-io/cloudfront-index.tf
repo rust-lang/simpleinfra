@@ -1,5 +1,9 @@
 // This file configures index.crates.io
 
+locals {
+  index_default_ttl = 3600 // 1 hour
+}
+
 resource "aws_cloudfront_origin_access_identity" "index" {
   comment = "index.crates.io access"
 }
@@ -26,9 +30,9 @@ resource "aws_cloudfront_distribution" "index" {
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
 
-    default_ttl = 3600 // 1 hour
+    default_ttl = local.index_default_ttl
     min_ttl     = 1
-    max_ttl     = 3600 // 1 hour
+    max_ttl     = local.index_default_ttl
 
     forwarded_values {
       headers = [
@@ -81,4 +85,11 @@ resource "aws_route53_record" "index" {
   type    = "CNAME"
   ttl     = 300
   records = [aws_cloudfront_distribution.index.domain_name]
+
+  # TODO: uncomment
+  # weighted_routing_policy {
+  #   weight = var.index_cloudfront_weight
+  # }
+
+  # set_identifier = "cloudfront"
 }

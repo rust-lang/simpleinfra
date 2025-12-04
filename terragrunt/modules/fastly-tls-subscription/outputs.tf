@@ -13,5 +13,10 @@ locals {
 
 output "destinations" {
   # Prefix address pools for Fastly to enable IPv6 support
-  value = [for pool in local.address_pools : "dualstack.${pool}"]
+  # Note: when the module was originally written, all pools were missing the dualstack.
+  #       Instead, now Faslty returns "duealstack." prefixed pools directly.
+  value = [
+    for pool in local.address_pools :
+    startswith(pool, "dualstack.") ? pool : "dualstack.${pool}"
+  ]
 }
