@@ -19,8 +19,7 @@ resource "aws_cloudfront_distribution" "index" {
   price_class         = "PriceClass_All"
 
   aliases = [
-    # TODO: add this
-    # local.cloudfront_index_domain_name,
+    local.cloudfront_index_domain_name,
     var.index_domain_name
   ]
   viewer_certificate {
