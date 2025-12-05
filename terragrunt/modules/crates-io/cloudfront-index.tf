@@ -100,10 +100,9 @@ resource "aws_route53_record" "index" {
   # TODO replace the records
   # records = [aws_route53_record.cloudfront_index_domain.fqdn]
 
-  # TODO: uncomment
-  # weighted_routing_policy {
-  #   weight = var.index_cloudfront_weight
-  # }
+  weighted_routing_policy {
+    weight = var.index_cloudfront_weight
+  }
 
-  # set_identifier = "cloudfront"
+  set_identifier = "cloudfront"
 }
