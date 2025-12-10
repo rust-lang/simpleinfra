@@ -82,11 +82,10 @@ variable "static_fastly_weight" {
   type        = number
 }
 
-# TODO: uncomment
-# variable "index_cloudfront_weight" {
-#   description = "Weight of the traffic for index.crates.io that is routed through CloudFront"
-#   type        = number
-# }
+variable "index_cloudfront_weight" {
+  description = "Weight of the traffic for index.crates.io that is routed through CloudFront"
+  type        = number
+}
 
 variable "index_fastly_weight" {
   description = "Weight of the traffic for index.crates.io that is routed through Fastly"
