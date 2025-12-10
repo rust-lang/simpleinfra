@@ -24,7 +24,10 @@ resource "aws_s3_bucket_policy" "index" {
         Sid    = "CloudFrontAccess",
         Effect = "Allow"
         Principal = {
-          AWS = "${aws_cloudfront_origin_access_identity.index.iam_arn}"
+          AWS = [
+            "${aws_cloudfront_origin_access_identity.index.iam_arn}",
+            "${aws_iam_user.fastly_s3_index_reader.arn}"
+          ]
         }
         Action = [
           "s3:GetObject",
