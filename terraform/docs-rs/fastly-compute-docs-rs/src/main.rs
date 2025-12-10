@@ -1,11 +1,12 @@
+mod shield;
+
 use fastly::{
-    Backend, ConfigStore, Error, Request, Response, SecretStore,
+    ConfigStore, Error, Request, Response, SecretStore,
     error::Context as _,
     http::{
         HeaderName, Method, StatusCode,
         header::{CACHE_CONTROL, EXPIRES, STRICT_TRANSPORT_SECURITY},
     },
-    shielding::Shield,
 };
 
 // Should match the backend name in terraform
@@ -30,57 +31,7 @@ const X_FORWARDED_HOST: HeaderName = HeaderName::from_static("x-forwarded-host")
 #[fastly::main]
 fn main(mut req: Request) -> Result<Response, Error> {
     let config = ConfigStore::open(DOCS_RS_CONFIG);
-
-    let shield_pop = config.get(SHIELD_POP_KEY);
-    let shield: Option<Shield> = shield_pop.as_ref().and_then(|pop| match Shield::new(pop) {
-        Ok(shield) => Some(shield),
-        Err(e) => {
-            eprintln!(
-                "Could not find shield '{}', Disabling the origin shielding.\n {:?}",
-                pop, e
-            );
-            None
-        }
-    });
-
-    // default "settings" for this handler, just the client, the edge POP and
-    // direct requests to the origin.
-    let mut origin_backend = Backend::from_name(DOCS_RS_BACKEND)
-        .expect("we know the name is valid, and ::from_name just validates that");
-    let mut target_is_origin = true;
-    let mut response_is_for_client = true;
-
-    // for now this is very defensive logic around the origin shield.
-    // We might simplify it later.
-    if let Some(ref shield) = shield {
-        // shielding is configured with a valid shield
-        if shield.running_on() {
-            // and we're running on the shield POP node.
-            // -> our client is the fastly edge POP node.
-            // -> our target for the request is the origin
-            target_is_origin = true;
-            response_is_for_client = false;
-        } else {
-            // we're running on an edge POP node, so the request should go to the shield node.
-            // -> our client is the user
-            // -> our target is the shield POP
-            match shield.encrypted_backend() {
-                Ok(shield_backend) => {
-                    origin_backend = shield_backend;
-                    target_is_origin = false;
-                    response_is_for_client = true;
-                }
-                Err(e) => {
-                    // not sure when this can happen. In any case, fall back to a direct request
-                    // to the origin.
-                    eprintln!(
-                        "Could not create backend for shield pop '{:?}'.\n {:?}",
-                        shield_pop, e
-                    );
-                }
-            }
-        }
-    }
+    let shield = shield::Context::load(&config)?;
 
     match req.get_method() {
         &Method::GET | &Method::HEAD | &Method::OPTIONS => {
@@ -109,11 +60,9 @@ fn main(mut req: Request) -> Result<Response, Error> {
 
                 if !has_any_cache_headers {
                     response_candidate.set_uncacheable(
-                        // `true` here means that we want to prevent request collapsing until we
-                        // get the next cacheable response.
-                        // About request collapsing:
-                        // https://www.fastly.com/documentation/guides/concepts/edge-state/cache/request-collapsing/
-                        true,
+                        // don't record the "uncacheable" path.
+                        // If set to `true`, fastly assumes the path will never be cacheable.
+                        false,
                     );
                 }
                 Ok(())
@@ -128,7 +77,7 @@ fn main(mut req: Request) -> Result<Response, Error> {
         }
     }
 
-    if target_is_origin {
+    if shield.target_is_origin() {
         let secrets = SecretStore::open(DOCS_RS_SECRET_STORE).expect("failed to open secret store");
         let origin_auth = secrets
             .get(ORIGIN_AUTH_KEY)
@@ -170,10 +119,10 @@ fn main(mut req: Request) -> Result<Response, Error> {
     }
 
     // Send request to backend, shield POP or origin
-    let mut resp = req.send(origin_backend)?;
+    let mut resp = req.send(shield.target_backend())?;
 
     // set HSTS header
-    if response_is_for_client {
+    if shield.response_is_for_client() {
         let ttl: u32 = config
             .get(HSTS_MAX_AGE_KEY)
             .and_then(|ttl| ttl.parse().ok())
