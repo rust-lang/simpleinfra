@@ -59,17 +59,16 @@ resource "aws_route53_record" "fastly_index_domain" {
   records         = module.fastly_tls_subscription_index.destinations
 }
 
-# TODO: uncomment when the other record is also weighted
-# resource "aws_route53_record" "weighted_index_fastly" {
-#   zone_id = data.aws_route53_zone.index.id
-#   name    = var.index_domain_name
-#   type    = "CNAME"
-#   ttl     = 300
-#   records = [aws_route53_record.fastly_index_domain.fqdn]
+resource "aws_route53_record" "weighted_index_fastly" {
+  zone_id = data.aws_route53_zone.index.id
+  name    = var.index_domain_name
+  type    = "CNAME"
+  ttl     = 300
+  records = [aws_route53_record.fastly_index_domain.fqdn]
 
-#   weighted_routing_policy {
-#     weight = var.index_fastly_weight
-#   }
+  weighted_routing_policy {
+    weight = var.index_fastly_weight
+  }
 
-#   set_identifier = "fastly"
-# }
+  set_identifier = "fastly"
+}
