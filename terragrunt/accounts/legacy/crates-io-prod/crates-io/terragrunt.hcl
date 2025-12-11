@@ -18,7 +18,7 @@ inputs = {
   static_bucket_name     = "crates-io"
   index_bucket_name      = "crates-io-index"
 
-  static_ttl = 86400 // 1 day
+  static_ttl = 31536000 // 1 year
 
   webapp_origin_domain = "crates-io.herokuapp.com"
 
