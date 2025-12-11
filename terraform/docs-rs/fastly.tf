@@ -1,7 +1,6 @@
 locals {
-  fastly_domain_name = "fastly.${local.domain_name}"
-  secret_store_name  = "docs_rs_secrets"
-  config_store_name  = "docs_rs_config"
+  secret_store_name = "docs_rs_secrets"
+  config_store_name = "docs_rs_config"
 }
 
 data "external" "package" {
@@ -43,10 +42,6 @@ resource "fastly_service_compute" "docs_rs" {
   name = local.domain_name
 
   domain {
-    name = local.fastly_domain_name
-  }
-
-  domain {
     name = local.domain_name
   }
 
@@ -81,19 +76,6 @@ resource "fastly_secretstore" "docs_rs" {
   name = local.secret_store_name
 }
 
-module "fastly_tls_subscription_globalsign" {
-  source = "../fastly-tls-subscription"
-
-  certificate_authority = "globalsign"
-  aws_route53_zone_id   = data.aws_route53_zone.webapp.id
-
-  domains = [
-    local.fastly_domain_name,
-  ]
-
-  depends_on = [fastly_service_compute.docs_rs]
-}
-
 # I installed the same module twice because the first time I created it with just one domain
 # and I can't edit it anymore.
 module "fastly_tls_subscription_globalsign_docs_rs" {
@@ -107,15 +89,6 @@ module "fastly_tls_subscription_globalsign_docs_rs" {
   ]
 
   depends_on = [fastly_service_compute.docs_rs]
-}
-
-resource "aws_route53_record" "fastly_domain" {
-  name            = local.fastly_domain_name
-  type            = "CNAME"
-  zone_id         = data.aws_route53_zone.webapp.id
-  allow_overwrite = true
-  records         = concat(module.fastly_tls_subscription_globalsign.destinations, module.fastly_tls_subscription_globalsign_docs_rs.destinations)
-  ttl             = 60
 }
 
 data "fastly_tls_configuration" "docs_rs_tls" {
