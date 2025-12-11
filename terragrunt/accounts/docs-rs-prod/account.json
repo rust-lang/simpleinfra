@@ -1,0 +1,10 @@
+{
+    "aws": {
+        "profile": "docs-rs-prod",
+        "regions": [
+            {
+                "region": "us-east-1"
+            }
+        ]
+    }
+}

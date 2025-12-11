@@ -27,6 +27,11 @@ resource "aws_organizations_account" "docs_rs_staging" {
   email = "admin+docs-rs-staging@rust-lang.org"
 }
 
+resource "aws_organizations_account" "docs_rs_prod" {
+  name  = "docs-rs-prod"
+  email = "admin+docs-rs-prod@rust-lang.org"
+}
+
 resource "aws_organizations_account" "dev_desktops_prod" {
   name  = "dev-desktops-prod"
   email = "admin+dev-desktops-prod@rust-lang.org"

@@ -359,6 +359,16 @@ locals {
         permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
       ]
     },
+    # docs-rs prod
+    {
+      account : aws_organizations_account.docs_rs_prod,
+      groups : [
+        { group : aws_identitystore_group.infra-admins,
+        permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
+        { group : aws_identitystore_group.infra,
+        permissions : [aws_ssoadmin_permission_set.read_only_access] },
+      ]
+    },
     # Dev-Desktops Prod
     {
       account : aws_organizations_account.dev_desktops_prod,
