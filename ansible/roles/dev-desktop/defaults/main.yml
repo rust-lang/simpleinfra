@@ -22,6 +22,8 @@ vars_user_config:
     shell: /usr/bin/zsh
   - username: gh-thomcc
     shell: /usr/bin/fish
+  - username: gh-jyn514
+    shell: /usr/bin/zsh
   - username: gh-jieyouxu
     shell: /usr/bin/fish
   - username: gh-syphar
