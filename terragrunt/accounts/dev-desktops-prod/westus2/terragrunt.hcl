@@ -19,10 +19,5 @@ dependency "resource_group" {
 inputs = {
   resource_group_name = dependency.resource_group.outputs.name
   location = "West US 2"
-  instances = {
-    "dev-desktop-us-2" = {
-      instance_type = "Standard_F32s_v2"
-      storage       = 2048
-    }
-  }
+  instances = { }
 }
