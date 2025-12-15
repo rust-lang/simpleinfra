@@ -115,6 +115,15 @@ resource "fastly_service_vcl" "index" {
       }
     EOT
   }
+
+  snippet {
+    name    = "enable segmented caching"
+    type    = "recv"
+    content = <<-VCL
+      set req.enable_segmented_caching = true;
+      set segmented_caching.block_size = 10000000;
+    VCL
+  }
 }
 
 module "fastly_tls_subscription_index" {
