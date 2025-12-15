@@ -117,6 +117,16 @@ resource "fastly_service_vcl" "index" {
   }
 
   snippet {
+    name    = "rewrite root to index"
+    type    = "recv"
+    content = <<-VCL
+      if (req.url == "/") {
+        set req.url = "/index.html";
+      }
+    VCL
+  }
+
+  snippet {
     name    = "enable segmented caching"
     type    = "recv"
     content = <<-VCL
