@@ -8,7 +8,7 @@ terraform {
     }
     random = {
       source  = "hashicorp/random"
-      version = "~> 3.6.2"
+      version = "~> 3.7"
     }
     github = {
       source  = "integrations/github"
