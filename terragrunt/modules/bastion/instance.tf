@@ -35,13 +35,13 @@ resource "aws_route53_record" "bastion" {
 
 // Create the EC2 instance itself.
 
-data "aws_ami" "ubuntu" {
+data "aws_ami" "ubuntu24" {
   most_recent = true
   owners      = ["099720109477"] # Canonical
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
   }
 
   filter {
@@ -51,7 +51,7 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_instance" "bastion" {
-  ami                     = data.aws_ami.ubuntu.id
+  ami                     = data.aws_ami.ubuntu24.id
   instance_type           = "t3a.nano"
   ebs_optimized           = true
   disable_api_termination = true
