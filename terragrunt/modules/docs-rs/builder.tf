@@ -49,6 +49,7 @@ resource "aws_launch_template" "builder" {
 data "aws_ami" "builder" {
   most_recent = true
   name_regex  = "^docs-rs-builder-*"
+  owners      = ["self"]
 }
 
 // The instance profile the builder will assume when communicating with s3
