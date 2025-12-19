@@ -3,7 +3,7 @@
 // Associate an elastic IP to the instance.
 
 resource "aws_eip" "bastion" {
-  vpc = true
+  domain = "vpc"
   tags = {
     Name = "bastion"
   }
@@ -63,9 +63,8 @@ resource "aws_instance" "bastion" {
     delete_on_termination = true
   }
 
-  network_interface {
+  primary_network_interface {
     network_interface_id = aws_network_interface.bastion.id
-    device_index         = 0
   }
 
   tags = {

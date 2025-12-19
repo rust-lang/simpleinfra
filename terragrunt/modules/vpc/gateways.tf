@@ -18,7 +18,7 @@ resource "aws_egress_only_internet_gateway" "eigw" {
 
 resource "aws_vpc_endpoint" "s3" {
   vpc_id            = aws_vpc.vpc.id
-  service_name      = "com.amazonaws.${data.aws_region.current.name}.s3"
+  service_name      = "com.amazonaws.${data.aws_region.current.id}.s3"
   vpc_endpoint_type = "Gateway"
 
   tags = {
@@ -28,7 +28,7 @@ resource "aws_vpc_endpoint" "s3" {
 
 resource "aws_vpc_endpoint" "dynamodb" {
   vpc_id            = aws_vpc.vpc.id
-  service_name      = "com.amazonaws.${data.aws_region.current.name}.dynamodb"
+  service_name      = "com.amazonaws.${data.aws_region.current.id}.dynamodb"
   vpc_endpoint_type = "Gateway"
 
   tags = {
@@ -43,7 +43,7 @@ resource "aws_vpc_endpoint" "dynamodb" {
 resource "aws_eip" "nat" {
   for_each = toset(values(var.private_subnets)) # Name of the AZs
 
-  vpc = true
+  domain = "vpc"
   tags = {
     Name = "${var.name}--nat-${each.value}"
   }
