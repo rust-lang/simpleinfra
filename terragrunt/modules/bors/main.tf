@@ -285,6 +285,10 @@ resource "aws_ecs_task_definition" "bors" {
         {
           name  = "WEB_URL",
           value = "https://${var.domain}"
+        },
+        {
+          name  = "OAUTH_CLIENT_ID",
+          value = "${var.oauth_client_id}"
         }
       ]
 
@@ -300,6 +304,10 @@ resource "aws_ecs_task_definition" "bors" {
         {
           name      = "DATABASE_URL"
           valueFrom = aws_ssm_parameter.db_endpoint.arn
+        },
+        {
+          name      = "OAUTH_CLIENT_SECRET"
+          valueFrom = data.aws_ssm_parameter.oauth_client_secret.arn
         }
       ]
 
@@ -325,6 +333,11 @@ data "aws_ssm_parameter" "webhook_secret" {
 
 data "aws_ssm_parameter" "app_key" {
   name            = "/bors/app-private-key"
+  with_decryption = false
+}
+
+data "aws_ssm_parameter" "oauth_client_secret" {
+  name            = "/bors/oauth-client-secret"
   with_decryption = false
 }
 
@@ -528,4 +541,8 @@ variable "gh_app_id" {
 
 variable "trusted_sub" {
   description = "GitHub OIDC claim"
+}
+
+variable "oauth_client_id" {
+  description = "OAuth client ID"
 }
