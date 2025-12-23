@@ -280,7 +280,7 @@ resource "aws_ecs_task_definition" "bors" {
         },
         {
           name  = "CMD_PREFIX",
-          value = "@bors2"
+          value = "@bors"
         },
         {
           name  = "WEB_URL",
