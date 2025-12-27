@@ -18,13 +18,12 @@ module "web" {
   ephemeral_storage_gb = 40
 
   environment = {
-    DOCSRS_PREFIX               = "/tmp"
-    DOCSRS_STORAGE_BACKEND      = "s3"
-    DOCSRS_LOG                  = "docs_rs=debug,rustwide=info"
-    RUST_BACKTRACE              = "1"
-    S3_REGION                   = "us-east-1"
-    DOCSRS_S3_BUCKET            = "${aws_s3_bucket.storage.id}"
-    DOCSRS_STATIC_CLOUDFRONT_ID = "${aws_cloudfront_distribution.static.id}"
+    DOCSRS_PREFIX          = "/tmp"
+    DOCSRS_STORAGE_BACKEND = "s3"
+    DOCSRS_LOG             = "docs_rs=debug,rustwide=info"
+    RUST_BACKTRACE         = "1"
+    S3_REGION              = "us-east-1"
+    DOCSRS_S3_BUCKET       = "${aws_s3_bucket.storage.id}"
   }
 
   secrets = {
@@ -72,19 +71,7 @@ resource "aws_iam_role_policy" "web" {
           aws_s3_bucket.storage.arn,
           "${aws_s3_bucket.storage.arn}/*",
         ]
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "cloudfront:CreateInvalidation",
-          "cloudfront:GetInvalidation",
-          "cloudfront:ListInvalidations",
-        ]
-        Resource = [
-          aws_cloudfront_distribution.webapp.arn,
-          aws_cloudfront_distribution.static.arn,
-        ]
-      },
+      }
     ]
   })
 }
