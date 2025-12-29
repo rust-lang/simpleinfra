@@ -276,7 +276,7 @@ resource "aws_ecs_task_definition" "bors" {
         },
         {
           name  = "RUST_LOG"
-          value = "bors=debug"
+          value = "bors=trace"
         },
         {
           name  = "CMD_PREFIX",
