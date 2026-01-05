@@ -355,7 +355,8 @@ resource "aws_iam_policy" "ssm_access" {
         Resource = [
           data.aws_ssm_parameter.app_key.arn,
           data.aws_ssm_parameter.webhook_secret.arn,
-          aws_ssm_parameter.db_endpoint.arn
+          aws_ssm_parameter.db_endpoint.arn,
+          data.aws_ssm_parameter.oauth_client_secret.arn
         ]
       }
     ]
