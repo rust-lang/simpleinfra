@@ -90,7 +90,9 @@ resource "aws_iam_role" "gha" {
           Effect = "Allow"
           Action = [
             "ecr:GetAuthorizationToken",
-            "ecs:UpdateService"
+            "ecs:UpdateService",
+            # Used to wait until the service is stable
+            "ecs:DescribeServices"
           ]
           Resource = "*"
         }
