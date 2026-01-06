@@ -1,10 +1,12 @@
 mod shield;
 
+use std::sync::{Arc, Mutex};
+
 use fastly::{
     ConfigStore, Error, Request, Response, SecretStore,
     error::Context as _,
     http::{
-        HeaderName, Method, StatusCode,
+        HeaderName, HeaderValue, Method, StatusCode,
         header::{CACHE_CONTROL, EXPIRES, STRICT_TRANSPORT_SECURITY},
     },
 };
@@ -33,39 +35,56 @@ fn main(mut req: Request) -> Result<Response, Error> {
     let config = ConfigStore::open(DOCS_RS_CONFIG);
     let shield = shield::Context::load(&config)?;
 
+    let surrogate_control_header: Arc<Mutex<Option<HeaderValue>>> = Arc::new(Mutex::new(None));
+
     match req.get_method() {
         &Method::GET | &Method::HEAD | &Method::OPTIONS => {
             // for GET/HEAD/OPTIONS request, follow what the backend sends in the headers.
             // Don't apply any default when there are no headers.
-            req.set_after_send(|response_candidate| {
-                // By design, fastly caching happens _before_ the response ends up back in our code here.
-                // (below, at `let mut response = req.send(backend)?`).
-                //
-                // In the case that the origin/backend doesnt contain any caching headers,
-                // fastly will apply a default TTL.
-                //
-                // We don't want this.
-                //
-                // So we will check if the backend response has any caching header, and if it doesn't,
-                // set the response to be uncacheable.
-                //
-                // If any backend wants anything to be cached, it has to set the appropriate caching
-                // headers.
-                //
-                // Related docs:
-                // https://www.fastly.com/documentation/guides/concepts/edge-state/cache/#controlling-cache-behavior-based-on-backend-response
-                let has_any_cache_headers = [CACHE_CONTROL, SURROGATE_CONTROL, EXPIRES]
-                    .iter()
-                    .any(|header| response_candidate.contains_header(header));
+            req.set_after_send({
+                let surrogate_control_header = surrogate_control_header.clone();
 
-                if !has_any_cache_headers {
-                    response_candidate.set_uncacheable(
-                        // don't record the "uncacheable" path.
-                        // If set to `true`, fastly assumes the path will never be cacheable.
-                        false,
-                    );
+                move |response_candidate| {
+                    let has_surrogate_control = {
+                        let mut surrogate_control_header = surrogate_control_header.lock().unwrap();
+
+                        *surrogate_control_header = response_candidate
+                            .get_header(SURROGATE_CONTROL)
+                            .map(|h| h.to_owned());
+
+                        surrogate_control_header.is_some()
+                    };
+
+                    // By design, fastly caching happens _before_ the response ends up back in our code here.
+                    // (below, at `let mut response = req.send(backend)?`).
+                    //
+                    // In the case that the origin/backend doesnt contain any caching headers,
+                    // fastly will apply a default TTL.
+                    //
+                    // We don't want this.
+                    //
+                    // So we will check if the backend response has any caching header, and if it doesn't,
+                    // set the response to be uncacheable.
+                    //
+                    // If any backend wants anything to be cached, it has to set the appropriate caching
+                    // headers.
+                    //
+                    // Related docs:
+                    // https://www.fastly.com/documentation/guides/concepts/edge-state/cache/#controlling-cache-behavior-based-on-backend-response
+                    let has_any_cache_headers = [CACHE_CONTROL, EXPIRES]
+                        .iter()
+                        .any(|header| response_candidate.contains_header(header))
+                        || has_surrogate_control;
+
+                    if !has_any_cache_headers {
+                        response_candidate.set_uncacheable(
+                            // don't record the "uncacheable" path.
+                            // If set to `true`, fastly assumes the path will never be cacheable.
+                            false,
+                        );
+                    }
+                    Ok(())
                 }
-                Ok(())
             });
         }
         &Method::PUT | &Method::POST | &Method::PATCH | &Method::DELETE => {
@@ -129,6 +148,12 @@ fn main(mut req: Request) -> Result<Response, Error> {
             .unwrap_or(31_557_600);
 
         resp.set_header(STRICT_TRANSPORT_SECURITY, format!("max-age={ttl}"));
+    } else {
+        // response is for edge node
+        let surrogate_control_header = surrogate_control_header.lock().unwrap();
+        if let Some(surrogate_control_header) = &*surrogate_control_header {
+            resp.set_header(SURROGATE_CONTROL, surrogate_control_header);
+        }
     }
 
     // enable dynamic compression at the edge
