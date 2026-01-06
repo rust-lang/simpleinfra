@@ -278,11 +278,11 @@ resource "aws_ecs_task_definition" "bors" {
         },
         {
           name  = "RUST_LOG"
-          value = "bors=debug"
+          value = "bors=trace"
         },
         {
           name  = "CMD_PREFIX",
-          value = "@bors2"
+          value = "@bors"
         },
         {
           name  = "WEB_URL",
