@@ -9,6 +9,7 @@ include {
 
 inputs = {
   domain = "bors-prod.rust-lang.net"
+  public_url = "bors.rust-lang.org"
   gh_app_id = "278306"
   trusted_sub = "repo:rust-lang/bors:environment:production"
   oauth_client_id = "Ov23li6CuHNVV4KULH9X"

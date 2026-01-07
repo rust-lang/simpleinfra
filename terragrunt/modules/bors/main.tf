@@ -290,7 +290,7 @@ resource "aws_ecs_task_definition" "bors" {
         },
         {
           name  = "WEB_URL",
-          value = "https://${var.domain}"
+          value = "https://${var.public_url}"
         },
         {
           name  = "OAUTH_CLIENT_ID",
