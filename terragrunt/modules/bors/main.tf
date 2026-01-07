@@ -290,7 +290,7 @@ resource "aws_ecs_task_definition" "bors" {
         },
         {
           name  = "WEB_URL",
-          value = "https://${var.domain}"
+          value = "https://${var.public_url}"
         },
         {
           name  = "OAUTH_CLIENT_ID",
@@ -556,4 +556,8 @@ variable "trusted_sub" {
 
 variable "oauth_client_id" {
   description = "OAuth client ID"
+}
+
+variable "public_url" {
+  description = "Public URL for the bors instance. Used in GitHub comments."
 }
