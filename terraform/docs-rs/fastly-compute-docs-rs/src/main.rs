@@ -24,6 +24,7 @@ const HSTS_MAX_AGE_KEY: &str = "hsts_max_age";
 
 const FASTLY_CLIENT_IP: HeaderName = HeaderName::from_static("fastly-client-ip");
 const SURROGATE_CONTROL: HeaderName = HeaderName::from_static("surrogate-control");
+const SURROGATE_KEY: HeaderName = HeaderName::from_static("surrogate-key");
 const FASTLY_FF: HeaderName = HeaderName::from_static("fastly-ff");
 const X_ORIGIN_AUTH: HeaderName = HeaderName::from_static("x-origin-auth");
 const X_COMPRESS_HINT: HeaderName = HeaderName::from_static("x-compress-hint");
@@ -140,6 +141,7 @@ fn main(mut req: Request) -> Result<Response, Error> {
     // Workaround for outstanding Fastly platform issue.
     // See https://rust-lang.zulipchat.com/#narrow/channel/356853-t-docs-rs/topic/New.20docs.2Ers.20infrastructure/near/566536029
     resp.remove_header(SURROGATE_CONTROL);
+    resp.remove_header(SURROGATE_KEY);
 
     // enable dynamic compression at the edge
     // https://www.fastly.com/documentation/guides/concepts/compression/#dynamic-compression
