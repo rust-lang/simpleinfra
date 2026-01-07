@@ -128,20 +128,20 @@ fn main(mut req: Request) -> Result<Response, Error> {
     // Send request to backend, shield POP or origin
     let mut resp = req.send(shield.target_backend())?;
 
-    // set HSTS header
     if shield.response_is_for_client() {
+        // set HSTS header
         let ttl: u32 = config
             .get(HSTS_MAX_AGE_KEY)
             .and_then(|ttl| ttl.parse().ok())
             .unwrap_or(31_557_600);
 
         resp.set_header(STRICT_TRANSPORT_SECURITY, format!("max-age={ttl}"));
-    }
 
-    // Workaround for outstanding Fastly platform issue.
-    // See https://github.com/rust-lang/simpleinfra/pull/877
-    resp.remove_header(SURROGATE_CONTROL);
-    resp.remove_header(SURROGATE_KEY);
+        // Workaround for outstanding Fastly platform issue.
+        // See https://github.com/rust-lang/simpleinfra/pull/877
+        resp.remove_header(SURROGATE_CONTROL);
+        resp.remove_header(SURROGATE_KEY);
+    }
 
     // enable dynamic compression at the edge
     // https://www.fastly.com/documentation/guides/concepts/compression/#dynamic-compression
