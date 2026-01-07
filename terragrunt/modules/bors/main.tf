@@ -1,3 +1,7 @@
+locals {
+  bors_rust_lang_org = "bors.rust-lang.org"
+}
+
 resource "aws_ecr_repository" "primary" {
   name                 = "bors"
   image_tag_mutability = "MUTABLE"
@@ -403,8 +407,10 @@ resource "aws_lb_listener" "primary" {
 }
 
 resource "aws_acm_certificate" "primary" {
-  domain_name       = var.domain
-  validation_method = "DNS"
+  domain_name = var.domain
+  # Allow the load balancer to accept HTTPS connections for bors.rust-lang.org
+  subject_alternative_names = var.domain == "bors-prod.rust-lang.net" ? [local.bors_rust_lang_org] : []
+  validation_method         = "DNS"
 
   lifecycle {
     create_before_destroy = true
@@ -416,13 +422,14 @@ data "aws_route53_zone" "net" {
   private_zone = false
 }
 
+# Don't create Route53 record for bors.rust-lang.org because it is managed in the legacy AWS account.
 resource "aws_route53_record" "acm_validation" {
   for_each = {
     for dvo in aws_acm_certificate.primary.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
       record = dvo.resource_record_value
       type   = dvo.resource_record_type
-    }
+    } if dvo.domain_name != local.bors_rust_lang_org
   }
 
   allow_overwrite = true
@@ -434,8 +441,9 @@ resource "aws_route53_record" "acm_validation" {
 }
 
 resource "aws_acm_certificate_validation" "primary" {
-  certificate_arn         = aws_acm_certificate.primary.arn
-  validation_record_fqdns = [for record in aws_route53_record.acm_validation : record.fqdn]
+  certificate_arn = aws_acm_certificate.primary.arn
+  # Include both Terraform-managed FQDNs and manually-managed ones (e.g., bors.rust-lang.org in the legacy account)
+  validation_record_fqdns = [for dvo in aws_acm_certificate.primary.domain_validation_options : dvo.resource_record_name]
 }
 
 resource "aws_route53_record" "lb" {
