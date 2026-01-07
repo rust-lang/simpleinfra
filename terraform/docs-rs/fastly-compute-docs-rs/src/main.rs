@@ -90,7 +90,7 @@ fn main(mut req: Request) -> Result<Response, Error> {
     } else {
         // Workaround for outstanding Fastly platform issue.
         // Setting the `Fastly-FF` header means the shield -> edge response will include the `Surrogate-Control` header.
-        // See https://rust-lang.zulipchat.com/#narrow/channel/356853-t-docs-rs/topic/New.20docs.2Ers.20infrastructure/near/566536029
+        // See https://github.com/rust-lang/simpleinfra/pull/877
         req.set_header(FASTLY_FF, "1");
     }
 
@@ -139,7 +139,7 @@ fn main(mut req: Request) -> Result<Response, Error> {
     }
 
     // Workaround for outstanding Fastly platform issue.
-    // See https://rust-lang.zulipchat.com/#narrow/channel/356853-t-docs-rs/topic/New.20docs.2Ers.20infrastructure/near/566536029
+    // See https://github.com/rust-lang/simpleinfra/pull/877
     resp.remove_header(SURROGATE_CONTROL);
     resp.remove_header(SURROGATE_KEY);
 
