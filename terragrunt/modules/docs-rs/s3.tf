@@ -8,32 +8,6 @@ resource "aws_s3_bucket" "storage" {
   bucket = "docs-rs-storage-${local.account_id}"
 }
 
-resource "aws_s3_bucket_policy" "static_access" {
-  bucket = aws_s3_bucket.storage.id
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "AllowStaticDocsRsAccess",
-        Effect = "Allow",
-        Action = "s3:GetObject",
-        Principal = {
-          Service = "cloudfront.amazonaws.com"
-        },
-        Resource = "${aws_s3_bucket.storage.arn}/*",
-        Condition = {
-          StringEquals = {
-            "s3:ExistingObjectTag/static-cloudfront-access" = "allow"
-          }
-          StringLike = {
-            "AWS:SourceArn" = "${aws_cloudfront_distribution.static.arn}"
-          }
-        }
-      }
-    ]
-  })
-}
-
 resource "aws_s3_bucket_public_access_block" "storage" {
   bucket = aws_s3_bucket.storage.id
 
