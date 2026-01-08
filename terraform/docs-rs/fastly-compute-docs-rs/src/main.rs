@@ -24,6 +24,8 @@ const HSTS_MAX_AGE_KEY: &str = "hsts_max_age";
 
 const FASTLY_CLIENT_IP: HeaderName = HeaderName::from_static("fastly-client-ip");
 const SURROGATE_CONTROL: HeaderName = HeaderName::from_static("surrogate-control");
+const SURROGATE_KEY: HeaderName = HeaderName::from_static("surrogate-key");
+const FASTLY_FF: HeaderName = HeaderName::from_static("fastly-ff");
 const X_ORIGIN_AUTH: HeaderName = HeaderName::from_static("x-origin-auth");
 const X_COMPRESS_HINT: HeaderName = HeaderName::from_static("x-compress-hint");
 const X_FORWARDED_HOST: HeaderName = HeaderName::from_static("x-forwarded-host");
@@ -85,6 +87,11 @@ fn main(mut req: Request) -> Result<Response, Error> {
             .plaintext();
 
         req.set_header(X_ORIGIN_AUTH, origin_auth.as_ref());
+    } else {
+        // Workaround for outstanding Fastly platform issue.
+        // Setting the `Fastly-FF` header means the shield -> edge response will include the `Surrogate-Control` header.
+        // See https://github.com/rust-lang/simpleinfra/pull/877
+        req.set_header(FASTLY_FF, "1");
     }
 
     if req.get_header(X_FORWARDED_HOST).is_none() {
@@ -121,14 +128,19 @@ fn main(mut req: Request) -> Result<Response, Error> {
     // Send request to backend, shield POP or origin
     let mut resp = req.send(shield.target_backend())?;
 
-    // set HSTS header
     if shield.response_is_for_client() {
+        // set HSTS header
         let ttl: u32 = config
             .get(HSTS_MAX_AGE_KEY)
             .and_then(|ttl| ttl.parse().ok())
             .unwrap_or(31_557_600);
 
         resp.set_header(STRICT_TRANSPORT_SECURITY, format!("max-age={ttl}"));
+
+        // Workaround for outstanding Fastly platform issue.
+        // See https://github.com/rust-lang/simpleinfra/pull/877
+        resp.remove_header(SURROGATE_CONTROL);
+        resp.remove_header(SURROGATE_KEY);
     }
 
     // enable dynamic compression at the edge
