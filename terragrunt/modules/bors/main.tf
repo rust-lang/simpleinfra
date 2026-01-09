@@ -378,6 +378,23 @@ resource "aws_lb_target_group" "primary" {
   vpc_id      = data.aws_vpc.default.id
   target_type = "ip"
 
+  # How many seconds to stay in the deregistering (or deactivating) state.
+  # In this state, the load balancer sends no requests to the target.
+  # So this delay should be long enough to allow in-flight connections to
+  # complete.
+  # After this delay, the ECS task enters the stopping state, and ECS
+  # sends the SIGTERM signal to the container, so that it can shutdown gracefully.
+  # See https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-lifecycle-explanation.html
+  deregistration_delay = 30
+
+  health_check {
+    # delay between each health check attempt
+    interval            = 10
+    unhealthy_threshold = 2
+    protocol            = "TCP"
+    healthy_threshold   = 3
+  }
+
   lifecycle {
     create_before_destroy = true
   }
