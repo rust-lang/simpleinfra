@@ -247,7 +247,7 @@ data "aws_region" "current" {}
 resource "aws_ecs_task_definition" "bors" {
   family                   = "bors"
   cpu                      = var.cpu
-  memory                   = 512
+  memory                   = var.memory
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
 
@@ -564,4 +564,8 @@ variable "public_url" {
 
 variable "cpu" {
   description = "How much CPU should be allocated to the bors instance."
+}
+
+variable "memory" {
+  description = "How much memory should be allocated to the bors instance."
 }
