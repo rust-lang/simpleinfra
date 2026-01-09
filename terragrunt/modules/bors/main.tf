@@ -246,7 +246,7 @@ data "aws_region" "current" {}
 
 resource "aws_ecs_task_definition" "bors" {
   family                   = "bors"
-  cpu                      = ${var.cpu}
+  cpu                      = var.cpu
   memory                   = 512
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
