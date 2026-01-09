@@ -398,7 +398,7 @@ resource "aws_lb_listener" "primary" {
   protocol          = "TLS"
   certificate_arn   = aws_acm_certificate.primary.arn
   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-  alpn_policy       = "HTTP1Only"
+  alpn_policy       = "HTTP2Preferred"
 
   default_action {
     type             = "forward"
