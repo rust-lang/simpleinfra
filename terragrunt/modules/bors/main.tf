@@ -246,7 +246,7 @@ data "aws_region" "current" {}
 
 resource "aws_ecs_task_definition" "bors" {
   family                   = "bors"
-  cpu                      = 256
+  cpu                      = var.cpu
   memory                   = 512
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
@@ -560,4 +560,8 @@ variable "oauth_client_id" {
 
 variable "public_url" {
   description = "Public URL for the bors instance. Used in GitHub comments."
+}
+
+variable "cpu" {
+  description = "How much CPU should be allocated to the bors instance."
 }

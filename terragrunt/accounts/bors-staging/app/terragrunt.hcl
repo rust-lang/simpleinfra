@@ -13,4 +13,5 @@ inputs = {
   gh_app_id = "343095"
   trusted_sub = "repo:rust-lang/bors:environment:staging"
   oauth_client_id = "Ov23liTJD2gXjfBvmjZN"
+  cpu = 256
 }
