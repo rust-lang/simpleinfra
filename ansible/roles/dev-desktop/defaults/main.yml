@@ -38,3 +38,5 @@ vars_user_config:
     shell: /usr/bin/zsh
   - username: gh-antoyo
     shell: /usr/bin/fish
+  - username: gh-samueltardieu
+    shell: /usr/bin/fish
