@@ -27,7 +27,7 @@ resource "fastly_configstore_entries" "docs_rs" {
     # So if things break, just remove this entry.
 
     # this is the "san jose" shield location, closest to our EC2 server in AWS us-west1 (north california)
-    shield_pop = "sjc-ca-us"
+    # shield_pop = "sjc-ca-us"
 
     # max age for HSTS header.
     # should be less for test / staging environments
