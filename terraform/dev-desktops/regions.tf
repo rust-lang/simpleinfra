@@ -13,7 +13,7 @@ module "aws_eu_central_1" {
     "dev-desktop-eu-1" = {
       instance_type = "c6g.8xlarge"
       instance_arch = "arm64"
-      storage       = 2000
+      storage       = 3000
     }
   }
 }
