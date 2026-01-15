@@ -30,6 +30,8 @@ inputs = {
   static_fastly_weight = 255
   index_cloudfront_weight = 1
   index_fastly_weight = 255
+  webapp_cloudfront_weight = 255
+  webapp_fastly_weight = 0
 
   cdn_log_event_queue_arn = "arn:aws:sqs:us-west-1:365596307002:cdn-log-event-queue"
 }
