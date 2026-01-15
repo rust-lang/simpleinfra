@@ -32,18 +32,6 @@ resource "fastly_service_vcl" "webapp" {
 
   default_ttl = 0
 
-  # TODO: Enable logging
-  # logging_s3 {
-  #   name        = "s3-request-logs"
-  #   bucket_name = aws_s3_bucket.logs.bucket
-
-  #   s3_iam_role = aws_iam_role.fastly_assume_role.arn
-  #   domain      = "s3.us-west-1.amazonaws.com"
-  #   path        = "/fastly-requests/${var.webapp_domain_name}/"
-
-  #   compression_codec = "zstd"
-  # }
-
   # Forward relevant headers to the origin
   snippet {
     name    = "forward headers to origin"
