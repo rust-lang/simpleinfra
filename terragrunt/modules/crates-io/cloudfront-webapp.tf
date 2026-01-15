@@ -1,4 +1,9 @@
-// This file configures crates.io
+// This file configures the crates.io web app API via CloudFront CDN
+
+locals {
+  cloudfront_webapp_domain_name = "cloudfront-app.${var.webapp_domain_name}"
+  webapp_cdn_timeout_seconds    = 60
+}
 
 resource "aws_cloudfront_distribution" "webapp" {
   comment = var.webapp_domain_name
@@ -8,7 +13,11 @@ resource "aws_cloudfront_distribution" "webapp" {
   is_ipv6_enabled     = true
   price_class         = "PriceClass_All"
 
-  aliases = [var.webapp_domain_name]
+  aliases = [
+    # TODO: Uncomment this for phase 2
+    # local.cloudfront_webapp_domain_name,
+    var.webapp_domain_name
+  ]
   viewer_certificate {
     acm_certificate_arn = module.certificate.arn
     ssl_support_method  = "sni-only"
@@ -68,8 +77,8 @@ resource "aws_cloudfront_distribution" "webapp" {
       origin_ssl_protocols   = ["TLSv1.2"]
 
       // crates.io accepts crate uploads, so add a longer origin timeout.
-      origin_keepalive_timeout = 60
-      origin_read_timeout      = 60
+      origin_keepalive_timeout = local.webapp_cdn_timeout_seconds
+      origin_read_timeout      = local.webapp_cdn_timeout_seconds
     }
   }
 
@@ -84,6 +93,17 @@ resource "aws_cloudfront_distribution" "webapp" {
   }
 }
 
+# Phase 2: Uncomment this record and add cloudfront_webapp_domain_name to CloudFront aliases
+# resource "aws_route53_record" "cloudfront_webapp_domain" {
+#   zone_id = data.aws_route53_zone.webapp.id
+#   name    = local.cloudfront_webapp_domain_name
+#   type    = "CNAME"
+#   ttl     = 300
+#   records = [aws_cloudfront_distribution.webapp.domain_name]
+# }
+
+# TODO: convert this to weighted.
+# resource "aws_route53_record" "weighted_webapp_cloudfront" {
 resource "aws_route53_record" "webapp" {
   for_each = toset(var.dns_apex ? [] : [""])
 
@@ -92,6 +112,12 @@ resource "aws_route53_record" "webapp" {
   type    = "CNAME"
   ttl     = 300
   records = [aws_cloudfront_distribution.webapp.domain_name]
+
+  # weighted_routing_policy {
+  #   weight = var.webapp_cloudfront_weight
+  # }
+
+  # set_identifier = "cloudfront"
 }
 
 data "aws_route53_zone" "webapp" {
@@ -99,6 +125,8 @@ data "aws_route53_zone" "webapp" {
   name = join(".", reverse(slice(reverse(split(".", var.webapp_domain_name)), 0, 2)))
 }
 
+# TODO: convert this to weighted.
+# resource "aws_route53_record" "weighted_webapp_cloudfront_apex" {
 resource "aws_route53_record" "webapp_apex" {
   for_each = toset(var.dns_apex ? ["A", "AAAA"] : [])
 
@@ -111,6 +139,12 @@ resource "aws_route53_record" "webapp_apex" {
     zone_id                = aws_cloudfront_distribution.webapp.hosted_zone_id
     evaluate_target_health = false
   }
+
+  # weighted_routing_policy {
+  #   weight = var.webapp_cloudfront_weight
+  # }
+
+  # set_identifier = "cloudfront"
 }
 
 # Set strict-transport-security headers for crates.io and its subdomains

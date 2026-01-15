@@ -92,6 +92,16 @@ variable "index_fastly_weight" {
   type        = number
 }
 
+variable "webapp_cloudfront_weight" {
+  description = "Weight of the traffic for crates.io that is routed through CloudFront"
+  type        = number
+}
+
+variable "webapp_fastly_weight" {
+  description = "Weight of the traffic for crates.io that is routed through Fastly"
+  type        = number
+}
+
 variable "fastly_aws_account_id" {
   # See https://docs.fastly.com/en/guides/creating-an-aws-iam-role-for-fastly-logging
   description = "The AWS account ID that Fastly uses to write logs"
