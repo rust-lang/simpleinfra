@@ -11,8 +11,7 @@ module "certificate" {
     var.index_domain_name,
     local.cloudfront_domain_name,
     local.cloudfront_index_domain_name,
-    # TODO: Uncomment for phase 2
-    # local.cloudfront_webapp_domain_name,
+    local.cloudfront_webapp_domain_name,
   ]
 
   legacy = true
