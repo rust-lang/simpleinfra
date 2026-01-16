@@ -14,8 +14,7 @@ resource "aws_cloudfront_distribution" "webapp" {
   price_class         = "PriceClass_All"
 
   aliases = [
-    # TODO: Uncomment this for phase 2
-    # local.cloudfront_webapp_domain_name,
+    local.cloudfront_webapp_domain_name,
     var.webapp_domain_name
   ]
   viewer_certificate {
