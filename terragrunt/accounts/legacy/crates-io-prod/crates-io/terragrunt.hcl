@@ -1,5 +1,7 @@
 terraform {
-  source = "git::../../../../..//terragrunt/modules/crates-io?ref=${trimspace(file("../deployed-ref"))}"
+  source = "../../../../modules//crates-io"
+  # Marco removed the deployed ref because too annoying. If you need it, feel free to add it back
+  # source = "git::../../../../..//terragrunt/modules/crates-io?ref=${trimspace(file("../deployed-ref"))}"
 }
 
 include {
