@@ -123,9 +123,7 @@ data "aws_route53_zone" "webapp" {
   name = join(".", reverse(slice(reverse(split(".", var.webapp_domain_name)), 0, 2)))
 }
 
-# TODO: convert this to weighted.
-# resource "aws_route53_record" "weighted_webapp_cloudfront_apex" {
-resource "aws_route53_record" "webapp_apex" {
+resource "aws_route53_record" "weighted_webapp_cloudfront_apex" {
   for_each = toset(var.dns_apex ? ["A", "AAAA"] : [])
 
   zone_id = data.aws_route53_zone.webapp.id
@@ -138,11 +136,11 @@ resource "aws_route53_record" "webapp_apex" {
     evaluate_target_health = false
   }
 
-  # weighted_routing_policy {
-  #   weight = var.webapp_cloudfront_weight
-  # }
+  weighted_routing_policy {
+    weight = var.webapp_cloudfront_weight
+  }
 
-  # set_identifier = "cloudfront"
+  set_identifier = "cloudfront"
 }
 
 # Set strict-transport-security headers for crates.io and its subdomains
