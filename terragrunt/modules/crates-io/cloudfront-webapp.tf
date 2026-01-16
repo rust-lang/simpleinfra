@@ -93,14 +93,13 @@ resource "aws_cloudfront_distribution" "webapp" {
   }
 }
 
-# Phase 2: Uncomment this record and add cloudfront_webapp_domain_name to CloudFront aliases
-# resource "aws_route53_record" "cloudfront_webapp_domain" {
-#   zone_id = data.aws_route53_zone.webapp.id
-#   name    = local.cloudfront_webapp_domain_name
-#   type    = "CNAME"
-#   ttl     = 300
-#   records = [aws_cloudfront_distribution.webapp.domain_name]
-# }
+resource "aws_route53_record" "cloudfront_webapp_domain" {
+  zone_id = data.aws_route53_zone.webapp.id
+  name    = local.cloudfront_webapp_domain_name
+  type    = "CNAME"
+  ttl     = 300
+  records = [aws_cloudfront_distribution.webapp.domain_name]
+}
 
 resource "aws_route53_record" "weighted_webapp_cloudfront" {
   for_each = toset(var.dns_apex ? [] : [""])
