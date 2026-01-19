@@ -96,39 +96,39 @@ resource "aws_route53_record" "fastly_webapp_domain" {
   records         = module.fastly_tls_subscription_webapp.destinations
 }
 
-# resource "aws_route53_record" "weighted_webapp_fastly" {
-#   for_each = toset(var.dns_apex ? [] : [""])
+resource "aws_route53_record" "weighted_webapp_fastly" {
+  for_each = toset(var.dns_apex ? [] : [""])
 
-#   zone_id = data.aws_route53_zone.webapp.id
-#   name    = var.webapp_domain_name
-#   type    = "CNAME"
-#   ttl     = 300
-#   records = [aws_route53_record.fastly_webapp_domain.fqdn]
+  zone_id = data.aws_route53_zone.webapp.id
+  name    = var.webapp_domain_name
+  type    = "CNAME"
+  ttl     = 300
+  records = [aws_route53_record.fastly_webapp_domain.fqdn]
 
-#   weighted_routing_policy {
-#     weight = var.webapp_fastly_weight
-#   }
+  weighted_routing_policy {
+    weight = var.webapp_fastly_weight
+  }
 
-#   set_identifier = "fastly"
-# }
+  set_identifier = "fastly"
+}
 
-# resource "aws_route53_record" "weighted_webapp_fastly_apex" {
-#   for_each = toset(var.dns_apex ? ["A", "AAAA"] : [])
+resource "aws_route53_record" "weighted_webapp_fastly_apex" {
+  for_each = toset(var.dns_apex ? ["A", "AAAA"] : [])
 
-#   zone_id = data.aws_route53_zone.webapp.id
-#   name    = var.webapp_domain_name
-#   type    = each.value
+  zone_id = data.aws_route53_zone.webapp.id
+  name    = var.webapp_domain_name
+  type    = each.value
 
-#   alias {
-#     # For apex domains with Fastly, we use the Fastly subdomain as the alias target
-#     name                   = aws_route53_record.fastly_webapp_domain.fqdn
-#     zone_id                = data.aws_route53_zone.webapp.zone_id
-#     evaluate_target_health = false
-#   }
+  alias {
+    # For apex domains with Fastly, we use the Fastly subdomain as the alias target
+    name                   = aws_route53_record.fastly_webapp_domain.fqdn
+    zone_id                = data.aws_route53_zone.webapp.zone_id
+    evaluate_target_health = false
+  }
 
-#   weighted_routing_policy {
-#     weight = var.webapp_fastly_weight
-#   }
+  weighted_routing_policy {
+    weight = var.webapp_fastly_weight
+  }
 
-#   set_identifier = "fastly"
-# }
+  set_identifier = "fastly"
+}
