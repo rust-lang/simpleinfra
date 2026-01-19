@@ -29,6 +29,7 @@ inputs = {
   static_fastly_weight = 100
   index_cloudfront_weight = 50
   index_fastly_weight = 50
+
   webapp_cloudfront_weight = 50
   webapp_fastly_weight = 50
 
