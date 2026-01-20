@@ -111,5 +111,11 @@ inputs = {
       email       = "urgau@numericable.fr"
       groups      = ["triagebot"]
     }
+    "ubiratansoares" = {
+      given_name  = "Ubiratan",
+      family_name = "Soares"
+      email       = "ubiratansoares@rustfoundation.org"
+      groups      = ["infra", "infra-admins"]
+    }
   }
 }
