@@ -20,3 +20,7 @@ output "destinations" {
     startswith(pool, "dualstack.") ? pool : "dualstack.${pool}"
   ]
 }
+
+output "tls_configuration_id" {
+  value = fastly_tls_subscription.subscription.configuration_id
+}
