@@ -112,19 +112,22 @@ resource "aws_route53_record" "weighted_webapp_fastly" {
   set_identifier = "fastly"
 }
 
+data "fastly_tls_configuration" "webapp_tls" {
+  id = module.fastly_tls_subscription_webapp.tls_configuration_id
+
+  depends_on = [module.fastly_tls_subscription_webapp]
+}
+
+# For apex domains, Route53 cannot alias to a CNAME. Use Fastly anycast IPs instead.
 resource "aws_route53_record" "weighted_webapp_fastly_apex" {
   for_each = toset(var.dns_apex ? ["A", "AAAA"] : [])
 
   zone_id = data.aws_route53_zone.webapp.id
   name    = var.webapp_domain_name
   type    = each.value
+  ttl     = 60
 
-  alias {
-    # For apex domains with Fastly, we use the Fastly subdomain as the alias target
-    name                   = aws_route53_record.fastly_webapp_domain.fqdn
-    zone_id                = data.aws_route53_zone.webapp.zone_id
-    evaluate_target_health = false
-  }
+  records = [for dns_record in data.fastly_tls_configuration.webapp_tls.dns_records : dns_record.record_value if dns_record.record_type == each.value]
 
   weighted_routing_policy {
     weight = var.webapp_fastly_weight
