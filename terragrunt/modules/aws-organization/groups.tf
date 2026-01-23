@@ -63,6 +63,13 @@ resource "aws_identitystore_group" "foundation" {
   description  = "Foundation staff"
 }
 
+resource "aws_identitystore_group" "content" {
+  identity_store_id = local.identity_store_id
+
+  display_name = "content"
+  description  = "The content team"
+}
+
 # The different permission sets a group may have assigned to it
 
 resource "aws_ssoadmin_permission_set" "administrator_access" {
@@ -438,6 +445,8 @@ locals {
         { group : aws_identitystore_group.infra-admins,
         permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
         { group : aws_identitystore_group.infra,
+        permissions : [aws_ssoadmin_permission_set.read_only_access] },
+        { group : aws_identitystore_group.content,
         permissions : [aws_ssoadmin_permission_set.read_only_access] },
       ]
     },
