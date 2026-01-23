@@ -1,0 +1,10 @@
+{
+    "aws": {
+        "profile": "content-prod",
+        "regions": [
+            {
+                "region": "us-east-2"
+            }
+        ]
+    }
+}
