@@ -117,5 +117,11 @@ inputs = {
       email       = "ubiratansoares@rustfoundation.org"
       groups      = ["infra", "infra-admins"]
     }
+    "PLeVasseur" = {
+      given_name  = "Pete",
+      family_name = "LeVasseur"
+      email       = "plevasseur@gmail.com"
+      groups      = ["content"]
+    }
   }
 }
