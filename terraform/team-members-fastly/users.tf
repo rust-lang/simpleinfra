@@ -60,6 +60,11 @@ locals {
       name  = "Tobias Bieniek"
       role  = "user"
     }
+    "ubiratan" = {
+      login = "ubiratansoares@rustfoundation.org"
+      name  = "Ubiratan Soares"
+      role  = "superuser"
+    }
   }
 }
 
