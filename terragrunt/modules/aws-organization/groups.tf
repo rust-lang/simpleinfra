@@ -431,6 +431,16 @@ locals {
         permissions : [aws_ssoadmin_permission_set.read_only_access] },
       ]
     },
+    # Content prod. Used by https://rust-lang.org/governance/teams/launching-pad/#team-content
+    {
+      account : aws_organizations_account.content_prod,
+      groups : [
+        { group : aws_identitystore_group.infra-admins,
+        permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
+        { group : aws_identitystore_group.infra,
+        permissions : [aws_ssoadmin_permission_set.read_only_access] },
+      ]
+    },
   ]
 }
 
