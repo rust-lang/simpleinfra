@@ -447,7 +447,7 @@ locals {
         { group : aws_identitystore_group.infra,
         permissions : [aws_ssoadmin_permission_set.read_only_access] },
         { group : aws_identitystore_group.content,
-        permissions : [aws_ssoadmin_permission_set.read_only_access] },
+        permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.content_s3_write] },
       ]
     },
   ]
