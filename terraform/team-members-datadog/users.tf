@@ -72,6 +72,10 @@ locals {
       login = "tobiasbieniek@rustfoundation.org"
       name  = "Tobias Bieniek"
     }
+    "ubiratan" = {
+      login = "ubiratansoares@rustfoundation.org"
+      name  = "Ubiratan Soares"
+    }
     "walter" = {
       login = "walterpearce@rustfoundation.org"
       name  = "Walter Pearce"

@@ -6,6 +6,7 @@ locals {
     "marcoieni"      = local.users.marcoieni
     "rustfoundation" = local.users.rustfoundation
     "tobias"         = local.users.tobias
+    "ubiratan"       = local.users.ubiratan
     "walter"         = local.users.walter
   }
 }
