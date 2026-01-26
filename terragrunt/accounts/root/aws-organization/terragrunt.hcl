@@ -123,5 +123,41 @@ inputs = {
       email       = "plevasseur@gmail.com"
       groups      = ["content"]
     }
+    "TC" = {
+      given_name  = "TC"
+      family_name = "n/a"
+      email       = "tc+rust@traviscross.com"
+      groups      = ["content"]
+    }
+    "tomassedovic" = {
+      given_name  = "Tomas"
+      family_name = "Sedovic"
+      email       = "tomas@sedovic.cz"
+      groups      = ["content"]
+    }
+    "MerrimanInd" = {
+      given_name  = "Xander"
+      family_name = "Cesari"
+      email       = "xander@merriman.industries"
+      groups      = ["content"]
+    }
+    "cldershem" = {
+      given_name  = "Cameron"
+      family_name = "Dershem"
+      email       = "cameron@pinkhatbeard.com"
+      groups      = ["content"]
+    }
+    "LoriLorusso" = {
+      given_name  = "Lori"
+      family_name = "Lorusso"
+      email       = "lorilorusso@rustfoundation.org"
+      groups      = ["content"]
+    }
+    "tmandry" = {
+      given_name  = "Tyler"
+      family_name = "Mandry"
+      email       = "tmandry@gmail.com"
+      groups      = ["content"]
+    }
   }
 }
