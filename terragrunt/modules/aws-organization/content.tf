@@ -28,6 +28,15 @@ resource "aws_ssoadmin_permission_set_inline_policy" "content_s3_write" {
         }
       },
       {
+        Sid    = "CloudFrontListDistributions"
+        Effect = "Allow"
+        Action = [
+          "cloudfront:ListDistributions",
+          "cloudfront:ListStreamingDistributions"
+        ]
+        Resource = "*"
+      },
+      {
         Sid    = "CloudFrontPermissions"
         Effect = "Allow"
         Action = [
@@ -38,7 +47,6 @@ resource "aws_ssoadmin_permission_set_inline_policy" "content_s3_write" {
           "cloudfront:GetCachePolicyConfig",
           "cloudfront:GetDistribution",
           "cloudfront:GetDistributionConfig",
-          "cloudfront:ListDistributions",
         ]
         Resource = "*"
         Condition = {
