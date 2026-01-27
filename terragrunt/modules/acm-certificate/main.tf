@@ -4,11 +4,22 @@ locals {
   depth = var.legacy ? 2 : 3
 
   top_level_domains = { for domain in var.domains : domain => join(".", reverse(slice(reverse(split(".", domain)), 0, local.depth))) }
+
+  zone_ids = merge(
+    # Prefer explicit zone IDs passed to the module.
+    var.zone_ids,
+    # Fall back to looked-up zone IDs for any remaining zones.
+    { for name, zone in data.aws_route53_zone.zones : name => zone.id }
+  )
 }
 
 data "aws_route53_zone" "zones" {
-  for_each = toset(values(local.top_level_domains))
-  name     = each.value
+  for_each = toset([
+    for name in values(local.top_level_domains) : name
+    # Skip lookups when a zone ID override was provided.
+    if !contains(keys(var.zone_ids), name)
+  ])
+  name = each.value
 }
 
 resource "aws_acm_certificate" "cert" {
@@ -25,10 +36,11 @@ resource "aws_acm_certificate" "cert" {
 resource "aws_route53_record" "cert_validation" {
   for_each = {
     for dvo in aws_acm_certificate.cert.domain_validation_options : dvo.domain_name => {
-      name    = dvo.resource_record_name
-      record  = dvo.resource_record_value
-      type    = dvo.resource_record_type
-      zone_id = data.aws_route53_zone.zones[local.top_level_domains[dvo.domain_name]].id
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+      # Use the explicit zone ID when provided, otherwise the lookup result.
+      zone_id = local.zone_ids[local.top_level_domains[dvo.domain_name]]
     }
   }
 

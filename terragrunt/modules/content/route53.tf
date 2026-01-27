@@ -7,13 +7,16 @@ resource "aws_route53_zone" "zone" {
   name = local.domain_name
 }
 
-# TODO
 # Create the DNS record pointing the domain to CloudFront.
-# resource "aws_route53_record" "public" {
-#   zone_id = aws_route53_zone.zone.id
-#   name    = local.domain_name
-#   type    = "CNAME"
-#   ttl     = 300
-#   # TODO Point the record at the distribution hostname.
-#   records = ["rust-lang.org"]
-# }
+resource "aws_route53_record" "public" {
+  zone_id = aws_route53_zone.zone.id
+  name    = local.domain_name
+  type    = "A"
+
+  # Use an alias record to point at the CloudFront distribution.
+  alias {
+    name                   = aws_cloudfront_distribution.public.domain_name
+    zone_id                = aws_cloudfront_distribution.public.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
