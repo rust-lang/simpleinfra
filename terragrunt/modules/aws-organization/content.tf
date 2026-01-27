@@ -17,7 +17,10 @@ resource "aws_ssoadmin_permission_set_inline_policy" "content_s3_write" {
           "s3:ListBucket",
           "s3:GetBucketLocation"
         ]
-        Resource = "arn:aws:s3:::rust-content-internal"
+        Resource = [
+          "arn:aws:s3:::rust-content-internal",
+          "arn:aws:s3:::rust-content-public"
+        ]
       },
       {
         Sid    = "ReadWriteObjects"
@@ -27,7 +30,10 @@ resource "aws_ssoadmin_permission_set_inline_policy" "content_s3_write" {
           "s3:PutObject",
           "s3:DeleteObject"
         ]
-        Resource = "arn:aws:s3:::rust-content-internal/*"
+        Resource = [
+          "arn:aws:s3:::rust-content-internal/*",
+          "arn:aws:s3:::rust-content-public/*"
+        ]
       }
     ]
   })
