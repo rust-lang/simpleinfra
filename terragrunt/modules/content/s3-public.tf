@@ -6,6 +6,10 @@ locals {
 # S3 bucket to store public content, such as podcast episodes.
 resource "aws_s3_bucket" "public" {
   bucket = local.rust_content_public
+
+  tags = {
+    TeamAccess = "content"
+  }
 }
 
 # Block all public access paths so S3 is not directly reachable.
@@ -123,6 +127,10 @@ resource "aws_cloudfront_distribution" "public" {
     geo_restriction {
       restriction_type = "none"
     }
+  }
+
+  tags = {
+    TeamAccess = "content"
   }
 }
 
