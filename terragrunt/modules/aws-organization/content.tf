@@ -38,6 +38,7 @@ resource "aws_ssoadmin_permission_set_inline_policy" "content_s3_write" {
           "cloudfront:GetCachePolicyConfig",
           "cloudfront:GetDistribution",
           "cloudfront:GetDistributionConfig",
+          "cloudfront:ListDistributions",
         ]
         Resource = "*"
         Condition = {
