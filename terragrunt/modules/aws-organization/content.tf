@@ -28,11 +28,17 @@ resource "aws_ssoadmin_permission_set_inline_policy" "content_s3_write" {
         }
       },
       {
-        Sid    = "CloudFrontListDistributions"
+        Sid    = "CloudFrontUnrestrictedPermissions"
         Effect = "Allow"
         Action = [
+          # Distributions
           "cloudfront:ListDistributions",
-          "cloudfront:ListStreamingDistributions"
+          "cloudfront:ListStreamingDistributions",
+
+          # Cache policies
+          "cloudfront:GetCachePolicy",
+          "cloudfront:GetCachePolicyConfig",
+          "cloudfront:ListCachePolicies"
         ]
         Resource = "*"
       },
@@ -43,8 +49,6 @@ resource "aws_ssoadmin_permission_set_inline_policy" "content_s3_write" {
           "cloudfront:CreateInvalidation",
           "cloudfront:GetInvalidation",
           "cloudfront:ListInvalidations",
-          "cloudfront:GetCachePolicy",
-          "cloudfront:GetCachePolicyConfig",
           "cloudfront:GetDistribution",
           "cloudfront:GetDistributionConfig",
         ]
