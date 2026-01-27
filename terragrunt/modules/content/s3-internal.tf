@@ -2,6 +2,10 @@
 # E.g., raw podcast audio files that need to be edited before publishing.
 resource "aws_s3_bucket" "internal" {
   bucket = "rust-content-internal"
+
+  tags = {
+    TeamAccess = "content"
+  }
 }
 
 # Block all public access paths so S3 is not directly reachable.

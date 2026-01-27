@@ -11,29 +11,40 @@ resource "aws_ssoadmin_permission_set_inline_policy" "content_s3_write" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "ListBucket"
-        Effect = "Allow"
-        Action = [
-          "s3:ListBucket",
-          "s3:GetBucketLocation"
-        ]
-        Resource = [
-          "arn:aws:s3:::rust-content-internal",
-          "arn:aws:s3:::rust-content-public"
-        ]
-      },
-      {
-        Sid    = "ReadWriteObjects"
+        Sid    = "S3Permissions"
         Effect = "Allow"
         Action = [
           "s3:GetObject",
           "s3:PutObject",
-          "s3:DeleteObject"
+          "s3:DeleteObject",
+          "s3:ListBucket",
+          "s3:GetBucketLocation",
         ]
-        Resource = [
-          "arn:aws:s3:::rust-content-internal/*",
-          "arn:aws:s3:::rust-content-public/*"
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "s3:ResourceTag/TeamAccess" = "content"
+          }
+        }
+      },
+      {
+        Sid    = "CloudFrontPermissions"
+        Effect = "Allow"
+        Action = [
+          "cloudfront:CreateInvalidation",
+          "cloudfront:GetInvalidation",
+          "cloudfront:ListInvalidations",
+          "cloudfront:GetCachePolicy",
+          "cloudfront:GetCachePolicyConfig",
+          "cloudfront:GetDistribution",
+          "cloudfront:GetDistributionConfig",
         ]
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "cloudfront:ResourceTag/TeamAccess" = "content"
+          }
+        }
       }
     ]
   })
