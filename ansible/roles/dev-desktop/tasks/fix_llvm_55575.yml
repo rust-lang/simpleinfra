@@ -6,17 +6,24 @@
 #
 # This fix can be removed once we move to llvm 16
 
+- name: Check for llvm 14 install
+  ansible.builtin.stat:
+    path: /usr/lib/llvm-14
+  register: llvm14_install
+
 - name: Find all lldb Python files
   ansible.builtin.find:
     paths: /usr/lib/llvm-14/lib/python3.12/dist-packages/lldb
     file_type: file
   register: lldb_python_files
+  when: llvm14_install.stat.exists
 
 - name: Find all lldb Python modules
   ansible.builtin.find:
     paths: /usr/lib/llvm-14/lib/python3.12/dist-packages/lldb
     file_type: directory
   register: lldb_python_directories
+  when: llvm14_install.stat.exists
 
 - name: Fix llvm/llvm-project#55575
   ansible.builtin.file:
@@ -24,9 +31,11 @@
     dest: "/usr/lib/python3/dist-packages/lldb/{{ item.path | basename }}"
     state: link
   with_items: "{{ lldb_python_files.files + lldb_python_directories.files }}"
+  when: llvm14_install.stat.exists
 
 - name: Fix lldb-server-14.0.0
   ansible.builtin.file:
     src: /usr/lib/llvm-14/bin/lldb-server
     dest: /usr/bin/lldb-server-14.0.6
     state: link
+  when: llvm14_install.stat.exists
