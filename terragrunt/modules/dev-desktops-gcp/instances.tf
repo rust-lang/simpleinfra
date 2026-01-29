@@ -7,7 +7,22 @@ data "google_compute_image" "ubuntu" {
 resource "google_compute_address" "public" {
   for_each = var.instances
 
-  name = each.key
+  name         = each.key
+  address_type = "EXTERNAL"
+  ip_version   = "IPV4"
+
+  depends_on = [google_project_service.compute]
+}
+
+# Reserve static public IPv6 addresses for each instance.
+resource "google_compute_address" "public_ipv6" {
+  for_each = var.instances
+
+  name               = "${each.key}-ipv6"
+  address_type       = "EXTERNAL"
+  ip_version         = "IPV6"
+  ipv6_endpoint_type = "VM"
+  subnetwork         = google_compute_subnetwork.dev_desktops.id
 
   depends_on = [google_project_service.compute]
 }
@@ -33,9 +48,16 @@ resource "google_compute_instance" "instance" {
   }
 
   network_interface {
-    network = google_compute_network.dev_desktops.id
+    subnetwork = google_compute_subnetwork.dev_desktops.id
+    stack_type = "IPV4_IPV6"
     access_config {
       nat_ip = google_compute_address.public[each.key].address
+    }
+    ipv6_access_config {
+      external_ipv6 = google_compute_address.public_ipv6[each.key].address
+      name          = "External IPv6"
+      # Premium is the only available tier for IPv6.
+      network_tier = "PREMIUM"
     }
   }
 
