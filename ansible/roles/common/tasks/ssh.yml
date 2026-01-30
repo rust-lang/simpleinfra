@@ -31,4 +31,6 @@
     dest: "/etc/ssh/authorized_keys/{{ item }}"
     mode: 0444
 
+  notify: reload-ssh
+
   loop: "{{ unprivileged_users + sudo_users }}"
