@@ -151,22 +151,43 @@
     path: /tmp/rustup-init.sh
     state: absent
 
-- name: Check if Node is installed
-  command: node --version
+# Keep the required Node major version in a single place for reuse.
+- name: Set desired Node major version
+  set_fact:
+    node_major_version: "22"
+
+# Verify that the installed Node matches the required major version.
+#
+# The `failed_when` condition specifies that the task should be considered failed
+# if the return code (`rc`) of the command is not in the list [0, 1, 2].
+# Explanation of return codes:
+# - 0: the version is installed
+# - 1: the version is not installed but the command executed successfully
+# - 2: there was an error executing the command
+- name: Check if Node {{ node_major_version }} is installed
+  shell: "node --version | grep -qE '^v{{ node_major_version }}\\.'"
+  # store the result of the command in a variable called `node_version`
   register: node_version
   changed_when: false
-  failed_when: node_version.rc != 0 and node_version.rc != 2
+  failed_when: node_version.rc not in [0, 1, 2]
+
+- name: Uninstall previous Node version
+  apt:
+    name:
+      - nodejs
+    state: absent
+  when: node_version.rc != 0
 
 - name: Set up NodeSource repository
   shell: |
-    curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-  when: node_version.rc == 2
+    curl -fsSL https://deb.nodesource.com/setup_{{ node_major_version }}.x | bash -
+  when: node_version.rc != 0
 
+# In NodeSource, the package `nodejs` provides both `node` and `npm`
 - name: Install Node
   apt:
-    name: 
+    name:
       - nodejs
-      - npm
     state: present
     update_cache: yes
 
