@@ -1,6 +1,6 @@
 # Ingress rules mirror AWS/Azure dev-desktop access (SSH, mosh, ping).
 resource "google_compute_firewall" "dev_desktops_access_ipv4" {
-  name    = "${var.network_name}-access-ipv4"
+  name    = "${local.network_name}-access-ipv4"
   network = google_compute_network.dev_desktops.id
 
   target_tags = ["dev-desktops"]
@@ -28,7 +28,7 @@ resource "google_compute_firewall" "dev_desktops_access_ipv4" {
 
 # IPv6 ingress rules mirror IPv4 access (SSH, mosh, ping).
 resource "google_compute_firewall" "dev_desktops_access_ipv6" {
-  name    = "${var.network_name}-access-ipv6"
+  name    = "${local.network_name}-access-ipv6"
   network = google_compute_network.dev_desktops.id
 
   target_tags = ["dev-desktops"]
@@ -57,7 +57,7 @@ resource "google_compute_firewall" "dev_desktops_access_ipv6" {
 
 # Allow Prometheus node_exporter scraping from monitoring.infra.rust-lang.org.
 resource "google_compute_firewall" "dev_desktops_node_exporter" {
-  name    = "${var.network_name}-node-exporter"
+  name    = "${local.network_name}-node-exporter"
   network = google_compute_network.dev_desktops.id
 
   target_tags = ["dev-desktops"]
@@ -72,7 +72,7 @@ resource "google_compute_firewall" "dev_desktops_node_exporter" {
 
 # Explicit egress rule documents intent for full outbound connectivity.
 resource "google_compute_firewall" "dev_desktops_egress_ipv4" {
-  name      = "${var.network_name}-egress-ipv4"
+  name      = "${local.network_name}-egress-ipv4"
   network   = google_compute_network.dev_desktops.id
   direction = "EGRESS"
 
@@ -85,7 +85,7 @@ resource "google_compute_firewall" "dev_desktops_egress_ipv4" {
 
 # IPv6 egress rule documents intent for full outbound connectivity.
 resource "google_compute_firewall" "dev_desktops_egress_ipv6" {
-  name      = "${var.network_name}-egress-ipv6"
+  name      = "${local.network_name}-egress-ipv6"
   network   = google_compute_network.dev_desktops.id
   direction = "EGRESS"
 
