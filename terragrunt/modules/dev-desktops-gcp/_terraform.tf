@@ -33,13 +33,6 @@ variable "zone" {
   type        = string
 }
 
-# A dedicated network keeps dev-desktop traffic isolated from other services.
-variable "network_name" {
-  description = "The VPC network name for dev desktops"
-  type        = string
-  default     = "dev-desktops"
-}
-
 variable "subnet_cidr" {
   description = "The IPv4 CIDR range for the dev desktops subnet"
   type        = string
@@ -55,4 +48,8 @@ variable "instances" {
     instance_type = string
     storage       = number
   }))
+}
+
+locals {
+  network_name = "dev-desktops-${var.region}"
 }

@@ -5,7 +5,7 @@ resource "google_project_service" "compute" {
 
 # Dedicated VPC to isolate dev desktops from other GCP workloads.
 resource "google_compute_network" "dev_desktops" {
-  name = var.network_name
+  name = local.network_name
   # For ipv6 support we need custom subnets
   auto_create_subnetworks = false
 
@@ -14,7 +14,7 @@ resource "google_compute_network" "dev_desktops" {
 
 # Dual-stack subnet to support both external IPv4 and IPv6 addresses.
 resource "google_compute_subnetwork" "dev_desktops" {
-  name          = "${var.network_name}-${var.region}"
+  name          = local.network_name
   ip_cidr_range = var.subnet_cidr
   region        = var.region
 
