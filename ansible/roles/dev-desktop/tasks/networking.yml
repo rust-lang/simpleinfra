@@ -1,0 +1,133 @@
+---
+# Configure IPv6 on cloud instances by fetching the address from the
+# instance metadata service and setting it statically.
+#
+# Supports:
+#   - AWS EC2 (IMDSv2)
+#   - GCP Compute Engine
+
+- name: Determine primary network interface
+  set_fact:
+    dev_desktop_primary_iface: "{{ ansible_default_ipv6.interface | default(ansible_default_ipv4.interface) }}"
+
+# Only configure IPv6 if the host doesn't already have a global IPv6 address.
+# fe80::/10 is link-local; fc00::/7 (fc/fd) is unique-local. Neither is globally routable.
+- name: Check if global IPv6 is already configured
+  set_fact:
+    dev_desktop_has_global_ipv6: "{{ (ansible_all_ipv6_addresses | default([]) | select('match', '^(?!(fe80:|fc|fd)).+') | list | length) > 0 }}"
+
+# Detect cloud provider by checking which metadata service responds
+- name: Check if running on AWS
+  uri:
+    url: http://169.254.169.254/latest/meta-data/
+    method: GET
+    timeout: 2
+  register: dev_desktop_aws_check
+  failed_when: false
+  changed_when: false
+  when: not dev_desktop_has_global_ipv6
+
+- name: Check if running on GCP
+  uri:
+    url: http://metadata.google.internal/computeMetadata/v1/
+    method: GET
+    headers:
+      Metadata-Flavor: Google
+    timeout: 2
+  register: dev_desktop_gcp_check
+  failed_when: false
+  changed_when: false
+  when:
+    - not dev_desktop_has_global_ipv6
+    - dev_desktop_aws_check.status is not defined or dev_desktop_aws_check.status != 200
+
+- name: Set cloud provider fact
+  set_fact:
+    dev_desktop_cloud_provider: >-
+      {% if dev_desktop_aws_check.status is defined and dev_desktop_aws_check.status == 200 %}aws
+      {% elif dev_desktop_gcp_check.status is defined and dev_desktop_gcp_check.status == 200 %}gcp
+      {% else %}unknown{% endif %}
+  when: not dev_desktop_has_global_ipv6
+
+# ============== AWS IPv6 Configuration ==============
+- name: Get AWS IMDS token
+  uri:
+    url: http://169.254.169.254/latest/api/token
+    method: PUT
+    headers:
+      X-aws-ec2-metadata-token-ttl-seconds: "60"
+    return_content: yes
+  register: dev_desktop_imds_token
+  when:
+    - not dev_desktop_has_global_ipv6
+    - dev_desktop_cloud_provider | trim == 'aws'
+
+- name: Get IPv6 address from AWS IMDS
+  uri:
+    url: http://169.254.169.254/latest/meta-data/ipv6
+    headers:
+      X-aws-ec2-metadata-token: "{{ dev_desktop_imds_token.content }}"
+    return_content: yes
+  register: dev_desktop_aws_ipv6
+  failed_when: false
+  when:
+    - not dev_desktop_has_global_ipv6
+    - dev_desktop_cloud_provider | trim == 'aws'
+
+- name: Set IPv6 address fact (AWS)
+  set_fact:
+    dev_desktop_ipv6_address: "{{ dev_desktop_aws_ipv6.content | trim }}"
+    dev_desktop_ipv6_gateway: "fe80::1"
+  when:
+    - not dev_desktop_has_global_ipv6
+    - dev_desktop_cloud_provider | trim == 'aws'
+    - dev_desktop_aws_ipv6.content is defined
+    - dev_desktop_aws_ipv6.content | length > 0
+
+# ============== GCP IPv6 Configuration ==============
+- name: Get IPv6 address from GCP metadata
+  uri:
+    url: "http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ipv6s"
+    headers:
+      Metadata-Flavor: Google
+    return_content: yes
+  register: dev_desktop_gcp_ipv6
+  failed_when: false
+  when:
+    - not dev_desktop_has_global_ipv6
+    - dev_desktop_cloud_provider | trim == 'gcp'
+
+- name: Get IPv6 gateway from GCP metadata
+  uri:
+    url: "http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/gateway-ipv6"
+    headers:
+      Metadata-Flavor: Google
+    return_content: yes
+  register: dev_desktop_gcp_gateway
+  failed_when: false
+  when:
+    - not dev_desktop_has_global_ipv6
+    - dev_desktop_cloud_provider | trim == 'gcp'
+    - dev_desktop_gcp_ipv6.content is defined
+
+- name: Set IPv6 address fact (GCP)
+  set_fact:
+    dev_desktop_ipv6_address: "{{ dev_desktop_gcp_ipv6.content | trim }}"
+    dev_desktop_ipv6_gateway: "{{ dev_desktop_gcp_gateway.content | trim }}"
+  when:
+    - not dev_desktop_has_global_ipv6
+    - dev_desktop_cloud_provider | trim == 'gcp'
+    - dev_desktop_gcp_ipv6.content is defined
+    - dev_desktop_gcp_ipv6.content | length > 0
+
+# ============== Apply Netplan Configuration ==============
+- name: Configure IPv6 via netplan
+  template:
+    src: netplan-ipv6.yaml
+    dest: /etc/netplan/99-dev-desktop-ipv6.yaml
+    mode: "0600"
+  notify: apply-netplan
+  when:
+    - not dev_desktop_has_global_ipv6
+    - dev_desktop_ipv6_address is defined
+    - dev_desktop_ipv6_address | length > 0

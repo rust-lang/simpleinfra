@@ -1,0 +1,13 @@
+# Static IPv6 configuration for cloud instances.
+# The IPv6 address is fetched from the cloud provider's metadata service
+# since some providers don't provide IPv6 via RA/DHCPv6.
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    {{ dev_desktop_primary_iface }}:
+      addresses:
+        - {{ dev_desktop_ipv6_address }}/128
+      routes:
+        - to: ::/0
+          via: "{{ dev_desktop_ipv6_gateway }}"
