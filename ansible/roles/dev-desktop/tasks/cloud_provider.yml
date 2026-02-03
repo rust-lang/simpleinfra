@@ -1,0 +1,37 @@
+---
+# Detect which cloud provider the dev desktop is running on.
+#
+# This is used by other tasks to apply provider-specific configuration
+# (e.g. packages only available on GCP).
+
+- block:
+
+    - name: Check if running on AWS
+      uri:
+        url: http://169.254.169.254/latest/meta-data/
+        method: GET
+        timeout: 2
+      register: dev_desktop_aws_check
+      failed_when: false
+      changed_when: false
+
+    - name: Check if running on GCP
+      uri:
+        url: http://metadata.google.internal/computeMetadata/v1/
+        method: GET
+        headers:
+          Metadata-Flavor: Google
+        timeout: 2
+      register: dev_desktop_gcp_check
+      failed_when: false
+      changed_when: false
+      when: dev_desktop_aws_check.status is not defined or dev_desktop_aws_check.status != 200
+
+    - name: Set cloud provider fact
+      set_fact:
+        dev_desktop_cloud_provider: >-
+          {% if dev_desktop_aws_check.status is defined and dev_desktop_aws_check.status == 200 %}aws
+          {% elif dev_desktop_gcp_check.status is defined and dev_desktop_gcp_check.status == 200 %}gcp
+          {% else %}unknown{% endif %}
+
+  when: dev_desktop_cloud_provider is not defined

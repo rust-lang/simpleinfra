@@ -84,6 +84,14 @@
       - libxcb-xfixes0-dev
     state: present
 
+- name: Install perf cloud tools on GCP dev desktops
+  apt:
+    name:
+      - "linux-cloud-tools-{{ kernel.stdout }}"
+      - "linux-cloud-tools-{{ kernel_flavor.stdout }}"
+    state: present
+  when: dev_desktop_cloud_provider | default('unknown') | trim == 'gcp'
+
 # we don't need it because we don't need to send emails
 - name: Uninstall postfix
   apt:
