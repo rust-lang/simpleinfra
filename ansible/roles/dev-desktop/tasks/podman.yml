@@ -81,3 +81,27 @@
   when:
     - podman_info.rc != 0
     - podman_info.stderr is search("database graph driver")
+
+- name: Restart podman auto-update service when storage reset
+  service:
+    name: podman-auto-update.service
+    state: restarted
+  when:
+    - podman_info.rc != 0
+    - podman_info.stderr is search("database graph driver")
+
+- name: Restart podman clean transient service when storage reset
+  service:
+    name: podman-clean-transient.service
+    state: restarted
+  when:
+    - podman_info.rc != 0
+    - podman_info.stderr is search("database graph driver")
+
+- name: Restart podman restart service when storage reset
+  service:
+    name: podman-restart.service
+    state: restarted
+  when:
+    - podman_info.rc != 0
+    - podman_info.stderr is search("database graph driver")
