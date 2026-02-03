@@ -63,7 +63,9 @@
               - play-2.infra.rust-lang.org:9100
               - dev-desktop-staging.infra.rust-lang.org:9100
               - dev-desktop-eu-1.infra.rust-lang.org:9100
+              - dev-desktop-eu-2.infra.rust-lang.org:9100
               - dev-desktop-us-1.infra.rust-lang.org:9100
+              - dev-desktop-us-2.infra.rust-lang.org:9100
 
         # Metrics scraped from apps hosted in our ECS clusters
         - job_name: ecs-sd  # Will be overridden by each job
