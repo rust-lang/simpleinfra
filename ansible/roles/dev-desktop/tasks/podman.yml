@@ -32,3 +32,52 @@
     owner: root
     group: root
     mode: 0644
+
+- name: Check podman storage configuration
+  command: podman info --format "{{ '{{' }} .Store.GraphDriverName {{ '}}' }}"
+  register: podman_info
+  changed_when: false
+  failed_when: false
+
+- name: Find stale podman storage contents when storage driver mismatch
+  find:
+    paths: /var/lib/containers/storage
+    file_type: any
+    recurse: true
+  register: podman_storage_entries
+  when:
+    - podman_info.rc != 0
+    - podman_info.stderr is search("database graph driver")
+
+- name: Remove stale podman storage contents when storage driver mismatch
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ podman_storage_entries.files }}"
+  when:
+    - podman_info.rc != 0
+    - podman_info.stderr is search("database graph driver")
+
+- name: Run podman system migrate after storage reset
+  command: podman system migrate
+  become: true
+  changed_when: false
+  when:
+    - podman_info.rc != 0
+    - podman_info.stderr is search("database graph driver")
+
+- name: Restart podman socket when storage reset
+  service:
+    name: podman.socket
+    state: restarted
+  when:
+    - podman_info.rc != 0
+    - podman_info.stderr is search("database graph driver")
+
+- name: Restart podman service when storage reset
+  service:
+    name: podman
+    state: restarted
+  when:
+    - podman_info.rc != 0
+    - podman_info.stderr is search("database graph driver")
