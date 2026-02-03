@@ -20,6 +20,7 @@ resource "datadog_role" "foundation" {
       data.datadog_permissions.all.permissions.dashboards_public_share,
       data.datadog_permissions.all.permissions.notebooks_write,
       data.datadog_permissions.all.permissions.logs_modify_indexes,
+      data.datadog_permissions.all.permissions.logs_write_exclusion_filters,
       data.datadog_permissions.all.permissions.logs_generate_metrics,
       data.datadog_permissions.all.permissions.metrics_metadata_write,
       data.datadog_permissions.all.permissions.dbm_read,
