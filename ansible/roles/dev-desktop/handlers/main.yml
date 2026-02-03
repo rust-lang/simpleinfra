@@ -6,3 +6,6 @@
 
 - name: reboot-machine
   reboot:
+
+- name: apply-netplan
+  command: netplan apply
