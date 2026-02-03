@@ -111,7 +111,7 @@ resource "aws_security_group" "dev_desktops" {
   }
 
   ingress {
-    from_port        = 8
+    from_port        = 128
     to_port          = -1
     protocol         = "icmpv6"
     ipv6_cidr_blocks = ["::/0"]
