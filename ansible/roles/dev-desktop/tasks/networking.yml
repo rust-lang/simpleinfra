@@ -16,38 +16,9 @@
   set_fact:
     dev_desktop_has_global_ipv6: "{{ (ansible_all_ipv6_addresses | default([]) | select('match', '^(?!(fe80:|fc|fd)).+') | list | length) > 0 }}"
 
-# Detect cloud provider by checking which metadata service responds
-- name: Check if running on AWS
-  uri:
-    url: http://169.254.169.254/latest/meta-data/
-    method: GET
-    timeout: 2
-  register: dev_desktop_aws_check
-  failed_when: false
-  changed_when: false
-  when: not dev_desktop_has_global_ipv6
-
-- name: Check if running on GCP
-  uri:
-    url: http://metadata.google.internal/computeMetadata/v1/
-    method: GET
-    headers:
-      Metadata-Flavor: Google
-    timeout: 2
-  register: dev_desktop_gcp_check
-  failed_when: false
-  changed_when: false
-  when:
-    - not dev_desktop_has_global_ipv6
-    - dev_desktop_aws_check.status is not defined or dev_desktop_aws_check.status != 200
-
-- name: Set cloud provider fact
-  set_fact:
-    dev_desktop_cloud_provider: >-
-      {% if dev_desktop_aws_check.status is defined and dev_desktop_aws_check.status == 200 %}aws
-      {% elif dev_desktop_gcp_check.status is defined and dev_desktop_gcp_check.status == 200 %}gcp
-      {% else %}unknown{% endif %}
-  when: not dev_desktop_has_global_ipv6
+- name: Detect cloud provider
+  include_tasks: cloud_provider.yml
+  when: dev_desktop_cloud_provider is not defined
 
 # ============== AWS IPv6 Configuration ==============
 - name: Get AWS IMDS token
