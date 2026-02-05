@@ -32,10 +32,17 @@ resource "aws_security_group" "bastion" {
   }
 
   ingress {
-    from_port        = 8
+    from_port   = 8
+    to_port     = -1
+    protocol    = "icmp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Ping access from the world"
+  }
+
+  ingress {
+    from_port        = 128
     to_port          = -1
-    protocol         = "icmp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    protocol         = "icmpv6"
     ipv6_cidr_blocks = ["::/0"]
     description      = "Ping access from the world"
   }
