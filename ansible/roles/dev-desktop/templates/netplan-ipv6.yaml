@@ -7,7 +7,7 @@ network:
   ethernets:
     {{ dev_desktop_primary_iface }}:
       addresses:
-        - {{ dev_desktop_ipv6_address }}/128
+        - {{ dev_desktop_ipv6_cidr }}
       routes:
         - to: ::/0
           via: "{{ dev_desktop_ipv6_gateway }}"

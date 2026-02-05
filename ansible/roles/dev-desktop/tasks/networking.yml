@@ -47,8 +47,9 @@
 
 - name: Set IPv6 address fact (AWS)
   set_fact:
-    dev_desktop_ipv6_address: "{{ dev_desktop_aws_ipv6.content | trim }}"
     dev_desktop_ipv6_gateway: "fe80::1"
+    # AWS IMDS returns a single address without prefix.
+    dev_desktop_ipv6_cidr: "{{ (dev_desktop_aws_ipv6.content | trim) }}/128"
   when:
     - not dev_desktop_has_global_ipv6
     - dev_desktop_cloud_provider | trim == 'aws'
@@ -58,7 +59,7 @@
 # ============== GCP IPv6 Configuration ==============
 - name: Get IPv6 address from GCP metadata
   uri:
-    url: "http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ipv6s"
+    url: "http://metadata.google.internal/computeMetadata/v1/instance/network-interfaces/0/ipv6"
     headers:
       Metadata-Flavor: Google
     return_content: yes
@@ -83,8 +84,9 @@
 
 - name: Set IPv6 address fact (GCP)
   set_fact:
-    dev_desktop_ipv6_address: "{{ dev_desktop_gcp_ipv6.content | trim }}"
     dev_desktop_ipv6_gateway: "{{ dev_desktop_gcp_gateway.content | trim }}"
+    # GCP IPv6 metadata returns a single address with prefix (e.g. "...::/96").
+    dev_desktop_ipv6_cidr: "{{ dev_desktop_gcp_ipv6.content | trim }}"
   when:
     - not dev_desktop_has_global_ipv6
     - dev_desktop_cloud_provider | trim == 'gcp'
@@ -100,5 +102,5 @@
   notify: apply-netplan
   when:
     - not dev_desktop_has_global_ipv6
-    - dev_desktop_ipv6_address is defined
-    - dev_desktop_ipv6_address | length > 0
+    - dev_desktop_ipv6_cidr is defined
+    - dev_desktop_ipv6_cidr | length > 0
