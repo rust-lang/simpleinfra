@@ -88,7 +88,6 @@ resource "aws_nat_gateway" "nat" {
 module "bastion" {
   source           = "../bastion"
   vpc_id           = aws_vpc.vpc.id
-  allowed_users    = var.bastion_users
   public_subnet_id = aws_subnet.public[0].id
   zone_id          = var.zone_id
 }

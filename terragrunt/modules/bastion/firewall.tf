@@ -2,40 +2,34 @@
 
 
 // Security group to prevent unauthorized access to the bastion.
-
-data "aws_ssm_parameter" "allowed_ips" {
-  for_each = toset(var.allowed_users)
-  name     = "/bastion/allowed-ips/${each.value}"
-}
-
 resource "aws_security_group" "bastion" {
   vpc_id      = var.vpc_id
   name        = "bastion-${var.vpc_id}"
   description = "Access rules for the production bastion instance."
 
-
-  // SSH access from the allowed users
-  dynamic "ingress" {
-    for_each = toset(var.allowed_users)
-    content {
-      from_port   = 22
-      to_port     = 22
-      protocol    = "tcp"
-      cidr_blocks = [data.aws_ssm_parameter.allowed_ips[ingress.value].value]
-      description = "SSH access for ${ingress.value}"
-    }
+  ingress {
+    from_port        = 22
+    to_port          = 22
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+    description      = "SSH access from the world"
   }
 
-  // Ping access from allowed users
-  dynamic "ingress" {
-    for_each = toset(var.allowed_users)
-    content {
-      from_port   = 8
-      to_port     = -1
-      protocol    = "icmp"
-      cidr_blocks = [data.aws_ssm_parameter.allowed_ips[ingress.value].value]
-      description = "Ping access for ${ingress.value}"
-    }
+  ingress {
+    from_port   = 8
+    to_port     = -1
+    protocol    = "icmp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Ping access from the world"
+  }
+
+  ingress {
+    from_port        = 128
+    to_port          = -1
+    protocol         = "icmpv6"
+    ipv6_cidr_blocks = ["::/0"]
+    description      = "Ping access from the world"
   }
 
   // Allow outgoing connections
