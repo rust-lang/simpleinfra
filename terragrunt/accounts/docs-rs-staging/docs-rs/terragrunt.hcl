@@ -25,6 +25,5 @@ inputs = {
   private_subnet_ids        = dependency.vpc.outputs.private_subnets
   domain                    = "docs-rs-staging.rust-lang.net"
   bastion_security_group_id = dependency.vpc.outputs.bastion_security_group_id
-  min_num_builder_instances = 1
-  max_num_builder_instances = 1
+  builder_instance_type     = "c6a.large" # 2 vCPU. 4 GiB RAM.
 }

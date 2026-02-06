@@ -9,7 +9,7 @@ This is the [Terraform] module that defines the infrastructure for [docs.rs].
 [docs.rs] consists of a few different components:
 
 - A web frontend hosted as a container running in an [ECS] cluster.
-- A background documentation builder running on [ec2](https://aws.amazon.com/ec2) instances as part of an [autoscaling](https://aws.amazon.com/ec2/autoscaling) group.
+- A background documentation builder running on a dedicated [ec2](https://aws.amazon.com/ec2) instance.
 - A background utility (**TODO**: this is currently not configured) which includes:
   - crate registry watcher that watches for changes to the crates registry and enqueues doc builds
   - the repository stats updater that ensures # stars, # issues, etc. from GitHub & GitLab are up-to-date

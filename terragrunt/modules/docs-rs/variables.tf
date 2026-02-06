@@ -30,12 +30,7 @@ variable "cluster_config" {
   description = "The configuration for the cluster this is running in"
 }
 
-variable "min_num_builder_instances" {
-  type        = number
-  description = "The minimum number of builder instances there should be"
-}
-
-variable "max_num_builder_instances" {
-  type        = number
-  description = "The maximum number of builder instances there should be"
+variable "builder_instance_type" {
+  type        = string
+  description = "The EC2 instance type for the docs-rs builder"
 }

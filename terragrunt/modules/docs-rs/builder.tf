@@ -1,55 +1,40 @@
-// The autoscaling group for the builder
+resource "aws_instance" "builder" {
+  ami                         = data.aws_ami.ubuntu24.id
+  instance_type               = var.builder_instance_type
+  subnet_id                   = element(var.cluster_config.subnet_ids, 0)
+  vpc_security_group_ids      = [aws_security_group.builder.id]
+  iam_instance_profile        = aws_iam_instance_profile.builder.name
+  associate_public_ip_address = true
 
-resource "aws_autoscaling_group" "builder" {
-  name                = "docs-rs-builder"
-  vpc_zone_identifier = var.cluster_config.subnet_ids
-  max_size            = var.max_num_builder_instances
-  min_size            = var.min_num_builder_instances
-  # Let the instances get warm
-  default_instance_warmup = 60
+  root_block_device {
+    # Size of the volume in GiB.
+    volume_size           = 64
+    delete_on_termination = true
+  }
 
-  launch_template {
-    id      = aws_launch_template.builder.id
-    version = "$Latest"
+  tags = {
+    Name = "docs-rs-builder"
   }
 }
 
-resource "aws_launch_template" "builder" {
-  name_prefix   = "builder"
-  image_id      = data.aws_ami.builder.id
-  instance_type = "t2.large"
-
-  network_interfaces {
-    associate_public_ip_address = true
-    security_groups             = [aws_security_group.builder.id]
-  }
-
-  iam_instance_profile {
-    arn = aws_iam_instance_profile.builder.arn
-  }
-
-  block_device_mappings {
-    device_name = "/dev/sda1"
-
-    ebs {
-      volume_size           = 64
-      delete_on_termination = true
-    }
-  }
-
-  tag_specifications {
-    resource_type = "instance"
-
-    tags = {
-      Name = "docs-rs-builder"
-    }
-  }
-}
-
-data "aws_ami" "builder" {
+data "aws_ami" "ubuntu24" {
   most_recent = true
-  name_regex  = "^docs-rs-builder-*"
-  owners      = ["self"]
+  owners      = ["099720109477"] // Canonical
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
 }
 
 // The instance profile the builder will assume when communicating with s3
