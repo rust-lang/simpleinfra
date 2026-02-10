@@ -205,6 +205,7 @@
           After=network.target
 
           [Service]
+          # a thin wrapper around rustc-perf/collector/collect-job-queue.sh that sets some secrets
           ExecStart=/home/collector/rustc-perf/run.sh
           WorkingDirectory=/home/collector/rustc-perf
           User=collector
