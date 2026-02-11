@@ -40,3 +40,16 @@ resource "aws_route53_record" "bors_prod" {
     "ns-410.awsdns-51.com.",
   ]
 }
+
+resource "aws_route53_record" "docs_rs_prod" {
+  zone_id = data.aws_route53_zone.rust_lang_net.zone_id
+  name    = "docs-rs-prod.rust-lang.net"
+  type    = "NS"
+  ttl     = 3600
+  records = [
+    "ns-1930.awsdns-49.co.uk.",
+    "ns-719.awsdns-25.net.",
+    "ns-214.awsdns-26.com.",
+    "ns-1042.awsdns-02.org.",
+  ]
+}
