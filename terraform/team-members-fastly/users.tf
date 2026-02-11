@@ -31,11 +31,6 @@ locals {
       name  = "Mark Rousskov"
       role  = "superuser"
     }
-    "paul" = {
-      login = "paullenz@rustfoundation.org"
-      name  = "Paul Lenz"
-      role  = "billing"
-    }
     "pietro" = {
       login = "pietro@pietroalbini.org"
       name  = "Pietro Albini"
