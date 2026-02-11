@@ -6,9 +6,10 @@ locals {
       role  = "billing"
     }
     "adam" = {
-      login = "adamharvey@rustfoundation.org"
-      name  = "Adam Harvey"
-      role  = "user"
+      login    = "adamharvey@rustfoundation.org"
+      name     = "Adam Harvey"
+      role     = "engineer"
+      services = local.crates_io_service_ids
     }
     "jdn" = {
       login = "jdno@jdno.dev"
@@ -56,9 +57,10 @@ locals {
       role  = "user"
     }
     "tobias" = {
-      login = "tobiasbieniek@rustfoundation.org"
-      name  = "Tobias Bieniek"
-      role  = "user"
+      login    = "tobiasbieniek@rustfoundation.org"
+      name     = "Tobias Bieniek"
+      role     = "engineer"
+      services = local.crates_io_service_ids
     }
     "ubiratan" = {
       login = "ubiratansoares@rustfoundation.org"
@@ -66,6 +68,17 @@ locals {
       role  = "superuser"
     }
   }
+
+  crates_io_service_ids = [
+    "yEvEoHsDVsUDRLd6ZTxipI", # crates.io
+    "t5Ms9xHxvMQ0oX8vMs88DG", # index.crates.io
+    "gEfRWQihVaQqh6vsPlY0H1", # static.crates.io
+
+    "zEKt1p82mWliIlbTQh5Hl1", # staging.crates.io
+    "k8I4J4zBUYdoQ0oJt98df7", # index.staging.crates.io
+    "liljrvY3Xt0CzNk0mpuLa7", # static.staging.crates.io
+  ]
+
 }
 
 resource "fastly_user" "users" {
@@ -74,4 +87,23 @@ resource "fastly_user" "users" {
   login = each.value.login
   name  = each.value.name
   role  = each.value.role
+}
+
+# Assign service permissions to users
+resource "fastly_service_authorization" "users_authorization" {
+  # ... expands the list into positional args so `merge` can combine them.
+  for_each = merge([
+    # user_name identifies fastly_user.users entries; user holds optional services.
+    for user_name, user in local.users : {
+      for service_id in try(user.services, []) :
+      "${user_name}:${service_id}" => {
+        user       = user_name
+        service_id = service_id
+      }
+    }
+  ]...)
+
+  user_id    = fastly_user.users[each.value.user].id
+  service_id = each.value.service_id
+  permission = "full"
 }
