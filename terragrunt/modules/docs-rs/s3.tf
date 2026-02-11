@@ -21,11 +21,6 @@ resource "aws_s3_bucket" "backups" {
   bucket = "docs-rs-backups-${local.account_id}"
 }
 
-resource "aws_s3_bucket_acl" "backups" {
-  bucket = aws_s3_bucket.backups.id
-  acl    = "private"
-}
-
 resource "aws_s3_bucket_lifecycle_configuration" "backups" {
   bucket = aws_s3_bucket.backups.id
 
