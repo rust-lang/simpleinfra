@@ -24,12 +24,6 @@ resource "aws_route53_record" "lb" {
   records = [aws_lb.lb.dns_name]
 }
 
-module "certificate" {
-  source  = "../acm-certificate"
-  domains = [var.load_balancer_domain]
-  legacy  = false
-}
-
 resource "aws_security_group" "lb" {
   name        = "${var.cluster_name}-load-balancer"
   description = "Allow incoming traffic for the load balancer"
@@ -116,4 +110,3 @@ resource "aws_lb_listener" "lb_https" {
     }
   }
 }
-
