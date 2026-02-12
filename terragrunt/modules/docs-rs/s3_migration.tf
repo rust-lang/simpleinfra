@@ -144,6 +144,8 @@ resource "aws_datasync_location_s3" "migration_source" {
   s3_config {
     bucket_access_role_arn = aws_iam_role.datasync_source_location[0].arn
   }
+
+  depends_on = [aws_iam_role_policy.datasync_source_location_s3]
 }
 
 resource "aws_datasync_location_s3" "migration_destination" {
@@ -155,6 +157,9 @@ resource "aws_datasync_location_s3" "migration_destination" {
   s3_config {
     bucket_access_role_arn = aws_iam_role.datasync_destination_location[0].arn
   }
+
+  # DataSync validates S3 access when creating the location.
+  depends_on = [aws_iam_role_policy.datasync_destination_location_s3]
 }
 
 resource "aws_datasync_task" "migration" {
