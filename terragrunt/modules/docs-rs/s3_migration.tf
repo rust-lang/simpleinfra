@@ -139,7 +139,7 @@ resource "aws_datasync_location_s3" "migration_source" {
   count    = var.s3_migration_enabled ? 1 : 0
 
   s3_bucket_arn = "arn:aws:s3:::${var.s3_migration_source_bucket_name}"
-  subdirectory  = "/"
+  subdirectory  = ""
 
   s3_config {
     bucket_access_role_arn = aws_iam_role.datasync_source_location[0].arn
@@ -152,7 +152,7 @@ resource "aws_datasync_location_s3" "migration_destination" {
   count = var.s3_migration_enabled ? 1 : 0
 
   s3_bucket_arn = aws_s3_bucket.storage.arn
-  subdirectory  = "/"
+  subdirectory  = ""
 
   s3_config {
     bucket_access_role_arn = aws_iam_role.datasync_destination_location[0].arn
