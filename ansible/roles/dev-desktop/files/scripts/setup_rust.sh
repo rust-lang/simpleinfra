@@ -22,7 +22,7 @@ if ! git remote | grep upstream; then
 fi
 
 git fetch upstream
-git checkout upstream/master
+git checkout upstream/main
 popd
 
 set_defaults.sh
