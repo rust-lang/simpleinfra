@@ -107,7 +107,8 @@ resource "aws_iam_role_policy" "datasync_destination_location_s3" {
 resource "aws_cloudwatch_log_group" "datasync_s3_migration" {
   count = var.s3_migration_enabled ? 1 : 0
 
-  name              = "/aws/datasync/docs-rs-storage-import"
+  # Enhanced mode DataSync tasks require the log group to be exactly /aws/datasync.
+  name              = "/aws/datasync"
   retention_in_days = 30
 }
 
@@ -170,10 +171,15 @@ resource "aws_datasync_task" "migration" {
   destination_location_arn = aws_datasync_location_s3.migration_destination[0].arn
   cloudwatch_log_group_arn = aws_cloudwatch_log_group.datasync_s3_migration[0].arn
 
+  # Can avoid network errors when transfering between different accounts and regions
+  task_mode = "ENHANCED"
+
   options {
     # Unlimited bandwidth to minimize migration time
     bytes_per_second = -1
     log_level        = "BASIC"
+    # Enhanced mode doesn't support full source/destination sync verification.
+    verify_mode = "ONLY_FILES_TRANSFERRED"
     # For one-time imports with TransferMode=ALL, deleted source objects are not removed from destination.
     preserve_deleted_files = "PRESERVE"
     task_queueing          = "ENABLED"
