@@ -60,3 +60,41 @@ resource "aws_s3_bucket_public_access_block" "backups" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
+
+// Allow principals in docs-rs-prod account to read this bucket for DataSync.
+resource "aws_s3_bucket_policy" "storage_datasync_cross_account_read" {
+  bucket = aws_s3_bucket.storage.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowDataSyncSourceRoleReadBucket"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::760062276060:root"
+        }
+        Action = [
+          "s3:GetBucketLocation",
+          "s3:ListBucket",
+          "s3:ListBucketMultipartUploads"
+        ]
+        Resource = aws_s3_bucket.storage.arn
+      },
+      {
+        Sid    = "AllowDataSyncSourceRoleReadObjects"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::760062276060:root"
+        }
+        Action = [
+          "s3:GetObject",
+          "s3:GetObjectTagging",
+          "s3:GetObjectVersion",
+          "s3:GetObjectVersionTagging",
+          "s3:ListMultipartUploadParts"
+        ]
+        Resource = "${aws_s3_bucket.storage.arn}/*"
+      }
+    ]
+  })
+}

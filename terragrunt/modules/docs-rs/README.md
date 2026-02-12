@@ -40,9 +40,9 @@ The registry watcher watches the registry for new entries. When a new crate is a
 ```mermaid
 flowchart LR
     User -- DNS --> CloudFront
-    CloudFront -- DNS --> ECSLB[Application Load Balancer]    
+    CloudFront -- DNS --> ECSLB[Application Load Balancer]
     ECSLB --> service[ECS Service]
-    
+
     subgraph ecs [ECS Cluster]
         service --> Container
         service -.-> task[Task Definition]
