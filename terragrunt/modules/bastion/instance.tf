@@ -41,7 +41,12 @@ data "aws_ami" "ubuntu" {
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+    values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
   }
 
   filter {
@@ -51,11 +56,10 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_instance" "bastion" {
-  ami                     = data.aws_ami.ubuntu.id
-  instance_type           = "t3a.nano"
-  ebs_optimized           = true
-  disable_api_termination = true
-  monitoring              = false
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t3a.nano"
+  ebs_optimized = true
+  monitoring    = false
 
   root_block_device {
     volume_type           = "gp3"
