@@ -111,6 +111,29 @@ resource "aws_cloudwatch_log_group" "datasync_s3_migration" {
   retention_in_days = 30
 }
 
+resource "aws_cloudwatch_log_resource_policy" "datasync_s3_migration" {
+  count = var.s3_migration_enabled ? 1 : 0
+
+  policy_name = "docs-rs-datasync-s3-migration-logs"
+  policy_document = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowDataSyncToWriteLogs"
+        Effect = "Allow"
+        Principal = {
+          Service = "datasync.amazonaws.com"
+        }
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "${aws_cloudwatch_log_group.datasync_s3_migration[0].arn}:*"
+      }
+    ]
+  })
+}
+
 resource "aws_datasync_location_s3" "migration_source" {
   provider = aws.west1
   count    = var.s3_migration_enabled ? 1 : 0
