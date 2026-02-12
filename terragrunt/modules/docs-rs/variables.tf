@@ -34,3 +34,16 @@ variable "builder_instance_type" {
   type        = string
   description = "The EC2 instance type for the docs-rs builder"
 }
+
+variable "s3_migration_enabled" {
+  type        = bool
+  description = "Enable manual S3 migration from a source bucket to the docs-rs storage bucket."
+  default     = false
+}
+
+variable "s3_migration_source_bucket_name" {
+  type        = string
+  description = "Name of the source S3 bucket to copy from."
+  default     = null
+  nullable    = true
+}
