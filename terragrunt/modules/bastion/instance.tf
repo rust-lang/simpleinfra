@@ -57,7 +57,7 @@ data "aws_ami" "ubuntu" {
 
 resource "aws_instance" "bastion" {
   ami           = data.aws_ami.ubuntu.id
-  instance_type = "t3a.nano"
+  instance_type = "t3a.micro"
   ebs_optimized = true
   monitoring    = false
 
