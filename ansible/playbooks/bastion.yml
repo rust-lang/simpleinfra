@@ -4,20 +4,22 @@
   become: yes
   become_user: root
 
+  pre_tasks:
+    - name: Ensure bastion unprivileged users are configured
+      ansible.builtin.assert:
+        that:
+          - vars_bastion_unprivileged_users | default([]) | length > 0
+        fail_msg: >-
+          vars_bastion_unprivileged_users must be a non-empty list for bastion
+          host {{ inventory_hostname }}.
+
   roles:
 
     - role: common
       papertrail_url: "{{ vars_papertrail_url }}"
       collect_metrics_from: "{{ global_collect_metrics_from }}"
       sudo_users: "{{ global_sudo_users }}"
-      unprivileged_users:
-        - joshua  # docsrs.infra.rust-lang.org
-        - syphar  # docsrs.infra.rust-lang.org
-        - nemo157  # docsrs.infra.rust-lang.org
-        - guillaumegomez  # docsrs.infra.rust-lang.org
-        - shep  # play.rust-lang.org
-        - rylev # RDS access to rustc-perf
-        - kobzol # RDS access to bors
+      unprivileged_users: "{{ vars_bastion_unprivileged_users }}"
 
     - role: datadog.datadog
       vars:
