@@ -1,5 +1,14 @@
-[bastion]
+# Declare children of the bastion group through Ansible inventory “group-of-groups”.
+# Verify with `ansible-inventory --graph --inventory envs/prod`.
+[bastion:children]
+infra-bastion
+docs-rs-bastion
+
+[infra-bastion]
 bastion.infra.rust-lang.org
+
+[docs-rs-bastion]
+bastion.docs-rs-prod.rust-lang.net
 
 [monitoring]
 monitoring.infra.rust-lang.org

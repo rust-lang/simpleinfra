@@ -1,5 +1,8 @@
+[bastion:children]
+docs-rs-bastion
+
 [dev-desktop]
 dev-desktop-staging.infra.rust-lang.org
 
-[bastion]
+[docs-rs-bastion]
 bastion.docs-rs-staging.rust-lang.net
