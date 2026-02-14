@@ -27,8 +27,12 @@ resource "aws_ssoadmin_permission_set_inline_policy" "content_s3_write" {
         Effect = "Allow"
         Action = [
           "s3:GetObject",
+          "s3:GetObjectAttributes",
+          "s3:GetObjectTagging",
           "s3:PutObject",
+          "s3:PutObjectTagging",
           "s3:DeleteObject",
+          "s3:DeleteObjectTagging",
         ]
         Resource = [
           "arn:aws:s3:::rust-content-internal/*",
