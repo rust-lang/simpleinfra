@@ -205,14 +205,39 @@
           After=network.target
 
           [Service]
+          # a thin wrapper around rustc-perf/collector/collect-job-queue.sh that sets some secrets
           ExecStart=/home/collector/rustc-perf/run.sh
           WorkingDirectory=/home/collector/rustc-perf
           User=collector
           Group=collector
           Restart=always
+          Environment=RUSTC_PERF_PRE_RUN_COMMAND=sudo\x1f/usr/local/bin/perf-collector-cache-drop
 
           [Install]
           WantedBy=multi-user.target
+      become: yes
+
+    - name: Create cache-drop root helper
+      copy:
+        dest: /usr/local/bin/perf-collector-cache-drop
+        content: |
+          #!/bin/bash
+          set -e
+          sync
+          echo 1 > /proc/sys/vm/drop_caches
+        mode: '0755'
+        owner: root
+        group: root
+      become: yes
+
+    - name: allow unprivileged users to drop caches
+      copy:
+        dest: /etc/sudoers.d/collector-cache-drop
+        content: |
+          collector ALL=(ALL) NOPASSWD: /usr/local/bin/perf-collector-cache-drop
+        mode: '0440'
+        owner: root
+        group: root
       become: yes
 
     - name: Enable collector service
