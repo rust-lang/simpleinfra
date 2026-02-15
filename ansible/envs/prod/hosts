@@ -1,5 +1,6 @@
 [bastion]
 bastion.infra.rust-lang.org
+bastion.docs-rs-prod.rust-lang.net
 
 [monitoring]
 monitoring.infra.rust-lang.org
