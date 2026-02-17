@@ -43,8 +43,9 @@ user, you can consider temporarily pushing one to the host using the AWS CLI.
 aws ec2-instance-connect send-ssh-public-key \
     --instance-id $HOST_INSTANCE_ID \
     --instance-os-user $USER \
-    --ssh-public-key file://$PATH_TO_PUBLIC_KEY
-    --region $REGION
+    --ssh-public-key file://$PATH_TO_PUBLIC_KEY \
+    --region $REGION \
+    --profile $AWS_PROFILE
 ```
 
 You will then have 60 seconds to kick off the `./apply` script before the
