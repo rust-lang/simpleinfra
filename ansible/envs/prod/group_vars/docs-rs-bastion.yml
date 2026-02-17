@@ -1,0 +1,5 @@
+---
+
+vars_bastion_unprivileged_users:
+  - syphar
+  - guillaumegomez

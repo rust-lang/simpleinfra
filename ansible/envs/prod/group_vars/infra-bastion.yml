@@ -1,0 +1,10 @@
+---
+
+vars_bastion_unprivileged_users:
+  - joshua  # docsrs.infra.rust-lang.org
+  - syphar  # docsrs.infra.rust-lang.org
+  - nemo157  # docsrs.infra.rust-lang.org
+  - guillaumegomez  # docsrs.infra.rust-lang.org
+  - shep  # play.rust-lang.org
+  - rylev # RDS access to rustc-perf
+  - kobzol # RDS access to bors
