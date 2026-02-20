@@ -11,6 +11,7 @@ locals {
     "simulacrum",
     "jdn",
     "marcoieni",
+    "ubiratansoares",
   ]
 }
 
