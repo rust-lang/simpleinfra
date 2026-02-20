@@ -6,6 +6,7 @@ docs-rs-bastion
 
 [infra-bastion]
 bastion.infra.rust-lang.org
+bastion.docs-rs-prod.rust-lang.net
 
 [docs-rs-bastion]
 bastion.docs-rs-prod.rust-lang.net
