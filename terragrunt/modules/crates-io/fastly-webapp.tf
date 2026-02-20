@@ -8,7 +8,7 @@ locals {
 resource "fastly_ngwaf_workspace" "webapp" {
   name        = "${var.webapp_domain_name}-waf"
   description = "Next-Gen WAF workspace for ${var.webapp_domain_name}"
-  # TODO: at some point blog instead of just logging
+  # TODO: at some point `block` instead of just logging
   mode = "log"
 
   # Configure when the WAF should flag an IP address as potentially malicious based on cumulative attack signals over different time windows.
@@ -25,6 +25,51 @@ resource "fastly_ngwaf_workspace" "webapp" {
     # If true, a single attack signal immediately blocks the IP.
     # We set it to false, to allow for legitimate edge cases
     immediate = false
+  }
+}
+
+# Custom signal used for per-client rate limiting in the webapp workspace.
+resource "fastly_ngwaf_workspace_signal" "webapp_rate_limit" {
+  workspace_id = fastly_ngwaf_workspace.webapp.id
+  name         = "webapp-rate-limit"
+  description  = "webapp per-IP rate limiting"
+}
+
+resource "fastly_ngwaf_workspace_rule" "webapp_per_ip_rate_limit" {
+  workspace_id = fastly_ngwaf_workspace.webapp.id
+  type         = "rate_limit"
+  description  = "Rate limit per client IP to 3,600 requests per hour"
+  enabled      = true
+
+  # Fastly NGWAF requires at least one rule condition.
+  # Match all request paths so the rate limit applies globally.
+  condition {
+    field    = "path"
+    operator = "contains"
+    value    = "/"
+  }
+
+  # If the workspace mode isn't "block", then this rule is not enforced.
+  action {
+    signal = "site.webapp-rate-limit"
+    type   = "block_signal"
+  }
+
+  # If an IP sends 600 req in 10 minutes, block them for 5 minutes.
+  rate_limit {
+    signal = fastly_ngwaf_workspace_signal.webapp_rate_limit.reference_id
+    # Maximum number of requests within the evaluation window before the rate limit is triggered.
+    threshold = 600
+    # Rate limit evaluation window in seconds.
+    # Fastly NGWAF only supports rate-limit windows of 1 or 10 minutes.
+    # 10 minutes.
+    interval = 600
+    # How long the rate limit is enforced (in seconds). 5 minutes.
+    duration = 300
+
+    client_identifiers {
+      type = "ip"
+    }
   }
 }
 
