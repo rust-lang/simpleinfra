@@ -180,11 +180,11 @@ resource "aws_datasync_task" "migration" {
     log_level        = "BASIC"
     # Enhanced mode doesn't support full source/destination sync verification.
     verify_mode = "ONLY_FILES_TRANSFERRED"
-    # For one-time imports with TransferMode=ALL, deleted source objects are not removed from destination.
-    preserve_deleted_files = "PRESERVE"
+    # Mirror source deletions into destination on each execution.
+    preserve_deleted_files = "REMOVE"
     task_queueing          = "ENABLED"
-    # Transfers all the content from the source, without comparing to the destination location
-    transfer_mode = "ALL"
+    # Incremental sync: copy only new/changed objects since the previous run.
+    transfer_mode = "CHANGED"
 
     # Values I had to set to None to avoid aws errors
     posix_permissions = "NONE"
