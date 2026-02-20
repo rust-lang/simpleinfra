@@ -169,7 +169,7 @@ resource "aws_datasync_task" "migration" {
   name                     = "docs-rs-storage-import"
   source_location_arn      = aws_datasync_location_s3.migration_source[0].arn
   destination_location_arn = aws_datasync_location_s3.migration_destination[0].arn
-  cloudwatch_log_group_arn = aws_cloudwatch_log_group.datasync_s3_migration[0].arn
+  cloudwatch_log_group_arn = "${aws_cloudwatch_log_group.datasync_s3_migration[0].arn}:*"
 
   # Can avoid network errors when transfering between different accounts and regions
   task_mode = "ENHANCED"
