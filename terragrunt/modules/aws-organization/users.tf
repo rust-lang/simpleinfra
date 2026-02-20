@@ -3,6 +3,7 @@ locals {
     billing : aws_identitystore_group.billing
     content : aws_identitystore_group.content
     crates-io : aws_identitystore_group.crates_io
+    docs-rs : aws_identitystore_group.docs_rs
     infra : aws_identitystore_group.infra
     infra-admins : aws_identitystore_group.infra-admins
     metrics-initiative : aws_identitystore_group.metrics_initiative

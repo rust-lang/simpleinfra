@@ -35,6 +35,13 @@ resource "aws_identitystore_group" "crates_io" {
   description  = "The crates.io team"
 }
 
+resource "aws_identitystore_group" "docs_rs" {
+  identity_store_id = local.identity_store_id
+
+  display_name = "docs-rs"
+  description  = "The docs.rs team"
+}
+
 resource "aws_identitystore_group" "metrics_initiative" {
   identity_store_id = local.identity_store_id
 
@@ -364,6 +371,8 @@ locals {
         permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
         { group : aws_identitystore_group.infra,
         permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
+        { group : aws_identitystore_group.docs_rs,
+        permissions : [aws_ssoadmin_permission_set.read_only_access] },
       ]
     },
     # docs-rs prod
@@ -373,6 +382,8 @@ locals {
         { group : aws_identitystore_group.infra-admins,
         permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
         { group : aws_identitystore_group.infra,
+        permissions : [aws_ssoadmin_permission_set.read_only_access] },
+        { group : aws_identitystore_group.docs_rs,
         permissions : [aws_ssoadmin_permission_set.read_only_access] },
       ]
     },

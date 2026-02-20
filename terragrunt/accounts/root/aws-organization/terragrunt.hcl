@@ -159,5 +159,11 @@ inputs = {
       email       = "tmandry@gmail.com"
       groups      = ["content"]
     }
+    "syphar" = {
+      given_name  = "Denis"
+      family_name = "Cornehl"
+      email       = "denis@cornehl.org"
+      groups      = ["docs-rs"]
+    }
   }
 }
