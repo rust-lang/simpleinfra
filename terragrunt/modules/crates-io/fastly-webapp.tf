@@ -43,6 +43,7 @@ resource "fastly_ngwaf_workspace_rule" "webapp_per_ip_rate_limit" {
 
   # Fastly NGWAF requires at least one rule condition.
   # Match all request paths so the rate limit applies globally.
+  group_operator = "all"
   condition {
     field    = "path"
     operator = "contains"
