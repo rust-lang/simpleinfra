@@ -15,6 +15,11 @@ resource "aws_instance" "builder" {
   tags = {
     Name = "docs-rs-builder"
   }
+
+  lifecycle {
+    # Don't recreate the instance automatically when the AMI changes.
+    ignore_changes = [ami]
+  }
 }
 
 data "aws_ami" "ubuntu24" {
