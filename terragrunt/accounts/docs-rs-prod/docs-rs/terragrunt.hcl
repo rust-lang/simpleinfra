@@ -30,4 +30,7 @@ inputs = {
   # One-time ~10TB migration from the legacy bucket managed in terraform/docs-rs.
   s3_migration_enabled            = true
   s3_migration_source_bucket_name = "rust-docs-rs"
+
+  # Event-driven replication from legacy docs.rs bucket.
+  s3_crr_enabled = true
 }

@@ -47,3 +47,9 @@ variable "s3_migration_source_bucket_name" {
   default     = null
   nullable    = true
 }
+
+variable "s3_crr_enabled" {
+  type        = bool
+  description = "Enable cross-account S3 CRR from the legacy docs.rs bucket into this bucket."
+  default     = false
+}
