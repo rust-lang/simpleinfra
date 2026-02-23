@@ -28,10 +28,6 @@ locals {
       login = "joelmarcey@rustfoundation.org"
       name  = "Joel Marcey"
     }
-    "jon" = {
-      login = "jonbauman@rustfoundation.org"
-      name  = "Jon Bauman"
-    }
     "jtgeibel" = {
       login = "jtgeibel@gmail.com"
       name  = "Justin Geibel"
