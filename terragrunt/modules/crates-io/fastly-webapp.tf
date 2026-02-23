@@ -28,6 +28,57 @@ resource "fastly_ngwaf_workspace" "webapp" {
   }
 }
 
+# The upload endpoint can legitimately contain payloads that trigger these anomalies.
+# Restrict the suppression to PUT /api/v1/crates/new only.
+# Signal names retrieved by creating a rule manually and querying the Fastly API for that rule's configuration.
+resource "fastly_ngwaf_workspace_rule" "webapp_allow_null_byte_on_crate_upload" {
+  workspace_id = fastly_ngwaf_workspace.webapp.id
+  type         = "signal"
+  description  = "Allow null-byte anomaly for crate uploads"
+  enabled      = true
+
+  group_operator = "all"
+  condition {
+    field    = "method"
+    operator = "equals"
+    value    = "PUT"
+  }
+  condition {
+    field    = "path"
+    operator = "equals"
+    value    = "/api/v1/crates/new"
+  }
+
+  action {
+    type   = "exclude_signal"
+    signal = "NULLBYTE"
+  }
+}
+
+resource "fastly_ngwaf_workspace_rule" "webapp_allow_invalid_encoding_on_crate_upload" {
+  workspace_id = fastly_ngwaf_workspace.webapp.id
+  type         = "signal"
+  description  = "Allow Invalid Encoding anomaly for crate uploads"
+  enabled      = true
+
+  group_operator = "all"
+  condition {
+    field    = "method"
+    operator = "equals"
+    value    = "PUT"
+  }
+  condition {
+    field    = "path"
+    operator = "equals"
+    value    = "/api/v1/crates/new"
+  }
+
+  action {
+    type   = "exclude_signal"
+    signal = "NOTUTF8"
+  }
+}
+
 # Custom signal used for per-client rate limiting in the webapp workspace.
 resource "fastly_ngwaf_workspace_signal" "webapp_rate_limit" {
   workspace_id = fastly_ngwaf_workspace.webapp.id
