@@ -2,6 +2,15 @@ resource "aws_s3_bucket" "storage" {
   bucket = "rust-docs-rs"
 }
 
+# Versioning is required for S3 CRR.
+resource "aws_s3_bucket_versioning" "storage" {
+  bucket = aws_s3_bucket.storage.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
 resource "aws_s3_bucket_inventory" "storage" {
   name    = "all-objects-csv"
   bucket  = aws_s3_bucket.storage.id
