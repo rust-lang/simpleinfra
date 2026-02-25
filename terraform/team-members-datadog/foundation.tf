@@ -8,6 +8,12 @@ locals {
     "ubiratan"       = local.users.ubiratan
     "walter"         = local.users.walter
   }
+
+  # Foundation members inherit all permissions from Datadog's Standard Role.
+  foundation_roles = [
+    "Datadog Standard Role",
+    datadog_role.foundation.name,
+  ]
 }
 
 resource "datadog_role" "foundation" {
