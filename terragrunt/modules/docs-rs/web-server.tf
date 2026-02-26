@@ -30,9 +30,9 @@ module "web" {
     DOCSRS_GITHUB_ACCESSTOKEN = "/docs-rs/github-access-token"
   }
 
-  # computed_secrets = {
-  #   DOCSRS_DATABASE_URL = aws_ssm_parameter.connection_url.arn
-  # }
+  computed_secrets = {
+    DOCSRS_DATABASE_URL = aws_ssm_parameter.connection_url.arn
+  }
 
   expose_http = {
     container_port = 80
