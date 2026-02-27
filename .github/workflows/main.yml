@@ -14,6 +14,11 @@ jobs:
       - name: Install Rust stable
         run: rustup update stable && rustup default stable && rustup component add clippy rustfmt
 
+      - name: Install tools for compute-static tests
+        uses: taiki-e/install-action@493d7f216ecab2af0602481ce809ab2c72836fa1 # v2.62.62
+        with:
+          tool: cargo-nextest,viceroy
+
       - name: Run rustfmt
         run: cargo fmt --all -- --check
 
@@ -22,6 +27,10 @@ jobs:
 
       - name: Run clippy
         run: cargo clippy --all -- -Dwarnings
+
+      - name: Run compute-static tests
+        working-directory: terragrunt/modules/crates-io/compute-static
+        run: cargo nextest run
 
   terraform:
     name: Terraform configuration
