@@ -12,7 +12,7 @@ output "role" {
 }
 
 resource "aws_iam_role" "ci_role" {
-  name = "ci--${var.org}--${var.repo}"
+  name = "ci--${var.org}--${var.repo}${var.environment != null ? "--${var.environment}" : ""}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
