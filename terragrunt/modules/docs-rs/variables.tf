@@ -35,6 +35,11 @@ variable "builder_instance_type" {
   description = "The EC2 instance type for the docs-rs builder"
 }
 
+variable "github_environment" {
+  type        = string
+  description = "The GitHub deployment environment used for GitHub Actions OIDC."
+}
+
 variable "s3_migration_enabled" {
   type        = bool
   description = "Enable manual S3 migration from a source bucket to the docs-rs storage bucket."

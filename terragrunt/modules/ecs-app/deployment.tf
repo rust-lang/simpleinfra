@@ -6,7 +6,6 @@ module "ecs_task" {
   source = "../ecs-task"
 
   name                 = var.name
-  env                  = var.env
   cpu                  = var.cpu
   memory               = var.memory
   ephemeral_storage_gb = var.ephemeral_storage_gb

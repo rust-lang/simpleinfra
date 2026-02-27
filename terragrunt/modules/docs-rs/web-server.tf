@@ -7,9 +7,10 @@ module "web" {
   source         = "../ecs-app"
   cluster_config = var.cluster_config
 
-  env  = "staging"
-  name = "docs-rs-web"
-  repo = "rust-lang/docs.rs"
+  github_environment = var.github_environment
+  gh_oidc_arn        = module.gh_oidc.arn
+  name               = "docs-rs-web"
+  repo               = "rust-lang/docs.rs"
 
   cpu                  = 256
   memory               = 512
