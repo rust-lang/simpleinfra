@@ -63,7 +63,7 @@ resource "aws_ecs_task_definition" "task" {
 data "aws_region" "current" {}
 
 resource "aws_cloudwatch_log_group" "task" {
-  name              = "/${var.env}/${var.name}"
+  name              = "/ecs/${var.name}"
   retention_in_days = 7
 }
 

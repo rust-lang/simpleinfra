@@ -23,6 +23,7 @@ inputs = {
   zone_id                   = dependency.dns_zone.outputs.id
   cluster_config            = dependency.cluster.outputs.config
   private_subnet_ids        = dependency.vpc.outputs.private_subnets
+  github_environment        = "production"
   domain                    = "docs-rs-prod.rust-lang.net"
   bastion_security_group_id = dependency.vpc.outputs.bastion_security_group_id
   builder_instance_type     = "c6a.8xlarge" # 32 vCPU. 64 GiB RAM.

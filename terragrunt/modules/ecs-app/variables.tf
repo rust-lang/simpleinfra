@@ -1,17 +1,21 @@
-variable "env" {
-  type = string
-  validation {
-    condition     = contains(["staging", "prod"], var.env)
-    error_message = "The environment must be 'staging' or 'prod'."
-  }
-}
-
 variable "name" {
   type = string
 }
 
 variable "repo" {
   type = string
+}
+
+variable "github_environment" {
+  type        = string
+  description = "GitHub environment used to upload the ECR container image. If specified, you can use GitHub Actions OIDC to upload the Docker ECR image."
+  default     = null
+}
+
+variable "gh_oidc_arn" {
+  type        = string
+  description = "ARN of a GitHub Actions OIDC provider to use when creating the CI role."
+  default     = null
 }
 
 variable "platform_version" {
