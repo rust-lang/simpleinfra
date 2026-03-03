@@ -7,7 +7,7 @@ module "lambda_static" {
   name       = "${local.name}--static-router"
   source_dir = "lambdas/static-router"
   handler    = "index.handler"
-  runtime    = "nodejs20.x"
+  runtime    = "nodejs22.x"
   role_arn   = data.aws_iam_role.cloudfront_lambda.arn
 }
 
