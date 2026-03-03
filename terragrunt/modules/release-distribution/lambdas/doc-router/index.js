@@ -67,7 +67,7 @@ exports.handler = (event, context, callback) => {
     }
 
     // Forward patch versioned documentation as-is.
-    if (/^\/(\d+)\.(\d+).(\d+)\/(.*)/.test(request.uri)) {
+    if (/^\/(\d+)\.(\d+)\.(\d+)\/(.*)/.test(request.uri)) {
         return callback(null, request);
     }
     // Include patch version 0 if minor versioned documentation is requested
