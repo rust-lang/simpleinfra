@@ -11,6 +11,14 @@ resource "aws_ssoadmin_permission_set_inline_policy" "content_s3_write" {
     Version = "2012-10-17"
     Statement = [
       {
+        Sid    = "S3ListAllBuckets"
+        Effect = "Allow"
+        Action = [
+          "s3:ListAllMyBuckets",
+        ]
+        Resource = "*"
+      },
+      {
         Sid    = "S3ListContentBucket"
         Effect = "Allow"
         Action = [
