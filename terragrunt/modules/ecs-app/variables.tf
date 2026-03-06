@@ -8,8 +8,7 @@ variable "repo" {
 
 variable "github_environment" {
   type        = string
-  description = "GitHub environment used to upload the ECR container image. If specified, you can use GitHub Actions OIDC to upload the Docker ECR image."
-  default     = null
+  description = "GitHub environment used by GitHub Actions OIDC to upload the Docker image to ECR."
 }
 
 variable "gh_oidc_arn" {
