@@ -1,3 +1,11 @@
+resource "aws_eip" "builder" {
+  domain = "vpc"
+
+  tags = {
+    Name = "docs-rs-builder"
+  }
+}
+
 resource "aws_instance" "builder" {
   ami                         = data.aws_ami.ubuntu24.id
   instance_type               = var.builder_instance_type
@@ -20,6 +28,11 @@ resource "aws_instance" "builder" {
     # Don't recreate the instance automatically when the AMI changes.
     ignore_changes = [ami]
   }
+}
+
+resource "aws_eip_association" "builder" {
+  instance_id   = aws_instance.builder.id
+  allocation_id = aws_eip.builder.id
 }
 
 data "aws_ami" "ubuntu24" {
