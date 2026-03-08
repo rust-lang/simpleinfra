@@ -51,6 +51,11 @@ resource "fastly_service_compute" "docs_rs" {
     address       = local.origin
     override_host = local.origin
 
+    between_bytes_timeout = 10000 # ms -> 10s
+    connect_timeout       = 10000 # ms -> 10s
+    first_byte_timeout    = 60000 # ms -> 60s -> same as origin
+    keepalive_time        = 60    # s
+
     use_ssl = false
     port    = 80
   }
