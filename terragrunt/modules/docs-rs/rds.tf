@@ -33,8 +33,7 @@ resource "aws_db_instance" "db" {
   engine         = "postgres"
   engine_version = "18"
 
-  # 2 vCPUs, 2 GiB RAM.
-  instance_class = "db.t4g.small"
+  instance_class = var.db_instance_class
   # General Purpose SSD storage. RDS default.
   storage_type         = "gp3"
   db_subnet_group_name = aws_db_subnet_group.db.name

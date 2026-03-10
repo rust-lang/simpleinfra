@@ -27,4 +27,5 @@ inputs = {
   domain                    = "docs-rs-staging.rust-lang.net"
   bastion_security_group_id = dependency.vpc.outputs.bastion_security_group_id
   builder_instance_type     = "c6a.large" # 2 vCPU. 4 GiB RAM.
+  db_instance_class         = "db.t4g.small" # 2 vCPUs. 2 GiB RAM.
 }

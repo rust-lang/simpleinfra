@@ -27,6 +27,7 @@ inputs = {
   domain                    = "docs-rs-prod.rust-lang.net"
   bastion_security_group_id = dependency.vpc.outputs.bastion_security_group_id
   builder_instance_type     = "c6a.8xlarge" # 32 vCPU. 64 GiB RAM.
+  db_instance_class         = "db.m6i.large" # 2 vCPUs. 8 GiB RAM.
 
   # One-time ~10TB migration from the legacy bucket managed in terraform/docs-rs.
   s3_migration_enabled            = true

@@ -58,3 +58,8 @@ variable "s3_crr_enabled" {
   description = "Enable cross-account S3 CRR from the legacy docs.rs bucket into this bucket."
   default     = false
 }
+
+variable "db_instance_class" {
+  type        = string
+  description = "The RDS instance class for the docs-rs database"
+}
