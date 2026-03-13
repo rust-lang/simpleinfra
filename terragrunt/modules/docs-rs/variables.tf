@@ -63,3 +63,13 @@ variable "db_instance_class" {
   type        = string
   description = "The RDS instance class for the docs-rs database"
 }
+
+variable "cdn_domain_name" {
+  type        = string
+  description = "The public domain name served by the Fastly CDN (e.g. docs.rs)."
+}
+
+variable "cdn_origin" {
+  type        = string
+  description = "The origin hostname that Fastly will forward requests to."
+}
