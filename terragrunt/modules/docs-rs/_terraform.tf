@@ -14,5 +14,9 @@ terraform {
       source  = "integrations/github"
       version = "~> 6.9"
     }
+    fastly = {
+      source  = "fastly/fastly"
+      version = "~> 8.6"
+    }
   }
 }

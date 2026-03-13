@@ -1,0 +1,21 @@
+# This file describes a Fastly Compute package. To learn more visit:
+# https://www.fastly.com/documentation/reference/compute/fastly-toml
+
+authors = [""]
+cloned_from = "https://github.com/fastly/compute-starter-kit-rust-default"
+description = "Compute@Edge function for docs.rs"
+language = "rust"
+manifest_version = 3
+name = "fastly-compute-docs-rs"
+service_id = ""
+
+[local_server]
+
+[scripts]
+  # workaround to build with custom profile and copy wasm to expected location
+  build = """
+  cargo build --profile fastly-release &&
+  TARGET_DIR=$(cargo metadata --format-version=1 | jq -r .target_directory) &&
+  mkdir -p ${TARGET_DIR}/wasm32-wasip1/release &&
+  command cp -f ${TARGET_DIR}/wasm32-wasip1/fastly-release/fastly-compute-project.wasm ${TARGET_DIR}/wasm32-wasip1/release/fastly-compute-project.wasm
+  """
