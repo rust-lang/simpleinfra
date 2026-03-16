@@ -61,6 +61,11 @@ resource "fastly_service_vcl" "webapp" {
 
   default_ttl = 0
 
+  logging_datadog {
+    name  = "datadog-webapp-${var.webapp_domain_name}"
+    token = data.aws_ssm_parameter.datadog_token.value
+  }
+
   # Forward relevant headers to the origin
   snippet {
     name    = "forward headers to origin"
