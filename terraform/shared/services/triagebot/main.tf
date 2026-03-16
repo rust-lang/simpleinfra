@@ -47,7 +47,7 @@ module "ecs_task" {
   cpu    = 256
   memory = 512
 
-  log_retention_days = 3
+  log_retention_days = 60
   ecr_repositories_arns = [
     module.ecr.arn,
   ]
