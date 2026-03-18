@@ -6,6 +6,7 @@ members = [
     "setup-deploy-keys",
     "ansible/roles/dev-desktop/files/team_login",
     "terraform/docs-rs/fastly-compute-docs-rs",
+    "terragrunt/modules/docs-rs/fastly-compute-docs-rs",
 ]
 
 [profile.fastly-release]
