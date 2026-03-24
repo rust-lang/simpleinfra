@@ -26,6 +26,11 @@ locals {
       name  = "Marco Ieni"
       role  = "superuser"
     }
+    "marcoieni-sso" = {
+      login = "marcoieni@rust-lang.org"
+      name  = "Marco Ieni"
+      role  = "superuser"
+    }
     "mark" = {
       login = "mark.simulacrum@gmail.com"
       name  = "Mark Rousskov"
@@ -59,6 +64,11 @@ locals {
     }
     "ubiratan" = {
       login = "ubiratansoares@rustfoundation.org"
+      name  = "Ubiratan Soares"
+      role  = "superuser"
+    }
+    "ubiratan-sso" = {
+      login = "ubiratansoares@rust-lang.org"
       name  = "Ubiratan Soares"
       role  = "superuser"
     }
