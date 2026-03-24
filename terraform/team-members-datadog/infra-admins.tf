@@ -3,11 +3,9 @@ locals {
     "admin"          = local.users.admin
     "jdn"            = local.users.jdn
     "joel"           = local.users.joel
-    "marcoieni"      = local.users.marcoieni
     "mark"           = local.users.mark
     "pietro"         = local.users.pietro
     "rustfoundation" = local.users.rustfoundation
-    "ubiratan"       = local.users.ubiratan
     "walter"         = local.users.walter
   }
 }
