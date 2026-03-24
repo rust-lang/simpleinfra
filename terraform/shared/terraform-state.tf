@@ -15,10 +15,19 @@ locals {
   ]
 
   // Allow infra admins to access the legacy Terraform state bucket through SSO.
-  terraform_state_allowed_sso_principals = [
-    for username in local.terraform_state_users :
-    "arn:aws:sts::${data.aws_caller_identity.current.account_id}:assumed-role/AWSReservedSSO_AdministratorAccess_*/${username}"
-  ]
+  //
+  // In bucket policies AWS matches permission-set sessions through the
+  // underlying IAM role ARN, not the STS assumed-role session ARN.
+  //
+  // The legacy account assigns both AdministratorAccess and ReadOnlyAccess to
+  // infra-admins through AWS IAM Identity Center, so allow both permission
+  // sets here.
+  terraform_state_allowed_sso_principals = flatten([
+    for permission_set in ["AdministratorAccess", "ReadOnlyAccess"] : [
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_${permission_set}_*",
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/*/AWSReservedSSO_${permission_set}_*",
+    ]
+  ])
 }
 
 data "aws_s3_bucket" "rust_terraform" {
