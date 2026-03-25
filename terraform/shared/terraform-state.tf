@@ -5,7 +5,7 @@
 // cycle could make solving issues if things go wrong way harder.
 
 locals {
-  // List of IAM users authorized to access the Terraform bucket.
+  // List of IAM or SSO users authorized to access the Terraform bucket.
   terraform_state_users = [
     "pietroalbini",
     "simulacrum",
@@ -14,11 +14,26 @@ locals {
     "ubiratansoares",
   ]
 
-  // Allow infra admins to access the legacy Terraform state bucket through SSO.
-  terraform_state_allowed_sso_principals = [
+  // We use this to allow federated identities (AWS Identity Center)
+  // to access the Terraform state bucket.
+  // For SSO sessions, aws:userId follows the pattern "<role-id>:username".
+  // Check rust_terraform_sso_allowed below
+  terraform_state_allowed_sso_userids = [
     for username in local.terraform_state_users :
-    "arn:aws:sts::${data.aws_caller_identity.current.account_id}:assumed-role/AWSReservedSSO_AdministratorAccess_*/${username}"
+    "${data.aws_iam_role.rust_terraform_sso_allowed.unique_id}:${username}"
   ]
+}
+
+// Look up the AdministratorAccess role created by AWS Identity Center.
+data "aws_iam_roles" "sso_infra_admin" {
+  path_prefix = "/aws-reserved/sso.amazonaws.com/"
+  name_regex  = "AWSReservedSSO_AdministratorAccess_.*"
+}
+
+// Fetch the full role details (including unique_id) by extracting the role name
+// from the ARN returned above.
+data "aws_iam_role" "rust_terraform_sso_allowed" {
+  name = regex(".*/(.*)", tolist(data.aws_iam_roles.sso_infra_admin.arns)[0])[0]
 }
 
 data "aws_s3_bucket" "rust_terraform" {
@@ -36,6 +51,9 @@ data "aws_iam_user" "rust_terraform_allowed" {
 // Because of that the bucket has a policy to deny access to everyone except
 // selected infra team members and the root account.
 //
+// Access is controlled via aws:userId, which works for
+// both IAM users and SSO assumed-role sessions
+//
 // https://aws.amazon.com/blogs/security/how-to-restrict-amazon-s3-bucket-access-to-a-specific-iam-role/
 resource "aws_s3_bucket_policy" "rust_terraform" {
   bucket = data.aws_s3_bucket.rust_terraform.id
@@ -52,16 +70,15 @@ resource "aws_s3_bucket_policy" "rust_terraform" {
           "${data.aws_s3_bucket.rust_terraform.arn}/*",
         ]
         Condition = {
-          // Used when you login with the `aws-creds.py` script
           StringNotLike = {
             "aws:userId" = concat(
+              // Root account — always allowed
               [data.aws_caller_identity.current.account_id],
+              // IAM users (SSO session via aws-creds.py)
               [for name, user in data.aws_iam_user.rust_terraform_allowed : user.user_id],
+              // SSO users (SSO session via AWS Identity Center)
+              local.terraform_state_allowed_sso_userids,
             )
-          }
-          // Used when you login with SSO
-          ArnNotLike = {
-            "aws:PrincipalArn" = local.terraform_state_allowed_sso_principals
           }
         }
       }
