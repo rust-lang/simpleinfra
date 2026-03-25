@@ -5,6 +5,6 @@ do
     cd $d
     echo $d
     # if the fast forward is successful, this branch is merged, so we can kill it
-    git pull upstream master --ff-only && git checkout --detach && git submodule update --init --recursive
+    git pull upstream main --ff-only && git checkout --detach && git submodule update --init --recursive
     cd ..
 done

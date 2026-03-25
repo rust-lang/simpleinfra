@@ -10,7 +10,7 @@ git worktree add --detach ../rust$N
 popd
 pushd rust$N
 git fetch upstream
-git checkout upstream/master
+git checkout upstream/main
 ln -s ../bootstrap.toml
 popd
 
