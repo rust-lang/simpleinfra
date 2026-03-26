@@ -26,11 +26,6 @@ locals {
       name  = "Marco Ieni"
       role  = "superuser"
     }
-    "marcoieni-sso" = {
-      login = "marcoieni@rust-lang.org"
-      name  = "Marco Ieni"
-      role  = "superuser"
-    }
     "mark" = {
       login = "mark.simulacrum@gmail.com"
       name  = "Mark Rousskov"
@@ -67,9 +62,38 @@ locals {
       name  = "Ubiratan Soares"
       role  = "superuser"
     }
+
+    # Users enabled with Google SSO
+    # For now we keep duplicate accounts while we rollout Google Workspace
+    # We'll stick with SSO afterwards
     "ubiratan-sso" = {
       login = "ubiratansoares@rust-lang.org"
       name  = "Ubiratan Soares"
+      role  = "superuser"
+    }
+    "marcoieni-sso" = {
+      login = "marcoieni@rust-lang.org"
+      name  = "Marco Ieni"
+      role  = "superuser"
+    }
+    "jdn-sso" = {
+      login = "jdno@rust-lang.org"
+      name  = "Jan David Nose"
+      role  = "superuser"
+    }
+    "joel-sso" = {
+      login = "joelmarcey@rust-lang.org"
+      name  = "Joel Marcey"
+      role  = "superuser"
+    }
+    "mark-sso" = {
+      login = "mark-simulacrum@rust-lang.org"
+      name  = "Mark Rousskov"
+      role  = "superuser"
+    }
+    "emily-sso" = {
+      login = "emilyalbini@rust-lang.org"
+      name  = "Emily Albini"
       role  = "superuser"
     }
   }
