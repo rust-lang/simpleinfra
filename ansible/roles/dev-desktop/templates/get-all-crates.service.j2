@@ -1,0 +1,8 @@
+[Unit]
+Description=Refresh crates.io export
+
+[Service]
+Type=oneshot
+User=crates-io-downloader
+ExecStart=/home/crates-io-downloader/refresh-crates.sh
+MemoryMax=80%

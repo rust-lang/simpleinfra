@@ -1,0 +1,9 @@
+[Unit]
+Description=Refresh crates.io export timer
+
+[Timer]
+OnCalendar=daily
+RandomizedDelaySec=3600
+
+[Install]
+#WantedBy=timers.target
