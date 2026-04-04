@@ -1,0 +1,48 @@
+---
+
+- name: Set up user for crates.io downloads
+  user:
+    name: crates-io-downloader
+    state: present
+
+- name: Install Rust for crates-io-downloader
+  shell: "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y"
+  become_user: crates-io-downloader
+
+- name: Install get-all-crates
+  shell: "PATH=$PATH:$HOME/.cargo/bin cargo install get-all-crates --version 0.1.22 --locked"
+  become_user: crates-io-downloader
+
+- name: Set up get-all-crates systemd service
+  template:
+    src: get-all-crates.service.j2
+    dest: /etc/systemd/system/get-all-crates.service
+    mode: 0644
+  register: get_all_crates_service
+
+- name: Set up get-all-crates systemd timer
+  template:
+    src: get-all-crates.timer.j2
+    dest: /etc/systemd/system/get-all-crates.timer
+    mode: 0644
+  register: get_all_crates_timer
+
+- name: reload systemd
+  systemd:
+    daemon_reload: true
+  when: get_all_crates_timer is changed or get_all_crates_service is changed
+
+- name: setup all-crates directory
+  file:
+    path: /var/cache/all-crates
+    state: directory
+    owner: crates-io-downloader
+    group: crates-io-downloader
+    mode: 0755
+
+- name: Set up get-all-crates script
+  copy:
+    src: files/refresh-crates.sh
+    dest: /home/crates-io-downloader/refresh-crates.sh
+    owner: crates-io-downloader
+    mode: u+x
