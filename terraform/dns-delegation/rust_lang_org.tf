@@ -14,3 +14,20 @@ resource "aws_route53_record" "content" {
     "ns-1408.awsdns-48.org.",
   ]
 }
+
+# Temporary subdomain used to enable backwards compatibility
+# while we migrate legacy "mailing lists" powered by Mailgun
+# routing to Google Groups
+# Google Workspace will route unrecognized recipients to
+# this subdomain
+resource "aws_route53_record" "mailgun_legacy_lists" {
+  zone_id = data.aws_route53_zone.rust_lang_org.zone_id
+  name    = "legacy-lists.rust-lang.org"
+  type    = "MX"
+  ttl     = 3600
+
+  records = [
+    "10 mxa.mailgun.org",
+    "10 mxb.mailgun.org",
+  ]
+}
