@@ -6,6 +6,7 @@ resource "google_service_account" "gws-readonly-sa" {
 }
 
 # The service account key used for read-only access in API integrations
+# in the team repo dry-run.
 resource "google_service_account_key" "gws-readonly-sa-key" {
   service_account_id = google_service_account.gws-readonly-sa.name
 }
