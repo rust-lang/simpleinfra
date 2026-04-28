@@ -97,8 +97,9 @@ resource "fastly_ngwaf_workspace_rule" "webapp_per_ip_rate_limit" {
 
   # If the workspace mode isn't "block", then this rule is not enforced.
   action {
-    signal = "site.webapp-rate-limit"
-    type   = "block_signal"
+    signal        = "site.webapp-rate-limit"
+    type          = "block_signal"
+    response_code = 429
   }
 
   # If an IP sends 600 req in 10 minutes, block them for 5 minutes.
