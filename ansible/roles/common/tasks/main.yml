@@ -1,6 +1,7 @@
 ---
 
 - include_tasks: apt.yml
+- include_tasks: kernel.yml
 - include_tasks: users.yml
 - include_tasks: ssh.yml
 - include_tasks: networking.yml
