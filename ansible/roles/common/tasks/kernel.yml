@@ -1,0 +1,16 @@
+---
+
+- name: disable algif_aead kernel module
+  copy:
+    dest: /etc/modprobe.d/disable-algif.conf
+    content: |
+      install algif_aead /bin/false
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: unload algif_aead kernel module
+  command: rmmod algif_aead
+  register: algif_aead_rmmod
+  changed_when: algif_aead_rmmod.rc == 0
+  failed_when: false
