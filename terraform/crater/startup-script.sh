@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+# Disable the algif_aead kernel module to mitigate CVE-2026-31431
+echo "install algif_aead /bin/false" | sudo tee /etc/modprobe.d/disable-algif.conf
+sudo rmmod algif_aead 2>/dev/null || true
+
 mkdir -p /opt
 cd /opt
 sudo apt update
