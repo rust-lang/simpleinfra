@@ -53,6 +53,8 @@ test("example expected redirects", async (t) => {
     // /doc
     { from: "/doc/std", to: "/std" },
     { from: "/doc/hello", to: "/hello" },
+    // Test that repeated slashes are collapsed to prevent open redirect vulnerabilities
+    { from: "/doc//example.com/something", to: "/example.com/something" },
   ];
 
   for (const redir of redirects) {
