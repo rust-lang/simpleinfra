@@ -111,7 +111,12 @@ exports.handler = (event, context, callback) => {
 
     // Docs used to be under /doc, so redirect those for now
     if (request.uri.startsWith('/doc/')) {
-        return redirect(request.uri.slice(4), callback);
+        // Collapse repeated slashes to prevent open redirect vulnerabilities.
+        // E.g. this prevents paths like `/doc//example.com` from redirecting
+        // to `https://example.com`.
+        const redirectTarget = request.uri.slice(4).replace(/\/+/g, '/');
+
+        return redirect(redirectTarget, callback);
     }
 
     // The `/stable`, `/beta`, and `/nightly` urls are all workable as-is
