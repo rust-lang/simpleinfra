@@ -94,12 +94,9 @@ fn main(mut req: Request) -> Result<Response, Error> {
         req.set_header(FASTLY_FF, "1");
     }
 
-    if req.get_header(X_FORWARDED_HOST).is_none() {
-        // When the request doesn't have an X-Forwarded-Host header,
-        // set one.
-        // When this is a request on a shield POP, we should already
-        // get the header from the edge POP, so just pass it on.
-        // The forwarded host (= subdomain) will be needed
+    if shield.response_is_for_client() {
+        // Requests received from end users must not be allowed to supply
+        // proxy identity headers.
         req.set_header(
             X_FORWARDED_HOST,
             req.get_url()
@@ -107,13 +104,7 @@ fn main(mut req: Request) -> Result<Response, Error> {
                 .context("missing hostname in request URL")?
                 .to_owned(),
         );
-    }
 
-    if req.get_header(FASTLY_CLIENT_IP).is_none() {
-        // When the request doesn't have an Fastly-Client-Ip header, set one.
-        // When this is a request on a shield POP, we should already
-        // get the header from the edge POP, and just pass it on.
-        //
         // https://www.fastly.com/documentation/reference/http/http-headers/Fastly-Client-IP/
         // We intentionally choose this simple header instead of X-Forwarded-For, because we only
         // need the client IP, and not all in between.
@@ -123,6 +114,19 @@ fn main(mut req: Request) -> Result<Response, Error> {
                 .context("this is the client request, it should have an IP address")?
                 .to_string(),
         );
+    } else {
+        // On shield POPs, these values should be present, because they are set
+        // by the edge POP.
+        // The origin uses these values to recover the original request
+        // host and client IP.
+        for header in [X_FORWARDED_HOST, FASTLY_CLIENT_IP] {
+            if !req.contains_header(&header) {
+                eprintln!(
+                    "shield POP received request without expected {} header from edge POP",
+                    header.as_str()
+                );
+            }
+        }
     }
 
     // Send request to backend, shield POP or origin
