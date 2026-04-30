@@ -5,7 +5,8 @@
     dest: /etc/cron.cleanup_disk_space
     owner: root
     group: root
-    mode: 0744
+    # The script needs to be executable by any user
+    mode: 0755
 
 - name: Set up the cleanup cron job
   template:
