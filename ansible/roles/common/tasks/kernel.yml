@@ -1,4 +1,5 @@
 ---
+# Mitigate CVE-2026-31431 (https://copy.fail)
 
 - name: disable algif_aead kernel module
   copy:
