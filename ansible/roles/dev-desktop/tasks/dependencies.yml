@@ -19,6 +19,7 @@
       - fzf
       - g++-14-aarch64-linux-gnu # Required for functional clang++ when libgcc-14-dev is installed
       - gcc-mingw-w64-x86-64 # Allows running `x check --target x86_64-pc-windows-gnu`
+      - gh
       - jq
       - tidy # Format and diff html for rustdoc
       - cvise
