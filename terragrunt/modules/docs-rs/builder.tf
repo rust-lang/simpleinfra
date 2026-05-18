@@ -17,6 +17,9 @@ resource "aws_instance" "builder" {
   root_block_device {
     # Size of the volume in GiB.
     volume_size           = 64
+    volume_type           = "gp3"
+    iops                  = var.builder_volume_iops
+    throughput            = var.builder_volume_throughput
     delete_on_termination = true
   }
 

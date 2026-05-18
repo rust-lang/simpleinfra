@@ -35,6 +35,18 @@ variable "builder_instance_type" {
   description = "The EC2 instance type for the docs-rs builder"
 }
 
+variable "builder_volume_iops" {
+  type        = number
+  description = "The provisioned IOPS for the docs-rs builder gp3 root volume."
+  default     = 3000
+}
+
+variable "builder_volume_throughput" {
+  type        = number
+  description = "The provisioned throughput in MiB/s for the docs-rs builder gp3 root volume."
+  default     = 125
+}
+
 variable "github_environment" {
   type        = string
   description = "The GitHub deployment environment used for GitHub Actions OIDC."
