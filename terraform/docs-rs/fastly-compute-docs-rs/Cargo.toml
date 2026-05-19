@@ -5,4 +5,4 @@ edition = "2024"
 publish = false
 
 [dependencies]
-fastly = "0.11.0"
+fastly = "0.12.1"
