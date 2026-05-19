@@ -1,5 +1,5 @@
 use fastly::{
-    Backend, ConfigStore,
+    Backend, ConfigStore, Request, SecretStore,
     error::{Error, anyhow},
     shielding::Shield,
 };
@@ -18,6 +18,7 @@ pub enum State {
 
 pub struct Context {
     pub shield: State,
+    request_came_from_edge: Option<bool>,
     pub origin_backend: fastly::Backend,
 }
 
@@ -28,17 +29,37 @@ impl Default for Context {
         Context {
             origin_backend: Backend::from_name(super::DOCS_RS_BACKEND)
                 .expect("we know the name is valid, and ::from_name just validates that"),
+            request_came_from_edge: None,
             shield: State::Disabled,
         }
     }
 }
 
 impl Context {
-    pub fn load(config: &ConfigStore) -> Result<Self, Error> {
+    pub fn load(
+        config: &ConfigStore,
+        secrets: &SecretStore,
+        req: &mut Request,
+    ) -> Result<Self, Error> {
         let Some(shield_pop) = config.get(super::SHIELD_POP_KEY) else {
             // no shield configured, disable origin shielding
             return Ok(Context::default());
         };
+
+        let origin_auth = secrets
+            .get(super::ORIGIN_AUTH_KEY)
+            .expect("failed to get origin auth from secret store")
+            .plaintext();
+        // Only the exact secret marks a request as having come from an edge POP.
+        // Missing or incorrect values are treated as untrusted client input.
+        let request_came_from_edge = req
+            .get_header(super::X_ORIGIN_AUTH)
+            .map(|value| value.as_bytes() == origin_auth.as_ref())
+            .unwrap_or(false);
+
+        // Never trust or forward caller-supplied internal auth headers.
+        // This makes spoofed values harmless on both edge and shield POPs.
+        req.remove_header(super::X_ORIGIN_AUTH);
 
         let shield = match Shield::new(&shield_pop) {
             Ok(shield) => shield,
@@ -53,13 +74,17 @@ impl Context {
             }
         };
 
-        let mut ctx = Context::default();
+        let mut ctx = Context {
+            request_came_from_edge: Some(request_came_from_edge),
+            ..Default::default()
+        };
 
         // shielding is configured with a valid shield
         if shield.running_on() {
             // and we're running on the shield POP node.
-            // -> our client is the fastly edge POP node.
-            // -> our target for the request is the origin
+            // -> our target for the request is always the origin
+            // -> our client can be a user, or fastly edge POP node.
+            // Invalid auth has already fallen back to "client request" above.
             ctx.shield = State::OnShield;
         } else {
             // we're running on an edge POP node, so the request should go to the shield node.
@@ -72,6 +97,10 @@ impl Context {
                     err
                 )
             })?);
+
+            // Edge POPs always overwrite any inbound value with the configured secret
+            // before forwarding to the shield.
+            req.set_header(super::X_ORIGIN_AUTH, origin_auth.as_ref());
         };
 
         Ok(ctx)
@@ -88,7 +117,13 @@ impl Context {
     /// does the request come from the actual client? Or just the fastly edge POP node?
     pub fn response_is_for_client(&self) -> bool {
         match self.shield {
-            State::OnShield => false,
+            State::OnShield => {
+                // On the shield node, a valid internal origin auth header means the request
+                // arrived from an edge POP rather than directly from the client.
+                !self
+                    .request_came_from_edge
+                    .expect("we always have checked this when the shield is not disabled")
+            }
             State::OnEdge(_) | State::Disabled => true,
         }
     }
