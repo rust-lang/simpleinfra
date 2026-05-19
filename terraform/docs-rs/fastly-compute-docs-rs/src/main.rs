@@ -79,22 +79,28 @@ fn main(mut req: Request) -> Result<Response, Error> {
         }
     }
 
-    if shield.target_is_origin() {
-        let secrets = SecretStore::open(DOCS_RS_SECRET_STORE).expect("failed to open secret store");
-        let origin_auth = secrets
-            .get(ORIGIN_AUTH_KEY)
-            .expect("failed to get origin auth from secret store")
-            .plaintext();
+    let secrets = SecretStore::open(DOCS_RS_SECRET_STORE).expect("failed to open secret store");
+    let origin_auth = secrets
+        .get(ORIGIN_AUTH_KEY)
+        .expect("failed to get origin auth from secret store")
+        .plaintext();
+    let origin_auth = origin_auth.as_ref();
 
-        req.set_header(X_ORIGIN_AUTH, origin_auth.as_ref());
-    } else {
+    let request_is_from_edge_pop = !shield.response_is_for_client()
+        && req
+            .get_header(&X_ORIGIN_AUTH)
+            .is_some_and(|header| header.as_bytes() == origin_auth);
+
+    req.set_header(X_ORIGIN_AUTH, origin_auth);
+
+    if !shield.target_is_origin() {
         // Workaround for outstanding Fastly platform issue.
         // Setting the `Fastly-FF` header means the shield -> edge response will include the `Surrogate-Control` header.
         // See https://github.com/rust-lang/simpleinfra/pull/877
         req.set_header(FASTLY_FF, "1");
     }
 
-    if shield.response_is_for_client() {
+    if !request_is_from_edge_pop {
         // Requests received from end users must not be allowed to supply
         // proxy identity headers.
         req.set_header(
@@ -132,7 +138,7 @@ fn main(mut req: Request) -> Result<Response, Error> {
     // Send request to backend, shield POP or origin
     let mut resp = req.send(shield.target_backend())?;
 
-    if shield.response_is_for_client() {
+    if !request_is_from_edge_pop {
         // set HSTS header
         let ttl: u32 = config
             .get(HSTS_MAX_AGE_KEY)
