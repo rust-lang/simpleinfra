@@ -8,11 +8,36 @@ responses.
 
 ## Development
 
-Build the function:
+Install the Fastly CLI from [here](https://www.fastly.com/documentation/reference/tools/cli/#installing).
+
+Then, build the function:
 
 ```shell
 cd compute-static
 fastly compute build
+```
+
+## Testing
+
+Testing requires [cargo-nextest](https://nexte.st/docs/installation/pre-built-binaries/), as specified in
+the [Fastly documentation](https://www.fastly.com/documentation/guides/compute/developer-guides/rust/). You can install
+it from source with binstall:
+
+```shell
+cargo install cargo-binstall
+cargo binstall cargo-nextest --secure
+```
+
+Then, install [Viceroy](https://github.com/fastly/Viceroy) to run the edge function locally:
+
+```shell
+cargo install --locked viceroy
+```
+
+Finally, run the tests:
+
+```shell
+cargo nextest run
 ```
 
 ## Deployment
