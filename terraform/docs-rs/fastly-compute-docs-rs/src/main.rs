@@ -31,7 +31,8 @@ const X_FORWARDED_HOST: HeaderName = HeaderName::from_static("x-forwarded-host")
 #[fastly::main]
 fn main(mut req: Request) -> Result<Response, Error> {
     let config = ConfigStore::open(DOCS_RS_CONFIG);
-    let shield = shield::Context::load(&config)?;
+    let secrets = SecretStore::open(DOCS_RS_SECRET_STORE).expect("failed to open secret store");
+    let shield = shield::Context::load(&config, &secrets, &mut req)?;
 
     match req.get_method() {
         &Method::GET | &Method::HEAD | &Method::OPTIONS => {
@@ -78,7 +79,6 @@ fn main(mut req: Request) -> Result<Response, Error> {
     }
 
     if shield.target_is_origin() {
-        let secrets = SecretStore::open(DOCS_RS_SECRET_STORE).expect("failed to open secret store");
         let origin_auth = secrets
             .get(ORIGIN_AUTH_KEY)
             .expect("failed to get origin auth from secret store")
