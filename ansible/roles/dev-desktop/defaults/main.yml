@@ -42,3 +42,5 @@ vars_user_config:
     shell: /usr/bin/fish
   - username: gh-ShoyuVanilla
     shell: /usr/bin/fish
+  - username: gh-addiesh
+    shell: /usr/bin/fish
