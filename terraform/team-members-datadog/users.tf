@@ -17,7 +17,7 @@ locals {
       name  = "eth3lbert"
     }
     "guillaumegomez" = {
-      login = "guillaume1.gomez@gmail.com"
+      login = "contact@guillaume-gomez.fr"
       name  = "Guillaume Gomez"
     }
     "jakub" = {
