@@ -1,9 +1,10 @@
 locals {
   crates_io = {
-    "adam"     = local.users.adam
-    "carol"    = local.users.carols10cents
-    "jtgeibel" = local.users.jtgeibel
-    "tobias"   = local.users.tobias
+    "adam"      = local.users.adam
+    "carol"     = local.users.carols10cents
+    "eth3lbert" = local.users.eth3lbert
+    "jtgeibel"  = local.users.jtgeibel
+    "tobias"    = local.users.tobias
   }
 }
 
