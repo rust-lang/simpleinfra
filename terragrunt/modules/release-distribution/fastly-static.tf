@@ -104,6 +104,19 @@ resource "fastly_service_vcl" "static" {
     VCL
   }
 
+  # When a new release is published, promote-release purges the `manifeststxt`
+  # surrogate key so that `manifests.txt` updates promptly instead of lagging
+  # until TTL. This snippet tags the response with that key at request time.
+  snippet {
+    name    = "set cache key for manifests.txt"
+    type    = "fetch"
+    content = <<-VCL
+      if (req.url ~ "^\/manifests\.txt$") {
+        set beresp.http.Surrogate-Key = "manifeststxt";
+      }
+    VCL
+  }
+
   snippet {
     name    = "redirect rustup.sh to rustup.rs"
     type    = "error"
