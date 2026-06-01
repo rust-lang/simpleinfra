@@ -13,7 +13,7 @@ locals {
       name  = "Carol Nichols"
     }
     "eth3lbert" = {
-      login = "eth3lbert+dev@gmail.com"
+      login = "eth3lbert@gmail.com"
       name  = "eth3lbert"
     }
     "guillaumegomez" = {
