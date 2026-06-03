@@ -86,16 +86,6 @@ resource "fastly_service_vcl" "webapp" {
     VCL
   }
 
-  # Pass all requests to origin (no caching for API)
-  snippet {
-    name    = "pass all requests"
-    type    = "recv"
-    content = <<-VCL
-      # Don't cache any requests - pass directly to origin
-      return(pass);
-    VCL
-  }
-
   # Handle HSTS headers if strict_security_headers is enabled
   dynamic "snippet" {
     for_each = var.strict_security_headers ? [1] : []
