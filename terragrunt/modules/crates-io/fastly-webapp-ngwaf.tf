@@ -125,10 +125,12 @@ resource "fastly_ngwaf_workspace_rule" "webapp_per_ip_rate_limit" {
 # https://github.com/rust-lang/crates.io/issues/13825
 # https://github.com/rust-lang/crates.io/issues/13695
 resource "fastly_ngwaf_workspace_rule" "webapp_in_temp_bypass" {
-  workspace_id = fastly_ngwaf_workspace.webapp.id
-  type         = "request"
-  description  = "Temporary allow IN users bypass ngwaf rules"
-  enabled      = true
+  workspace_id    = fastly_ngwaf_workspace.webapp.id
+  type            = "request"
+  description     = "Temporary allow IN users bypass ngwaf rules"
+  enabled         = true
+  group_operator  = "all"
+  request_logging = "sampled"
 
   condition {
     field    = "country"
