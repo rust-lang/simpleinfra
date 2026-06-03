@@ -21,7 +21,7 @@ resource "aws_cloudfront_distribution" "beta_rust_lang_org" {
   ]
 
   viewer_certificate {
-    acm_certificate_arn      = "arn:aws:acm:us-east-1:890664054962:certificate/0633f4b2-8a1f-46f8-a2d3-184c461a2eb8"
+    acm_certificate_arn      = module.certificate.arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.1_2016"
   }
