@@ -2,6 +2,20 @@ data "aws_route53_zone" "rust_lang_org" {
   name = "rust-lang.org"
 }
 
+module "certificate" {
+  source = "../shared/modules/acm-certificate"
+
+  providers = {
+    aws = aws.us-east-1
+  }
+
+  # Exclude www.rust-lang.org because it's managed by GitHub Pages
+  domains = [
+    "prev.rust-lang.org",
+    "beta.rust-lang.org",
+  ]
+}
+
 resource "aws_cloudfront_function" "prev_rust_lang_org_redirect" {
   name    = "prev-rust-lang-org-redirect"
   comment = "Redirect prev.rust-lang.org to rust-lang.org"
@@ -25,7 +39,7 @@ resource "aws_cloudfront_distribution" "prev_rust_lang_org" {
   ]
 
   viewer_certificate {
-    acm_certificate_arn      = "arn:aws:acm:us-east-1:890664054962:certificate/0633f4b2-8a1f-46f8-a2d3-184c461a2eb8"
+    acm_certificate_arn      = module.certificate.arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }
