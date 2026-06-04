@@ -44,3 +44,5 @@ vars_user_config:
     shell: /usr/bin/fish
   - username: gh-addiesh
     shell: /usr/bin/fish
+  - username: gh-Human9000-bit
+    shell: /usr/bin/zsh
