@@ -5,6 +5,83 @@ locals {
   webapp_cdn_timeout_seconds    = 60
 }
 
+# Cache key for the web app distribution. Keep this minimal so CloudFront can
+# share cached objects across viewers. Values that the origin needs but that
+# must not fragment the cache are forwarded via the origin request policy below.
+resource "aws_cloudfront_cache_policy" "webapp" {
+  name = replace(var.webapp_domain_name, ".", "-")
+
+  # default_ttl is used only when the origin omits Cache-Control/Expires, so
+  # responses without caching headers are not cached. max_ttl caps the TTL for
+  # the origin's immutable assets (Cache-Control: max-age=315360000) at 1 year.
+  min_ttl     = 0
+  default_ttl = 0
+  max_ttl     = 31536000 // 1 year
+
+  parameters_in_cache_key_and_forwarded_to_origin {
+    # Cache Gzip and Brotli variants separately and let CloudFront compress at
+    # the edge. This normalizes Accept-Encoding into the cache key, so the
+    # header does not need to be forwarded to the origin explicitly.
+    enable_accept_encoding_brotli = true
+    enable_accept_encoding_gzip   = true
+
+    headers_config {
+      header_behavior = "whitelist"
+      headers {
+        // The crates.io website and API respond with different content based
+        // on what the client is accepting (i.e. HTML, JSON...). CloudFront
+        // ignores the origin's Vary header, so Accept must be part of the cache
+        // key (not just forwarded) to avoid serving the wrong representation.
+        items = ["Accept"]
+      }
+    }
+
+    cookies_config {
+      cookie_behavior = "none"
+    }
+
+    query_strings_config {
+      query_string_behavior = "all"
+    }
+  }
+}
+
+# Headers, cookies, and query strings the origin needs but that must stay out of
+# the cache key, so caching them does not fragment the cache across viewers.
+resource "aws_cloudfront_origin_request_policy" "webapp" {
+  name = replace(var.webapp_domain_name, ".", "-")
+
+  headers_config {
+    header_behavior = "whitelist"
+    headers {
+      items = [
+        // The header needs to be forwarded so it can be stored in the logs and
+        // analyzed for abuse prevention and rate limiting purposes.
+        "Referer",
+        // Users of the API are tracked based on the user agent, for abuse
+        // prevention purposes. The header needs to be forwarded so we can
+        // inspect it in the logs.
+        "User-Agent",
+        // Heroku will use an existing header if it is set by the client, so we
+        // may want to forward it along at this layer as well. This might be
+        // helpful for debugging at some point.
+        "X-Request-Id",
+        // Some authenticated API endpoints use the GET method, so we need to
+        // forward the Authorization header to allow token authentication.
+        "Authorization",
+      ]
+    }
+  }
+
+  cookies_config {
+    cookie_behavior = "all"
+  }
+
+  query_strings_config {
+    query_string_behavior = "none"
+  }
+}
+
 resource "aws_cloudfront_distribution" "webapp" {
   comment = var.webapp_domain_name
 
@@ -29,40 +106,10 @@ resource "aws_cloudfront_distribution" "webapp" {
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
 
-    default_ttl = 0
-    min_ttl     = 0
-    max_ttl     = 31536000 // 1 year
+    cache_policy_id          = aws_cloudfront_cache_policy.webapp.id
+    origin_request_policy_id = aws_cloudfront_origin_request_policy.webapp.id
 
     response_headers_policy_id = var.strict_security_headers ? aws_cloudfront_response_headers_policy.webapp[0].id : null
-
-    forwarded_values {
-      headers = [
-        // The crates.io website and API respond with different content based
-        // on what the client is accepting (i.e. HTML, JSON...)
-        "Accept",
-        // Pass the encoding header along so the origin can respond with
-        // compressed content if the client supports it.
-        "Accept-Encoding",
-        // The header needs to be forwarded so it can be stored in the logs and
-        // analyzed for abuse prevention and rate limiting purposes.
-        "Referer",
-        // Users of the API are tracked based on the user agent, for abuse
-        // prevention purposes. The header needs to be forwarded so we can
-        // inspect it in the logs.
-        "User-Agent",
-        // Heroku will use an existing header if it is set by the client, so we
-        // may want to forward it along at this layer as well. This might be
-        // helpful for debugging at some point.
-        "X-Request-Id",
-        // Some authenticated API endpoints use the GET method, so we need to
-        // forward the Authorization header to allow token authentication.
-        "Authorization",
-      ]
-      query_string = true
-      cookies {
-        forward = "all"
-      }
-    }
   }
 
   origin {
