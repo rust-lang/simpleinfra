@@ -12,7 +12,7 @@ terraform {
 
   backend "s3" {
     bucket         = "rust-terraform"
-    key            = "simpleinfra/prev-rust-lang-org.tfstate"
+    key            = "simpleinfra/rust-lang-org.tfstate"
     region         = "us-west-1"
     dynamodb_table = "terraform-state-lock"
     encrypt        = true
