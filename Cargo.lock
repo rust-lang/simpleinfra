@@ -390,6 +390,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "fastly-compute-docs-rs"
+version = "0.1.0"
+dependencies = [
+ "fastly",
+]
+
+[[package]]
 name = "fastly-compute-project"
 version = "0.1.0"
 dependencies = [
