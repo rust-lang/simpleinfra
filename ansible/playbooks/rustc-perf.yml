@@ -44,28 +44,6 @@
           - linux-cloud-tools-generic
         state: present
 
-    # Install AWS CLI binary used to upload self-profile artifacts to S3
-    # v2 is for some reason very slow when uploading artifacts to S3, so use v1 instead
-    - name: Install AWS CLI v1
-      block:
-        - name: Download AWS CLI v1 zip file
-          get_url:
-            url: "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip"
-            dest: "/tmp/awscli-bundle.zip"
-            mode: '0644'
-
-        - name: Extract AWS CLI v1 zip file
-          unarchive:
-            src: "/tmp/awscli-bundle.zip"
-            dest: "/tmp"
-            remote_src: yes
-
-        - name: Install AWS CLI v1
-          command: python3 /tmp/awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
-          become: yes
-          args:
-            creates: /usr/local/bin/aws
-
     # Install rustup/rustc/cargo
     - name: check if cargo is installed
       become: yes
