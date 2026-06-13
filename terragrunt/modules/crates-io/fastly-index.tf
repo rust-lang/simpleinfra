@@ -26,6 +26,11 @@ resource "fastly_service_vcl" "index" {
 
   default_ttl = local.index_default_ttl
 
+  logging_datadog {
+    name  = "datadog-index-${var.index_domain_name}"
+    token = data.aws_ssm_parameter.datadog_token.value
+  }
+
   logging_s3 {
     name        = "s3-request-logs"
     bucket_name = aws_s3_bucket.logs.bucket
