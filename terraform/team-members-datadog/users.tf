@@ -100,6 +100,7 @@ locals {
     { for name, user in local.foundation_board : name => merge(user, { roles = [datadog_role.board_member.name] }) },
     { for name, user in local.infra : name => merge(user, { roles = [datadog_role.infra.name] }) },
     { for name, user in local.infra_admins : name => merge(user, { roles = ["Datadog Admin Role"] }) },
+    { for name, user in local.secrets_scanner_access : name => merge(user, { roles = [datadog_role.secrets_scanner_access.name] }) },
   ]
 
   # This is an intermediate list that contains a single entry per user, but only with the roles from the first team.
