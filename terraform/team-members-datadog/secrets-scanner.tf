@@ -1,7 +1,5 @@
 locals {
-  secrets_scanner_access = {
-    "tobias" = local.users.tobias
-  }
+  secrets_scanner_access = local.foundation
 }
 
 resource "datadog_role" "secrets_scanner_access" {
@@ -20,4 +18,3 @@ resource "datadog_role" "secrets_scanner_access" {
     }
   }
 }
-
