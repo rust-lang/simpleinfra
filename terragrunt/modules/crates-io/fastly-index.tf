@@ -29,6 +29,12 @@ resource "fastly_service_vcl" "index" {
   logging_datadog {
     name  = "datadog-index-${var.index_domain_name}"
     token = data.aws_ssm_parameter.datadog_token.value
+
+    format = templatefile("${path.module}/fastly-log-format.tftpl", {
+      service_name = var.index_domain_name
+      dd_app       = local.datadog_app
+      dd_env       = var.env
+    })
   }
 
   logging_s3 {

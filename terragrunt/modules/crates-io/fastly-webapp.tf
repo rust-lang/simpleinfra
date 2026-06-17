@@ -2,6 +2,7 @@
 
 locals {
   fastly_webapp_domain_name = "fastly-app.${var.webapp_domain_name}"
+  datadog_webapp_service    = replace(var.webapp_domain_name, ".", "-")
 }
 
 resource "fastly_service_vcl" "webapp" {
@@ -64,6 +65,12 @@ resource "fastly_service_vcl" "webapp" {
   logging_datadog {
     name  = "datadog-webapp-${var.webapp_domain_name}"
     token = data.aws_ssm_parameter.datadog_token.value
+
+    format = templatefile("${path.module}/fastly-log-format.tftpl", {
+      service_name = local.datadog_webapp_service
+      dd_app       = local.datadog_app
+      dd_env       = var.env
+    })
   }
 
   # Forward relevant headers to the origin

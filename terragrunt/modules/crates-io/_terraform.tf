@@ -27,6 +27,7 @@ data "terraform_remote_state" "shared" {
 
 locals {
   inventories_bucket_arn = data.terraform_remote_state.shared.outputs.inventories_bucket_arn
+  datadog_app            = "crates-io"
 }
 
 variable "webapp_domain_name" {
