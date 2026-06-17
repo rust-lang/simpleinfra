@@ -1,6 +1,9 @@
 ---
 
 - include_tasks: apt.yml
+- include_tasks: ubuntu-pro.yml
+  when:
+    - ansible_distribution | default("") == "Ubuntu"
 - include_tasks: kernel.yml
 - include_tasks: users.yml
 - include_tasks: ssh.yml

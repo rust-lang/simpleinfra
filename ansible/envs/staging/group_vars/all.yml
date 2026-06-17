@@ -5,6 +5,8 @@ ssm_all: "{{ lookup('aws_ssm', '/staging/ansible/all/', region='us-west-1', shor
 
 vars_datadog_api_key: "{{ ssm_all['datadog-api-key'] }}"
 
+vars_ubuntu_pro_token: "{{ ssm_all['ubuntu-pro-token'] }}"
+
 # Do not log to Papertrail in the staging environment.
 vars_papertrail_url: null
 

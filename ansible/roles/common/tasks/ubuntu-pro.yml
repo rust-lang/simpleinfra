@@ -1,0 +1,69 @@
+---
+
+- name: ensure Ubuntu Pro token is configured
+  assert:
+    that:
+      - ubuntu_pro_token | default("", true) | trim | length > 0
+    fail_msg: >-
+      ubuntu_pro_token must be configured for Ubuntu host {{ inventory_hostname }}.
+
+- name: check Ubuntu Pro attachment status
+  command:
+    argv:
+      - pro
+      - status
+      - --format
+      - json
+  register: ubuntu_pro_status
+  changed_when: false
+  check_mode: false
+  no_log: true
+
+- name: record Ubuntu Pro attachment status
+  set_fact:
+    ubuntu_pro_is_attached: >-
+      {{ ((ubuntu_pro_status.stdout | from_json).attached | default(false)) | bool }}
+  no_log: true
+
+- name: attach Ubuntu Pro subscription
+  when:
+    - not ansible_check_mode
+    - not ubuntu_pro_is_attached
+  no_log: true
+  block:
+    # Keep the token out of the process arguments: `pro attach <token>` can be
+    # exposed through process listings while the command is running.
+    # Instead, write the token to a temporary config file.
+    # Writing to a file should be allowed to users with sudo permission.
+    - name: write temporary Ubuntu Pro attach config
+      copy:
+        dest: /root/.ubuntu-pro-attach.yml
+        content: "token: {{ ubuntu_pro_token | trim | to_json }}\n"
+        owner: root
+        group: root
+        mode: "0600"
+
+    - name: attach Ubuntu Pro subscription
+      command:
+        argv:
+          - pro
+          - attach
+          - --attach-config
+          - /root/.ubuntu-pro-attach.yml
+      register: ubuntu_pro_attach
+      changed_when: ubuntu_pro_attach.rc == 0
+      failed_when: ubuntu_pro_attach.rc not in [0, 2]
+  always:
+    - name: remove temporary Ubuntu Pro attach config
+      file:
+        path: /root/.ubuntu-pro-attach.yml
+        state: absent
+
+# `pro attach` can enable Ubuntu Pro apt sources such as ESM. Refresh the
+# package index so later apt tasks see the newly available repositories.
+- name: update apt cache after Ubuntu Pro attachment
+  apt:
+    update_cache: true
+  when:
+    - ubuntu_pro_attach is defined
+    - ubuntu_pro_attach is changed
