@@ -1,0 +1,32 @@
+---
+
+- name: query Ubuntu Pro status
+  command:
+    argv:
+      - pro
+      - status
+      - --format
+      - json
+  register: ubuntu_pro_status
+  changed_when: false
+  check_mode: false
+  no_log: true
+
+- name: record current Ubuntu Pro status
+  set_fact:
+    ubuntu_pro_current_status: "{{ ubuntu_pro_status.stdout | from_json }}"
+  no_log: true
+
+- name: record current Ubuntu Pro attachment and livepatch status
+  set_fact:
+    ubuntu_pro_is_attached: >-
+      {{ (ubuntu_pro_current_status.attached | default(false)) | bool }}
+    ubuntu_pro_livepatch_status: >-
+      {{
+        ubuntu_pro_current_status.services | default([])
+        | selectattr("name", "equalto", "livepatch")
+        | map(attribute="status")
+        | first
+        | default("unknown", true)
+      }}
+  no_log: true

@@ -7,23 +7,8 @@
     fail_msg: >-
       ubuntu_pro_token must be configured for Ubuntu host {{ inventory_hostname }}.
 
-- name: check Ubuntu Pro attachment status
-  command:
-    argv:
-      - pro
-      - status
-      - --format
-      - json
-  register: ubuntu_pro_status
-  changed_when: false
-  check_mode: false
-  no_log: true
-
-- name: record Ubuntu Pro attachment status
-  set_fact:
-    ubuntu_pro_is_attached: >-
-      {{ ((ubuntu_pro_status.stdout | from_json).attached | default(false)) | bool }}
-  no_log: true
+- name: check Ubuntu Pro status
+  include_tasks: ubuntu-pro-status.yml
 
 - name: attach Ubuntu Pro subscription
   when:
@@ -67,3 +52,21 @@
   when:
     - ubuntu_pro_attach is defined
     - ubuntu_pro_attach is changed
+
+- name: refresh Ubuntu Pro status after attachment
+  include_tasks: ubuntu-pro-status.yml
+  when:
+    - ubuntu_pro_attach is defined
+    - ubuntu_pro_attach is changed
+
+- name: warn when Ubuntu Pro livepatch is not enabled
+  debug:
+    msg: >-
+      WARNING: Ubuntu Pro livepatch is {{ ubuntu_pro_livepatch_status }} on
+      {{ inventory_hostname }}. Run `pro status` to troubleshoot.
+      If you need to update the kernel, run `sudo apt update && sudo apt full-upgrade`,
+      restart the machine, and check
+      `pro status` again to confirm livepatch is enabled.
+  when:
+    - ubuntu_pro_is_attached
+    - ubuntu_pro_livepatch_status != "enabled"
