@@ -7,3 +7,4 @@ collect_metrics_from: []
 avoid_removing_docker_users: []
 papertrail_url: null
 allow_ssh_extra_groups: ""
+ubuntu_pro_token: "{{ vars_ubuntu_pro_token }}"

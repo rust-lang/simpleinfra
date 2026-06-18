@@ -11,6 +11,7 @@ Currently it does these things:
 * Remove the default `ubuntu` user
 * Configure backup manifests
 * Setup [Prometheus]'s [node-exporter] to expose system metrics
+* Attach Ubuntu hosts to Ubuntu Pro
 
 [Prometheus]: https://prometheus.io
 [node-exporter]: https://github.com/prometheus/node_exporter
@@ -57,6 +58,11 @@ want to preserve.
   # Papertrail logs collection URL. [optional]
   # If the URL is missing logs will not be shipped to Papertrail.
   papertrail_url: logsN.papertrailapp.com:NNNNN
+
+  # Ubuntu Pro token used to attach Ubuntu hosts. [required for Ubuntu hosts]
+  # Production and staging load this from the `ubuntu-pro-token` SSM key under
+  # their `/ansible/all/` path.
+  ubuntu_pro_token: "{{ vars_ubuntu_pro_token }}"
 ```
 
 ## Unattended Upgrades

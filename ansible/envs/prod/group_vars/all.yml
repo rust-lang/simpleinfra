@@ -7,4 +7,6 @@ vars_datadog_api_key: "{{ ssm_all['datadog-api-key'] }}"
 
 vars_papertrail_url: "{{ ssm_all['papertrail-url'] }}"
 
+vars_ubuntu_pro_token: "{{ ssm_all['ubuntu-pro-token'] }}"
+
 vars_letsencrypt_dummy_certs: false
