@@ -1,10 +1,6 @@
 resource "aws_s3_bucket" "static" {
   bucket = var.static_bucket_name
 
-  versioning {
-    enabled = true
-  }
-
   // Allow the crates.io frontend to fetch the READMEs from JavaScript.
   cors_rule {
     allowed_methods = ["GET"]
@@ -47,6 +43,13 @@ resource "aws_s3_bucket" "static" {
     ignore_changes = [
       replication_configuration,
     ]
+  }
+}
+
+resource "aws_s3_bucket_versioning" "static" {
+  bucket = aws_s3_bucket.static.bucket
+  versioning_configuration {
+    status = "Enabled"
   }
 }
 
@@ -130,9 +133,12 @@ resource "aws_s3_bucket" "fallback" {
   provider = aws.eu-west-1
 
   bucket = "${var.static_bucket_name}-fallback"
+}
 
-  versioning {
-    enabled = true
+resource "aws_s3_bucket_versioning" "fallback" {
+  bucket = aws_s3_bucket.fallback.bucket
+  versioning_configuration {
+    status = "Enabled"
   }
 }
 
