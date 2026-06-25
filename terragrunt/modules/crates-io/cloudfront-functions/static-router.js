@@ -5,7 +5,7 @@ function handler(event) {
     // URL-encode the `+` character in the request URI
     // See more: https://github.com/rust-lang/crates.io/issues/4891
     if (request.uri.includes("+")) {
-        request.uri = request.uri.replace("+", "%2B");
+        request.uri = request.uri.replace(/\+/g, "%2B");
     } else if (request.uri === versionDownloads) {
         request.uri += 'index.html';
         return request;
