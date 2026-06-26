@@ -16,9 +16,9 @@ debug = 1
 
 [dependencies]
 derive_builder = "0.12.0"
-fastly = "0.9.1"
+fastly = "0.13.0"
 log = "0.4.17"
-log-fastly = "0.9.1"
+log-fastly = "0.13.0"
 once_cell = "1.18.0"
 regex = "1.7.1"
 serde = { version = "1.0.152", features = ["derive"] }

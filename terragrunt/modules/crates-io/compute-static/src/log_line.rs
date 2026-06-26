@@ -46,6 +46,6 @@ pub struct HttpDetails {
 
 #[derive(Clone, Debug, Builder, Serialize)]
 pub struct TlsDetails {
-    cipher: Option<&'static str>,
-    protocol: Option<&'static str>,
+    cipher: Option<String>,
+    protocol: Option<String>,
 }

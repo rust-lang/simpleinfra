@@ -80,9 +80,21 @@ fn collect_request(config: &Config, request: &Request) -> LogLineV1Builder {
         .build()
         .ok();
 
+    let cipher = request
+        .get_tls_cipher_openssl_name()
+        .ok()
+        .flatten()
+        .map(|s| s.to_string());
+
+    let protocol = request
+        .get_tls_protocol()
+        .ok()
+        .flatten()
+        .map(|s| s.to_string());
+
     let tls_details = TlsDetailsBuilder::default()
-        .cipher(request.get_tls_cipher_openssl_name())
-        .protocol(request.get_tls_protocol())
+        .cipher(cipher)
+        .protocol(protocol)
         .build()
         .ok();
 
@@ -175,7 +187,7 @@ fn set_ttl(config: &Config, request: &mut Request) {
 ///
 /// See more: https://github.com/rust-lang/crates.io/issues/4891
 fn rewrite_urls_with_plus_character(request: &mut Request) {
-    let url = request.get_url_mut();
+    let mut url = request.get_url_mut();
     let path = url.path();
 
     if path.contains('+') {
@@ -188,7 +200,7 @@ fn rewrite_urls_with_plus_character(request: &mut Request) {
 ///
 /// In this way, users can see what files are available for download.
 fn rewrite_version_downloads_urls(request: &mut Request) {
-    let url = request.get_url_mut();
+    let mut url = request.get_url_mut();
     let path = url.path();
 
     if path == VERSION_DOWNLOADS {
@@ -208,7 +220,7 @@ fn rewrite_download_urls(request: &mut Request) {
         Regex::new(r"^/crates/(?P<crate>[^/]+)/(?P<version>[^/]+)/download$").unwrap()
     });
 
-    let url = request.get_url_mut();
+    let mut url = request.get_url_mut();
     let path = url.path();
 
     if let Some(captures) = RE.captures(path) {
