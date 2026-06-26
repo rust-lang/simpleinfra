@@ -78,9 +78,21 @@ fn collect_request(config: &Config, request: &Request) -> LogLineV1Builder {
         .build()
         .ok();
 
+    let cipher = request
+        .get_tls_cipher_openssl_name()
+        .ok()
+        .flatten()
+        .map(|s| s.to_string());
+
+    let protocol = request
+        .get_tls_protocol()
+        .ok()
+        .flatten()
+        .map(|s| s.to_string());
+
     let tls_details = TlsDetailsBuilder::default()
-        .cipher(request.get_tls_cipher_openssl_name())
-        .protocol(request.get_tls_protocol())
+        .cipher(cipher)
+        .protocol(protocol)
         .build()
         .ok();
 

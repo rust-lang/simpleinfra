@@ -16,9 +16,9 @@ debug = 1
 
 [dependencies]
 derive_builder = "0.12.0"
-fastly = "0.11.13"
+fastly = "0.12.1"
 log = "0.4.17"
-log-fastly = "0.11.13"
+log-fastly = "0.12.1"
 serde = { version = "1.0.152", features = ["derive"] }
 serde_json = "1.0.92"
 time = { version = "0.3.17", features = ["serde-human-readable"] }
