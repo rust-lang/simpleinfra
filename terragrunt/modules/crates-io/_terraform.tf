@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source                = "hashicorp/aws"
-      version               = "~> 5.64"
+      version               = "~> 6.0"
       configuration_aliases = [aws.us-east-1, aws.eu-west-1]
     }
     fastly = {

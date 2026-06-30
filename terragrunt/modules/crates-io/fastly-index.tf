@@ -64,7 +64,7 @@ resource "fastly_service_vcl" "index" {
       set var.awsAccessKey = "${aws_iam_access_key.fastly_s3_index_reader.id}";
       set var.awsSecretKey = "${aws_iam_access_key.fastly_s3_index_reader.secret}";
       set var.awsS3Bucket = "${aws_s3_bucket.index.bucket}";
-      set var.awsRegion = "${aws_s3_bucket.index.region}";
+      set var.awsRegion = "${aws_s3_bucket.index.bucket_region}";
       set var.awsS3Host = var.awsS3Bucket ".s3." var.awsRegion ".amazonaws.com";
 
       if (req.method == "GET" && !req.backend.is_shield) {

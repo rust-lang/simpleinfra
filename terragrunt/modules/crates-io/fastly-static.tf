@@ -1,8 +1,8 @@
 locals {
   fastly_domain_name = "fastly-${var.static_domain_name}"
 
-  primary_host_name  = aws_s3_bucket.static.region
-  fallback_host_name = aws_s3_bucket.fallback.region
+  primary_host_name  = aws_s3_bucket.static.bucket_region
+  fallback_host_name = aws_s3_bucket.fallback.bucket_region
 
   dictionary_name = "compute_static"
 
