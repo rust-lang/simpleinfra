@@ -1,0 +1,6 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["github>rust-lang/renovate"],
+   // Require manual approval from the Dependency Dashboard before opening PRs
+  "dependencyDashboardApproval": true,
+}
