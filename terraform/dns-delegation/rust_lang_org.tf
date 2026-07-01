@@ -14,3 +14,21 @@ resource "aws_route53_record" "content" {
     "ns-1408.awsdns-48.org.",
   ]
 }
+
+# Plumbing subdomain used to enable email routing to
+# Google mail servers, at least while MX records
+# for rust-lang.org point to mailgun servers
+resource "aws_route53_record" "gws_mx_records" {
+  zone_id = data.aws_route53_zone.rust_lang_org.zone_id
+  name    = "mail.rust-lang.org"
+  type    = "MX"
+  ttl     = 3600
+
+  records = [
+    "1 aspmx.l.google.com",
+    "5 alt1.aspmx.l.google.com",
+    "5 alt2.aspmx.l.google.com",
+    "10 alt3.aspmx.l.google.com",
+    "10 alt4.aspmx.l.google.com",
+  ]
+}
