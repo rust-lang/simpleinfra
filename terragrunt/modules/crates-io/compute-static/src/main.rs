@@ -18,6 +18,7 @@ mod log_line;
 const DATADOG_APP: &str = "crates.io";
 const DATADOG_SERVICE: &str = "static.crates.io";
 const VERSION_DOWNLOADS: &str = "/archive/version-downloads/";
+const VERSION_DOWNLOADS_INDEX: &str = "/archive/version-downloads/index.html";
 
 #[fastly::main]
 fn main(request: Request) -> Result<Response, Error> {
@@ -125,9 +126,10 @@ fn handle_request(config: &Config, mut request: Request) -> Result<Response, Err
     rewrite_version_downloads_urls(&mut request);
 
     // Database dump is too big to cache on Fastly
-    if request.get_url_str().ends_with("db-dump.tar.gz") {
+    let url = request.get_url_str();
+    if url.ends_with("db-dump.tar.gz") {
         redirect_to_cloudfront(config, "db-dump.tar.gz")
-    } else if request.get_url_str().ends_with("db-dump.zip") {
+    } else if url.ends_with("db-dump.zip") {
         redirect_to_cloudfront(config, "db-dump.zip")
     } else {
         send_request_to_s3(config, &request)
@@ -192,8 +194,7 @@ fn rewrite_version_downloads_urls(request: &mut Request) {
     let path = url.path();
 
     if path == VERSION_DOWNLOADS {
-        let new_path = format!("{path}index.html");
-        url.set_path(&new_path);
+        url.set_path(VERSION_DOWNLOADS_INDEX);
     }
 }
 
