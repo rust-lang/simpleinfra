@@ -3,8 +3,6 @@ use fastly::http::{header, Method, StatusCode, Version};
 use fastly::{Error, Request, Response};
 use log::{info, warn, LevelFilter};
 use log_fastly::Logger;
-use once_cell::sync::Lazy;
-use regex::Regex;
 use serde_json::json;
 use std::env::var;
 use time::OffsetDateTime;
@@ -205,16 +203,26 @@ fn rewrite_version_downloads_urls(request: &mut Request) {
 /// of the index, so we need to rewrite the download URL to point to the
 /// crate file instead.
 fn rewrite_download_urls(request: &mut Request) {
-    static RE: Lazy<Regex> = Lazy::new(|| {
-        Regex::new(r"^/crates/(?P<crate>[^/]+)/(?P<version>[^/]+)/download$").unwrap()
-    });
-
     let url = request.get_url_mut();
     let path = url.path();
 
-    if let Some(captures) = RE.captures(path) {
-        let krate = captures.name("crate").unwrap().as_str();
-        let version = captures.name("version").unwrap().as_str();
+    if let Some(crates_path) = path.strip_prefix("/crates/") {
+        // crates_path = "{crate}/{version}/download"
+        let Some((krate, rest)) = crates_path.split_once('/') else {
+            return;
+        };
+
+        // krate = "{crate}"
+        // rest = "{version}/download"
+        let Some(version) = rest.strip_suffix("/download") else {
+            return;
+        };
+
+        // version = "{version}"
+        if krate.is_empty() || version.is_empty() || version.contains('/') {
+            return;
+        }
+
         let new_path = format!("/crates/{krate}/{krate}-{version}.crate");
         url.set_path(&new_path);
     }
@@ -340,6 +348,18 @@ mod tests {
         test(
             "https://static.crates.io/crates/serde/1.0.0-alpha.1+foo-bar/download",
             "https://static.crates.io/crates/serde/serde-1.0.0-alpha.1+foo-bar.crate",
+        );
+        test(
+            "https://static.crates.io/crates/serde//download",
+            "https://static.crates.io/crates/serde//download",
+        );
+        test(
+            "https://static.crates.io/crates/serde/1.0.0/download/extra",
+            "https://static.crates.io/crates/serde/1.0.0/download/extra",
+        );
+        test(
+            "https://static.crates.io/crates/serde/1.0.0/extra/download",
+            "https://static.crates.io/crates/serde/1.0.0/extra/download",
         );
     }
 }
