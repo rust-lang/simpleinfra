@@ -23,6 +23,14 @@ jobs:
       - name: Run clippy
         run: cargo clippy --all -- -Dwarnings
 
+      - name: Test compute-static Rust components
+        working-directory: terragrunt/modules/crates-io/compute-static
+        run: |
+          rustup target add wasm32-wasip1 && rustup component add clippy rustfmt
+          cargo fmt --all -- --check
+          cargo test --target "$(rustc -vV | sed -n 's/^host: //p')"
+          cargo clippy --workspace --all-targets -- -Dwarnings
+
   terraform:
     name: Terraform configuration
     runs-on: ubuntu-24.04
