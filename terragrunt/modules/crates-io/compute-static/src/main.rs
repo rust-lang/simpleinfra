@@ -3,7 +3,6 @@ use fastly::http::{header, Method, StatusCode, Version};
 use fastly::{Error, Request, Response};
 use log::{info, warn, LevelFilter};
 use log_fastly::Logger;
-use serde_json::json;
 use std::env::var;
 use time::OffsetDateTime;
 
@@ -294,15 +293,15 @@ fn build_and_send_log(log_line: LogLineV1Builder, config: &Config) {
     match log_line.build() {
         Ok(log) => {
             let versioned_log = LogLine::V1(log);
+            let serialized_log =
+                serde_json::to_string(&versioned_log).expect("failed to serialize request log");
 
-            [
-                &config.datadog_request_logs_endpoint,
-                &config.s3_request_logs_endpoint,
-            ]
-            .iter()
-            .for_each(|endpoint| {
-                info!(target: endpoint, "{}", json!(versioned_log).to_string());
-            });
+            for endpoint in [
+                config.datadog_request_logs_endpoint.as_str(),
+                config.s3_request_logs_endpoint.as_str(),
+            ] {
+                info!(target: endpoint, "{serialized_log}");
+            }
         }
         Err(error) => {
             warn!("failed to serialize request log: {error}");
