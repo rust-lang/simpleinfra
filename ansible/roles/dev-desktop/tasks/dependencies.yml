@@ -58,7 +58,7 @@
       - emacs
       - flex # Allows running `x build gcc`
       - lld
-      - lldb
+      - lldb-20
       - m4
       - mold
       - gdb
