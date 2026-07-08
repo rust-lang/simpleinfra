@@ -30,6 +30,14 @@ resource "aws_cloudfront_distribution" "static" {
     ssl_support_method  = "sni-only"
   }
 
+  // At cache-fill time, CloudFront reads the comma-separated cache tags from
+  // the S3 object metadata and indexes the cached object against them. This
+  // enables tag-based invalidations (e.g. `#crate:serde`) in addition to
+  // path-based ones.
+  cache_tag_config {
+    header_name = "x-amz-meta-cache-tags"
+  }
+
   default_cache_behavior {
     target_origin_id       = "main-with-fallback"
     allowed_methods        = ["GET", "HEAD"]
