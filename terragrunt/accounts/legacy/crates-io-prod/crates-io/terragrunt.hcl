@@ -9,6 +9,10 @@ include {
   merge_strategy = "deep"
 }
 
+dependency "docs_rs_event_queue" {
+  config_path = "../../../crates-io-prod/docs-rs-event-queue"
+}
+
 inputs = {
   env = "prod"
 
@@ -17,8 +21,8 @@ inputs = {
   index_domain_name  = "index.crates.io"
   dns_apex           = true
 
-  static_bucket_name     = "crates-io"
-  index_bucket_name      = "crates-io-index"
+  static_bucket_name = "crates-io"
+  index_bucket_name  = "crates-io-index"
 
   static_ttl = 31536000 // 1 year
 
@@ -29,13 +33,17 @@ inputs = {
   strict_security_headers = true
 
   static_cloudfront_weight = 0
-  static_fastly_weight = 255
+  static_fastly_weight     = 255
 
   index_cloudfront_weight = 1
-  index_fastly_weight = 255
+  index_fastly_weight     = 255
 
   webapp_cloudfront_weight = 50
-  webapp_fastly_weight = 50
+  webapp_fastly_weight     = 50
 
   cdn_log_event_queue_arn = "arn:aws:sqs:us-west-1:365596307002:cdn-log-event-queue"
+
+  docs_rs_event_queue_arn  = dependency.docs_rs_event_queue.outputs.queue_arn
+  docs_rs_event_queue_name = dependency.docs_rs_event_queue.outputs.queue_name
+  docs_rs_event_queue_url  = dependency.docs_rs_event_queue.outputs.queue_url
 }

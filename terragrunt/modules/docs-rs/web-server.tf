@@ -18,14 +18,17 @@ module "web" {
   platform_version     = "1.4.0"
   ephemeral_storage_gb = 40
 
-  environment = {
-    DOCSRS_PREFIX          = "/tmp"
-    DOCSRS_STORAGE_BACKEND = "s3"
-    DOCSRS_LOG             = "docs_rs=debug,rustwide=info"
-    RUST_BACKTRACE         = "1"
-    S3_REGION              = "us-east-1"
-    DOCSRS_S3_BUCKET       = "${aws_s3_bucket.storage.id}"
-  }
+  environment = merge(
+    {
+      DOCSRS_PREFIX          = "/tmp"
+      DOCSRS_STORAGE_BACKEND = "s3"
+      DOCSRS_LOG             = "docs_rs=debug,rustwide=info"
+      RUST_BACKTRACE         = "1"
+      S3_REGION              = "us-east-1"
+      DOCSRS_S3_BUCKET       = aws_s3_bucket.storage.id
+    },
+    local.crates_io_event_queue_environment,
+  )
 
   secrets = {
     DOCSRS_GITHUB_ACCESSTOKEN = "/docs-rs/github-access-token"

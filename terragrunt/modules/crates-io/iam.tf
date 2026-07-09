@@ -96,6 +96,36 @@ resource "aws_iam_user_policy_attachment" "heroku_cdn_logs_read" {
   policy_arn = aws_iam_policy.cdn_logs_read.arn
 }
 
+resource "aws_iam_policy" "docs_rs_event_queue_write" {
+  count = var.docs_rs_event_queue_arn == null ? 0 : 1
+
+  name        = "${var.iam_prefix}--docs-rs-event-queue-write"
+  description = "Write access to the SQS queue used to notify docs.rs about registry changes"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "DocsRsEventQueueWrite"
+        Effect = "Allow"
+        Action = [
+          "sqs:SendMessage",
+          "sqs:GetQueueAttributes",
+          "sqs:GetQueueUrl",
+        ]
+        Resource = var.docs_rs_event_queue_arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_user_policy_attachment" "heroku_docs_rs_event_queue_write" {
+  count = var.docs_rs_event_queue_arn == null ? 0 : 1
+
+  user       = aws_iam_user.heroku.name
+  policy_arn = aws_iam_policy.docs_rs_event_queue_write[0].arn
+}
+
 resource "aws_iam_role" "s3_replication" {
   name = "${var.iam_prefix}--s3-replication"
 

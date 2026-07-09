@@ -114,6 +114,30 @@ variable "cdn_log_event_queue_arn" {
   type        = string
 }
 
+variable "docs_rs_event_queue_arn" {
+  # See the `crates-io/docs-rs-event-queue` module
+  description = "ARN of the SQS queue used to notify docs.rs about registry changes"
+  type        = string
+  default     = null
+  nullable    = true
+}
+
+variable "docs_rs_event_queue_name" {
+  # See the `crates-io/docs-rs-event-queue` module
+  description = "Name of the SQS queue used to notify docs.rs about registry changes"
+  type        = string
+  default     = null
+  nullable    = true
+}
+
+variable "docs_rs_event_queue_url" {
+  # See the `crates-io/docs-rs-event-queue` module
+  description = "URL of the SQS queue used to notify docs.rs about registry changes"
+  type        = string
+  default     = null
+  nullable    = true
+}
+
 variable "env" {
   type = string
   validation {

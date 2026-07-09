@@ -71,6 +71,27 @@ variable "s3_crr_enabled" {
   default     = false
 }
 
+variable "crates_io_event_queue_arn" {
+  type        = string
+  description = "ARN of the SQS queue used by crates.io to notify docs.rs about registry changes."
+  default     = null
+  nullable    = true
+}
+
+variable "crates_io_event_queue_name" {
+  type        = string
+  description = "Name of the SQS queue used by crates.io to notify docs.rs about registry changes."
+  default     = null
+  nullable    = true
+}
+
+variable "crates_io_event_queue_url" {
+  type        = string
+  description = "URL of the SQS queue used by crates.io to notify docs.rs about registry changes."
+  default     = null
+  nullable    = true
+}
+
 variable "db_instance_class" {
   type        = string
   description = "The RDS instance class for the docs-rs database"

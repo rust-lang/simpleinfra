@@ -19,6 +19,10 @@ dependency "cluster" {
   config_path = "../ecs-cluster"
 }
 
+dependency "crates_io_event_queue" {
+  config_path = "../../crates-io-prod/docs-rs-event-queue"
+}
+
 inputs = {
   zone_id                   = dependency.dns_zone.outputs.id
   cluster_config            = dependency.cluster.outputs.config
@@ -30,6 +34,10 @@ inputs = {
   builder_volume_iops       = 8000
   builder_volume_throughput = 500
   db_instance_class         = "db.m6i.large" # 2 vCPUs. 8 GiB RAM.
+
+  crates_io_event_queue_arn  = dependency.crates_io_event_queue.outputs.queue_arn
+  crates_io_event_queue_name = dependency.crates_io_event_queue.outputs.queue_name
+  crates_io_event_queue_url  = dependency.crates_io_event_queue.outputs.queue_url
 
   # One-time ~10TB migration from the legacy bucket managed in terraform/docs-rs.
   s3_migration_enabled            = true
