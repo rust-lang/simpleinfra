@@ -11,6 +11,19 @@ resource "aws_cloudfront_function" "static_router" {
   code    = file("${path.module}/cloudfront-functions/static-router.js")
 }
 
+resource "aws_cloudfront_response_headers_policy" "static" {
+  name = "${replace(var.static_domain_name, ".", "-")}--static"
+
+  // CloudFront reads the cache tags from the origin response at cache-fill time
+  // (see `cache_tag_config` below) and then forwards the header to viewers by
+  // default. Strip it here so the tags stay an origin-internal detail.
+  remove_headers_config {
+    items {
+      header = "x-amz-meta-cache-tags"
+    }
+  }
+}
+
 resource "aws_cloudfront_distribution" "static" {
   comment = var.static_domain_name
 
@@ -39,11 +52,12 @@ resource "aws_cloudfront_distribution" "static" {
   }
 
   default_cache_behavior {
-    target_origin_id       = "main-with-fallback"
-    allowed_methods        = ["GET", "HEAD"]
-    cached_methods         = ["GET", "HEAD"]
-    compress               = true
-    viewer_protocol_policy = "redirect-to-https"
+    target_origin_id           = "main-with-fallback"
+    allowed_methods            = ["GET", "HEAD"]
+    cached_methods             = ["GET", "HEAD"]
+    compress                   = true
+    viewer_protocol_policy     = "redirect-to-https"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.static.id
 
     default_ttl = var.static_ttl
 
