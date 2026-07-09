@@ -130,6 +130,7 @@ fn handle_request(config: &Config, mut request: Request) -> Result<Response, Err
     }
 
     set_ttl(config, &mut request);
+    set_surrogate_keys(&mut request);
     rewrite_urls_with_plus_character(&mut request);
     rewrite_download_urls(&mut request);
     rewrite_version_downloads_urls(&mut request);
@@ -175,6 +176,30 @@ fn limit_http_methods(request: &Request) -> Option<Response> {
 /// of time.
 fn set_ttl(config: &Config, request: &mut Request) {
     request.set_ttl(config.static_ttl);
+}
+
+/// Set the surrogate keys
+///
+/// The crates.io backend attaches a comma-separated list of cache tags (e.g.
+/// `crate:serde,release:serde@1.0.0`) to the S3 objects as `cache-tags` metadata, which S3
+/// surfaces as the `x-amz-meta-cache-tags` response header. A callback is registered to read the
+/// header before the response is cached and translate it into surrogate keys, so that e.g. all
+/// cached files of a crate can be purged with a single request. The header is removed from the
+/// response in the process, since it is an origin-internal detail.
+fn set_surrogate_keys(request: &mut Request) {
+    request.set_after_send(|candidate| {
+        if candidate.get_status().is_success() {
+            if let Some(tags) = candidate.remove_header_str("x-amz-meta-cache-tags") {
+                candidate.set_surrogate_keys(parse_cache_tags(&tags));
+            }
+        }
+        Ok(())
+    });
+}
+
+/// Split a comma-separated `cache-tags` metadata value into individual cache tags
+fn parse_cache_tags(tags: &str) -> impl Iterator<Item = &str> {
+    tags.split(',').map(str::trim).filter(|tag| !tag.is_empty())
 }
 
 /// Rewrite URLs with a plus character
@@ -335,6 +360,25 @@ fn http_version_to_string(version: Version) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_parse_cache_tags() {
+        fn test(input: &str, expected: &[&str]) {
+            assert_eq!(parse_cache_tags(input).collect::<Vec<_>>(), expected);
+        }
+
+        test(
+            "crate:serde,release:serde@1.0.0",
+            &["crate:serde", "release:serde@1.0.0"],
+        );
+        test("crate:serde", &["crate:serde"]);
+        test(
+            " crate:serde , release:serde@1.0.0 ",
+            &["crate:serde", "release:serde@1.0.0"],
+        );
+        test("", &[]);
+        test(" , ", &[]);
+    }
 
     #[test]
     fn test_rewrite_download_urls() {
