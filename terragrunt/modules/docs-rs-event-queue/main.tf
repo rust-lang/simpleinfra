@@ -69,3 +69,35 @@ resource "aws_iam_user_policy" "producer" {
   user     = data.aws_iam_user.producer.user_name
   policy   = data.aws_iam_policy_document.producer.json
 }
+
+data "aws_iam_policy_document" "consumer" {
+  count    = length(var.consumer_principal_arns) > 0 ? 1 : 0
+  provider = aws.us-east-1
+
+  statement {
+    sid    = "ConsumeCratesIoIndexEvents"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = var.consumer_principal_arns
+    }
+
+    actions = [
+      "sqs:ChangeMessageVisibility",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:ReceiveMessage",
+      "sqs:GetQueueUrl",
+    ]
+    resources = [aws_sqs_queue.index_changes.arn]
+  }
+}
+
+resource "aws_sqs_queue_policy" "consumer" {
+  count    = length(var.consumer_principal_arns) > 0 ? 1 : 0
+  provider = aws.us-east-1
+
+  queue_url = aws_sqs_queue.index_changes.url
+  policy    = data.aws_iam_policy_document.consumer[0].json
+}
