@@ -29,6 +29,12 @@ resource "fastly_service_vcl" "webapp" {
 
   product_enablement {
     brotli_compression = true
+
+    ddos_protection {
+      enabled = true
+      mode    = "block"
+    }
+
     # Next generation WAF
     ngwaf {
       enabled      = true
