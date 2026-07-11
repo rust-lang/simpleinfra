@@ -66,3 +66,13 @@ resource "aws_organizations_account" "content_prod" {
   name  = "content-prod"
   email = "admin+content-prod@rust-lang.org"
 }
+
+resource "aws_organizations_account" "promote_release_staging" {
+  name  = "promote-release-staging"
+  email = "admin+promote-release-staging@rust-lang.org"
+}
+
+resource "aws_organizations_account" "promote_release_prod" {
+  name  = "promote-release-prod"
+  email = "admin+promote-release-prod@rust-lang.org"
+}

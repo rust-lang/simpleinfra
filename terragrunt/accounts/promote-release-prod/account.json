@@ -1,0 +1,10 @@
+{
+    "aws": {
+        "profile": "promote-release-prod",
+        "regions": [
+            {
+                "region": "us-east-2"
+            }
+        ]
+    }
+}

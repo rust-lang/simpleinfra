@@ -1,0 +1,10 @@
+{
+    "aws": {
+        "profile": "promote-release-staging",
+        "regions": [
+            {
+                "region": "us-east-2"
+            }
+        ]
+    }
+}
