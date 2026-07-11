@@ -102,17 +102,17 @@ resource "fastly_ngwaf_workspace_rule" "webapp_per_ip_rate_limit" {
     response_code = 429
   }
 
-  # If an IP sends 600 req in 10 minutes, block them for 5 minutes.
+  # If an IP sends 60 req in 1 minute, block them for 1 hour.
   rate_limit {
     signal = fastly_ngwaf_workspace_signal.webapp_rate_limit.reference_id
     # Maximum number of requests within the evaluation window before the rate limit is triggered.
-    threshold = 600
+    threshold = 60
     # Rate limit evaluation window in seconds.
     # Fastly NGWAF only supports rate-limit windows of 1 or 10 minutes.
-    # 10 minutes.
-    interval = 600
-    # How long the rate limit is enforced (in seconds). 5 minutes.
-    duration = 300
+    # 1 minutes.
+    interval = 60
+    # How long the rate limit is enforced (in seconds). 1 hour.
+    duration = 60 * 60
 
     client_identifiers {
       type = "ip"
