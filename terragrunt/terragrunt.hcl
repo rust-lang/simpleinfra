@@ -15,6 +15,7 @@ remote_state {
     profile        = local.cmd.remote_state_profile
     bucket         = local.cmd.remote_state_bucket
     dynamodb_table = local.cmd.remote_state_dynamodb_table
+    use_lockfile = true
     region         = local.cmd.remote_state_region
     key            = local.cmd.remote_state_key
   }
