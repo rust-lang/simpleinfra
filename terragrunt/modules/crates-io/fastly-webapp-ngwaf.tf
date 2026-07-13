@@ -119,3 +119,43 @@ resource "fastly_ngwaf_workspace_rule" "webapp_per_ip_rate_limit" {
     }
   }
 }
+
+resource "fastly_ngwaf_workspace_signal" "webapp_summary_request" {
+  workspace_id = fastly_ngwaf_workspace.webapp.id
+  name         = "summary request"
+  description  = "Requests to /api/v1/summary"
+}
+
+resource "fastly_ngwaf_workspace_rule" "webapp_summary_rate_limit" {
+  workspace_id = fastly_ngwaf_workspace.webapp.id
+  type         = "rate_limit"
+  description  = "Block heavy /api/v1/summary users for 15 min"
+  enabled      = true
+
+  group_operator = "all"
+  condition {
+    field    = "path"
+    operator = "equals"
+    value    = "/api/v1/summary"
+  }
+
+  action {
+    type   = "block_signal"
+    signal = fastly_ngwaf_workspace_signal.webapp_summary_request.reference_id
+  }
+
+  rate_limit {
+    signal    = fastly_ngwaf_workspace_signal.webapp_summary_request.reference_id
+    threshold = 10
+    # Rate limit evaluation window in seconds.
+    # Fastly NGWAF only supports rate-limit windows of 1 or 10 minutes.
+    # 1 minute.
+    interval  = 60
+    # 15 minutes
+    duration = 15 * 60
+
+    client_identifiers {
+      type = "ip"
+    }
+  }
+}
