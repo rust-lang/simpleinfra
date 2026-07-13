@@ -32,7 +32,7 @@ resource "aws_kms_key" "signing" {
         Action   = "kms:Sign"
         Resource = "*"
         Principal = {
-          AWS = "*"
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         },
         Condition = {
           Null = {
