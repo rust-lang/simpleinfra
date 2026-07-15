@@ -3,9 +3,6 @@ use fastly::http::{header, Method, StatusCode, Version};
 use fastly::{Error, Request, Response};
 use log::{info, warn, LevelFilter};
 use log_fastly::Logger;
-use once_cell::sync::Lazy;
-use regex::Regex;
-use serde_json::json;
 use std::env::var;
 use time::OffsetDateTime;
 
@@ -81,9 +78,21 @@ fn collect_request(config: &Config, request: &Request) -> LogLineV1Builder {
         .build()
         .ok();
 
+    let cipher = request
+        .get_tls_cipher_openssl_name()
+        .ok()
+        .flatten()
+        .map(|s| s.to_string());
+
+    let protocol = request
+        .get_tls_protocol()
+        .ok()
+        .flatten()
+        .map(|s| s.to_string());
+
     let tls_details = TlsDetailsBuilder::default()
-        .cipher(request.get_tls_cipher_openssl_name())
-        .protocol(request.get_tls_protocol())
+        .cipher(cipher)
+        .protocol(protocol)
         .build()
         .ok();
 
@@ -121,6 +130,7 @@ fn handle_request(config: &Config, mut request: Request) -> Result<Response, Err
     }
 
     set_ttl(config, &mut request);
+    set_surrogate_keys(&mut request);
     rewrite_urls_with_plus_character(&mut request);
     rewrite_download_urls(&mut request);
     rewrite_version_downloads_urls(&mut request);
@@ -168,6 +178,30 @@ fn set_ttl(config: &Config, request: &mut Request) {
     request.set_ttl(config.static_ttl);
 }
 
+/// Set the surrogate keys
+///
+/// The crates.io backend attaches a comma-separated list of cache tags (e.g.
+/// `crate:serde,release:serde@1.0.0`) to the S3 objects as `cache-tags` metadata, which S3
+/// surfaces as the `x-amz-meta-cache-tags` response header. A callback is registered to read the
+/// header before the response is cached and translate it into surrogate keys, so that e.g. all
+/// cached files of a crate can be purged with a single request. The header is removed from the
+/// response in the process, since it is an origin-internal detail.
+fn set_surrogate_keys(request: &mut Request) {
+    request.set_after_send(|candidate| {
+        if candidate.get_status().is_success() {
+            if let Some(tags) = candidate.remove_header_str("x-amz-meta-cache-tags") {
+                candidate.set_surrogate_keys(parse_cache_tags(&tags));
+            }
+        }
+        Ok(())
+    });
+}
+
+/// Split a comma-separated `cache-tags` metadata value into individual cache tags
+fn parse_cache_tags(tags: &str) -> impl Iterator<Item = &str> {
+    tags.split(',').map(str::trim).filter(|tag| !tag.is_empty())
+}
+
 /// Rewrite URLs with a plus character
 ///
 /// An issue was reported for crates.io where URLs that encoded the `+` character in a crate's
@@ -177,7 +211,7 @@ fn set_ttl(config: &Config, request: &mut Request) {
 ///
 /// See more: https://github.com/rust-lang/crates.io/issues/4891
 fn rewrite_urls_with_plus_character(request: &mut Request) {
-    let url = request.get_url_mut();
+    let mut url = request.get_url_mut();
     let path = url.path();
 
     if path.contains('+') {
@@ -190,7 +224,7 @@ fn rewrite_urls_with_plus_character(request: &mut Request) {
 ///
 /// In this way, users can see what files are available for download.
 fn rewrite_version_downloads_urls(request: &mut Request) {
-    let url = request.get_url_mut();
+    let mut url = request.get_url_mut();
     let path = url.path();
 
     if path == VERSION_DOWNLOADS {
@@ -205,16 +239,26 @@ fn rewrite_version_downloads_urls(request: &mut Request) {
 /// of the index, so we need to rewrite the download URL to point to the
 /// crate file instead.
 fn rewrite_download_urls(request: &mut Request) {
-    static RE: Lazy<Regex> = Lazy::new(|| {
-        Regex::new(r"^/crates/(?P<crate>[^/]+)/(?P<version>[^/]+)/download$").unwrap()
-    });
-
-    let url = request.get_url_mut();
+    let mut url = request.get_url_mut();
     let path = url.path();
 
-    if let Some(captures) = RE.captures(path) {
-        let krate = captures.name("crate").unwrap().as_str();
-        let version = captures.name("version").unwrap().as_str();
+    if let Some(crates_path) = path.strip_prefix("/crates/") {
+        // crates_path = "{crate}/{version}/download"
+        let Some((krate, rest)) = crates_path.split_once('/') else {
+            return;
+        };
+
+        // krate = "{crate}"
+        // rest = "{version}/download"
+        let Some(version) = rest.strip_suffix("/download") else {
+            return;
+        };
+
+        // version = "{version}"
+        if krate.is_empty() || version.is_empty() || version.contains('/') {
+            return;
+        }
+
         let new_path = format!("/crates/{krate}/{krate}-{version}.crate");
         url.set_path(&new_path);
     }
@@ -286,15 +330,15 @@ fn build_and_send_log(log_line: LogLineV1Builder, config: &Config) {
     match log_line.build() {
         Ok(log) => {
             let versioned_log = LogLine::V1(log);
+            let serialized_log =
+                serde_json::to_string(&versioned_log).expect("failed to serialize request log");
 
-            [
-                &config.datadog_request_logs_endpoint,
-                &config.s3_request_logs_endpoint,
-            ]
-            .iter()
-            .for_each(|endpoint| {
-                info!(target: endpoint, "{}", json!(versioned_log).to_string());
-            });
+            for endpoint in [
+                config.datadog_request_logs_endpoint.as_str(),
+                config.s3_request_logs_endpoint.as_str(),
+            ] {
+                info!(target: endpoint, "{serialized_log}");
+            }
         }
         Err(error) => {
             warn!("failed to serialize request log: {error}");
@@ -316,6 +360,25 @@ fn http_version_to_string(version: Version) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_parse_cache_tags() {
+        fn test(input: &str, expected: &[&str]) {
+            assert_eq!(parse_cache_tags(input).collect::<Vec<_>>(), expected);
+        }
+
+        test(
+            "crate:serde,release:serde@1.0.0",
+            &["crate:serde", "release:serde@1.0.0"],
+        );
+        test("crate:serde", &["crate:serde"]);
+        test(
+            " crate:serde , release:serde@1.0.0 ",
+            &["crate:serde", "release:serde@1.0.0"],
+        );
+        test("", &[]);
+        test(" , ", &[]);
+    }
 
     #[test]
     fn test_rewrite_download_urls() {
@@ -340,6 +403,18 @@ mod tests {
         test(
             "https://static.crates.io/crates/serde/1.0.0-alpha.1+foo-bar/download",
             "https://static.crates.io/crates/serde/serde-1.0.0-alpha.1+foo-bar.crate",
+        );
+        test(
+            "https://static.crates.io/crates/serde//download",
+            "https://static.crates.io/crates/serde//download",
+        );
+        test(
+            "https://static.crates.io/crates/serde/1.0.0/download/extra",
+            "https://static.crates.io/crates/serde/1.0.0/download/extra",
+        );
+        test(
+            "https://static.crates.io/crates/serde/1.0.0/extra/download",
+            "https://static.crates.io/crates/serde/1.0.0/extra/download",
         );
     }
 }

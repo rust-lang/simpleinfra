@@ -461,6 +461,31 @@ locals {
         permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.content_s3_write] },
       ]
     },
+    # Promote release
+    # FIXME: Lock down Admin access to prevent direct access to critical materials (e.g., KMS keys).
+    # We don't actually need full access for terraform deployments.
+    {
+      account : aws_organizations_account.promote_release_staging,
+      groups : [
+        { group : aws_identitystore_group.infra-admins,
+        permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
+        { group : aws_identitystore_group.billing,
+        permissions : [aws_ssoadmin_permission_set.billing_access] },
+        { group : aws_identitystore_group.infra,
+        permissions : [aws_ssoadmin_permission_set.view_only_access] },
+      ]
+    },
+    {
+      account : aws_organizations_account.promote_release_prod,
+      groups : [
+        { group : aws_identitystore_group.infra-admins,
+        permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
+        { group : aws_identitystore_group.billing,
+        permissions : [aws_ssoadmin_permission_set.billing_access] },
+        { group : aws_identitystore_group.infra,
+        permissions : [aws_ssoadmin_permission_set.view_only_access] },
+      ]
+    },
   ]
 }
 

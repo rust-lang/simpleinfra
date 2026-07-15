@@ -1,5 +1,3 @@
-use fastly::ConfigStore;
-
 // Name of the dictionary. Must match the dictionary in `fastly-static.tf`.
 const DICTIONARY_NAME: &str = "compute_static";
 
@@ -44,8 +42,9 @@ pub struct Config {
 }
 
 impl Config {
+    #[allow(deprecated)]
     pub fn from_dictionary() -> Self {
-        let dictionary = ConfigStore::open(DICTIONARY_NAME);
+        let dictionary = fastly::Dictionary::open(DICTIONARY_NAME);
 
         // Look up S3 hosts for current environment
         let primary_host = dictionary

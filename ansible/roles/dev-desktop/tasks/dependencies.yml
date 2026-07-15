@@ -20,12 +20,16 @@
       - g++-14-aarch64-linux-gnu # Required for functional clang++ when libgcc-14-dev is installed
       - gcc-mingw-w64-x86-64 # Allows running `x check --target x86_64-pc-windows-gnu`
       - gh
+      - git-delta
       - jq
       - tidy # Format and diff html for rustdoc
       - cvise
       - libssl-dev
       - llvm
+      - moreutils
+      - musl-tools
       - ninja-build
+      - patchutils
       - pkg-config
       - python-is-python3
       - python3
@@ -35,6 +39,10 @@
       - quota
       - ripgrep
       - rustfilt
+      - tree
+      - valgrind
+      - vim-fugitive
+      - vim-scripts
       - "linux-tools-{{ kernel.stdout }}"
       - "linux-tools-{{ kernel_flavor.stdout }}"
       - libatk1.0-0 # Allows running `x test rustdoc-gui`
@@ -58,7 +66,7 @@
       - emacs
       - flex # Allows running `x build gcc`
       - lld
-      - lldb
+      - lldb-20
       - m4
       - mold
       - gdb

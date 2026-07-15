@@ -2,8 +2,8 @@
 resource "fastly_ngwaf_workspace" "webapp" {
   name        = "${var.webapp_domain_name}-waf"
   description = "Next-Gen WAF workspace for ${var.webapp_domain_name}"
-  # TODO: at some point `block` instead of just logging
-  mode = "log"
+
+  mode = "block"
 
   # Configure when the WAF should flag an IP address as potentially malicious based on cumulative attack signals over different time windows.
   #
