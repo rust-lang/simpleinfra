@@ -84,7 +84,7 @@ jobs:
 
   javascript-tests:
     name: JavaScript Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -93,3 +93,26 @@ jobs:
       - name: Run tests
         run: |
           node --test terragrunt/modules/release-distribution/lambdas/doc-router/test.mjs
+
+  # Summary job for the merge queue.
+  # ALL THE PREVIOUS JOBS NEED TO BE ADDED TO THE `needs` SECTION OF THIS JOB!
+  CI:
+    # Keep `name` matching the status check.
+    name: CI
+    needs: [ terraform, actions-js, javascript-tests, rust, static-crates-io]
+    # We need to ensure this job does *not* get skipped if its dependencies fail,
+    # because a skipped job is considered a success by GitHub. So we have to
+    # overwrite `if:`. We use `!cancelled()` to ensure the job does still not get run
+    # when the workflow is canceled manually.
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-24.04
+    steps:
+      # Manually check the status of all dependencies. `if: failure()` does not work.
+      - name: Conclusion
+        env:
+          NEEDS: ${{ toJson(needs) }}
+        run: |
+          # Print the dependent jobs to see them in the CI log
+          jq -C <<< "$NEEDS"
+          # Check if all jobs that we depend on (in the needs array) were successful.
+          jq --exit-status 'all(.result == "success" or .result == "skipped")' <<< "$NEEDS"
