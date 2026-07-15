@@ -9,7 +9,7 @@ jobs:
     name: Rust projects
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Install Rust stable
         run: rustup update stable && rustup default stable && rustup component add clippy rustfmt
@@ -32,9 +32,9 @@ jobs:
       # renovate: datasource=crate depName=cargo-nextest
       NEXTEST_VERSION: "0.9.140"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
-      - uses: Swatinem/rust-cache@v2
+      - uses: Swatinem/rust-cache@c19371144df3bb44fab255c43d04cbc2ab54d1c4 # v2.9.1
         with:
           env-vars: VICEROY_VERSION NEXTEST_VERSION
           workspaces: terragrunt/modules/crates-io/compute-static
@@ -52,10 +52,10 @@ jobs:
     name: Terraform configuration
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Install terraform cli
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
 
       - name: Ensure the terraform files are formatted correctly
         run: terraform fmt -check -diff -recursive
@@ -64,8 +64,8 @@ jobs:
     name: GitHub Actions (JS)
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3.9.1
         with:
           node-version: 16
       - name: Ensure the bundled action is the same as the source code
@@ -86,8 +86,8 @@ jobs:
     name: JavaScript Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 24
       - name: Run tests
