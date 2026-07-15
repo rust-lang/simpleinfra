@@ -15,6 +15,19 @@ cd compute-static
 fastly compute build
 ```
 
+## Testing
+
+Install [Viceroy] and [cargo-nextest], then run:
+
+```shell
+cargo nextest run
+```
+
+The tests compile to WebAssembly. Viceroy provides the Fastly hostcalls that a
+regular WASI runtime does not implement, and Cargo invokes it through the
+configured target runner. Cargo-nextest runs each test in a separate WebAssembly
+instance because a panic stops the current instance.
+
 ## Deployment
 
 Terraform uses an [external data source] to build the function as part of its
@@ -28,4 +41,6 @@ export FASTLY_API_KEY=""
 terraform plan
 ```
 
+[cargo-nextest]: https://nexte.st/
 [external data source]: https://registry.terraform.io/providers/hashicorp/external/latest/docs/data-sources/data_source
+[viceroy]: https://github.com/fastly/Viceroy

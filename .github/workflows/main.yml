@@ -23,6 +23,31 @@ jobs:
       - name: Run clippy
         run: cargo clippy --all -- -Dwarnings
 
+  static-crates-io:
+    name: static.crates.io Fastly worker
+    runs-on: ubuntu-24.04
+    env:
+      # renovate: datasource=crate depName=viceroy
+      VICEROY_VERSION: "0.20.0"
+      # renovate: datasource=crate depName=cargo-nextest
+      NEXTEST_VERSION: "0.9.140"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          env-vars: VICEROY_VERSION NEXTEST_VERSION
+          workspaces: terragrunt/modules/crates-io/compute-static
+
+      - name: Install test tools
+        run: |
+          cargo install viceroy --locked --version "$VICEROY_VERSION"
+          cargo install cargo-nextest --locked --version "$NEXTEST_VERSION"
+
+      - name: Run the test suite
+        working-directory: terragrunt/modules/crates-io/compute-static
+        run: cargo nextest run
+
   terraform:
     name: Terraform configuration
     runs-on: ubuntu-24.04
