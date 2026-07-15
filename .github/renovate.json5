@@ -7,4 +7,17 @@
   ],
    // Require manual approval from the Dependency Dashboard before opening PRs
   "dependencyDashboardApproval": true,
+  "packageRules": [
+    {
+      // No dashboard approval necessary for GitHub Actions updates
+      "matchManagers": ["github-actions"],
+      "dependencyDashboardApproval": false
+    },
+    {
+      // Disable updates for Node.js because otherwise we will need to change
+      // the code of the GitHub Actions of this repository.
+      packageNames: ["node"],
+      enabled: false,
+    },
+  ],
 }
