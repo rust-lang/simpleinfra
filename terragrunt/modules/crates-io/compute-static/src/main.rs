@@ -101,7 +101,7 @@ fn collect_request(config: &Config, request: &Request) -> LogLineV1Builder {
         .service(DATADOG_SERVICE)
         .date_time(OffsetDateTime::now_utc())
         .edge_location(var("FASTLY_POP").ok())
-        .host(request.get_url().host().map(|s| s.to_string()))
+        .host(Some(config.datadog_host.clone()))
         .http(http_details)
         .ip(request.get_client_ip_addr())
         .method(Some(request.get_method().to_string()))
