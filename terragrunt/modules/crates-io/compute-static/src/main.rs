@@ -1,3 +1,4 @@
+use compute_static::compression::is_compressible_content_type;
 use fastly::convert::ToHeaderValue;
 use fastly::http::{header, Method, StatusCode, Version};
 use fastly::{Error, Request, Response};
@@ -16,6 +17,7 @@ const DATADOG_APP: &str = "crates.io";
 const DATADOG_SERVICE: &str = "static.crates.io";
 const VERSION_DOWNLOADS: &str = "/archive/version-downloads/";
 const VERSION_DOWNLOADS_INDEX: &str = "/archive/version-downloads/index.html";
+const X_COMPRESS_HINT: &str = "X-Compress-Hint";
 
 #[fastly::main]
 fn main(request: Request) -> Result<Response, Error> {
@@ -294,6 +296,8 @@ fn send_request_to_s3(config: &Config, request: &Request) -> Result<Response, Er
         response = fallback_request.send(&config.fallback_host)?;
     }
 
+    enable_dynamic_compression(request, &mut response);
+
     Ok(response)
 }
 
@@ -306,6 +310,25 @@ fn add_cors_headers(response: &mut Result<Response, Error>) {
         response.set_header("Access-Control-Allow-Origin", "*");
         response.set_header("Access-Control-Allow-Methods", "GET");
         response.set_header("Access-Control-Max-Age", "3000");
+    }
+}
+
+fn enable_dynamic_compression(request: &Request, response: &mut Response) {
+    if request.get_method() != Method::GET
+        || request.contains_header(header::RANGE)
+        || response.get_status() != StatusCode::OK
+        || response.contains_header(header::CONTENT_ENCODING)
+    {
+        return;
+    }
+
+    let Some(content_type) = response.get_content_type() else {
+        return;
+    };
+
+    if is_compressible_content_type(&content_type) {
+        response.set_header(X_COMPRESS_HINT, "on");
+        response.append_header(header::VARY, "Accept-Encoding");
     }
 }
 
