@@ -2,10 +2,8 @@ use fastly::mime::{self, Mime};
 
 pub fn is_compressible_content_type(content_type: &Mime) -> bool {
     content_type.type_() == mime::TEXT
-        || content_type.subtype() == mime::JSON
-        || content_type.subtype() == mime::XML
-        || content_type.suffix() == Some(mime::JSON)
-        || content_type.suffix() == Some(mime::XML)
+        || matches!(content_type.subtype(), mime::JSON | mime::XML)
+        || matches!(content_type.suffix(), Some(mime::JSON | mime::XML))
 }
 
 #[cfg(test)]
