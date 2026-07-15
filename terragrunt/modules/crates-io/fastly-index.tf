@@ -139,6 +139,24 @@ resource "fastly_service_vcl" "index" {
       set segmented_caching.block_size = 10000000;
     VCL
   }
+
+  snippet {
+    name    = "enable dynamic compression"
+    type    = "deliver"
+    content = <<-VCL
+      if (
+        req.method == "GET" &&
+        !req.http.Range &&
+        resp.status == 200 &&
+        !resp.http.Content-Encoding
+      ) {
+        set resp.http.X-Compress-Hint = "on";
+
+        # The cached object remains uncompressed, so only downstream caches vary.
+        set resp.http.Vary:Accept-Encoding = "";
+      }
+    VCL
+  }
 }
 
 module "fastly_tls_subscription_index" {
