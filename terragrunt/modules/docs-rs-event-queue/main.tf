@@ -34,7 +34,9 @@ resource "aws_sqs_queue" "index_changes" {
   # Note: ensure the client’s HTTP timeout is longer than 20 seconds.
   receive_wait_time_seconds = 20
 
-  # Give the consumer (docs-rs in this case) five minutes to handle an event.
+  # Set the queue's default visibility timeout to five minutes.
+  # docs.rs overrides this in its `receive_message` call.
+  #
   # After the consumer receives an event, SQS hides it for five minutes.
   # If the consumer deletes it, processing is complete. Otherwise, it becomes visible for retry.
   # Messages are idempotent, so it's safe to retry.
