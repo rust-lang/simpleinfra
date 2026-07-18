@@ -18,3 +18,8 @@ data "aws_ssm_parameter" "oauth_client_secret" {
   name            = "/bors/oauth-client-secret"
   with_decryption = false
 }
+
+data "aws_ssm_parameter" "zulip_token" {
+  name            = "/bors/zulip-token"
+  with_decryption = false
+}
