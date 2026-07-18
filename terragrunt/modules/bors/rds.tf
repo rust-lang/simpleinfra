@@ -1,7 +1,7 @@
 resource "aws_db_instance" "primary" {
   db_name                 = "bors"
   engine                  = "postgres"
-  engine_version          = "16.9"
+  engine_version          = "16.13"
   instance_class          = "db.t4g.micro"
   backup_retention_period = 7
 

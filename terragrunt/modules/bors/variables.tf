@@ -14,6 +14,10 @@ variable "oauth_client_id" {
   description = "OAuth client ID"
 }
 
+variable "zulip_username" {
+  description = "Zulip bot username/email"
+}
+
 variable "public_url" {
   description = "Public URL for the bors instance. Used in GitHub comments."
 }

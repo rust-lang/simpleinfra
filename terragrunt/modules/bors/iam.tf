@@ -53,8 +53,8 @@ resource "aws_iam_policy" "ssm_access" {
           data.aws_ssm_parameter.app_key.arn,
           data.aws_ssm_parameter.webhook_secret.arn,
           aws_ssm_parameter.db_endpoint.arn,
-          data.aws_ssm_parameter.oauth_client_secret.arn
-          data.aws_ssm_parameter.zulip_token.arn
+          data.aws_ssm_parameter.oauth_client_secret.arn,
+          data.aws_ssm_parameter.zulip_token.arn,
         ]
       }
     ]
