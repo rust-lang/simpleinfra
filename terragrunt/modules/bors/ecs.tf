@@ -146,8 +146,8 @@ resource "aws_ecs_task_definition" "bors" {
           value = "https://rust-lang.zulipchat.com"
         },
         {
-          name = "ZULIP_USERNAME"
-          value = "bors-bot@rust-lang.zulipchat.com"
+          name  = "ZULIP_USERNAME"
+          value = "${var.zulip_username}"
         }
       ]
 

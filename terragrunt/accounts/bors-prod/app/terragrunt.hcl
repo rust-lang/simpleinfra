@@ -13,6 +13,7 @@ inputs = {
   gh_app_id = "278306"
   trusted_sub = "repo:rust-lang/bors:environment:production"
   oauth_client_id = "Ov23li6CuHNVV4KULH9X"
+  zulip_username = "bors-bot@rust-lang.zulipchat.com"
   cpu = 1024
   memory = 2048
 }
