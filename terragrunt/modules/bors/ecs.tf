@@ -140,6 +140,14 @@ resource "aws_ecs_task_definition" "bors" {
         {
           name  = "OAUTH_CLIENT_ID",
           value = "${var.oauth_client_id}"
+        },
+        {
+          name  = "ZULIP_SERVER",
+          value = "https://rust-lang.zulipchat.com"
+        },
+        {
+          name = "ZULIP_USERNAME"
+          value = "bors-bot@rust-lang.zulipchat.com"
         }
       ]
 
@@ -159,6 +167,10 @@ resource "aws_ecs_task_definition" "bors" {
         {
           name      = "OAUTH_CLIENT_SECRET"
           valueFrom = data.aws_ssm_parameter.oauth_client_secret.arn
+        },
+        {
+          name      = "ZULIP_TOKEN"
+          valueFrom = data.aws_ssm_parameter.zulip_token.arn
         }
       ]
 
