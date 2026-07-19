@@ -38,6 +38,9 @@
       - python3-pip
       - quota
       - ripgrep
+      - batcat
+      - git-delta
+      - libfile-which-perl #  Used by jyn's editor scripts
       - rustfilt
       - tree
       - valgrind
