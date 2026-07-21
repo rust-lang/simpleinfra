@@ -325,21 +325,28 @@ fn add_cors_headers(response: &mut Result<Response, Error>) {
 
 fn enable_dynamic_compression(request: &Request, response: &mut Response) {
     if request.get_method() != Method::GET
-        || request.contains_header(header::RANGE)
-        || response.get_status() != StatusCode::OK
-        || response.contains_header(header::CONTENT_ENCODING)
+        || !is_eligible_for_dynamic_compression(request, response)
     {
         return;
     }
 
+    response.set_header(X_COMPRESS_HINT, "on");
+    response.append_header(header::VARY, "Accept-Encoding");
+}
+
+fn is_eligible_for_dynamic_compression(request: &Request, response: &Response) -> bool {
+    if request.contains_header(header::RANGE)
+        || response.get_status() != StatusCode::OK
+        || response.contains_header(header::CONTENT_ENCODING)
+    {
+        return false;
+    }
+
     let Some(content_type) = response.get_content_type() else {
-        return;
+        return false;
     };
 
-    if is_compressible_content_type(&content_type) {
-        response.set_header(X_COMPRESS_HINT, "on");
-        response.append_header(header::VARY, "Accept-Encoding");
-    }
+    is_compressible_content_type(&content_type)
 }
 
 /// Collect data for the logs from the response
