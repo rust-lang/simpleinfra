@@ -298,6 +298,15 @@ fn send_request_to_s3(config: &Config, request: &Request) -> Result<Response, Er
 
     enable_dynamic_compression(request, &mut response);
 
+    // Automatic framing derives downstream framing from the response body and
+    // discards S3's Content-Length. This is normally necessary because downstream
+    // transformations such as client-negotiated compression can change the
+    // representation. For HEAD, preserve the origin length only when the
+    // equivalent GET is ineligible for dynamic compression.
+    if should_preserve_framing_headers(request, &response) {
+        response.set_framing_headers_mode(fastly::http::FramingHeadersMode::ManuallyFromHeaders);
+    }
+
     Ok(response)
 }
 
@@ -315,21 +324,38 @@ fn add_cors_headers(response: &mut Result<Response, Error>) {
 
 fn enable_dynamic_compression(request: &Request, response: &mut Response) {
     if request.get_method() != Method::GET
-        || request.contains_header(header::RANGE)
-        || response.get_status() != StatusCode::OK
-        || response.contains_header(header::CONTENT_ENCODING)
+        || !is_eligible_for_dynamic_compression(request, response)
     {
         return;
     }
 
+    response.set_header(X_COMPRESS_HINT, "on");
+    response.append_header(header::VARY, "Accept-Encoding");
+}
+
+/// Whether a HEAD response can preserve the origin's framing headers.
+///
+/// Preserve S3's `Content-Length` only when the equivalent GET is structurally ineligible for
+/// dynamic compression. Intentionally do not inspect `Accept-Encoding`: Fastly owns that automatic
+/// negotiation. Omitting `Content-Length` for eligible HEAD responses is valid and safer
+/// than forwarding a potentially stale value.
+fn should_preserve_framing_headers(request: &Request, response: &Response) -> bool {
+    request.get_method() == Method::HEAD && !is_eligible_for_dynamic_compression(request, response)
+}
+
+fn is_eligible_for_dynamic_compression(request: &Request, response: &Response) -> bool {
+    if request.contains_header(header::RANGE)
+        || response.get_status() != StatusCode::OK
+        || response.contains_header(header::CONTENT_ENCODING)
+    {
+        return false;
+    }
+
     let Some(content_type) = response.get_content_type() else {
-        return;
+        return false;
     };
 
-    if is_compressible_content_type(&content_type) {
-        response.set_header(X_COMPRESS_HINT, "on");
-        response.append_header(header::VARY, "Accept-Encoding");
-    }
+    is_compressible_content_type(&content_type)
 }
 
 /// Collect data for the logs from the response
