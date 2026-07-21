@@ -298,13 +298,12 @@ fn send_request_to_s3(config: &Config, request: &Request) -> Result<Response, Er
 
     enable_dynamic_compression(request, &mut response);
 
-    // Without this, HEAD requests throw away the content length from the upstream S3.
-    // The default Automatic mode will re-frame the response depending on
-    // client preferences, which may differ from the way content is fetched
-    // from the origin. HEAD doesn't *do* framing since it has no body, and for
-    // some reason, the automatic mode doesn't attach any content-length to the
-    // response.
-    if request.get_method() == Method::HEAD {
+    // Automatic framing derives downstream framing from the response body and
+    // discards S3's Content-Length. This is normally necessary because downstream
+    // transformations such as client-negotiated compression can change the
+    // representation. For HEAD, preserve the origin length only when the
+    // equivalent GET cannot be dynamically compressed.
+    if should_preserve_framing_headers(request, &response) {
         response.set_framing_headers_mode(fastly::http::FramingHeadersMode::ManuallyFromHeaders);
     }
 
@@ -332,6 +331,10 @@ fn enable_dynamic_compression(request: &Request, response: &mut Response) {
 
     response.set_header(X_COMPRESS_HINT, "on");
     response.append_header(header::VARY, "Accept-Encoding");
+}
+
+fn should_preserve_framing_headers(request: &Request, response: &Response) -> bool {
+    request.get_method() == Method::HEAD && !is_eligible_for_dynamic_compression(request, response)
 }
 
 fn is_eligible_for_dynamic_compression(request: &Request, response: &Response) -> bool {
