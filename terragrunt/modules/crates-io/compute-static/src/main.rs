@@ -302,7 +302,7 @@ fn send_request_to_s3(config: &Config, request: &Request) -> Result<Response, Er
     // discards S3's Content-Length. This is normally necessary because downstream
     // transformations such as client-negotiated compression can change the
     // representation. For HEAD, preserve the origin length only when the
-    // equivalent GET cannot be dynamically compressed.
+    // equivalent GET is ineligible for dynamic compression.
     if should_preserve_framing_headers(request, &response) {
         response.set_framing_headers_mode(fastly::http::FramingHeadersMode::ManuallyFromHeaders);
     }
@@ -333,6 +333,12 @@ fn enable_dynamic_compression(request: &Request, response: &mut Response) {
     response.append_header(header::VARY, "Accept-Encoding");
 }
 
+/// Whether a HEAD response can preserve the origin's framing headers.
+///
+/// Preserve S3's `Content-Length` only when the equivalent GET is structurally ineligible for
+/// dynamic compression. Intentionally do not inspect `Accept-Encoding`: Fastly owns that automatic
+/// negotiation. Omitting `Content-Length` for eligible HEAD responses is valid and safer
+/// than forwarding a potentially stale value.
 fn should_preserve_framing_headers(request: &Request, response: &Response) -> bool {
     request.get_method() == Method::HEAD && !is_eligible_for_dynamic_compression(request, response)
 }
