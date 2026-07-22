@@ -5,6 +5,13 @@ locals {
 resource "fastly_service_vcl" "static" {
   name = var.static_domain_name
 
+  product_enablement {
+    ddos_protection {
+      enabled = true
+      mode    = "log"
+    }
+  }
+
   domain {
     name = local.fastly_domain_name
   }
