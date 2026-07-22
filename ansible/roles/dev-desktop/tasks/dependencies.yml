@@ -93,6 +93,10 @@
       - libxcb-xfixes0-dev
     state: present
 
+# neovim is installed, and a good default for people without a specific preference for classic vim
+- name: Set vim alternative
+  shell: update-alternatives --set vim /usr/bin/nvim
+
 # we don't need it because we don't need to send emails
 - name: Uninstall postfix
   apt:
