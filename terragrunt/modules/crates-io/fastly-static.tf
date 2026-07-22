@@ -26,6 +26,13 @@ data "fastly_package_hash" "package" {
 resource "fastly_service_compute" "static" {
   name = var.static_domain_name
 
+  product_enablement {
+    ddos_protection {
+      enabled = true
+      mode    = "log"
+    }
+  }
+
   domain {
     name = local.fastly_domain_name
   }
