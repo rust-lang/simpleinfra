@@ -6,6 +6,7 @@ locals {
     docs-rs : aws_identitystore_group.docs_rs
     infra : aws_identitystore_group.infra
     infra-admins : aws_identitystore_group.infra-admins
+    ci-staging-admin : aws_identitystore_group.ci-staging-admin
     metrics-initiative : aws_identitystore_group.metrics_initiative
     release : aws_identitystore_group.release
     triagebot : aws_identitystore_group.triagebot

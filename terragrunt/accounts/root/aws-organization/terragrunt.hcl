@@ -55,7 +55,7 @@ inputs = {
       given_name = "Jakub"
       family_name = "Beránek"
       email = "berykubik@gmail.com"
-      groups = ["infra", "triagebot"]
+      groups = ["infra", "triagebot", "ci-staging-admin"]
     }
     "tobias" = {
       given_name = "Tobias"
