@@ -56,10 +56,6 @@ locals {
       login = "pietro@pietroalbini.org"
       name  = "Pietro Albini"
     }
-    "rustfoundation" = {
-      login = "infra@rustfoundation.org"
-      name  = "Rust Foundation Infrastructure"
-    }
     "seth" = {
       login = "smarkle.aws@gmail.com"
       name  = "Seth Markle"

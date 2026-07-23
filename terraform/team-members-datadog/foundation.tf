@@ -1,12 +1,11 @@
 locals {
   foundation = {
-    "adam"           = local.users.adam
-    "joel"           = local.users.joel
-    "marcoieni"      = local.users.marcoieni
-    "rustfoundation" = local.users.rustfoundation
-    "tobias"         = local.users.tobias
-    "ubiratan"       = local.users.ubiratan
-    "walter"         = local.users.walter
+    "adam"      = local.users.adam
+    "joel"      = local.users.joel
+    "marcoieni" = local.users.marcoieni
+    "tobias"    = local.users.tobias
+    "ubiratan"  = local.users.ubiratan
+    "walter"    = local.users.walter
   }
 
   # Foundation members inherit all permissions from Datadog's Standard Role.
