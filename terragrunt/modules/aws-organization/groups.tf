@@ -21,6 +21,13 @@ resource "aws_identitystore_group" "infra" {
   description  = "The infrastructure team"
 }
 
+resource "aws_identitystore_group" "ci-staging-admin" {
+  identity_store_id = local.identity_store_id
+
+  display_name = "ci-staging-admin"
+  description  = "Staging admins"
+}
+
 resource "aws_identitystore_group" "billing" {
   identity_store_id = local.identity_store_id
 
@@ -422,6 +429,8 @@ locals {
       account : aws_organizations_account.ci_staging,
       groups : [
         { group : aws_identitystore_group.infra-admins,
+        permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
+        { group : aws_identitystore_group.ci-staging-admin,
         permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
         { group : aws_identitystore_group.infra,
         permissions : [aws_ssoadmin_permission_set.read_only_access] },
