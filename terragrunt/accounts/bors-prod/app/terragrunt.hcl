@@ -16,4 +16,5 @@ inputs = {
   zulip_username = "bors-bot@rust-lang.zulipchat.com"
   cpu = 1024
   memory = 2048
+  ec2_runner_role = "arn:aws:iam::008376430877:role/gha-runner-management"
 }

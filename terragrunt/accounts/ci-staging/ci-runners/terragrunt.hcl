@@ -10,4 +10,6 @@ include {
 inputs = {
   code_connection_name = "staging-gh-connection"
   repository           = "rust-lang/aws-runners-test"
+  // bors-staging account ID
+  executor_account_id  = "392478027976"
 }

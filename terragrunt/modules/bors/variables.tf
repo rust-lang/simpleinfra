@@ -29,3 +29,7 @@ variable "cpu" {
 variable "memory" {
   description = "How much memory should be allocated to the bors instance."
 }
+
+variable "ec2_runner_role" {
+  description = "Role to be assumed to run EC2 instances"
+}
