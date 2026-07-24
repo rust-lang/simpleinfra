@@ -61,3 +61,29 @@ resource "aws_iam_policy" "ssm_access" {
 
   })
 }
+
+resource "aws_iam_role_policy" "gha-self-hosted" {
+  name = "gha-self-hosted"
+  role = aws_iam_role.runtime.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Resource = [
+          // Allow assuming roles in both the staging and prod accounts.
+          // We allow both because it may be useful for prod to launch a subset
+          // of instances in staging (for verification that rust-lang/rust
+          // runners will work against changes to infrastructure).
+          //
+          // Note that right now only the corresponding target account actually
+          // allows access from bors.
+          "arn:aws:iam::442426873467:role/*",
+          "arn:aws:iam::008376430877:role/*",
+        ]
+      }
+    ]
+  })
+}

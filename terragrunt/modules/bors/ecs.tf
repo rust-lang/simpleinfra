@@ -148,6 +148,10 @@ resource "aws_ecs_task_definition" "bors" {
         {
           name  = "ZULIP_USERNAME"
           value = "${var.zulip_username}"
+        },
+        {
+          name  = "CI_EC2_RUNNER_ROLE"
+          value = "${var.ec2_runner_role}"
         }
       ]
 
