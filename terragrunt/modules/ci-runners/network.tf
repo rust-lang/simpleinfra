@@ -26,6 +26,8 @@ resource "aws_vpc_security_group_egress_rule" "anywhere" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "simulacrum-ssh" {
+  // Only enable in non-prod accounts
+  count             = var.repository != "rust-lang/rust" ? 1 : 0
   security_group_id = aws_security_group.runner.id
   cidr_ipv4         = "131.143.232.57/32"
   from_port         = "22"
