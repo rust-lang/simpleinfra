@@ -127,6 +127,81 @@ resource "aws_iam_role_policy" "executor" {
           // the policy.
           "arn:aws:ec2:us-east-2:*:image/*",
         ]
+      },
+      {
+        // Allow tagging instances on launch.
+        Effect = "Allow"
+        Action = [
+          "ec2:CreateTags",
+        ]
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "ec2:CreateAction" = "RunInstances"
+          }
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_openid_connect_provider" "github_actions" {
+  url            = "https://token.actions.githubusercontent.com"
+  client_id_list = ["sts.amazonaws.com"]
+}
+
+resource "aws_iam_role" "image_upload" {
+  name = "gha-self-hosted-images-upload"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Sid    = "AllowGithub"
+        Effect = "Allow"
+        Principal = {
+          Federated = resource.aws_iam_openid_connect_provider.github_actions.id
+        }
+        Condition = {
+          StringEquals = {
+            "token.actions.githubusercontent.com:sub" = "repo:rust-lang/gha-self-hosted:ref:refs/heads/gha-aws-runners"
+            # Restrict the OIDC token validation to only accept tokens
+            # where the audience claim is set to "sts.amazonaws.com". This ensures that
+            # GitHub Actions OIDC tokens can only be used to request AWS
+            # Security Token Service (STS) credentials,
+            "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+          }
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "github_actions" {
+  name = "image-builder"
+  role = aws_iam_role.image_upload.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Deny"
+        Action = [
+          "ec2:Describe*",
+          "ec2:RunInstances",
+          "ec2:StopInstances",
+          "ec2:TerminateInstances",
+          "ec2:CreateKeyPair",
+          "ec2:DeleteKeyPair",
+          "ec2:CreateSecurityGroup",
+          "ec2:DeleteSecurityGroup",
+          "ec2:AuthorizeSecurityGroupIngress",
+          "ec2:CreateImage",
+        ]
+        Resource = [
+          # Figure out if we can scope these down to resources created by the same role...
+          "*",
+        ]
       }
     ]
   })
