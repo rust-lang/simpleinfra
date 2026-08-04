@@ -21,6 +21,7 @@ resource "datadog_role" "safe_readonly" {
       data.datadog_permissions.all.permissions.dashboards_read,
       data.datadog_permissions.all.permissions.apm_read,
       data.datadog_permissions.all.permissions.monitors_read,
+      data.datadog_permissions.all.permissions.on_call_read,
     ])
 
     content {
