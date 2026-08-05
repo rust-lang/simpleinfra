@@ -1,3 +1,4 @@
+mod ngwaf;
 mod shield;
 
 use fastly::{
@@ -21,6 +22,8 @@ const ORIGIN_AUTH_KEY: &str = "origin-auth";
 const DOCS_RS_CONFIG: &str = "docs_rs_config";
 const SHIELD_POP_KEY: &str = "shield_pop";
 const HSTS_MAX_AGE_KEY: &str = "hsts_max_age";
+const NGWAF_CORP_KEY: &str = "ngwaf_corp";
+const NGWAF_WORKSPACE_KEY: &str = "ngwaf_workspace";
 
 const FASTLY_CLIENT_IP: HeaderName = HeaderName::from_static("fastly-client-ip");
 const SURROGATE_CONTROL: HeaderName = HeaderName::from_static("surrogate-control");
@@ -33,6 +36,7 @@ fn main(mut req: Request) -> Result<Response, Error> {
     let config = ConfigStore::open(DOCS_RS_CONFIG);
     let secrets = SecretStore::open(DOCS_RS_SECRET_STORE).expect("failed to open secret store");
     let shield = shield::Context::load(&config, &secrets, &mut req)?;
+    let ngwaf = ngwaf::NgWaf::load(&config);
 
     match req.get_method() {
         &Method::GET | &Method::HEAD | &Method::OPTIONS => {
@@ -88,6 +92,15 @@ fn main(mut req: Request) -> Result<Response, Error> {
     }
 
     if shield.response_is_for_client() {
+        if let Some(ngwaf) = &ngwaf {
+            req = match ngwaf.inspect(req) {
+                Ok(req) => req,
+                Err(resp) => {
+                    return Ok(resp);
+                }
+            };
+        }
+
         // Requests received from end users must not be allowed to supply
         // proxy identity headers.
         req.set_header(
