@@ -17,6 +17,7 @@ resource "datadog_role" "safe_readonly" {
     for_each = toset([
       data.datadog_permissions.all.permissions.logs_read_index_data,
       data.datadog_permissions.all.permissions.logs_read_data,
+      data.datadog_permissions.all.permissions.logs_read_config,
       data.datadog_permissions.all.permissions.logs_live_tail,
       data.datadog_permissions.all.permissions.dashboards_read,
       data.datadog_permissions.all.permissions.apm_read,
