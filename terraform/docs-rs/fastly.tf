@@ -60,6 +60,16 @@ resource "fastly_service_compute" "docs_rs" {
     port    = 80
   }
 
+  product_enablement {
+    domain_inspector = true
+
+    # Next generation WAF
+    ngwaf {
+      enabled      = true
+      workspace_id = fastly_ngwaf_workspace.webapp.id
+    }
+  }
+
   resource_link {
     name        = local.secret_store_name
     resource_id = fastly_secretstore.docs_rs.id
