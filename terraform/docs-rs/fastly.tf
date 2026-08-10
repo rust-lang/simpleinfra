@@ -33,9 +33,9 @@ resource "fastly_configstore_entries" "docs_rs" {
     # should be less for test / staging environments
     hsts_max_age = "31557600"
 
-    # TODO: switch on when product_enablement went through?
-    # ngwaf_corp      = "some_corp" # FIXME: what's our corp name?
-    # ngwaf_workspace = fastly_ngwaf_workspace.webapp.id
+    # TODO: switch on
+    # ngwaf_corp      = "rust_foundation"
+    # ngwaf_workspace = fastly_ngwaf_workspace.webapp.name
   }
 
   # manage config entries only via terraform, manual changes will be overwritten on next apply
