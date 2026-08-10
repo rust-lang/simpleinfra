@@ -78,7 +78,10 @@ resource "aws_iam_role_policy" "executor" {
         Action = [
           "ssm:GetParameters",
         ]
-        Resource = ["arn:aws:ssm:*::parameter/aws/service/canonical/ubuntu/*"]
+        Resource = [
+          "arn:aws:ssm:*::parameter/aws/service/canonical/ubuntu/*",
+          "arn:aws:ssm:us-east-2:*:parameter/latest-gha-runner-ami",
+        ]
       },
       // The management service (bors) needs to be able to start new instances.
       //
