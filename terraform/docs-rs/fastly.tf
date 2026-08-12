@@ -32,6 +32,10 @@ resource "fastly_configstore_entries" "docs_rs" {
     # max age for HSTS header.
     # should be less for test / staging environments
     hsts_max_age = "31557600"
+
+    # TODO: switch on
+    # ngwaf_corp      = "rust_foundation"
+    # ngwaf_workspace = fastly_ngwaf_workspace.webapp.name
   }
 
   # manage config entries only via terraform, manual changes will be overwritten on next apply
