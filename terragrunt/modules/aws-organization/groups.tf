@@ -495,6 +495,20 @@ locals {
         permissions : [aws_ssoadmin_permission_set.view_only_access] },
       ]
     },
+    # Membership in infra-admins does not automatically grant access to a new
+    # account. Assign the existing groups here instead of creating a
+    # rustc-perf-specific permission set: infra-admins already gives the
+    # account operator AdministratorAccess, while infra retains read-only
+    # visibility consistent with the other production accounts.
+    {
+      account : aws_organizations_account.rustc_perf_prod,
+      groups : [
+        { group : aws_identitystore_group.infra-admins,
+        permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
+        { group : aws_identitystore_group.infra,
+        permissions : [aws_ssoadmin_permission_set.read_only_access] },
+      ]
+    },
   ]
 }
 
