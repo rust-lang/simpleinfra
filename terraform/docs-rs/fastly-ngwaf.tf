@@ -22,3 +22,10 @@ resource "fastly_ngwaf_workspace" "webapp" {
     immediate = false
   }
 }
+
+resource "sigsci_edge_deployment" "deployment" {
+  site_short_name = fastly_ngwaf_workspace.name
+  authorized_services = [
+    fastly_service_compute.docs_rs.id
+  ]
+}
