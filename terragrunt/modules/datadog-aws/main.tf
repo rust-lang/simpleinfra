@@ -13,6 +13,7 @@ resource "aws_iam_policy" "datadog" {
     Statement = [
       {
         Action = [
+          "account:GetAccountInformation",
           "apigateway:GET",
           "autoscaling:Describe*",
           "backup:List*",
@@ -87,6 +88,7 @@ resource "aws_iam_policy" "datadog" {
           "tag:GetResources",
           "tag:GetTagKeys",
           "tag:GetTagValues",
+          "trustedadvisor:ListRecommendations",
           "xray:BatchGetTraces",
           "xray:GetTraceSummaries",
         ],
