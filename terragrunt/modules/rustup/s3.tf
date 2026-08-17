@@ -7,10 +7,10 @@ resource "aws_s3_bucket" "builds" {
 }
 
 module "ci_role" {
-  source = "../gha-oidc-role"
-  org    = "rust-lang"
-  repo   = "rustup"
-  branch = "main"
+  source   = "../gha-oidc-role"
+  org      = "rust-lang"
+  repo     = "rustup"
+  branches = ["main", "stable"]
 }
 
 resource "aws_s3_bucket_policy" "cloudfront" {
