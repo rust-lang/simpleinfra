@@ -34,7 +34,7 @@ resource "fastly_configstore_entries" "docs_rs" {
     hsts_max_age = "31557600"
 
     ngwaf_corp      = "rust_foundation"
-    ngwaf_workspace = fastly_ngwaf_workspace.webapp.name
+    ngwaf_workspace = fastly_ngwaf_workspace.webapp.id
   }
 
   # manage config entries only via terraform, manual changes will be overwritten on next apply
