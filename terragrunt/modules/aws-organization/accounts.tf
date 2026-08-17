@@ -79,3 +79,8 @@ resource "aws_organizations_account" "promote_release_prod" {
   name  = "promote-release-prod"
   email = "admin+promote-release-prod@rust-lang.org"
 }
+
+resource "aws_organizations_account" "rustc_perf_prod" {
+  name  = "rustc-perf-prod"
+  email = "admin+rustc-perf-prod@rust-lang.org"
+}
