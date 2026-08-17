@@ -17,6 +17,7 @@ resource "aws_iam_role" "ci_role" {
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
+      for k in concat(var.branch == null ? [] : [var.branch], var.branches) :
       {
         Effect = "Allow"
         Action = "sts:AssumeRoleWithWebIdentity"
@@ -27,7 +28,7 @@ resource "aws_iam_role" "ci_role" {
           StringEquals = {
             "token.actions.githubusercontent.com:sub" = (var.environment != null ?
               "repo:${var.org}/${var.repo}:environment:${var.environment}" :
-            "repo:${var.org}/${var.repo}:ref:refs/heads/${var.branch}")
+            "repo:${var.org}/${var.repo}:ref:refs/heads/${k}")
             # Restrict the OIDC token validation to only accept tokens
             # where the audience claim is set to "sts.amazonaws.com". This ensures that
             # GitHub Actions OIDC tokens can only be used to request AWS
@@ -35,8 +36,7 @@ resource "aws_iam_role" "ci_role" {
             "token.actions.githubusercontent.com:aud" : "sts.amazonaws.com"
           }
         }
-      }
-    ]
+    }]
   })
 }
 
@@ -67,6 +67,12 @@ variable "branch" {
   type        = string
   default     = null
   description = "The branch of the repository allowed to assume the role"
+}
+
+variable "branches" {
+  type        = list(string)
+  default     = []
+  description = "The branches of the repository allowed to assume the role"
 }
 
 variable "environment" {
