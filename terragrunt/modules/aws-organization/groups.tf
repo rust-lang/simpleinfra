@@ -365,7 +365,7 @@ locals {
             aws_ssoadmin_permission_set.administrator_access
         ] },
         { group : aws_identitystore_group.infra,
-        permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
+        permissions : [aws_ssoadmin_permission_set.read_only_access] },
         { group : aws_identitystore_group.crates_io,
         permissions : [aws_ssoadmin_permission_set.read_only_access] },
       ]
