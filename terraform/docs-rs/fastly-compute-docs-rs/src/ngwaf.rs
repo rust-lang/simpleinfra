@@ -34,18 +34,35 @@ impl NgWaf {
         // options, for now we go the safe way, so we don't break anything.
 
         match security::inspect(config) {
-            Ok(resp) => match resp.verdict() {
-                security::InspectVerdict::Block => {
-                    return Err(Response::from_status(StatusCode::NOT_ACCEPTABLE));
+            Ok(resp) => {
+                if resp.is_redirect() {
+                    // handle NgWAF challenges (like CAPTCHA)
+                    return Err(resp
+                        .into_redirect()
+                        .expect("is_redirect() guarantees a redirect response"));
                 }
-                security::InspectVerdict::Allow => {}
-                security::InspectVerdict::Unauthorized => {
-                    eprintln!("The service is not authorized to inspect the request");
+
+                match resp.verdict() {
+                    security::InspectVerdict::Block => {
+                        // `resp.status()` is the response status code configured
+                        // in the NgWaf rules.
+                        // For example, 429 for rate limiting.
+                        let status = u16::try_from(resp.status())
+                            .ok()
+                            .and_then(|status| StatusCode::from_u16(status).ok())
+                            .unwrap_or(StatusCode::NOT_ACCEPTABLE);
+
+                        return Err(Response::from_status(status));
+                    }
+                    security::InspectVerdict::Allow => {}
+                    security::InspectVerdict::Unauthorized => {
+                        eprintln!("The service is not authorized to inspect the request");
+                    }
+                    security::InspectVerdict::Other(name) => {
+                        eprintln!("unable to inspect request: {}", name);
+                    }
                 }
-                security::InspectVerdict::Other(name) => {
-                    eprintln!("unable to inspect request: {}", name);
-                }
-            },
+            }
             Err(err) => {
                 eprintln!("error inspecting request: {:?}", err);
             }
