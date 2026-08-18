@@ -36,7 +36,12 @@ impl NgWaf {
         match security::inspect(config) {
             Ok(resp) => match resp.verdict() {
                 security::InspectVerdict::Block => {
-                    return Err(Response::from_status(StatusCode::NOT_ACCEPTABLE));
+                    let status = u16::try_from(resp.status())
+                        .ok()
+                        .and_then(|status| StatusCode::from_u16(status).ok())
+                        .unwrap_or(StatusCode::NOT_ACCEPTABLE);
+
+                    return Err(Response::from_status(status));
                 }
                 security::InspectVerdict::Allow => {}
                 security::InspectVerdict::Unauthorized => {
