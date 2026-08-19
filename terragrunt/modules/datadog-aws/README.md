@@ -12,4 +12,4 @@ following variables:
 
 [datadog]: https://datadoghq.com
 [datadog-aws]: https://docs.datadoghq.com/integrations/amazon_web_services/
-[terraform module]: https://registry.terraform.io/providers/DataDog/datadog/latest/docs/resources/integration_aws
+[terraform module]: https://registry.terraform.io/providers/DataDog/datadog/latest/docs/resources/integration_aws_account
