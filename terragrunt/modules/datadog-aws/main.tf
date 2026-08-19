@@ -3,6 +3,7 @@ locals {
 }
 
 data "aws_caller_identity" "current" {}
+data "aws_partition" "current" {}
 
 resource "aws_iam_policy" "datadog" {
   name        = "DatadogAWSIntegrationPolicy"
@@ -113,7 +114,7 @@ resource "aws_iam_role" "datadog" {
         }
         Condition = {
           StringEquals = {
-            "sts:ExternalId" = datadog_integration_aws.aws.external_id
+            "sts:ExternalId" = datadog_integration_aws_account.aws.auth_config.aws_auth_config_role.external_id
           }
         }
       }
@@ -126,18 +127,46 @@ resource "aws_iam_role_policy_attachment" "datadog" {
   policy_arn = aws_iam_policy.datadog.arn
 }
 
-resource "datadog_integration_aws" "aws" {
-  account_id = data.aws_caller_identity.current.account_id
-  role_name  = local.datadog_iam_role_name
+resource "datadog_integration_aws_account" "aws" {
+  account_tags   = ["env:${var.env}"]
+  aws_account_id = data.aws_caller_identity.current.account_id
+  aws_partition  = data.aws_partition.current.partition
 
-  account_specific_namespace_rules = {
-    # The AWS Lambda integration includes CloudFront functions, which are
-    # redundantly deployed to many regions. This creates a large number of
-    # serverless functions in Datadog, which we don't need.
-    lambda = false
+  // Leave empty to default to all regions
+  aws_regions {}
+
+  auth_config {
+    aws_auth_config_role {
+      role_name = local.datadog_iam_role_name
+    }
   }
 
-  host_tags = [
-    "env:${var.env}"
-  ]
+  logs_config {
+    // Leave empty to disable Datadog Forwarder log autosubscription.
+    lambda_forwarder {}
+  }
+
+  metrics_config {
+    collect_cloudwatch_alarms = true
+    namespace_filters {
+      exclude_only = [
+        "AWS/ElasticMapReduce",
+        # The AWS Lambda integration includes CloudFront functions, which are
+        # redundantly deployed to many regions. This creates a large number of
+        # serverless functions in Datadog, which we don't need.
+        "AWS/Lambda",
+        "AWS/SQS",
+        "AWS/Usage",
+      ]
+    }
+  }
+
+  resources_config {
+    extended_collection = false
+  }
+
+  traces_config {
+    # Leave empty to disable AWS X-Ray trace collection.
+    xray_services {}
+  }
 }
