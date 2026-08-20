@@ -69,12 +69,6 @@ inputs = {
       email = "adam@adamharvey.name"
       groups = ["crates-io"]
     }
-    "ehuss" = {
-      given_name = "Eric"
-      family_name = "Huss"
-      email = "eric@huss.org"
-      groups = ["triagebot"]
-    }
     "apiraino" = {
       given_name = "apiraino"
       family_name = "n/a"
