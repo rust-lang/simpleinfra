@@ -1,7 +1,8 @@
 // This file configures the crates.io web app API via Fastly CDN
 
 locals {
-  fastly_webapp_domain_name = "fastly-app.${var.webapp_domain_name}"
+  fastly_webapp_domain_name       = "fastly-app.${var.webapp_domain_name}"
+  webapp_rate_limit_response_code = 429
 }
 
 resource "fastly_service_vcl" "webapp" {
@@ -89,6 +90,19 @@ resource "fastly_service_vcl" "webapp" {
       set bereq.http.X-Request-Id = req.http.X-Request-Id;
       set bereq.http.Authorization = req.http.Authorization;
       set bereq.http.Cookie = req.http.Cookie;
+    VCL
+  }
+
+  # Add a response body to requests blocked by the NGWAF rate limit.
+  snippet {
+    name    = "NGWAF rate limit response body"
+    type    = "error"
+    content = <<-VCL
+      if (obj.status == ${local.webapp_rate_limit_response_code}) {
+        set obj.http.Content-Type = "application/json";
+        synthetic {json"{"errors":[{"detail":"too many requests from the same IP"}]}"json};
+        return (deliver);
+      }
     VCL
   }
 
