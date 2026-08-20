@@ -131,13 +131,41 @@
     state: present
   when: ansible_architecture == "x86_64"
 
-- name: Install kernel modules on cloud machines
+
+# Starting with some version ubuntu-linux kernel 7.x.y, the packaging scheme
+# for extra modules changed : rather than packaging two extra modules according
+# to the kernel + flavor, canonical packages a single bundle.
+#
+# This task captures this change and enables support to both
+# kernel=6.x.y and kernel=7.x.y of ubuntu
+#
+# https://discourse.ubuntu.com/t/kernel-development-release-cadence-and-deprecation-of-linux-modules-extra/65176
+#
+- name: Check whether separate kernel extra modules package exists
+  command: "apt-cache show linux-modules-extra-{{ kernel.stdout }}"
+  register: kernel_modules_extra
+  changed_when: false
+  failed_when: false
+
+# So far, GCP machines running with kernel 6.x.y
+- name: Install split kernel modules on cloud machines
   apt:
     name:
       - "linux-modules-extra-{{ kernel_flavor.stdout }}"
       - "linux-modules-extra-{{ kernel.stdout }}"
     state: present
-  when: kernel_flavor.stdout != "generic"
+  when:
+    - kernel_flavor.stdout != "generic"
+    - kernel_modules_extra.rc == 0
+
+# As of now, AWS machines running with kernel 7.x.y
+- name: Install combined kernel modules package on cloud machines
+  apt:
+    name: "linux-modules-{{ kernel.stdout }}"
+    state: present
+  when:
+    - kernel_flavor.stdout != "generic"
+    - kernel_modules_extra.rc != 0
 
 - name: Install kernel modules on local Ubuntu VMs
   apt:
