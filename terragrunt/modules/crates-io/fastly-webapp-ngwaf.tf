@@ -99,7 +99,7 @@ resource "fastly_ngwaf_workspace_rule" "webapp_per_ip_rate_limit" {
   action {
     signal        = "site.webapp-rate-limit"
     type          = "block_signal"
-    response_code = 429
+    response_code = local.webapp_rate_limit_response_code
   }
 
   # If an IP sends 600 req in 10 minutes, block them for 5 minutes.
