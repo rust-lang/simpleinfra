@@ -127,6 +127,25 @@ resource "aws_iam_role_policy_attachment" "datadog" {
   policy_arn = aws_iam_policy.datadog.arn
 }
 
+resource "aws_iam_role_policy" "datadog_forwarders" {
+  count = length(var.datadog_forwarder_arns) > 0 ? 1 : 0
+  name  = "DatadogForwarderInvoke"
+  role  = aws_iam_role.datadog.id
+
+  # Datadog invokes registered Forwarders to validate them before it configures
+  # and maintains their automatic log-subscription triggers.
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action   = "lambda:InvokeFunction"
+        Effect   = "Allow"
+        Resource = var.datadog_forwarder_arns
+      }
+    ]
+  })
+}
+
 resource "datadog_integration_aws_account" "aws" {
   account_tags   = ["env:${var.env}"]
   aws_account_id = data.aws_caller_identity.current.account_id
@@ -142,8 +161,10 @@ resource "datadog_integration_aws_account" "aws" {
   }
 
   logs_config {
-    // Leave empty to disable Datadog Forwarder log autosubscription.
-    lambda_forwarder {}
+    lambda_forwarder {
+      lambdas = var.datadog_forwarder_arns
+      sources = var.datadog_log_sources
+    }
   }
 
   metrics_config {
