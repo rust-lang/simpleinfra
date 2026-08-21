@@ -7,6 +7,12 @@ include {
   merge_strategy = "deep"
 }
 
+# Tell Terragrunt to apply aws-organization first
+dependencies {
+  paths = ["../aws-organization"]
+}
+
 inputs = {
-  env = "prod"
+  cloudtrail_datadog_api_key_secret_name = "/prod/datadog/cloudtrail-api-key"
+  env                                    = "prod"
 }
