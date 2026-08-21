@@ -6,13 +6,24 @@ variable "env" {
   }
 }
 
-variable "cloudtrail_datadog_api_key_secret_name" {
-  description = "Name of the Secrets Manager secret used by the CloudTrail Forwarder; null disables the organization trail"
-  type        = string
-  default     = null
+variable "datadog_forwarder_arns" {
+  description = "ARNs of Datadog Forwarder Lambda functions registered for automatic log subscription"
+  type        = list(string)
+  default     = []
 
   validation {
-    condition     = var.cloudtrail_datadog_api_key_secret_name == null ? true : length(trimspace(var.cloudtrail_datadog_api_key_secret_name)) > 0
-    error_message = "The CloudTrail Datadog API key secret name must be null or a non-empty string."
+    condition     = alltrue([for arn in var.datadog_forwarder_arns : length(trimspace(arn)) > 0])
+    error_message = "Datadog Forwarder ARNs must be non-empty strings."
+  }
+}
+
+variable "datadog_log_sources" {
+  description = "AWS log sources for which Datadog should configure automatic Forwarder subscriptions"
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition     = alltrue([for source in var.datadog_log_sources : length(trimspace(source)) > 0])
+    error_message = "Datadog log sources must be non-empty strings."
   }
 }

@@ -1,7 +1,5 @@
 locals {
-  datadog_forwarder_arns = module.organization_cloudtrail[*].datadog_forwarder_arn
-  datadog_iam_role_name  = "DatadogAWSIntegrationRole"
-  datadog_log_sources    = length(local.datadog_forwarder_arns) > 0 ? ["cloudtrail"] : []
+  datadog_iam_role_name = "DatadogAWSIntegrationRole"
 }
 
 data "aws_caller_identity" "current" {}
@@ -130,7 +128,7 @@ resource "aws_iam_role_policy_attachment" "datadog" {
 }
 
 resource "aws_iam_role_policy" "datadog_forwarders" {
-  count = length(local.datadog_forwarder_arns) > 0 ? 1 : 0
+  count = length(var.datadog_forwarder_arns) > 0 ? 1 : 0
   name  = "DatadogForwarderInvoke"
   role  = aws_iam_role.datadog.id
 
@@ -142,7 +140,7 @@ resource "aws_iam_role_policy" "datadog_forwarders" {
       {
         Action   = "lambda:InvokeFunction"
         Effect   = "Allow"
-        Resource = local.datadog_forwarder_arns
+        Resource = var.datadog_forwarder_arns
       }
     ]
   })
@@ -164,8 +162,8 @@ resource "datadog_integration_aws_account" "aws" {
 
   logs_config {
     lambda_forwarder {
-      lambdas = local.datadog_forwarder_arns
-      sources = local.datadog_log_sources
+      lambdas = var.datadog_forwarder_arns
+      sources = var.datadog_log_sources
     }
   }
 

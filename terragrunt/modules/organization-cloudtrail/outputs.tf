@@ -8,6 +8,11 @@ output "datadog_forwarder_arn" {
   value       = module.datadog_forwarder.datadog_forwarder_arn
 }
 
+output "datadog_log_sources" {
+  description = "AWS log sources to auto-subscribe to the Datadog Forwarder"
+  value       = ["cloudtrail"]
+}
+
 output "trail_arn" {
   description = "Organization CloudTrail ARN"
   value       = aws_cloudtrail.organization.arn
