@@ -37,7 +37,7 @@ os.chmod("/tmp/packer", 0o755)
 # TODO: Ideally we'd do some kind of verification the AMI works before we publish it to SSM
 # But since it's not super clear how to do that nicely and breakage is relatively unlikely,
 # for now we just directly update.
-def update_ami(ami_name):
+def update_ami(ami_name, arch):
     # Now that we should have an AMI, we want to place it's ID in an SSM parameter.
     # Getting the ID out of packer is annoying so just query EC2 for it from the name.
     ec2 = boto3.client("ec2", region_name="us-east-2")
@@ -54,8 +54,12 @@ def update_ami(ami_name):
         )
         if image["Name"] == ami_name:
             ssm = boto3.client("ssm", region_name="us-east-2")
+            if arch == "x86_64":
+                ssm_name = "latest-gha-runner-ami"
+            else:
+                ssm_name = "latest-gha-runner-ami-arm64"
             ssm.put_parameter(
-                Name="latest-gha-runner-ami",
+                Name=ssm_name,
                 Value=image["ImageId"],
                 Type="String",
                 DataType="aws:ec2:image",
@@ -68,6 +72,8 @@ def update_ami(ami_name):
 
 
 def handler(event, context):
+    architecture = event["arch"]
+
     ami_name = "packer-gha-runner-" + str(uuid.uuid4())
     latest_release = subprocess.run(
         [
@@ -86,7 +92,12 @@ def handler(event, context):
     runner_url = None
     for asset in json.loads(latest_release.stdout)["assets"]:
         url = asset["browser_download_url"]
-        if "linux-x64" in url:
+        if (
+            architecture == "x86_64"
+            and "linux-x64" in url
+            or architecture == "aarch64"
+            and "linux-arm64" in url
+        ):
             runner_url = url
     # Then execute the packer build
     with_home = os.environ.copy()
@@ -100,10 +111,12 @@ def handler(event, context):
             f"ami_name={ami_name}",
             "-var",
             f"runner_url={runner_url}",
+            "-var",
+            f"architecture={architecture}",
             "ubuntu.pkr.hcl",
         ],
         check=True,
         env=with_home,
     )
 
-    update_ami(ami_name)
+    update_ami(ami_name, architecture)
