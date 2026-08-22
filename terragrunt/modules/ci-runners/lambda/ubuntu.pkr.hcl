@@ -15,10 +15,14 @@ variable "runner_url" {
   type = string
 }
 
+variable "architecture" {
+  type = string
+}
+
 source "amazon-ebs" "ubuntu" {
   ami_name = "${var.ami_name}"
 
-  instance_type = "c8a.medium"
+  instance_type = var.architecture == "x86_64" ? "c8a.medium" : "c9g.medium"
   region        = "us-east-2"
 
   temporary_security_group_source_public_ip = true
@@ -26,7 +30,7 @@ source "amazon-ebs" "ubuntu" {
 
   source_ami_filter {
     filters = {
-      name                = "ubuntu-minimal/*ubuntu-resolute-26.04-amd64-minimal-*"
+      name                = var.architecture == "x86_64" ? "ubuntu-minimal/*ubuntu-resolute-26.04-amd64-minimal-*" : "ubuntu-minimal/*ubuntu-resolute-26.04-arm64-minimal-*"
       root-device-type    = "ebs"
       virtualization-type = "hvm"
     }

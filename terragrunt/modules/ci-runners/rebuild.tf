@@ -104,7 +104,8 @@ resource "aws_iam_role_policy" "image_builder" {
 }
 
 resource "aws_scheduler_schedule" "image_builder" {
-  name       = "daily-rebuild"
+  for_each   = toset(["aarch64", "x86_64"])
+  name       = "daily-rebuild-${each.value}"
   group_name = "default"
 
   flexible_time_window {
@@ -118,8 +119,9 @@ resource "aws_scheduler_schedule" "image_builder" {
     arn      = aws_lambda_function.image_builder.arn
     role_arn = aws_iam_role.image_invoker.arn
 
-    # No input needed
-    input = jsonencode({})
+    input = jsonencode({
+      "arch" : each.value
+    })
 
     # Don't retry more than once. Building AMIs is relatively expensive, we don't
     # need to accidentally spin up a bunch of builders.
