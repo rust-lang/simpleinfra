@@ -17,6 +17,7 @@ resource "datadog_role" "safe_readonly" {
     for_each = toset([
       data.datadog_permissions.all.permissions.apm_read,
       data.datadog_permissions.all.permissions.dashboards_read,
+      data.datadog_permissions.all.permissions.gcp_configuration_read,
       data.datadog_permissions.all.permissions.incident_notification_settings_read,
       data.datadog_permissions.all.permissions.incident_read,
       data.datadog_permissions.all.permissions.incident_settings_read,
@@ -28,6 +29,7 @@ resource "datadog_role" "safe_readonly" {
       data.datadog_permissions.all.permissions.monitors_read,
       data.datadog_permissions.all.permissions.notebooks_read,
       data.datadog_permissions.all.permissions.on_call_read,
+      data.datadog_permissions.all.permissions.security_monitoring_rules_read,
       data.datadog_permissions.all.permissions.slos_read,
     ])
 
