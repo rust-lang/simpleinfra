@@ -28,6 +28,10 @@ locals {
       login = "jdno@jdno.dev"
       name  = "Jan David Nose"
     }
+    "jess" = {
+      login = "rust@jessizen.com"
+      name  = "Jess Izen"
+    }
     "joel" = {
       login = "joelmarcey@rustfoundation.org"
       name  = "Joel Marcey"

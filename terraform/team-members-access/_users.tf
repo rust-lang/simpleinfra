@@ -11,6 +11,7 @@ locals {
     "carols10cents"  = [aws_iam_group.crates_io.name],
     "jtgeibel"       = [aws_iam_group.crates_io.name],
     "Turbo87"        = [aws_iam_group.crates_io.name],
+    "jlizen"         = [aws_iam_group.foundation.name],
     "JoelMarcey"     = [aws_iam_group.foundation.name],
     "rebeccarumbul"  = [aws_iam_group.foundation.name],
     "abibroom"       = [aws_iam_group.foundation.name],
