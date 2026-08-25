@@ -10,6 +10,12 @@ following variables:
 
 - `env`: The environment of the account, either `prod` or `staging`
 
+## Log forwarding
+
+The optional `datadog_forwarder_arns` and `datadog_log_sources` inputs register
+Datadog Forwarder Lambda functions and enable automatic log subscriptions for
+the specified AWS sources.
+
 [datadog]: https://datadoghq.com
 [datadog-aws]: https://docs.datadoghq.com/integrations/amazon_web_services/
 [terraform module]: https://registry.terraform.io/providers/DataDog/datadog/latest/docs/resources/integration_aws_account
