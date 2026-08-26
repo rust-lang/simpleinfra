@@ -1,0 +1,10 @@
+{
+    "aws": {
+        "profile": "rustc-perf-prod",
+        "regions": [
+            {
+                "region": "us-east-2"
+            }
+        ]
+    }
+}
