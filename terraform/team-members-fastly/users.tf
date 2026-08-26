@@ -16,6 +16,11 @@ locals {
       name  = "Jan David Nose"
       role  = "superuser"
     }
+    "jess" = {
+      login = "jessizen@rustfoundation.org"
+      name  = "Jess Izen"
+      role  = "user"
+    }
     "joel" = {
       login = "joelmarcey@rustfoundation.org"
       name  = "Joel Marcey"
