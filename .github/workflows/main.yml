@@ -23,21 +23,37 @@ jobs:
       - name: Run clippy
         run: cargo clippy --all -- -Dwarnings
 
-  static-crates-io:
-    name: static.crates.io Fastly worker
+  fastly-workers:
+    name: ${{ matrix.name }} Fastly worker
     runs-on: ubuntu-24.04
     env:
       # renovate: datasource=crate depName=viceroy
       VICEROY_VERSION: "0.20.0"
       # renovate: datasource=crate depName=cargo-nextest
       NEXTEST_VERSION: "0.9.140"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: docs.rs
+            workspace: terraform/docs-rs/fastly-compute-docs-rs
+            test-command: just lint run-unit-tests
+          - name: static.crates.io
+            workspace: terragrunt/modules/crates-io/compute-static
+            test-command: cargo nextest run
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: install just
+        if: matrix.name == 'docs.rs'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes just
 
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           env-vars: VICEROY_VERSION NEXTEST_VERSION
-          workspaces: terragrunt/modules/crates-io/compute-static
+          workspaces: ${{ matrix.workspace }}
 
       - name: Install test tools
         run: |
@@ -45,8 +61,8 @@ jobs:
           cargo install cargo-nextest --locked --version "$NEXTEST_VERSION"
 
       - name: Run the test suite
-        working-directory: terragrunt/modules/crates-io/compute-static
-        run: cargo nextest run
+        working-directory: ${{ matrix.workspace }}
+        run: ${{ matrix.test-command }}
 
   terraform:
     name: Terraform configuration
@@ -99,7 +115,7 @@ jobs:
   CI:
     # Keep `name` matching the status check.
     name: CI
-    needs: [ terraform, actions-js, javascript-tests, rust, static-crates-io]
+    needs: [ terraform, actions-js, javascript-tests, rust, fastly-workers]
     # We need to ensure this job does *not* get skipped if its dependencies fail,
     # because a skipped job is considered a success by GitHub. So we have to
     # overwrite `if:`. We use `!cancelled()` to ensure the job does still not get run

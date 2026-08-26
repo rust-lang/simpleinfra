@@ -3,6 +3,10 @@ locals {
   config_store_name = "docs_rs_config"
 }
 
+data "aws_ssm_parameter" "datadog_api_key" {
+  name = "/prod/docs-rs/datadog-api-key"
+}
+
 data "external" "package" {
   program     = ["bash", "terraform-external-build.sh"]
   working_dir = "./fastly-compute-docs-rs/bin"
@@ -43,6 +47,12 @@ resource "fastly_configstore_entries" "docs_rs" {
 
 resource "fastly_service_compute" "docs_rs" {
   name = local.domain_name
+
+  logging_datadog {
+    name   = "application_logs"
+    token  = data.aws_ssm_parameter.datadog_api_key.value
+    region = "US"
+  }
 
   domain {
     name = local.domain_name

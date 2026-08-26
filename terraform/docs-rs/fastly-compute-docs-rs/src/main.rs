@@ -1,3 +1,4 @@
+mod logging;
 mod ngwaf;
 mod shield;
 
@@ -9,6 +10,7 @@ use fastly::{
         header::{CACHE_CONTROL, EXPIRES, STRICT_TRANSPORT_SECURITY},
     },
 };
+use tracing::{error, warn};
 use uuid::Uuid;
 
 // Should match the backend name in terraform
@@ -35,6 +37,11 @@ const X_REQUEST_ID: HeaderName = HeaderName::from_static("x-request-id");
 
 #[fastly::main]
 fn main(mut req: Request) -> Result<Response, Error> {
+    logging::setup();
+
+    let request_span = tracing::info_span!("request", request_id = tracing::field::Empty);
+    let _request_guard = request_span.enter();
+
     let config = ConfigStore::open(DOCS_RS_CONFIG);
     let secrets = SecretStore::open(DOCS_RS_SECRET_STORE).expect("failed to open secret store");
     let shield = shield::Context::load(&config, &secrets, &mut req)?;
@@ -86,10 +93,17 @@ fn main(mut req: Request) -> Result<Response, Error> {
 
     // Generate the request ID at the POP receiving the client request. On
     // shield POPs, preserve the ID set by the edge POP.
+    //
+    // Also sets the request id on the surrounding tracing span for the request,
+    // the Datadog formatter will merge the value into the log-record.
     if shield.response_is_for_client() {
-        req.set_header(X_REQUEST_ID, Uuid::new_v4().to_string());
-    } else if !req.contains_header(&X_REQUEST_ID) {
-        eprintln!("shield POP received request without expected X-Request-ID header from edge POP");
+        let rid = Uuid::new_v4().to_string();
+        req.set_header(X_REQUEST_ID, &rid);
+        request_span.record("request_id", rid);
+    } else if let Some(rid) = req.get_header_str(&X_REQUEST_ID) {
+        request_span.record("request_id", rid);
+    } else {
+        error!("shield POP received request without expected X-Request-ID header from edge POP");
     }
 
     if shield.target_is_origin() {
@@ -137,9 +151,9 @@ fn main(mut req: Request) -> Result<Response, Error> {
         // host and client IP.
         for header in [X_FORWARDED_HOST, FASTLY_CLIENT_IP] {
             if !req.contains_header(&header) {
-                eprintln!(
-                    "shield POP received request without expected {} header from edge POP",
-                    header.as_str()
+                warn!(
+                    header = header.as_str(),
+                    "shield POP received request without expected header from edge POP"
                 );
             }
         }

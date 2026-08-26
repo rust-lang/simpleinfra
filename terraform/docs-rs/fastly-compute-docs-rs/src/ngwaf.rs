@@ -1,4 +1,5 @@
 use fastly::{ConfigStore, Request, Response, http::StatusCode, security};
+use tracing::error;
 
 pub(crate) struct NgWaf {
     corp: String,
@@ -56,15 +57,15 @@ impl NgWaf {
                     }
                     security::InspectVerdict::Allow => {}
                     security::InspectVerdict::Unauthorized => {
-                        eprintln!("The service is not authorized to inspect the request");
+                        error!("service is not authorized to inspect request");
                     }
                     security::InspectVerdict::Other(name) => {
-                        eprintln!("unable to inspect request: {}", name);
+                        error!(verdict = name, "unable to inspect request");
                     }
                 }
             }
             Err(err) => {
-                eprintln!("error inspecting request: {:?}", err);
+                error!(error = ?err, "error inspecting request");
             }
         }
 
