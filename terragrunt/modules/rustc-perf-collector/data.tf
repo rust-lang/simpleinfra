@@ -1,10 +1,9 @@
 locals {
-  // The project requested the M9g (Graviton 5) family on a Dedicated Host.
-  // Start with a 12xlarge partition: it provides 48 vCPUs and 192 GiB while
-  // using one of the eight 12xlarge slots listed for an empty M9g host, leaving
-  // capacity available for future M9g collectors.
+  // An M9g Dedicated Host has two metal-48xl slots. Use both slots so each
+  // collector gets direct access to one of the host's Graviton 5 sockets.
+  instance_count  = 2
   instance_family = "m9g"
-  instance_type   = "m9g.12xlarge"
+  instance_type   = "m9g.metal-48xl"
 
   availability_zone = "us-east-2a"
 }

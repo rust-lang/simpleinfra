@@ -1,4 +1,6 @@
 resource "aws_instance" "collector" {
+  count = local.instance_count
+
   ami           = data.aws_ami.ubuntu.id
   instance_type = local.instance_type
   // host tenancy plus the explicit host ID places this instance on the
@@ -9,7 +11,7 @@ resource "aws_instance" "collector" {
   vpc_security_group_ids = [aws_security_group.collector.id]
   // The public address is only for outbound package, toolchain, and benchmark
   // downloads. network.tf defines no ingress rules; administration goes
-  // through SSM. This avoids a continuously billed NAT gateway for one host.
+  // through SSM. This avoids a continuously billed NAT gateway.
   associate_public_ip_address = true
   iam_instance_profile        = aws_iam_instance_profile.collector.name
 
@@ -48,7 +50,7 @@ resource "aws_instance" "collector" {
   }
 
   tags = {
-    Name        = "rustc-perf-graviton5"
+    Name        = "rustc-perf-graviton5-${count.index + 1}"
     Environment = "prod"
     Service     = "rustc-perf"
   }

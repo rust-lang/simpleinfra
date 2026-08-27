@@ -1,17 +1,15 @@
 # rustc-perf production AWS account
 
-This account contains the Graviton 5 collector for rustc-perf. The collector is
-an `m9g.12xlarge` partition, with 48 vCPUs and 192 GiB of memory, placed on an
-M9g Dedicated Host in `us-east-2`. The host is allocated for the M9g family,
-not the 12xlarge size. AWS's capacity table currently lists room for eight
-`m9g.12xlarge` instances on an empty host, so this initial collector leaves
-capacity for more compatible M9g instances later. Dedicated tenancy keeps the
-physical server exclusive to the account; a boot-time `perf stat` smoke test
-separately verifies that the guest exposes the hardware counters rustc-perf
-needs.
+This account contains two Graviton 5 collectors for rustc-perf. Each collector
+is an `m9g.metal-48xl` instance with 192 vCPUs and 768 GiB of memory. Both are
+placed on the same M9g Dedicated Host in `us-east-2`, using the host's two
+metal-48xl slots. Dedicated tenancy keeps the physical server exclusive to the
+account, while the bare-metal instance type gives each collector direct access
+to its Graviton 5 socket. A boot-time `perf stat` smoke test verifies that the
+hardware counters rustc-perf needs are available.
 
-The machine has no inbound firewall rules. Operators connect through AWS
-Systems Manager Session Manager. Its public IPv4 address is used only for
+The machines have no inbound firewall rules. Operators connect through AWS
+Systems Manager Session Manager. Their public IPv4 addresses are used only for
 outbound access without the cost of a NAT gateway.
 
 Terraform allocates the host with On-Demand billing. It does not purchase a
@@ -80,13 +78,15 @@ approved the quota request.
    terragrunt apply
    ```
 
-## Verify the collector
+## Verify the collectors
 
-Once the instance is registered with Systems Manager, start a session:
+Once the instances are registered with Systems Manager, list their IDs and
+start a session with either one (change the array index to select the other):
 
 ```console
 cd terragrunt/accounts/rustc-perf-prod/collector
-instance_id="$(terragrunt output -raw instance_id)"
+terragrunt output -json instance_ids
+instance_id="$(terragrunt output -json instance_ids | jq -r '.[0]')"
 aws ssm start-session \
   --profile rustc-perf-prod \
   --region us-east-2 \
@@ -103,10 +103,10 @@ perf stat -e cycles,instructions,branches,branch-misses -- sleep 1
 
 The boot configuration installs the native kernel's `perf` package and sets
 `kernel.perf_event_paranoid=-1`, allowing the unprivileged collector process to
-read the counters. Stopping the instance preserves its encrypted root volume,
+read the counters. Stopping an instance preserves its encrypted root volume,
 but it does **not** stop billing for the allocated Dedicated Host. Ending host
-charges requires terminating every instance on the host and releasing the host;
-the collector's API termination protection makes that an explicit Terraform
+charges requires terminating both instances and releasing the host; the
+collectors' API termination protection makes that an explicit Terraform
 configuration change rather than an accidental command.
 
 ## Dedicated host auto recovery

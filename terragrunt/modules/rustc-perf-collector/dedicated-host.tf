@@ -1,9 +1,8 @@
 // A Dedicated Host is an entire physical EC2 server allocated to this AWS
-// account. Selecting the family rather than one instance type lets us divide
-// its capacity among supported M9g sizes instead of fixing the host layout at
-// allocation time. aws_ec2_host allocates an On-Demand host; it deliberately
-// does not purchase a one- or three-year Dedicated Host Reservation because
-// that is a separate, irreversible billing commitment with payment-term input.
+// account. Its two metal-48xl slots provide the two requested bare-metal
+// collectors. aws_ec2_host allocates an On-Demand host; it deliberately does
+// not purchase a one- or three-year Dedicated Host Reservation because that is
+// a separate, irreversible billing commitment with payment-term input.
 resource "aws_ec2_host" "collector" {
   availability_zone = local.availability_zone
   instance_family   = local.instance_family

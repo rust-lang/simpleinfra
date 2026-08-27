@@ -1,6 +1,6 @@
-// This service needs one outbound-only host, so a small dedicated VPC is easier
-// to reason about than adopting a default VPC or deploying the multi-AZ/NAT
-// topology used by web services.
+// This service needs outbound-only collectors, so a small dedicated VPC is
+// easier to reason about than adopting a default VPC or deploying the
+// multi-AZ/NAT topology used by web services.
 resource "aws_vpc" "collector" {
   cidr_block           = "10.0.0.0/24"
   enable_dns_hostnames = true
@@ -64,5 +64,5 @@ resource "aws_vpc_security_group_egress_rule" "collector" {
   security_group_id = aws_security_group.collector.id
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1"
-  description       = "Allow the collector to fetch toolchains and benchmark sources"
+  description       = "Allow the collectors to fetch toolchains and benchmark sources"
 }

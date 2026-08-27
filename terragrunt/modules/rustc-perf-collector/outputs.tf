@@ -1,21 +1,11 @@
-output "instance_id" {
-  description = "EC2 instance ID of the Graviton 5 collector"
-  value       = aws_instance.collector.id
+output "instance_ids" {
+  description = "EC2 instance IDs of the Graviton 5 collectors"
+  value       = aws_instance.collector[*].id
 }
 
 output "dedicated_host_id" {
-  description = "EC2 Dedicated Host containing the collector"
+  description = "EC2 Dedicated Host containing the collectors"
   value       = aws_ec2_host.collector.id
-}
-
-output "instance_type" {
-  description = "EC2 instance type of the collector"
-  value       = aws_instance.collector.instance_type
-}
-
-output "availability_zone" {
-  description = "Availability Zone selected for the collector"
-  value       = aws_instance.collector.availability_zone
 }
 
 output "perf_check_marker" {

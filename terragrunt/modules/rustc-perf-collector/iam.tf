@@ -1,6 +1,6 @@
 // The instance role is intentionally limited to Systems Manager. Workload
 // access to rustc-perf storage or secrets should be added separately and with
-// narrower policies once the collector is enrolled.
+// narrower policies once the collectors are enrolled.
 resource "aws_iam_role" "collector" {
   name = "rustc-perf-collector"
 
