@@ -26,5 +26,6 @@ dev-desktop-us-2.infra.rust-lang.org
 crater.infra.rust-lang.org
 
 [rustc-perf]
+rustc-perf-m9g.infra.rust-lang.org
 rustc-perf-one.infra.rust-lang.org
 rustc-perf-two.infra.rust-lang.org
