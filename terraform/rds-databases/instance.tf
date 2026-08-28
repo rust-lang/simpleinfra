@@ -70,7 +70,7 @@ resource "aws_db_instance" "shared" {
   backup_retention_period      = 3
   storage_type                 = "gp3"
   engine                       = "postgres"
-  engine_version               = "16.8"
+  engine_version               = "16"
   instance_class               = "db.m7g.large"
   identifier                   = "shared"
   username                     = "root"
