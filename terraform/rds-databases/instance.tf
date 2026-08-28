@@ -43,10 +43,19 @@ resource "aws_security_group" "rust_prod_db" {
   }
 
   ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = ["144.76.186.39/32", "195.201.172.195/32", "159.69.58.186/32"]
+    from_port = 5432
+    to_port   = 5432
+    protocol  = "tcp"
+    cidr_blocks = [
+      # rustc-perf-one collector
+      "144.76.186.39/32",
+      # rustc-perf-two collector
+      "195.201.172.195/32",
+      # Legacy rustc-perf collector
+      "159.69.58.186/32",
+      # M9g (Graviton 5) rustc-perf collector
+      "18.227.166.169/32",
+    ]
     description = "Connections from rustc-perf collection servers"
   }
 
@@ -61,7 +70,7 @@ resource "aws_db_instance" "shared" {
   backup_retention_period      = 3
   storage_type                 = "gp3"
   engine                       = "postgres"
-  engine_version               = "16.8"
+  engine_version               = "16"
   instance_class               = "db.m7g.large"
   identifier                   = "shared"
   username                     = "root"
