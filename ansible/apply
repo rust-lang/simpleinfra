@@ -80,6 +80,8 @@ def run_playbook(args):
             ansible_args += ["--tags", args.tags]
         if args.skip_tags is not None:
             ansible_args += ["--skip-tags", args.skip_tags]
+        if args.limit is not None:
+            ansible_args += ["--limit", args.limit]
         if args.check:
             ansible_args += ["--check"]
         if args.diff:
@@ -116,6 +118,10 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--skip-tags", help="do not run these tags",
+        default=None,
+    )
+    parser.add_argument(
+        "--limit", help="limit execution to the specified hosts/groups",
         default=None,
     )
     parser.add_argument(
