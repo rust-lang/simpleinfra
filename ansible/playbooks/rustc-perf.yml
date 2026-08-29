@@ -41,8 +41,14 @@
           - python3-venv
           # For `perf` and `cpupower` to work
           - linux-tools-generic
-          - linux-cloud-tools-generic
         state: present
+
+    # For `perf` and `cpupower` to work
+    - name: install cloud tools apt package (x86_64 only)
+      apt:
+        name: linux-cloud-tools-generic
+        state: present
+      when: ansible_architecture == "x86_64"
 
     # Install rustup/rustc/cargo
     - name: check if cargo is installed
@@ -78,6 +84,7 @@
         sysctl_set: yes
         reload: yes
 
+    # kernel.nmi_watchdog only exists on x86
     - name: Disable watchdog to reduce interrupts and noise
       sysctl:
         name: kernel.nmi_watchdog
@@ -85,6 +92,7 @@
         state: present
         sysctl_set: yes
         reload: yes
+      when: ansible_architecture == "x86_64"
 
     - name: Disable ASLR to reduce noise
       sysctl:
@@ -118,6 +126,7 @@
           [Install]
           WantedBy=multi-user.target
       become: yes
+      when: ansible_architecture == "x86_64"
 
     - name: Enable low-noise service
       systemd:
@@ -125,6 +134,7 @@
         enabled: yes
         daemon_reload: yes
       become: yes
+      when: ansible_architecture == "x86_64"
 
     - name: Disable swap for current session
       command: swapoff -a
