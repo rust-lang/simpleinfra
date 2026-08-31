@@ -5,8 +5,10 @@
 > For **contributors outside the Rust Project**:
 >
 > Before opening an issue or raising a PR to this repository, please get in
-> touch with [`t-infra` in Zulip] for discussion about it. We may close your
-> PR or issue otherwise.
+> touch with [`t-infra` in Zulip] to discuss about it. This recommendation also
+> applies to security scanners findings you want to contribute or fix. We may
+> close your PR or issue otherwise.
+> 
 
 This repository containing the tools and automation written by the [Rust
 infrastructure team][team] to manage our services. Using some of the tools in
