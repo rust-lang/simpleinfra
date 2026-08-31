@@ -15,6 +15,7 @@
     src: ssh/sshd_config
     dest: /etc/ssh/sshd_config
 
+  # Notify is only triggered when there is a change.
   notify: reload-ssh
 
 - name: create authorized keys directory
@@ -34,3 +35,10 @@
   notify: reload-ssh
 
   loop: "{{ unprivileged_users + sudo_users }}"
+
+# Handlers run only when notified by a changed task, but are normally delayed
+# until the end of the play.
+# Flush them here so SSH changes take effect sooner.
+# We want to make sure ssh is reloaded even if there is a failure in the playbook later.
+- name: apply ssh changes
+  meta: flush_handlers
