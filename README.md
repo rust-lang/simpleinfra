@@ -1,5 +1,14 @@
 # Simpleinfra
 
+> [!WARNING]
+>
+> For **contributors outside the Rust Project**:
+>
+> Before opening an issue or raising a PR to this repository, please get in
+> touch with [`t-infra` in Zulip] to discuss about it. This recommendation also
+> applies to security scanners findings you want to contribute or fix. We may
+> close your PR or issue otherwise.
+
 This repository containing the tools and automation written by the [Rust
 infrastructure team][team] to manage our services. Using some of the tools in
 this repo require privileges only infra team members have.
@@ -69,3 +78,4 @@ it finishes, but a program with your user's privileges can still interact with
 the key as long as the script is running.
 
 [1password-cli]: https://support.1password.com/command-line-getting-started/
+[`t-infra` in Zulip]: https://rust-lang.zulipchat.com/#narrow/channel/242791-t-infra
