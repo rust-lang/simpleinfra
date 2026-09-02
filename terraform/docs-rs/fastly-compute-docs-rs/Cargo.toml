@@ -5,6 +5,6 @@ edition = "2024"
 publish = false
 
 [dependencies]
-fastly = "0.12.1"
+fastly = "0.13.1"
 uuid = { version = "1.25.0", features = ["v4", "fast-rng"] }
 
