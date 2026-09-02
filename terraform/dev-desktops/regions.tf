@@ -26,7 +26,7 @@ module "aws_us_east_1" {
 
   instances = {
     "dev-desktop-us-1" = {
-      instance_type = "c7g.8xlarge"
+      instance_type = "c7g.12xlarge"
       instance_arch = "arm64"
       storage       = 3000
     }
