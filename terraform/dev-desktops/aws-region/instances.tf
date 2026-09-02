@@ -3,7 +3,7 @@
 resource "aws_eip" "dev_desktop" {
   for_each = var.instances
 
-  vpc = true
+  domain = "vpc"
 
   tags = {
     Name = each.key
