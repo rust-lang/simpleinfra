@@ -6,3 +6,5 @@ publish = false
 
 [dependencies]
 fastly = "0.12.1"
+uuid = { version = "1.25.0", features = ["v4", "fast-rng"] }
+

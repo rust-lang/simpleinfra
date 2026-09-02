@@ -9,6 +9,7 @@ use fastly::{
         header::{CACHE_CONTROL, EXPIRES, STRICT_TRANSPORT_SECURITY},
     },
 };
+use uuid::Uuid;
 
 // Should match the backend name in terraform
 const DOCS_RS_BACKEND: &str = "docs_rs_origin";
@@ -27,9 +28,10 @@ const NGWAF_WORKSPACE_KEY: &str = "ngwaf_workspace";
 
 const FASTLY_CLIENT_IP: HeaderName = HeaderName::from_static("fastly-client-ip");
 const SURROGATE_CONTROL: HeaderName = HeaderName::from_static("surrogate-control");
-const X_ORIGIN_AUTH: HeaderName = HeaderName::from_static("x-origin-auth");
 const X_COMPRESS_HINT: HeaderName = HeaderName::from_static("x-compress-hint");
 const X_FORWARDED_HOST: HeaderName = HeaderName::from_static("x-forwarded-host");
+const X_ORIGIN_AUTH: HeaderName = HeaderName::from_static("x-origin-auth");
+const X_REQUEST_ID: HeaderName = HeaderName::from_static("x-request-id");
 
 #[fastly::main]
 fn main(mut req: Request) -> Result<Response, Error> {
@@ -80,6 +82,14 @@ fn main(mut req: Request) -> Result<Response, Error> {
         _ => {
             return Ok(Response::from_status(StatusCode::METHOD_NOT_ALLOWED));
         }
+    }
+
+    // Generate the request ID at the POP receiving the client request. On
+    // shield POPs, preserve the ID set by the edge POP.
+    if shield.response_is_for_client() {
+        req.set_header(X_REQUEST_ID, Uuid::new_v4().to_string());
+    } else if !req.contains_header(&X_REQUEST_ID) {
+        eprintln!("shield POP received request without expected X-Request-ID header from edge POP");
     }
 
     if shield.target_is_origin() {
