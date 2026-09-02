@@ -11,7 +11,7 @@ module "aws_eu_central_1" {
       storage       = 250
     }
     "dev-desktop-eu-1" = {
-      instance_type = "c6g.8xlarge"
+      instance_type = "c9g.8xlarge"
       instance_arch = "arm64"
       storage       = 6000
     }
@@ -26,7 +26,7 @@ module "aws_us_east_1" {
 
   instances = {
     "dev-desktop-us-1" = {
-      instance_type = "c7g.12xlarge"
+      instance_type = "c9g.12xlarge"
       instance_arch = "arm64"
       storage       = 3000
     }
