@@ -224,7 +224,7 @@ resource "aws_cloudwatch_metric_alarm" "reboot" {
   }
 
   actions_enabled = true
-  alarm_actions   = ["arn:aws:automate:${data.aws_region.current.name}:ec2:reboot"]
+  alarm_actions   = ["arn:aws:automate:${data.aws_region.current.region}:ec2:reboot"]
 }
 
 data "aws_region" "current" {}
