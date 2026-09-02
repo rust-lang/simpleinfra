@@ -44,8 +44,8 @@ module "ecs_task" {
   source = "../../modules/ecs-task"
 
   name   = "triagebot"
-  cpu    = 256
-  memory = 512
+  cpu    = 1024
+  memory = 2048
 
   log_retention_days = 60
   ecr_repositories_arns = [
