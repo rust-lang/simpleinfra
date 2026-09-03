@@ -85,15 +85,24 @@ resource "aws_cloudfront_origin_request_policy" "webapp" {
 resource "aws_cloudfront_distribution" "webapp" {
   comment = var.webapp_domain_name
 
-  enabled             = true
+  enabled             = var.webapp_cloudfront_enabled
   wait_for_deployment = false
   is_ipv6_enabled     = true
   price_class         = "PriceClass_All"
 
-  aliases = [
-    local.cloudfront_webapp_domain_name,
-    var.webapp_domain_name
-  ]
+  lifecycle {
+    precondition {
+      condition     = var.webapp_cloudfront_enabled || var.webapp_cloudfront_weight == 0
+      error_message = "webapp_cloudfront_weight must be zero when webapp_cloudfront_enabled is false."
+    }
+  }
+
+  # Expose the direct-to-CloudFront hostname only while the distribution is
+  # enabled.
+  aliases = concat(
+    [var.webapp_domain_name],
+    var.webapp_cloudfront_enabled ? [local.cloudfront_webapp_domain_name] : [],
+  )
   viewer_certificate {
     acm_certificate_arn = module.certificate.arn
     ssl_support_method  = "sni-only"
@@ -140,6 +149,8 @@ resource "aws_cloudfront_distribution" "webapp" {
 }
 
 resource "aws_route53_record" "cloudfront_webapp_domain" {
+  count = var.webapp_cloudfront_enabled ? 1 : 0
+
   zone_id = data.aws_route53_zone.webapp.id
   name    = local.cloudfront_webapp_domain_name
   type    = "CNAME"

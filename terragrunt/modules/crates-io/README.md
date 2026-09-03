@@ -14,13 +14,21 @@ These are documented in more detail in the following sections.
 
 ```mermaid
 flowchart LR
-    DNS --> CloudFront
-    CloudFront --> Heroku
+    DNS --> Fastly
+    Fastly --> Heroku
 ```
 
 The user-facing web application for [crates.io] is hosted on Heroku and is not
-managed with [Terraform]. But the module configures CloudFront as the CDN for
-the app and grants it access to the relevant S3 buckets.
+managed with [Terraform]. The module configures Fastly as the normal CDN path,
+including its Next-Gen WAF, and retains CloudFront as an alternative path.
+
+In production, the CloudFront distribution is disabled, and the direct `cloudfront-app.crates.io` hostname is not
+published. Set `webapp_cloudfront_enabled` to enable the distribution and
+publish its direct hostname, then set `webapp_cloudfront_weight` to a positive
+value to route traffic to it.
+In staging, CloudFront remains enabled and is available at
+`cloudfront-app.staging.crates.io` for direct testing, even if its DNS traffic
+weight is zero.
 
 ## `index.crates.io`
 

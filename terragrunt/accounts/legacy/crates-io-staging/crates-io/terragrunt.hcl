@@ -31,6 +31,7 @@ inputs = {
   index_cloudfront_weight = 50
   index_fastly_weight = 50
 
+  webapp_cloudfront_enabled = true
   webapp_cloudfront_weight = 0
   webapp_fastly_weight = 100
 
