@@ -1,0 +1,12 @@
+TARGET := "wasm32-wasip1"
+TARGET_UPPER := shoutysnakecase(TARGET)
+
+lint:
+  cargo fmt -- --check
+  cargo clippy --locked -- -D warnings
+
+# run unit-tests with `viceroy` / fastly test runner
+run-unit-tests *ARGS:
+  # needs `cargo binstall viceroy cargo-nextest`
+  CARGO_TARGET_{{ TARGET_UPPER }}_RUNNER="viceroy run -C fastly.toml --" \
+    cargo nextest run --release --target {{ TARGET }} {{ ARGS }}

@@ -3,6 +3,7 @@ use fastly::{
     error::{Error, anyhow},
     shielding::Shield,
 };
+use tracing::error;
 
 /// represents the state of origin shielding for a request/response.
 #[derive(Default)]
@@ -64,9 +65,10 @@ impl Context {
         let shield = match Shield::new(&shield_pop) {
             Ok(shield) => shield,
             Err(e) => {
-                eprintln!(
-                    "Could not find shield '{}', Disabling the origin shielding.\n {:?}",
-                    shield_pop, e
+                error!(
+                    shield_pop,
+                    error = ?e,
+                    "could not find shield; disabling origin shielding"
                 );
                 // we only log an error here for the case we have a typo in the shield pop name.
                 // In this case we should fall back to normal CDN mode, not fail the request entirely.
