@@ -13,6 +13,8 @@ publish = false
 
 [profile.release]
 debug = 1
+codegen-units = 1
+lto = "fat"
 
 [dependencies]
 derive_builder = "0.12.0"
