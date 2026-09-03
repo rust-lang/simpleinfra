@@ -97,6 +97,11 @@ variable "webapp_cloudfront_weight" {
   type        = number
 }
 
+variable "webapp_cloudfront_enabled" {
+  description = "Whether the CloudFront distribution for crates.io is enabled"
+  type        = bool
+}
+
 variable "webapp_fastly_weight" {
   description = "Weight of the traffic for crates.io that is routed through Fastly"
   type        = number

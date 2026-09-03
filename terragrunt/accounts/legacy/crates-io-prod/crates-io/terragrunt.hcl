@@ -34,6 +34,8 @@ inputs = {
   index_cloudfront_weight = 1
   index_fastly_weight = 255
 
+  # Disable cloudfront to ensure Fastly NGWAF is protecting crates.io.
+  webapp_cloudfront_enabled = false
   webapp_cloudfront_weight = 0
   webapp_fastly_weight = 100
 
