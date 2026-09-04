@@ -16,6 +16,10 @@ uuid = { version = "1.25.0", features = ["v4", "fast-rng"] }
 tracing = "0.1"
 tracing-serde = "0.2"
 tracing-subscriber = { version = "0.3", default-features = false, features = ["fmt", "json"] }
+time = { version = "0.3.17", features = ["serde-human-readable"] }
+
+[dev-dependencies]
+time = { version = "0.3.17", features = ["serde-human-readable", "macros"] }
 
 [profile.fastly-release]
 inherits = "release"

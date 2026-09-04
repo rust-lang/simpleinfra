@@ -4,8 +4,8 @@ use serde_json::{Map, Value};
 use std::{
     io::{self, Write},
     sync::Mutex,
-    time::{SystemTime, UNIX_EPOCH},
 };
+use time::OffsetDateTime;
 use tracing::{
     Event, Subscriber,
     span::{Attributes, Id, Record},
@@ -21,6 +21,13 @@ use tracing_subscriber::{
 
 // Must match the logging endpoint name in Terraform.
 const APPLICATION_LOG_ENDPOINT: &str = "application_logs";
+
+// About `ddsource`
+// This corresponds to the integration name, the technology
+// from which the log originated. When it matches an integration
+// name, Datadog automatically installs the corresponding parsers
+// and facets. For example, nginx, postgresql, and so on.
+const LOG_SOURCE_FORMAT: &str = "docs-rs-fastly-wasm";
 
 pub(crate) fn setup() {
     let application_logs = Endpoint::from_name(APPLICATION_LOG_ENDPOINT);
@@ -115,24 +122,20 @@ where
         // Event fields override those inherited from spans.
         fields.extend(event_fields);
 
-        let timestamp = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_millis();
-
         let message = match fields.remove("message") {
             Some(Value::String(message)) => Some(message),
             _ => None,
         };
 
         let row = TraceLog {
-            ddsource: "fastly",
+            ddsource: LOG_SOURCE_FORMAT,
             ddtags: "env:production",
             hostname: fastly::compute_runtime::hostname(),
-            timestamp,
+            timestamp: OffsetDateTime::now_utc(),
             message: message.as_deref().unwrap_or_default(),
             service: "docs.rs fastly WASM",
             status: level_name(*event.metadata().level()),
+            target: event.metadata().target(),
             fields,
         };
 
@@ -172,14 +175,14 @@ struct TraceLog<'a> {
     ddsource: &'static str,
     ddtags: &'static str,
     hostname: &'static str,
-    /// Milliseconds since the Unix epoch.
-    /// Format / name:
-    /// https://docs.datadoghq.com/logs/log_configuration/processors/log_date_remapper/
-    timestamp: u128,
+    #[serde(with = "time::serde::rfc3339")]
+    timestamp: OffsetDateTime,
     message: &'a str,
     service: &'static str,
     /// Normalized tracing level.
     status: &'static str,
+    /// The tracing target, normally the Rust module containing the event.
+    target: &'a str,
     /// Additional `tracing` event fields.
     fields: Map<String, Value>,
 }
@@ -192,6 +195,7 @@ mod tests {
         str,
         sync::{Arc, Mutex},
     };
+    use time::macros::datetime;
 
     #[derive(Clone, Debug, Default)]
     struct CapturedOutput {
@@ -240,27 +244,31 @@ mod tests {
 
     #[test]
     fn trace_log_serializes_to_datadog_json() {
+        let timestamp = datetime!(2026-09-04 06:07:42 UTC);
+
         let row = TraceLog {
-            ddsource: "fastly",
+            ddsource: LOG_SOURCE_FORMAT,
             ddtags: "env:production",
             hostname: "docs.rs-fastly",
-            timestamp: 1_500,
+            timestamp,
             message: "handled request",
             service: "docs.rs fastly WASM",
             status: "info",
+            target: "docs_rs_fastly::ngwaf",
             fields: Map::from_iter([("status_code".into(), json!(200))]),
         };
 
         assert_eq!(
             serde_json::to_value(row).unwrap(),
             json!({
-                "ddsource": "fastly",
+                "ddsource": LOG_SOURCE_FORMAT,
                 "ddtags": "env:production",
                 "hostname": "docs.rs-fastly",
-                "timestamp": 1500,
+                "timestamp": "2026-09-04T06:07:42Z",
                 "message": "handled request",
                 "service": "docs.rs fastly WASM",
                 "status": "info",
+                "target": "docs_rs_fastly::ngwaf",
                 "fields": { "status_code": 200 },
             })
         );
@@ -329,5 +337,30 @@ mod tests {
 
         let log = json_lines(&output).pop().unwrap();
         assert_eq!(log["fields"]["backend"], "origin");
+    }
+
+    #[test]
+    fn formatter_preserves_message_with_a_debug_error_field() {
+        #[derive(Debug)]
+        struct InspectError;
+
+        let output = capture_logs(|| {
+            let request = tracing::info_span!("request", request_id = "request-123");
+            let _entered = request.enter();
+            let error = InspectError;
+
+            tracing::error!(
+                target: "docs_rs_fastly::ngwaf",
+                error = ?error,
+                "error inspecting request"
+            );
+        });
+
+        let log = json_lines(&output).pop().unwrap();
+        assert_eq!(log["message"], "error inspecting request");
+        assert_eq!(log["status"], "error");
+        assert_eq!(log["target"], "docs_rs_fastly::ngwaf");
+        assert_eq!(log["fields"]["error"], "InspectError");
+        assert_eq!(log["fields"]["request_id"], "request-123");
     }
 }
