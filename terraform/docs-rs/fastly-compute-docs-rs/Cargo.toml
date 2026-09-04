@@ -1,3 +1,7 @@
+# this crate has to be built on its own, and only works in the WASM / fastly environment. 
+# This excludes the crate from the surrounding simpleinfra workspace.
+[workspace]
+
 [package]
 name = "fastly-compute-project"
 version = "0.1.0"

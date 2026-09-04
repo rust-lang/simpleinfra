@@ -6,6 +6,3 @@ members = [
     "setup-deploy-keys",
     "ansible/roles/dev-desktop/files/team_login",
 ]
-exclude = [
-    "terraform/docs-rs/fastly-compute-docs-rs",
-]
