@@ -1,3 +1,7 @@
+# this crate has to be built on its own, and only works in the WASM / fastly environment. 
+# This excludes the crate from the surrounding simpleinfra workspace.
+[workspace]
+
 [package]
 name = "fastly-compute-project"
 version = "0.1.0"
@@ -12,6 +16,10 @@ uuid = { version = "1.25.0", features = ["v4", "fast-rng"] }
 tracing = "0.1"
 tracing-serde = "0.2"
 tracing-subscriber = { version = "0.3", default-features = false, features = ["fmt", "json"] }
+time = { version = "0.3.17", features = ["serde-human-readable"] }
+
+[dev-dependencies]
+time = { version = "0.3.17", features = ["serde-human-readable", "macros"] }
 
 [profile.fastly-release]
 inherits = "release"
