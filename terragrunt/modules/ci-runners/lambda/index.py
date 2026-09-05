@@ -41,7 +41,8 @@ def update_ami(ami_name, arch):
     # Now that we should have an AMI, we want to place it's ID in an SSM parameter.
     # Getting the ID out of packer is annoying so just query EC2 for it from the name.
     ec2 = boto3.client("ec2", region_name="us-east-2")
-    images = ec2.describe_images(Owners=["self"])
+    ec2_arch = arch if arch == "x86_64" else "arm64"
+    images = ec2.describe_images(Owners=["self"], Architecture=[ec2_arch])
     for image in images["Images"]:
         creation_date = datetime.datetime.fromisoformat(image["CreationDate"])
         age_in_days = (
@@ -65,7 +66,7 @@ def update_ami(ami_name, arch):
                 DataType="aws:ec2:image",
                 Overwrite=True,
             )
-        elif age_in_days > 2:
+        elif age_in_days > 14:
             ec2.deregister_image(
                 ImageId=image["ImageId"], DeleteAssociatedSnapshots=True
             )
