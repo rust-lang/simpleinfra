@@ -12,6 +12,7 @@ data "aws_ssm_parameter" "triagebot" {
     "zulip-token",
     "zulip-api-token",
     "github-app-private-key",
+    "crates-io-yank-token",
   ])
   name = "/prod/ecs/triagebot/${each.value}"
 }
@@ -106,6 +107,10 @@ module "ecs_task" {
       {
         "name": "DATABASE_URL",
         "valueFrom": "${data.aws_ssm_parameter.database_url.arn}"
+      },
+      {
+        "name": "CRATES_IO_API_TOKEN",
+        "valueFrom": "${data.aws_ssm_parameter.triagebot["crates-io-yank-token"].arn}"
       }
     ]
   }
