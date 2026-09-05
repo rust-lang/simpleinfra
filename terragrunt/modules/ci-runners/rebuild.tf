@@ -98,9 +98,22 @@ resource "aws_iam_role_policy" "image_builder" {
         Resource = [
           "*",
         ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:GetParameter",
+        ]
+        Resource = [
+          data.aws_ssm_parameter.zulip_hook_url.arn,
+        ]
       }
     ]
   })
+}
+
+data "aws_ssm_parameter" "zulip_hook_url" {
+  name = "/zulip-hook-url"
 }
 
 resource "aws_scheduler_schedule" "image_builder" {

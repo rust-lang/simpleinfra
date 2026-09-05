@@ -34,6 +34,48 @@ with ZipFile(io.BytesIO(packer_zip.stdout)) as packer_zip:
 os.chmod("/tmp/packer", 0o755)
 
 
+def post_zulip(arch):
+    ec2 = boto3.client("ec2", region_name="us-east-2")
+    ssm = boto3.client("ssm", region_name="us-east-2")
+    ec2_arch = arch if arch == "x86_64" else "arm64"
+    images = ec2.describe_images(
+        Owners=["self"], Filters=[{"Name": "architecture", "Values": [ec2_arch]}]
+    )
+    most_recent = max(
+        images["Images"],
+        key=lambda image: datetime.datetime.fromisoformat(image["CreationDate"]),
+    )
+    creation_date = datetime.datetime.fromisoformat(most_recent["CreationDate"])
+    age_in_days = (
+        (datetime.datetime.now(datetime.UTC).timestamp() - creation_date.timestamp())
+        / 3600
+        / 24
+    )
+    if age_in_days > 2:
+        zulip_url = ssm.get_parameter(Name="/zulip-hook-url", WithDecryption=True)
+        zulip_url = zulip_url["Parameter"]["Value"]
+
+        sts = boto3.client('sts')
+        account = sts.get_caller_identity()['Account']
+
+        subprocess.run(
+            [
+                "curl",
+                zulip_url,
+                "--json",
+                json.dumps(
+                    {
+                        "content": f"Most recent AWS CI runner for {arch} in "
+                        + f"{account} is {most_recent['ImageId']} "
+                        + f"created {creation_date} ({f'{age_in_days:.2f}'} days ago). "
+                        + "Builds are expected daily, please check CloudWatch Logs and fix the issue.",
+                        "topic": "ci-runner-notifications",
+                    }
+                ),
+            ],
+            check=True,
+        )
+
 # TODO: Ideally we'd do some kind of verification the AMI works before we publish it to SSM
 # But since it's not super clear how to do that nicely and breakage is relatively unlikely,
 # for now we just directly update.
@@ -42,7 +84,9 @@ def update_ami(ami_name, arch):
     # Getting the ID out of packer is annoying so just query EC2 for it from the name.
     ec2 = boto3.client("ec2", region_name="us-east-2")
     ec2_arch = arch if arch == "x86_64" else "arm64"
-    images = ec2.describe_images(Owners=["self"], Architecture=[ec2_arch])
+    images = ec2.describe_images(
+        Owners=["self"], Filters=[{"Name": "architecture", "Values": [ec2_arch]}]
+    )
     for image in images["Images"]:
         creation_date = datetime.datetime.fromisoformat(image["CreationDate"])
         age_in_days = (
@@ -74,6 +118,8 @@ def update_ami(ami_name, arch):
 
 def handler(event, context):
     architecture = event["arch"]
+
+    post_zulip(architecture)
 
     ami_name = "packer-gha-runner-" + str(uuid.uuid4())
     latest_release = subprocess.run(
