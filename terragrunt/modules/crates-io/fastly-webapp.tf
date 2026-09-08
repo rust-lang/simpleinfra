@@ -66,6 +66,11 @@ resource "fastly_service_vcl" "webapp" {
     between_bytes_timeout = local.webapp_cdn_timeout_seconds * 1000
   }
 
+  request_setting {
+    name      = "Redirect HTTP to HTTPS"
+    force_ssl = true
+  }
+
   default_ttl = 0
 
   logging_datadog {
