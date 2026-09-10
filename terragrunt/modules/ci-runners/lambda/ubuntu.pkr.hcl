@@ -115,7 +115,7 @@ EOF
       "sudo chmod a+x /home/ubuntu/job-started.sh",
       "sudo apt-get update",
       # https://github.com/actions/runner/blob/main/docs/start/envlinux.md
-      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y rustup gcc awscli liblttng-ust1t64 libkrb5-3 zlib1g libssl3 libicu78 docker.io docker-buildx jq python3-pip",
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y rustup gcc awscli liblttng-ust1t64 libkrb5-3 zlib1g libssl3 libicu78 docker.io docker-buildx jq python3-pip git",
       "sudo usermod -a -G docker ubuntu",
       "sudo --login -u ubuntu bash -c 'rustup install stable --profile=minimal'",
       "sudo --login -u ubuntu bash -c 'mkdir actions-runner'",
