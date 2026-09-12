@@ -78,6 +78,21 @@ resource "fastly_service_vcl" "webapp" {
     token = data.aws_ssm_parameter.datadog_token.value
   }
 
+  # Serve download and README URLs as redirects or JSON without contacting Heroku.
+  snippet {
+    name    = "redirect static files"
+    type    = "recv"
+    content = file("${path.module}/vcl/static-redirect-recv.vcl")
+  }
+
+  snippet {
+    name = "static file redirect response"
+    type = "error"
+    content = templatefile("${path.module}/vcl/static-redirect-error.vcl.tftpl", {
+      static_domain_name = var.static_domain_name
+    })
+  }
+
   # Forward relevant headers to the origin
   snippet {
     name    = "forward headers to origin"

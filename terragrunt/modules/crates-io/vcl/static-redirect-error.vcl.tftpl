@@ -1,0 +1,21 @@
+if (obj.status == 600) {
+  declare local var.url STRING;
+  set var.url = "https://${static_domain_name}" obj.response;
+  set obj.http.Vary:accept = "";
+  set obj.http.Access-Control-Allow-Origin = "*";
+  set obj.http.Strict-Transport-Security = "max-age=31536000";
+
+  std.collect(req.http.Accept);
+  if (req.http.Accept ~ "json") {
+    set obj.status = 200;
+    set obj.response = "OK";
+    set obj.http.Content-Type = "application/json";
+    synthetic {json"{"url":""json} json.escape(var.url) {json""}"json};
+  } else {
+    set obj.status = 302;
+    set obj.response = "Found";
+    set obj.http.Location = var.url;
+    synthetic {""};
+  }
+  return (deliver);
+}
