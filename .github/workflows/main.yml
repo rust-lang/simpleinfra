@@ -7,7 +7,7 @@ on:
 jobs:
   rust:
     name: Rust projects
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -25,7 +25,7 @@ jobs:
 
   fastly-workers:
     name: ${{ matrix.name }} Fastly worker
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     env:
       # renovate: datasource=crate depName=viceroy
       VICEROY_VERSION: "0.20.0"
@@ -66,7 +66,7 @@ jobs:
 
   terraform:
     name: Terraform configuration
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -78,12 +78,12 @@ jobs:
 
   actions-js:
     name: GitHub Actions (JS)
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 16
+          node-version: 24
       - name: Ensure the bundled action is the same as the source code
         run: |
           for action in $(ls github-actions/); do
@@ -100,7 +100,7 @@ jobs:
 
   javascript-tests:
     name: JavaScript Tests
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -121,7 +121,7 @@ jobs:
     # overwrite `if:`. We use `!cancelled()` to ensure the job does still not get run
     # when the workflow is canceled manually.
     if: ${{ !cancelled() }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       # Manually check the status of all dependencies. `if: failure()` does not work.
       - name: Conclusion
