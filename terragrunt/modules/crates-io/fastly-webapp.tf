@@ -61,6 +61,11 @@ resource "fastly_service_vcl" "webapp" {
     port              = 443
     ssl_cert_hostname = var.webapp_origin_domain
 
+    # Close idle connections before the Heroku origin does, avoiding
+    # attempts to reuse a connection that Heroku is concurrently closing
+    # Reference : https://devcenter.heroku.com/articles/http-routing#timeouts
+    keepalive_time = 50
+
     # crates.io accepts crate uploads, so add a longer origin timeout.
     first_byte_timeout    = local.webapp_cdn_timeout_seconds * 1000
     between_bytes_timeout = local.webapp_cdn_timeout_seconds * 1000
