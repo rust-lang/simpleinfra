@@ -52,9 +52,10 @@ locals {
       role  = "superuser"
     }
     "syphar" = {
-      login = "denis@cornehl.org"
-      name  = "Denis Cornehl"
-      role  = "user"
+      login    = "denis@cornehl.org"
+      name     = "Denis Cornehl"
+      role     = "user"
+      services = local.docs_rs_service_ids
     }
     "tobias" = {
       login    = "tobiasbieniek@rustfoundation.org"
@@ -113,6 +114,9 @@ locals {
     "liljrvY3Xt0CzNk0mpuLa7", # static.staging.crates.io
   ]
 
+  docs_rs_service_ids = [
+    "PqekaQ4n2Cy4QOG85AjuAH", # docs.rs
+  ]
 }
 
 resource "fastly_user" "users" {
