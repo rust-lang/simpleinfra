@@ -76,6 +76,11 @@ resource "fastly_service_compute" "docs_rs" {
   product_enablement {
     domain_inspector = true
 
+    ddos_protection {
+      enabled = true
+      mode    = "block"
+    }
+
     # Next generation WAF
     ngwaf {
       enabled      = true
