@@ -13,6 +13,9 @@ resource "datadog_role" "board_member" {
     for_each = toset([
       data.datadog_permissions.all.permissions.dashboards_write,
       data.datadog_permissions.all.permissions.dbm_read,
+      data.datadog_permissions.all.permissions.network_path_config_read,
+      data.datadog_permissions.all.permissions.sheets_read,
+      data.datadog_permissions.all.permissions.sheets_write,
     ])
 
     content {

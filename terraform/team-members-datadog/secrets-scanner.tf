@@ -10,7 +10,8 @@ resource "datadog_role" "secrets_scanner_access" {
       data.datadog_permissions.all.permissions.data_scanner_read,
       data.datadog_permissions.all.permissions.data_scanner_unmask,
       data.datadog_permissions.all.permissions.data_scanner_write,
-
+      data.datadog_permissions.all.permissions.network_path_config_read,
+      data.datadog_permissions.all.permissions.sheets_read,
     ])
 
     content {
