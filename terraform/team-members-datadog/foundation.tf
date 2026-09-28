@@ -21,6 +21,7 @@ resource "datadog_role" "foundation" {
 
   dynamic "permission" {
     for_each = toset([
+      data.datadog_permissions.all.permissions.apm_service_renaming_write,
       data.datadog_permissions.all.permissions.dashboards_write,
       data.datadog_permissions.all.permissions.dashboards_public_share,
       data.datadog_permissions.all.permissions.notebooks_write,
@@ -30,6 +31,9 @@ resource "datadog_role" "foundation" {
       data.datadog_permissions.all.permissions.metrics_metadata_write,
       data.datadog_permissions.all.permissions.monitors_write,
       data.datadog_permissions.all.permissions.dbm_read,
+      data.datadog_permissions.all.permissions.network_path_config_read,
+      data.datadog_permissions.all.permissions.sheets_read,
+      data.datadog_permissions.all.permissions.sheets_write,
     ])
 
     content {

@@ -27,9 +27,11 @@ resource "datadog_role" "safe_readonly" {
       data.datadog_permissions.all.permissions.logs_read_data,
       data.datadog_permissions.all.permissions.logs_read_index_data,
       data.datadog_permissions.all.permissions.monitors_read,
+      data.datadog_permissions.all.permissions.network_path_config_read,
       data.datadog_permissions.all.permissions.notebooks_read,
       data.datadog_permissions.all.permissions.on_call_read,
       data.datadog_permissions.all.permissions.security_monitoring_rules_read,
+      data.datadog_permissions.all.permissions.sheets_read,
       data.datadog_permissions.all.permissions.slos_read,
     ])
 
