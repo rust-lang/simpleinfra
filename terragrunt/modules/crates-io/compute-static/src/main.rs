@@ -296,6 +296,10 @@ fn send_request_to_s3(config: &Config, request: &Request) -> Result<Response, Er
         response = fallback_request.send(&config.fallback_host)?;
     }
 
+    if let Some(response) = unsatisfiable_range_response(&response) {
+        return Ok(response);
+    }
+
     enable_dynamic_compression(request, &mut response);
 
     // Automatic framing derives downstream framing from the response body and
@@ -308,6 +312,33 @@ fn send_request_to_s3(config: &Config, request: &Request) -> Result<Response, Er
     }
 
     Ok(response)
+}
+
+/// Return an empty 416 response when a partial response starts at or beyond EOF.
+///
+/// Fastly's Compute cache can return a reversed byte range and the complete body for such requests.
+/// See https://github.com/rust-lang/crates.io/issues/13159.
+fn unsatisfiable_range_response(response: &Response) -> Option<Response> {
+    if response.get_status() != StatusCode::PARTIAL_CONTENT {
+        return None;
+    }
+
+    let content_range = response.get_header(header::CONTENT_RANGE)?.to_str().ok()?;
+    let (range, length) = content_range.strip_prefix("bytes ")?.split_once('/')?;
+    let (start, end) = range.split_once('-')?;
+    let start = start.parse::<u64>().ok()?;
+    end.parse::<u64>().ok()?;
+    let length = length.parse::<u64>().ok()?;
+
+    if start < length {
+        return None;
+    }
+
+    Some(
+        Response::new()
+            .with_status(StatusCode::RANGE_NOT_SATISFIABLE)
+            .with_header(header::CONTENT_RANGE, format!("bytes */{length}")),
+    )
 }
 
 /// Add CORS headers to response
@@ -409,6 +440,73 @@ fn http_version_to_string(version: Version) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_unsatisfiable_range_response() {
+        for content_range in [
+            "bytes 278076-278075/278076",
+            "bytes 278077-278075/278076",
+            "bytes 18446744073709551615-278075/278076",
+        ] {
+            let response = Response::from_body("complete archive")
+                .with_status(StatusCode::PARTIAL_CONTENT)
+                .with_header(header::CONTENT_RANGE, content_range)
+                .with_header(header::CONTENT_LENGTH, "278076")
+                .with_header(header::CACHE_CONTROL, "public,max-age=31536000,immutable");
+
+            let mut response = unsatisfiable_range_response(&response).unwrap();
+            assert_eq!(response.get_status(), StatusCode::RANGE_NOT_SATISFIABLE);
+            assert_eq!(
+                response.get_header_str(header::CONTENT_RANGE),
+                Some("bytes */278076")
+            );
+            assert!(response.take_body().into_bytes().is_empty());
+            assert!(response.get_header(header::CONTENT_LENGTH).is_none());
+            assert!(response.get_header(header::CACHE_CONTROL).is_none());
+        }
+    }
+
+    #[test]
+    fn test_unsatisfiable_range_response_preserves_other_responses() {
+        for content_range in [
+            None,
+            Some("bytes 278075-278075/278076"),
+            Some("bytes 0-0/278076"),
+            Some("bytes 278076-278075/*"),
+            Some("bytes */278076"),
+            Some("bytes 278076-invalid/278076"),
+            Some("bytes 18446744073709551616-278075/278076"),
+            Some("bytes 278076-278075/18446744073709551616"),
+            Some("items 278076-278075/278076"),
+        ] {
+            let mut response = Response::from_body("partial archive")
+                .with_status(StatusCode::PARTIAL_CONTENT)
+                .with_header(header::CONTENT_LENGTH, "1");
+            if let Some(content_range) = content_range {
+                response.set_header(header::CONTENT_RANGE, content_range);
+            }
+
+            assert!(unsatisfiable_range_response(&response).is_none());
+            assert_eq!(response.take_body().into_string(), "partial archive");
+        }
+
+        let content_range = b"bytes 278076-278075/\xff".as_slice();
+        let response = Response::new()
+            .with_status(StatusCode::PARTIAL_CONTENT)
+            .with_header(header::CONTENT_RANGE, content_range);
+        assert!(unsatisfiable_range_response(&response).is_none());
+
+        for status in [
+            StatusCode::OK,
+            StatusCode::RANGE_NOT_SATISFIABLE,
+            StatusCode::INTERNAL_SERVER_ERROR,
+        ] {
+            let response = Response::new()
+                .with_status(status)
+                .with_header(header::CONTENT_RANGE, "bytes 278076-278075/278076");
+            assert!(unsatisfiable_range_response(&response).is_none());
+        }
+    }
 
     #[test]
     fn test_parse_cache_tags() {
