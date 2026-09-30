@@ -2,6 +2,7 @@ mod logging;
 mod ngwaf;
 mod shield;
 
+use crate::logging::ACCESS_LOG_ENDPOINT;
 use fastly::{
     ConfigStore, Error, Request, Response, SecretStore,
     error::Context as _,
@@ -9,7 +10,9 @@ use fastly::{
         HeaderName, Method, StatusCode,
         header::{CACHE_CONTROL, EXPIRES, STRICT_TRANSPORT_SECURITY},
     },
+    log::Endpoint,
 };
+use fastly_access_log::{LogLineV1Builder, collect_request, collect_response};
 use tracing::{error, warn};
 use uuid::Uuid;
 
@@ -35,16 +38,53 @@ const X_FORWARDED_HOST: HeaderName = HeaderName::from_static("x-forwarded-host")
 const X_ORIGIN_AUTH: HeaderName = HeaderName::from_static("x-origin-auth");
 const X_REQUEST_ID: HeaderName = HeaderName::from_static("x-request-id");
 
+pub(crate) const DATADOG_APP: &str = "docs.rs";
+pub(crate) const DATADOG_SERVICE: &str = "docs.rs fastly WASM";
+pub(crate) const DATADOG_ENV: &str = "production";
+
 #[fastly::main]
-fn main(mut req: Request) -> Result<Response, Error> {
+fn main(req: Request) -> Result<Response, Error> {
     logging::setup();
 
     let request_span = tracing::info_span!("request", request_id = tracing::field::Empty);
     let _request_guard = request_span.enter();
 
+    let mut access_log = collect_request(
+        &req,
+        DATADOG_SERVICE,
+        DATADOG_APP,
+        DATADOG_ENV,
+        Some(fastly::compute_runtime::hostname().to_owned()),
+    );
+
+    let result = handle(&mut access_log, req);
+
+    let access_log = collect_response(&mut access_log, &result);
+
+    if let Err(err) = fastly_access_log::build_and_send_log(
+        access_log,
+        [Endpoint::from_name(ACCESS_LOG_ENDPOINT)],
+    ) {
+        warn!(?err, "error emitting access log");
+    }
+
+    result
+}
+
+fn handle(access_log: &mut LogLineV1Builder, mut req: Request) -> Result<Response, Error> {
     let config = ConfigStore::open(DOCS_RS_CONFIG);
     let secrets = SecretStore::open(DOCS_RS_SECRET_STORE).expect("failed to open secret store");
+
     let shield = shield::Context::load(&config, &secrets, &mut req)?;
+    if shield.is_active() {
+        access_log.on_shield(
+            shield
+                .target_is_origin()
+                .then_some(true)
+                .or(shield.response_is_for_client().then_some(false)),
+        );
+    }
+
     let ngwaf = ngwaf::NgWaf::load(&config);
 
     match req.get_method() {
@@ -96,15 +136,18 @@ fn main(mut req: Request) -> Result<Response, Error> {
     //
     // Also sets the request id on the surrounding tracing span for the request,
     // the Datadog formatter will merge the value into the log-record.
-    if shield.response_is_for_client() {
+    let request_id = if shield.response_is_for_client() {
         let rid = Uuid::new_v4().to_string();
         req.set_header(X_REQUEST_ID, &rid);
-        request_span.record("request_id", rid);
+        Some(rid)
     } else if let Some(rid) = req.get_header_str(&X_REQUEST_ID) {
-        request_span.record("request_id", rid);
+        Some(rid.to_owned())
     } else {
         error!("shield POP received request without expected X-Request-ID header from edge POP");
-    }
+        None
+    };
+    tracing::Span::current().record("request_id", &request_id);
+    access_log.request_id(request_id);
 
     if shield.target_is_origin() {
         let origin_auth = secrets

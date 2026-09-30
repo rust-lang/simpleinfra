@@ -108,6 +108,10 @@ impl Context {
         Ok(ctx)
     }
 
+    pub fn is_active(&self) -> bool {
+        !matches!(self.shield, State::Disabled)
+    }
+
     /// will the request be sent to the origin or the shield?
     pub fn target_is_origin(&self) -> bool {
         match self.shield {
