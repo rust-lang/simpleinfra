@@ -33,11 +33,11 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "rust-terraform"
-    key            = "simpleinfra/crater.tfstate"
-    region         = "us-west-1"
-    dynamodb_table = "terraform-state-lock"
-    encrypt        = true
+    bucket       = "rust-terraform"
+    key          = "simpleinfra/crater.tfstate"
+    region       = "us-west-1"
+    use_lockfile = true
+    encrypt      = true
   }
 }
 
