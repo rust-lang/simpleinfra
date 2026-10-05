@@ -21,11 +21,6 @@ locals {
       name  = "Jess Izen"
       role  = "user"
     }
-    "joel" = {
-      login = "joelmarcey@rustfoundation.org"
-      name  = "Joel Marcey"
-      role  = "superuser"
-    }
     "marcoieni" = {
       login = "marcoieni@rustfoundation.org"
       name  = "Marco Ieni"
@@ -85,11 +80,6 @@ locals {
     "jdn-sso" = {
       login = "jdno@rust-lang.org"
       name  = "Jan David Nose"
-      role  = "superuser"
-    }
-    "joel-sso" = {
-      login = "joelmarcey@rust-lang.org"
-      name  = "Joel Marcey"
       role  = "superuser"
     }
     "mark-sso" = {

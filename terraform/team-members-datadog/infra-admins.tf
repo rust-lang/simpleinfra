@@ -2,7 +2,6 @@ locals {
   infra_admins = {
     "admin"     = local.users.admin
     "jdn"       = local.users.jdn
-    "joel"      = local.users.joel
     "marcoieni" = local.users.marcoieni
     "mark"      = local.users.mark
     "pietro"    = local.users.pietro
