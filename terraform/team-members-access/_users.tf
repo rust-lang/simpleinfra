@@ -12,7 +12,6 @@ locals {
     "jtgeibel"       = [aws_iam_group.crates_io.name],
     "Turbo87"        = [aws_iam_group.crates_io.name],
     "jlizen"         = [aws_iam_group.foundation.name],
-    "JoelMarcey"     = [aws_iam_group.foundation.name],
     "rebeccarumbul"  = [aws_iam_group.foundation.name],
     "abibroom"       = [aws_iam_group.foundation.name],
     "shepmaster"     = [aws_iam_group.infra_deploy_playground.name, aws_iam_group.infra_team.name],

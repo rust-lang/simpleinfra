@@ -1,7 +1,6 @@
 locals {
   on_call = {
     "adam"      = local.users.adam
-    "joel"      = local.users.joel
     "marcoieni" = local.users.marcoieni
     "tobias"    = local.users.tobias
     "ubiratan"  = local.users.ubiratan
