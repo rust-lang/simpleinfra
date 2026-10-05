@@ -24,6 +24,10 @@ locals {
       login = "berykubik@gmail.com"
       name  = "Jakub Beránek"
     }
+    "jess" = {
+      login = "jessizen@rustfoundation.org"
+      name  = "Jess Izen"
+    }
     "jdn" = {
       login = "jdno@jdno.dev"
       name  = "Jan David Nose"
