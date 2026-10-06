@@ -12,6 +12,10 @@ locals {
       login = "carol.nichols@gmail.com"
       name  = "Carol Nichols"
     }
+    "david" = {
+      login = "davidwood@rustfoundation.org"
+      name  = "David Wood"
+    }
     "eth3lbert" = {
       login = "eth3lbert@gmail.com"
       name  = "eth3lbert"

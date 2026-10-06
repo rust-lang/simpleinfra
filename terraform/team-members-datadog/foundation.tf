@@ -1,6 +1,7 @@
 locals {
   foundation = {
     "adam"      = local.users.adam
+    "david"     = local.users.david
     "jess"      = local.users.jess
     "marcoieni" = local.users.marcoieni
     "tobias"    = local.users.tobias

@@ -11,6 +11,11 @@ locals {
       role     = "engineer"
       services = local.crates_io_service_ids
     }
+    "david" = {
+      login = "davidwood@rustfoundation.org"
+      name  = "David Wood"
+      role  = "superuser"
+    }
     "jdn" = {
       login = "jdno@jdno.dev"
       name  = "Jan David Nose"

@@ -153,5 +153,11 @@ inputs = {
       email       = "denis@cornehl.org"
       groups      = ["docs-rs"]
     }
+    "davidwood" = {
+      given_name = "David"
+      family_name = "Wood"
+      email = "davidwood@rustfoundation.org"
+      groups = ["billing", "foundation"]
+    }
   }
 }
