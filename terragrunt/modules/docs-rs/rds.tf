@@ -22,8 +22,8 @@ resource "aws_security_group" "db" {
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
-    description     = "Connections from web servers on ECS, bastion, and builder"
-    security_groups = [aws_security_group.web.id, var.bastion_security_group_id, aws_security_group.builder.id]
+    description     = "Connections from web servers on ECS, watcher, bastion, and builder"
+    security_groups = [aws_security_group.web.id, aws_security_group.watcher.id, var.bastion_security_group_id, aws_security_group.builder.id]
   }
 }
 
