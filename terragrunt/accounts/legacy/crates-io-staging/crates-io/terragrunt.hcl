@@ -1,5 +1,5 @@
 terraform {
-  source = "../../../../modules//crates-io"
+  source = "${get_repo_root()}//terragrunt/modules/crates-io"
 }
 
 include {

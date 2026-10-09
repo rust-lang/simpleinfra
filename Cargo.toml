@@ -3,6 +3,7 @@
 # https://doc.rust-lang.org/cargo/reference/resolver.html#resolver-versions
 resolver = "2"
 members = [
+    "crates/fastly-access-log",
     "setup-deploy-keys",
     "ansible/roles/dev-desktop/files/team_login",
 ]
