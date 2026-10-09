@@ -20,40 +20,65 @@ resource "aws_s3_bucket" "rust_inventories" {
 
 resource "aws_s3_bucket_policy" "rust_inventories" {
   bucket = aws_s3_bucket.rust_inventories.id
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "AllowInventoryGeneration",
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "s3.amazonaws.com"
-      },
-      "Action": "s3:PutObject",
-      "Resource": "${aws_s3_bucket.rust_inventories.arn}/*",
-      "Condition": {
-        "StringEquals": {
-          "aws:SourceAccount": "${data.aws_caller_identity.current.account_id}",
-          "s3:x-amz-acl": "bucket-owner-full-control"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+
+      {
+        Sid : "AllowInventoryGeneration",
+        Effect : "Allow",
+        Principal : {
+          Service : "s3.amazonaws.com"
         },
-        "ArnLike": {
-          "aws:SourceArn": [
-            "arn:aws:s3:::static-rust-lang-org",
-            "arn:aws:s3:::crates-io",
-            "arn:aws:s3:::staging-crates-io",
-            "arn:aws:s3:::crates-io-index",
-            "arn:aws:s3:::staging-crates-io-index",
-            "${aws_s3_bucket.rust_lang_ci_mirrors.arn}",
-            "arn:aws:s3:::rust-docs-rs",
-            "arn:aws:s3:::rust-lang-ci2"
-          ]
+        Action : "s3:PutObject",
+        Resource : "${aws_s3_bucket.rust_inventories.arn}/*",
+        Condition : {
+          "StringEquals" : {
+            "aws:SourceAccount" : "${data.aws_caller_identity.current.account_id}",
+            "s3:x-amz-acl" : "bucket-owner-full-control"
+          },
+          "ArnLike" : {
+            "aws:SourceArn" : [
+              "arn:aws:s3:::static-rust-lang-org",
+              "arn:aws:s3:::crates-io",
+              "arn:aws:s3:::staging-crates-io",
+              "arn:aws:s3:::crates-io-index",
+              "arn:aws:s3:::staging-crates-io-index",
+              "${aws_s3_bucket.rust_lang_ci_mirrors.arn}",
+              "arn:aws:s3:::rust-docs-rs",
+              "arn:aws:s3:::rust-lang-ci2"
+            ]
+          }
         }
+      },
+
+      # Allow docs-rs EC2 to list its own inventory files
+      {
+        Sid    = "AllowReaderToListInventoryPrefix"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::890664054962:role/docs-rs"
+        }
+        Action   = "s3:ListBucket"
+        Resource = aws_s3_bucket.rust_inventories.arn
+        Condition = {
+          StringLike = {
+            "s3:prefix" = "rust-docs-rs/*"
+          }
+        }
+      },
+      # Downloads are restricted through docs-rs EC2 ARN.
+      {
+        Sid    = "AllowReaderToReadInventoryPrefix"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::890664054962:role/docs-rs"
+        }
+        Action   = "s3:GetObject"
+        Resource = "${aws_s3_bucket.rust_inventories.arn}/rust-docs-rs/*"
       }
-    }
-  ]
-}
-EOF
+    ]
+  })
 }
 
 resource "aws_s3_bucket_public_access_block" "rust_inventories" {
