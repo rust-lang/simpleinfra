@@ -17,6 +17,8 @@ resource "datadog_role" "docs_rs" {
       data.datadog_permissions.all.permissions.logs_write_processors,
       data.datadog_permissions.all.permissions.logs_read_archives,
       data.datadog_permissions.all.permissions.dashboards_write,
+      data.datadog_permissions.all.permissions.dashboards_public_share,
+      data.datadog_permissions.all.permissions.dashboards_embed_share,
       data.datadog_permissions.all.permissions.monitors_write,
       data.datadog_permissions.all.permissions.monitors_downtime,
       data.datadog_permissions.all.permissions.notebooks_write,
@@ -24,6 +26,7 @@ resource "datadog_role" "docs_rs" {
       data.datadog_permissions.all.permissions.network_path_config_read,
       data.datadog_permissions.all.permissions.sheets_read,
       data.datadog_permissions.all.permissions.sheets_write,
+      data.datadog_permissions.all.permissions.embeddable_graphs_share,
     ])
 
     content {
