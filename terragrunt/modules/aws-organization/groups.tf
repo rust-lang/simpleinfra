@@ -70,6 +70,13 @@ resource "aws_identitystore_group" "release" {
   description  = "The release team"
 }
 
+resource "aws_identitystore_group" "rustup" {
+  identity_store_id = local.identity_store_id
+
+  display_name = "rustup"
+  description  = "The rustup team"
+}
+
 resource "aws_identitystore_group" "foundation" {
   identity_store_id = local.identity_store_id
 
@@ -306,6 +313,49 @@ resource "aws_ssoadmin_permission_set_inline_policy" "foundation_domains" {
   })
 }
 
+# Rustup team permissions to access buckets
+
+resource "aws_ssoadmin_permission_set" "rustup_read" {
+  instance_arn     = local.instance_arn
+  name             = "ReadRustupReleases"
+  session_duration = "PT3H"
+}
+
+resource "aws_ssoadmin_permission_set_inline_policy" "rustup_read" {
+  instance_arn       = local.instance_arn
+  permission_set_arn = aws_ssoadmin_permission_set.rustup_read.arn
+
+  inline_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      // Permission to read from rustup bucket
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject*",
+          "s3:HeadObject*",
+          "s3:ListObject*",
+          "s3:ListBucket",
+        ]
+        Resource = [
+          "arn:aws:s3:::rustup-builds",
+          "arn:aws:s3:::rustup-builds/*",
+          "arn:aws:s3:::www.rustup.rs",
+          "arn:aws:s3:::www.rustup.rs/*",
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListAllMyBuckets",
+        ]
+        Resource = "*",
+      }
+    ]
+  })
+}
+
+
 # The assignment of groups to accounts with their respective permission sets
 
 locals {
@@ -338,6 +388,8 @@ locals {
         permissions : [aws_ssoadmin_permission_set.start_release] },
         { group : aws_identitystore_group.foundation,
         permissions : [aws_ssoadmin_permission_set.foundation_domains] },
+        { group : aws_identitystore_group.rustup,
+        permissions : [aws_ssoadmin_permission_set.rustup_read] },
       ]
     },
     # crates-io Staging

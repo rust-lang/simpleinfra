@@ -9,6 +9,7 @@ locals {
     ci-staging-admin : aws_identitystore_group.ci-staging-admin
     metrics-initiative : aws_identitystore_group.metrics_initiative
     release : aws_identitystore_group.release
+    rustup : aws_identitystore_group.rustup
     triagebot : aws_identitystore_group.triagebot
     foundation : aws_identitystore_group.foundation
   }
