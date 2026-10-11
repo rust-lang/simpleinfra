@@ -25,7 +25,7 @@ inputs = {
       given_name  = "Mark",
       family_name = "Rousskov"
       email       = "mark.simulacrum@gmail.com"
-      groups      = ["infra", "infra-admins", "release", "triagebot"]
+      groups      = ["infra", "infra-admins", "release", "triagebot", "rustup"]
     }
     "shepmaster" = {
       given_name  = "Jake",
@@ -49,7 +49,7 @@ inputs = {
       given_name = "Jakub"
       family_name = "Beránek"
       email = "berykubik@gmail.com"
-      groups = ["infra", "triagebot", "ci-staging-admin"]
+      groups = ["infra", "triagebot", "ci-staging-admin", "rustup"]
     }
     "tobias" = {
       given_name = "Tobias"
