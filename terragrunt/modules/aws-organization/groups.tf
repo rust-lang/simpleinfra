@@ -431,7 +431,7 @@ locals {
         { group : aws_identitystore_group.infra,
         permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
         { group : aws_identitystore_group.docs_rs,
-        permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.docs_rs_s3_write] },
+        permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
       ]
     },
     # docs-rs prod
@@ -443,7 +443,7 @@ locals {
         { group : aws_identitystore_group.infra,
         permissions : [aws_ssoadmin_permission_set.read_only_access] },
         { group : aws_identitystore_group.docs_rs,
-        permissions : [aws_ssoadmin_permission_set.read_only_access] },
+        permissions : [aws_ssoadmin_permission_set.read_only_access, aws_ssoadmin_permission_set.administrator_access] },
       ]
     },
     # Dev-Desktops Prod
