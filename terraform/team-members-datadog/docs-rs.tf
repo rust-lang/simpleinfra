@@ -19,6 +19,7 @@ resource "datadog_role" "docs_rs" {
       data.datadog_permissions.all.permissions.dashboards_write,
       data.datadog_permissions.all.permissions.dashboards_public_share,
       data.datadog_permissions.all.permissions.dashboards_embed_share,
+      data.datadog_permissions.all.permissions.metric_tags_write,
       data.datadog_permissions.all.permissions.monitors_write,
       data.datadog_permissions.all.permissions.monitors_downtime,
       data.datadog_permissions.all.permissions.notebooks_write,
