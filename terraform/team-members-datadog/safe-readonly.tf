@@ -16,9 +16,13 @@ resource "datadog_role" "safe_readonly" {
   dynamic "permission" {
     for_each = toset([
       data.datadog_permissions.all.permissions.apm_read,
+      data.datadog_permissions.all.permissions.appsec_vm_library_read,
+      data.datadog_permissions.all.permissions.built_in_features,
       data.datadog_permissions.all.permissions.dashboards_read,
       data.datadog_permissions.all.permissions.dbm_read,
+      data.datadog_permissions.all.permissions.events_read,
       data.datadog_permissions.all.permissions.gcp_configuration_read,
+      data.datadog_permissions.all.permissions.hosts_read,
       data.datadog_permissions.all.permissions.incident_notification_settings_read,
       data.datadog_permissions.all.permissions.incident_read,
       data.datadog_permissions.all.permissions.incident_settings_read,
@@ -27,6 +31,7 @@ resource "datadog_role" "safe_readonly" {
       data.datadog_permissions.all.permissions.logs_read_config,
       data.datadog_permissions.all.permissions.logs_read_data,
       data.datadog_permissions.all.permissions.logs_read_index_data,
+      data.datadog_permissions.all.permissions.metrics_read,
       data.datadog_permissions.all.permissions.monitors_read,
       data.datadog_permissions.all.permissions.network_path_config_read,
       data.datadog_permissions.all.permissions.notebooks_read,
@@ -34,6 +39,10 @@ resource "datadog_role" "safe_readonly" {
       data.datadog_permissions.all.permissions.security_monitoring_rules_read,
       data.datadog_permissions.all.permissions.sheets_read,
       data.datadog_permissions.all.permissions.slos_read,
+      data.datadog_permissions.all.permissions.static_analysis_settings_read,
+      data.datadog_permissions.all.permissions.timeseries_query,
+      data.datadog_permissions.all.permissions.user_self_profile_read,
+      data.datadog_permissions.all.permissions.user_self_profile_write,
     ])
 
     content {
