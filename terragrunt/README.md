@@ -12,10 +12,6 @@ functionality that we find useful. The features of Terragrunt we use are:
     Terragrunt can create the S3 bucket and DynamoDB tables that Terraform needs
     to store its state. Automating their creation ensures consistency across
     environments.
-  - [Versioned environments](https://terragrunt.gruntwork.io/docs/getting-started/quick-start/#promote-immutable-versioned-terraform-modules-across-environments):
-    With Terragrunt, we can have multiple environments that use different
-    versions of a Terraform module. This enables us to test on staging, review
-    changes, and then update production to the specific version.
 
 ## Directory Structure
 
