@@ -3,6 +3,12 @@
 locals {
   fastly_webapp_domain_name       = "fastly-app.${var.webapp_domain_name}"
   webapp_rate_limit_response_code = 429
+
+  # Names of the dynamic snippets that authenticate Fastly to Heroku, keyed by
+  # the VCL subroutine they run in.
+  webapp_origin_auth_snippets = {
+    for type in ["miss", "pass"] : type => "authenticate to origin on ${type}"
+  }
 }
 
 resource "fastly_service_vcl" "webapp" {
@@ -83,6 +89,24 @@ resource "fastly_service_vcl" "webapp" {
     token = data.aws_ssm_parameter.datadog_token.value
   }
 
+  # Authenticate both cache misses and pass-through requests (including uploads).
+  #
+  # This declares one empty Fastly dynamic snippet in `vcl_miss` and one in
+  # `vcl_pass`. The service version only stores their name, location and
+  # priority. Their VCL is uploaded separately by
+  # `fastly_service_dynamic_snippet_content.webapp_origin_auth`.
+  #
+  # The token is kept out of this resource because `snippet` blocks form a
+  # single set: a sensitive value in one of them would hide the diff of every
+  # snippet in Terraform plans.
+  dynamic "dynamicsnippet" {
+    for_each = local.webapp_origin_auth_snippets
+    content {
+      name = dynamicsnippet.value
+      type = dynamicsnippet.key
+    }
+  }
+
   # Serve download and README URLs as redirects or JSON without contacting Heroku.
   snippet {
     name    = "redirect static files"
@@ -142,6 +166,24 @@ resource "fastly_service_vcl" "webapp" {
       VCL
     }
   }
+}
+
+# Upload the VCL of the origin authentication dynamic snippets declared in
+# `fastly_service_vcl.webapp`. Only this resource contains the token, so plans
+# hide just its `content`.
+resource "fastly_service_dynamic_snippet_content" "webapp_origin_auth" {
+  for_each = local.webapp_origin_auth_snippets
+
+  service_id = fastly_service_vcl.webapp.id
+  # Fastly assigns the snippet ID when the service creates the snippet.
+  snippet_id = one([for s in fastly_service_vcl.webapp.dynamicsnippet : s.snippet_id if s.name == each.value])
+  # Overwrite any change made to the snippet outside Terraform.
+  manage_snippets = true
+
+  # Keep the credential on bereq so it is absent from client request logging.
+  content = <<-VCL
+    set bereq.http.X-Crates-Origin-Auth = "${data.aws_ssm_parameter.webapp_origin_auth_token.value}";
+  VCL
 }
 
 module "fastly_tls_subscription_webapp" {
