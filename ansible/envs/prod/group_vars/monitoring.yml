@@ -21,7 +21,6 @@ vars_alertmanager_zulip_url: "https://rust-lang.zulipchat.com/api/v1/external/sl
 vars_alertmanager_receiver_zulip_infra: "{{ vars_alertmanager_zulip_url }}&stream=t-infra%2Fprivate&topic=alertmanager"
 vars_alertmanager_receiver_zulip_docsrs: "{{ vars_alertmanager_zulip_url }}&stream=t-docs-rs%2Fprivate&topic=alertmanager"
 vars_prometheus_monitorbot_secret: "{{ lookup('aws_ssm', '/prod/monitorbot/secret', region='us-west-1') }}"
-vars_prometheus_cratesio_secret: "{{ ssm_monitoring['cratesio-scrape-secret'] }}"
 vars_prometheus_cratesio_heroku_metrics_secret: "{{ lookup('aws_ssm', '/prod/crates-io-heroku-metrics/password-metrics', region='us-west-1') }}"
 
 vars_backup_repository: s3:s3.amazonaws.com/rust-backups/monitoring
