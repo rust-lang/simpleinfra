@@ -1,5 +1,5 @@
 terraform {
-  source = "git::../../../../..//terragrunt/modules/release-distribution?ref=${trimspace(file("../deployed-ref"))}"
+  source = "../../../../..//terragrunt/modules/release-distribution"
 }
 
 include {

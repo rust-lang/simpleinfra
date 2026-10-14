@@ -1,5 +1,5 @@
 terraform {
-  source = "git::../../../../..//terragrunt/modules/win-rustup-rs?ref=${trimspace(file("../deployed-ref"))}"
+  source = "../../../../..//terragrunt/modules/win-rustup-rs"
 }
 
 include {
