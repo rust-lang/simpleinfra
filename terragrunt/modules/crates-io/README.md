@@ -30,10 +30,11 @@ In staging, CloudFront remains enabled and is available at
 `cloudfront-app.staging.crates.io` for direct testing, even if its DNS traffic
 weight is zero.
 
-### CloudFront origin authentication
+### CDN origin authentication
 
-CloudFront sends `X-Crates-Origin-Auth` on requests to the Heroku origin over
-HTTPS, overwriting any viewer-supplied value.
+CloudFront and Fastly send `X-Crates-Origin-Auth` on requests to the Heroku
+origin over HTTPS, overwriting any client-supplied value. Both read the token
+from the SSM `SecureString` `/${env}/crates-io/webapp/origin-auth-token`.
 
 The tokens (one for staging and one for production) were generated with:
 
