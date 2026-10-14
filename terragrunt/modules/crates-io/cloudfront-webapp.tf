@@ -5,6 +5,11 @@ locals {
   webapp_cdn_timeout_seconds    = 60
 }
 
+data "aws_ssm_parameter" "webapp_origin_auth_token" {
+  name            = "/${var.env}/crates-io/webapp/origin-auth-token"
+  with_decryption = true
+}
+
 # Cache key for the web app distribution. Keep this minimal so CloudFront can
 # share cached objects across viewers. Values that the origin needs but that
 # must not fragment the cache are forwarded via the origin request policy below.
@@ -124,6 +129,12 @@ resource "aws_cloudfront_distribution" "webapp" {
   origin {
     origin_id   = "heroku"
     domain_name = var.webapp_origin_domain
+
+    # CloudFront overwrites any viewer-supplied value before contacting Heroku.
+    custom_header {
+      name  = "X-Crates-Origin-Auth"
+      value = data.aws_ssm_parameter.webapp_origin_auth_token.value
+    }
 
     custom_origin_config {
       http_port              = 80
