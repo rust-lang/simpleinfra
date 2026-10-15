@@ -5,6 +5,11 @@ data "aws_iam_openid_connect_provider" "github_actions" {
 
 locals {
   oidc_provider_arn = var.lookup_oidc_provider ? data.aws_iam_openid_connect_provider.github_actions[0].arn : var.oidc_provider_arn
+
+  subjects = var.environment != null ? ["repo:${var.org}/${var.repo}:environment:${var.environment}"] : [
+    for branch in concat(var.branch == null ? [] : [var.branch], var.branches) :
+    "repo:${var.org}/${var.repo}:ref:refs/heads/${branch}"
+  ]
 }
 
 output "role" {
@@ -17,7 +22,7 @@ resource "aws_iam_role" "ci_role" {
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-      for k in concat(var.branch == null ? [] : [var.branch], var.branches) :
+      for subject in local.subjects :
       {
         Effect = "Allow"
         Action = "sts:AssumeRoleWithWebIdentity"
@@ -26,9 +31,7 @@ resource "aws_iam_role" "ci_role" {
         }
         Condition = {
           StringEquals = {
-            "token.actions.githubusercontent.com:sub" = (var.environment != null ?
-              "repo:${var.org}/${var.repo}:environment:${var.environment}" :
-            "repo:${var.org}/${var.repo}:ref:refs/heads/${k}")
+            "token.actions.githubusercontent.com:sub" = subject
             # Restrict the OIDC token validation to only accept tokens
             # where the audience claim is set to "sts.amazonaws.com". This ensures that
             # GitHub Actions OIDC tokens can only be used to request AWS
@@ -79,4 +82,9 @@ variable "environment" {
   type        = string
   default     = null
   description = "The GitHub environment allowed to assume the role"
+
+  validation {
+    condition     = (var.environment != null) != (var.branch != null || length(var.branches) > 0)
+    error_message = "Provide either environment or at least one branch (branch/branches), never both."
+  }
 }

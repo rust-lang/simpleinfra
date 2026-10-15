@@ -76,6 +76,12 @@ jobs:
       - name: Ensure the terraform files are formatted correctly
         run: terraform fmt -check -diff -recursive
 
+      - name: Test OIDC role module
+        working-directory: terragrunt/modules/gha-oidc-role
+        run: |
+          terraform init -backend=false -input=false
+          terraform test
+
   actions-js:
     name: GitHub Actions (JS)
     runs-on: ubuntu-24.04
