@@ -18,6 +18,9 @@ module "web" {
   platform_version     = "1.4.0"
   ephemeral_storage_gb = 40
 
+  # The image defaults to port 3000; the ECS service and ALB target port 80.
+  command = ["0.0.0.0:80"]
+
   environment = {
     DOCSRS_PREFIX          = "/tmp"
     DOCSRS_STORAGE_BACKEND = "s3"
