@@ -2,6 +2,12 @@ variable "name" {
   type = string
 }
 
+variable "command" {
+  type        = list(string)
+  default     = null
+  description = "Override the image's default command; null keeps the image default."
+}
+
 variable "repo" {
   type = string
 }

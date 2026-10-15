@@ -11,7 +11,7 @@ resource "aws_ecs_task_definition" "task" {
   requires_compatibilities = ["FARGATE"]
 
   container_definitions = jsonencode([
-    {
+    merge({
       name      = var.container_name
       image     = module.ecr.url
       essential = true
@@ -52,7 +52,7 @@ resource "aws_ecs_task_definition" "task" {
 
       portMappings = var.port_mappings
       dockerLabels = var.docker_labels
-    }
+    }, var.command == null ? {} : { command = var.command })
   ])
 
   ephemeral_storage {

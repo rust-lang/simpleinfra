@@ -7,3 +7,13 @@ output "storage_bucket_name" {
   description = "Destination docs-rs storage bucket name."
   value       = aws_s3_bucket.storage.id
 }
+
+output "admin_task_arn" {
+  description = "Task definition for one-off admin CLI commands."
+  value       = module.admin.task_arn
+}
+
+output "release_task_arn" {
+  description = "Task definition for the release script, derived from the admin task."
+  value       = aws_ecs_task_definition.release.arn
+}

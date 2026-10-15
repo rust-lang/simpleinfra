@@ -11,6 +11,7 @@ module "ecs_task" {
   ephemeral_storage_gb = var.ephemeral_storage_gb
 
   container_name        = local.container_name
+  command               = var.command
   secrets               = var.secrets
   computed_secrets      = var.computed_secrets
   environment_variables = var.environment

@@ -119,7 +119,7 @@ resource "aws_security_group" "builder" {
     to_port         = 22
     protocol        = "tcp"
     description     = "SSH access from bastion"
-    security_groups = [aws_security_group.web.id]
+    security_groups = [var.bastion_security_group_id]
   }
 
   // Allow outgoing connections

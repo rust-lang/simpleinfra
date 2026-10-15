@@ -9,6 +9,14 @@ variable "container_name" {
   description = "The name of the container being run"
 }
 
+variable "command" {
+  type        = list(string)
+  default     = null
+  description = "Override the image's default command; null keeps the image default."
+}
+
+
+
 variable "cpu" {
   type        = number
   description = "The number of CPU units used for the task"
