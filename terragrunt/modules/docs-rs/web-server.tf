@@ -21,14 +21,7 @@ module "web" {
   # The image defaults to port 3000; the ECS service and ALB target port 80.
   command = ["0.0.0.0:80"]
 
-  environment = {
-    DOCSRS_PREFIX                              = "/tmp"
-    DOCSRS_STORAGE_BACKEND                     = "s3"
-    DOCSRS_S3_BUCKET                           = aws_s3_bucket.storage.id
-    S3_REGION                                  = aws_s3_bucket.storage.region
-    DOCSRS_LOG                                 = "info"
-    DOCSRS_LOG_FORMAT                          = "json"
-    RUST_BACKTRACE                             = "1"
+  environment = merge(local.common_environment, {
     DOCSRS_AWS_SDK_MAX_RETRIES                 = "10"
     DOCSRS_ARCHIVE_INDEX_CACHE_EVICTION_POLICY = "lru"
 
@@ -46,11 +39,9 @@ module "web" {
     DOCSRS_RENDER_THREADS = "1"
     DOCSRS_MIN_POOL_IDLE  = "1"
     DOCSRS_MAX_POOL_SIZE  = "10"
-  }
+  })
 
-  computed_secrets = {
-    DOCSRS_DATABASE_URL = aws_ssm_parameter.connection_url.arn
-  }
+  computed_secrets = local.common_computed_secrets
 
   expose_http = {
     container_port = 80

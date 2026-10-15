@@ -82,9 +82,3 @@ resource "aws_db_instance" "db" {
     ]
   }
 }
-
-resource "aws_ssm_parameter" "connection_url" {
-  name  = "/docs-rs/database-url"
-  type  = "SecureString"
-  value = "postgres://${local.docs_rs_username}:${random_password.db.result}@${aws_db_instance.db.address}/${local.docs_rs_db_name}?sslmode=require"
-}
