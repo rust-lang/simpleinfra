@@ -10,6 +10,12 @@ resource "datadog_role" "docs_rs" {
 
   dynamic "permission" {
     for_each = toset([
+      data.datadog_permissions.all.permissions.apm_read,
+      data.datadog_permissions.all.permissions.apm_pipelines_write,
+      data.datadog_permissions.all.permissions.apm_retention_filter_write,
+      data.datadog_permissions.all.permissions.apm_generate_metrics,
+      data.datadog_permissions.all.permissions.error_tracking_read,
+      data.datadog_permissions.all.permissions.error_tracking_write,
       data.datadog_permissions.all.permissions.logs_read_index_data,
       data.datadog_permissions.all.permissions.logs_read_data,
       data.datadog_permissions.all.permissions.logs_live_tail,
