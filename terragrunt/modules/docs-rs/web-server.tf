@@ -22,16 +22,30 @@ module "web" {
   command = ["0.0.0.0:80"]
 
   environment = {
-    DOCSRS_PREFIX          = "/tmp"
-    DOCSRS_STORAGE_BACKEND = "s3"
-    DOCSRS_LOG             = "docs_rs=debug,rustwide=info"
-    RUST_BACKTRACE         = "1"
-    S3_REGION              = "us-east-1"
-    DOCSRS_S3_BUCKET       = "${aws_s3_bucket.storage.id}"
-  }
+    DOCSRS_PREFIX                              = "/tmp"
+    DOCSRS_STORAGE_BACKEND                     = "s3"
+    DOCSRS_S3_BUCKET                           = aws_s3_bucket.storage.id
+    S3_REGION                                  = aws_s3_bucket.storage.region
+    DOCSRS_LOG                                 = "info"
+    DOCSRS_LOG_FORMAT                          = "json"
+    RUST_BACKTRACE                             = "1"
+    DOCSRS_AWS_SDK_MAX_RETRIES                 = "10"
+    DOCSRS_ARCHIVE_INDEX_CACHE_EVICTION_POLICY = "lru"
 
-  secrets = {
-    DOCSRS_GITHUB_ACCESSTOKEN = "/docs-rs/github-access-token"
+    # Leave space for the image and other files on the 40 GiB task disk.
+    DOCSRS_ARCHIVE_INDEX_CACHE_MAX_SIZE = "10GiB"
+
+    DOCSRS_REQUEST_TIMEOUT               = "120s"
+    DOCSRS_REPORT_REQUEST_TIMEOUTS       = "true"
+    CACHE_CONTROL_STALE_WHILE_REVALIDATE = "1d"
+
+    # No CDN invalidation worker is configured for this web deployment.
+    DOCSRS_CACHE_INVALIDATEABLE_RESPONSES = "false"
+
+    # Size concurrency for the 0.25 vCPU web task, rather than the legacy daemon.
+    DOCSRS_RENDER_THREADS = "1"
+    DOCSRS_MIN_POOL_IDLE  = "1"
+    DOCSRS_MAX_POOL_SIZE  = "10"
   }
 
   computed_secrets = {
@@ -40,11 +54,11 @@ module "web" {
 
   expose_http = {
     container_port = 80
-    prometheus     = "/about/metrics"
+    prometheus     = null
     domains        = [var.cluster_config.lb_domain, var.domain]
     zone_id        = var.zone_id
 
-    health_check_path     = "/"
+    health_check_path     = "/-/health"
     health_check_interval = 5
     health_check_timeout  = 2
   }
@@ -63,13 +77,9 @@ resource "aws_iam_role_policy" "web" {
       {
         Effect = "Allow"
         Action = [
-          "s3:PutObject",
           "s3:GetObjectTagging",
-          "s3:PutObjectTagging",
           "s3:GetObject",
-          "s3:PutObjectAcl",
           "s3:ListBucket",
-          "s3:DeleteObject",
         ]
         Resource = [
           aws_s3_bucket.storage.arn,
