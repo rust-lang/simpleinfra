@@ -51,6 +51,29 @@ flowchart LR
 
 The user-facing web frontend for [docs.rs] is hosted on AWS [ECS]. Requests go through several hops on their way from the [CloudFront] distribution through the ECS Cluster to an ECS service and ultimately an ECS task which contains a container running the docs.rs web server. Many of these steps are behind a domain name which is configured in AWS [Route 53].
 
+## Admin task
+
+`docs-rs-admin` is a standalone Fargate task using the CLI image's normal
+`tini` + `docs_rs_admin` entrypoint. It has no ECS service or load balancer.
+Override the `app` container command when calling `RunTask`, for example
+`["database", "migrate"]`. The database URL is injected from SSM and logs are
+written to `/ecs/docs-rs-admin`.
+
+`docs-rs-release` derives its configuration from the admin task, sharing its
+image, IAM roles, environment, secrets, storage, and CloudWatch log group. It
+overrides the entrypoint and command to run the packaged
+`/usr/local/bin/docs_rs_release.sh` through `tini` and `/bin/sh`.
+
+After the web service is stable, the docs.rs deployment workflow runs the
+release task using the web service's subnets and security groups. The script
+applies database migrations, then purges static content if Fastly is configured.
+General admin calls continue to use `docs-rs-admin` with command overrides.
+
+Apply this module in the target account before enabling the updated action:
+it provisions the admin ECR repository, task definition, and CI permissions.
+Deployment workflows serialize runs using GitHub environment concurrency.
+Migrations run after the web rollout and must be compatible with that version.
+
 ## Background Worker
 
 **TODO**: the background worker is work in progress. Once it is fully configured, we should document how it works here.
