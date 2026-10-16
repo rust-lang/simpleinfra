@@ -1,3 +1,9 @@
+# Increment this variable to rotate the DB password
+variable "db_password_rotation_version" {
+  type    = number
+  default = 1
+}
+
 resource "aws_db_instance" "primary" {
   db_name                 = "bors"
   engine                  = "postgres"
@@ -23,6 +29,10 @@ resource "aws_db_instance" "primary" {
 resource "random_password" "db" {
   length  = 32
   special = false
+
+  keepers = {
+    rotation_version = var.db_password_rotation_version
+  }
 }
 
 resource "aws_security_group" "rds" {
