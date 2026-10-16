@@ -1,9 +1,10 @@
+use crate::{DATADOG_APP, DATADOG_ENV, DATADOG_SERVICE};
 use fastly::log::Endpoint;
 use serde::Serialize;
 use serde_json::{Map, Value};
 use std::{
     io::{self, Write},
-    sync::Mutex,
+    sync::{LazyLock, Mutex},
 };
 use time::OffsetDateTime;
 use tracing::{
@@ -19,8 +20,12 @@ use tracing_subscriber::{
     util::SubscriberInitExt,
 };
 
-// Must match the logging endpoint name in Terraform.
+static DDTAGS: LazyLock<String> =
+    LazyLock::new(|| format!("app:{},env:{}", DATADOG_APP, DATADOG_ENV));
+
+// Must match the logging endpoint names in Terraform.
 const APPLICATION_LOG_ENDPOINT: &str = "application_logs";
+pub(crate) const ACCESS_LOG_ENDPOINT: &str = "access_logs";
 
 // About `ddsource`
 // This corresponds to the integration name, the technology
@@ -129,11 +134,11 @@ where
 
         let row = TraceLog {
             ddsource: LOG_SOURCE_FORMAT,
-            ddtags: "env:production",
+            ddtags: &DDTAGS,
             hostname: fastly::compute_runtime::hostname(),
             timestamp: OffsetDateTime::now_utc(),
             message: message.as_deref().unwrap_or_default(),
-            service: "docs.rs fastly WASM",
+            service: DATADOG_SERVICE,
             status: level_name(*event.metadata().level()),
             target: event.metadata().target(),
             fields,
