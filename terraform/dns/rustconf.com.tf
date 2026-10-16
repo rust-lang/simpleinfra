@@ -23,7 +23,7 @@ module "rustconf_com" {
     "2020" = ["tildeio.github.io"],
     "2021" = ["rustconf-2021.netlify.app"],
     "2022" = ["rustconf-2022.netlify.app"],
-    "2024" = ["wp.wpenginepowered.com"],
+    "2024" = ["rustfoundation.github.io"],
   }
 
   MX = {
