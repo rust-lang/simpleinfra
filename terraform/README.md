@@ -7,7 +7,7 @@ over time.
 
 ## Applying the configuration
 
-To apply the configuration you'll need to have [Terraform 1.0+
+To apply the configuration you'll need to have [Terraform 1.10+
 installed][tf-install] and AWS credentials configured on the local machine.
 The first time you apply the configuration (or every time you add a new module)
 you'll need to initialize Terraform locally:
@@ -41,9 +41,11 @@ example) the mapping between Terraform resources and the actual resources on
 our cloud providers. The state needs to be synchronized between all the people
 able to apply changes.
 
-In our configuration, the state is stored in the `rust-terraform` S3 bucket
-(`simpleinfra.tfstate` file), and to prevent concurrent changes to that state
-the `terraform-state-lock` DynamoDB table (in the `us-west-1` region) is used.
+For S3-backed modules, the state is stored in the `rust-terraform` S3 bucket
+in the `us-west-1` region, using a separate state key under `simpleinfra/`
+for each module. S3 lockfiles (`<key>.tflock`) prevent concurrent changes to
+that state. The GCS-backed modules use their configured GCS buckets and native
+state locking.
 
 ## Resources
 
