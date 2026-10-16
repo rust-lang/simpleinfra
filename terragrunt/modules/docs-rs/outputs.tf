@@ -17,3 +17,8 @@ output "release_task_arn" {
   description = "Task definition for the release script, derived from the admin task."
   value       = aws_ecs_task_definition.release.arn
 }
+
+output "watcher_service_arn" {
+  description = "Singleton registry watcher service."
+  value       = aws_ecs_service.watcher.id
+}

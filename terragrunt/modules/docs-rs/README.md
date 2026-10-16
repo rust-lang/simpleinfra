@@ -10,10 +10,9 @@ This is the [Terraform] module that defines the infrastructure for [docs.rs].
 
 - A web frontend hosted as a container running in an [ECS] cluster.
 - A background documentation builder running on a dedicated [ec2](https://aws.amazon.com/ec2) instance.
-- A background utility (**TODO**: this is currently not configured) which includes:
+- A singleton background registry watcher on ECS which includes:
   - crate registry watcher that watches for changes to the crates registry and enqueues doc builds
   - the repository stats updater that ensures # stars, # issues, etc. from GitHub & GitLab are up-to-date
-  - the CDN invalidation queue handler
 
 These are documented in more detail below.
 
@@ -80,7 +79,28 @@ Migrations run after the web rollout and must be compatible with that version.
 
 ## Registry Watcher
 
-**TODO**: the registry watcher is work in progress. Once it is fully configured, we should document how it works here.
+`docs-rs-registry-watcher` is a Fargate service with one desired task and no
+autoscaling or load balancer. Deployments stop the old task before starting its
+replacement (minimum healthy percentage 0, maximum percentage 100), so there is
+a brief interruption rather than two watchers running during a rollout. This
+does not prevent someone from manually launching an additional standalone task.
+
+The task runs `docs_rs_watcher start`, sharing the database and storage settings
+with the other containers. It uses its own database pool (maximum 10 connections),
+checks the registry every 30 seconds, and limits queued rebuilds to 200. Its
+registry index is stored under `/tmp` on ephemeral task storage and is fetched
+again after task replacement. Logs are written to `/ecs/docs-rs-registry-watcher`.
+Its security group allows outbound connections and no inbound connections.
+Database access and deletion of removed crates' S3 documentation are allowed.
+
+Before the service can start, publish the `registry-watcher` Docker build target
+to the `docs-rs-registry-watcher` ECR repository with the `latest` tag. The shared
+GitHub deployment role has push/pull and service update permissions. The docs.rs
+workflow must publish this image and force a new deployment of this service,
+then wait for it to stabilize, after running release migrations. The GitHub
+repository updater token is injected from the existing SSM parameter
+`/docs-rs/github-access-token`. GitLab tokens and Fastly configuration are not
+injected into this task yet.
 
 [terraform]: https://terraform.io
 [docs.rs]: https://docs.rs

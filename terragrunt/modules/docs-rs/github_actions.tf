@@ -2,6 +2,30 @@ module "gh_oidc" {
   source = "../gha-oidc-provider"
 }
 
+resource "aws_iam_role_policy_attachment" "watcher_ci_push" {
+  role       = module.web.ci_role_name
+  policy_arn = module.watcher.policy_push_arn
+}
+
+resource "aws_iam_role_policy_attachment" "watcher_ci_pull" {
+  role       = module.web.ci_role_name
+  policy_arn = module.watcher.policy_pull_arn
+}
+
+resource "aws_iam_role_policy" "watcher_ci" {
+  name = "deploy-watcher"
+  role = module.web.ci_role_name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["ecs:UpdateService", "ecs:DescribeServices"]
+      Resource = aws_ecs_service.watcher.id
+    }]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "admin_ci_push" {
   role       = module.web.ci_role_name
   policy_arn = module.admin.policy_push_arn
