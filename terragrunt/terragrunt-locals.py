@@ -106,7 +106,6 @@ if __name__ == "__main__":
     data = {
         "remote_state_profile": account_json["aws"]["profile"],
         "remote_state_bucket": f"terraform-state-{aws_account_id}",
-        "remote_state_dynamodb_table": "terraform-lock",
         "remote_state_region": "us-east-1",
         "remote_state_key": remote_state_key,
         "providers_content": providers_content,
