@@ -22,3 +22,20 @@ output "watcher_service_arn" {
   description = "Singleton registry watcher service."
   value       = aws_ecs_service.watcher.id
 }
+
+output "builder_repository_url" {
+  value = module.builder_ecr.url
+}
+
+output "builder_autoscaling_group_name" {
+  description = "Auto Scaling group used to scale and refresh the builder fleet."
+  value       = aws_autoscaling_group.builder.name
+}
+
+output "builder_launch_template_id" {
+  value = aws_launch_template.builder.id
+}
+
+output "builder_launch_template_version" {
+  value = aws_launch_template.builder.latest_version
+}

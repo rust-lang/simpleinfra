@@ -1,0 +1,12 @@
+{
+  "storage-driver": "overlay2",
+  "exec-opts": ["native.cgroupdriver=cgroupfs"],
+  "runtimes": {
+    "runsc": {
+      "path": "/usr/bin/runsc",
+      "runtimeArgs": ["--platform=systrap"]
+    }
+  },
+  "log-driver": "local",
+  "log-opts": {"max-size": "20m", "max-file": "3"}
+}
