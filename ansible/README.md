@@ -22,6 +22,12 @@ For example:
 The playbook is the name of a file inside the `playbooks/` directory without
 the extension.
 
+### docs.rs builders
+
+Builder hosts use Terraform-rendered cloud-config and a first-boot bootstrap
+script, without Ansible.
+See the [builder documentation](../terragrunt/modules/docs-rs/BUILDERS.md) for setup.
+
 ### Executing a playbook on a new server
 
 By default the `./apply` script uses your current username to connect to the

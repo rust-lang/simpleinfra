@@ -1,0 +1,23 @@
+[Unit]
+Description=docs.rs build server
+Wants=network-online.target
+Requires=docker.service
+After=network-online.target docker.service
+PartOf=docker.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=root
+RuntimeDirectory=docs-rs
+RuntimeDirectoryMode=0700
+ExecStart=/usr/local/sbin/docs-rs-builder
+ExecStop=-/usr/bin/docker stop --time 120 docs-rs-builder
+ExecStopPost=-/usr/bin/docker rm --force docs-rs-builder
+Restart=always
+RestartSec=15
+TimeoutStartSec=0
+TimeoutStopSec=150
+
+[Install]
+WantedBy=multi-user.target

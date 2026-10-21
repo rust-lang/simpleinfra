@@ -2,6 +2,38 @@ module "gh_oidc" {
   source = "../gha-oidc-provider"
 }
 
+# Terraform owns the image version and launch-template configuration. CI can
+# recycle the fleet (for example after publishing latest), but cannot edit the template.
+resource "aws_iam_role_policy" "builder_ci" {
+  name = "deploy-builders"
+  role = module.web.ci_role_name
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["autoscaling:StartInstanceRefresh"]
+        Resource = aws_autoscaling_group.builder.arn
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["autoscaling:DescribeAutoScalingGroups", "autoscaling:DescribeInstanceRefreshes"]
+        Resource = "*"
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "builder_ci_push" {
+  role       = module.web.ci_role_name
+  policy_arn = module.builder_ecr.policy_push_arn
+}
+
+resource "aws_iam_role_policy_attachment" "builder_ci_pull" {
+  role       = module.web.ci_role_name
+  policy_arn = module.builder_ecr.policy_pull_arn
+}
+
 resource "aws_iam_role_policy_attachment" "watcher_ci_push" {
   role       = module.web.ci_role_name
   policy_arn = module.watcher.policy_push_arn

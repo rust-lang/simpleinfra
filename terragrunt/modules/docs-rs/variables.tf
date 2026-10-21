@@ -15,7 +15,7 @@ variable "private_subnet_ids" {
 
 variable "bastion_security_group_id" {
   type        = string
-  description = "Id of the security group for the bastion instance"
+  description = "Bastion security group allowed to connect to the database."
 }
 
 variable "cluster_config" {
@@ -30,21 +30,28 @@ variable "cluster_config" {
   description = "The configuration for the cluster this is running in"
 }
 
-variable "builder_instance_type" {
-  type        = string
-  description = "The EC2 instance type for the docs-rs builder"
+variable "builder_count" {
+  description = "Fixed desired capacity of the identical builder Auto Scaling group."
+  type        = number
+  nullable    = false
+
+  validation {
+    condition     = var.builder_count >= 0 && floor(var.builder_count) == var.builder_count
+    error_message = "Builder count must be a non-negative integer."
+  }
 }
 
-variable "builder_volume_iops" {
-  type        = number
-  description = "The provisioned IOPS for the docs-rs builder gp3 root volume."
-  default     = 3000
-}
-
-variable "builder_volume_throughput" {
-  type        = number
-  description = "The provisioned throughput in MiB/s for the docs-rs builder gp3 root volume."
-  default     = 125
+variable "builder_config" {
+  description = "Shared amd64 EC2, EBS, and build limits for every builder host."
+  type = object({
+    instance_type      = string
+    volume_size        = optional(number, 64)
+    volume_iops        = optional(number, 3000)
+    volume_throughput  = optional(number, 125)
+    build_cpu_limit    = optional(number, 1)
+    build_memory_limit = optional(string, "2GiB")
+  })
+  nullable = false
 }
 
 variable "github_environment" {
@@ -74,4 +81,14 @@ variable "s3_crr_enabled" {
 variable "db_instance_class" {
   type        = string
   description = "The RDS instance class for the docs-rs database"
+}
+
+variable "builder_image_version" {
+  type        = string
+  default     = "latest"
+  description = "Builder ECR image tag or sha256 digest. Changing it creates a launch-template version and refreshes EC2 hosts."
+  validation {
+    condition     = can(regex("^([A-Za-z0-9_][A-Za-z0-9_.-]{0,127}|sha256:[a-f0-9]{64})$", var.builder_image_version))
+    error_message = "The builder image version must be an image tag or sha256 digest."
+  }
 }
