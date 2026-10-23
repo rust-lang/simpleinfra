@@ -18,6 +18,10 @@ locals {
   common_computed_secrets = {
     DOCSRS_DATABASE_URL = aws_ssm_parameter.connection_url.arn
   }
+
+  common_secrets = {
+    DOCSRS_REGISTRY_API_TOKEN = "/docs-rs/registry-api-token"
+  }
 }
 
 resource "aws_ssm_parameter" "connection_url" {

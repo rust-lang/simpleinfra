@@ -30,6 +30,22 @@ In staging, CloudFront remains enabled and is available at
 `cloudfront-app.staging.crates.io` for direct testing, even if its DNS traffic
 weight is zero.
 
+### Fastly API rate limits
+
+Fastly NGWAF applies a per-IP limit of 600 requests per 10 minutes to normal
+requests. Requests with an `X-Docsrs-Authorization` header matching
+`docsrs_authorization_token` are excluded from that limit and have a separate
+shared limit of 10,000 requests per minute across all docs.rs instances. The
+shared token header is the rate-limit client key. Both limits block for five
+minutes and return HTTP 429 when exceeded.
+
+Before applying this module, create a `SecureString` SSM parameter at
+`/${env}/crates-io/webapp/docsrs-auth-token` in the crates.io WAF account. Set
+its value to the same token stored at `/docs-rs/registry-api-token` in the
+matching docs.rs account. Terraform reads the parameter; it does not manage its
+value. Terraform state contains the decrypted value in the data source and
+Fastly rules, so protect state access accordingly.
+
 ### CDN origin authentication
 
 CloudFront and Fastly send `X-Crates-Origin-Auth` on requests to the Heroku

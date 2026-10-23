@@ -15,4 +15,5 @@ module "admin" {
     DOCSRS_MAX_POOL_SIZE = "10"
   })
   computed_secrets = local.common_computed_secrets
+  secrets          = local.common_secrets
 }
