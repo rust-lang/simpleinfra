@@ -131,6 +131,14 @@ repository updater token is injected from the existing SSM parameter
 restart both workloads to reload a changed token. GitLab tokens and Fastly
 configuration are not injected into this task yet.
 
+The web, watcher, admin, and release ECS tasks receive
+`DOCSRS_REGISTRY_API_TOKEN` from the `/docs-rs/registry-api-token` SSM
+SecureString. Create that parameter in each docs.rs account before applying this
+module. Use a different token for staging and production, and store the same
+value in the matching crates.io WAF account at
+`/${env}/crates-io/webapp/docsrs-auth-token`. These copies are managed
+separately until cross-account secret sharing is configured.
+
 ## Datadog on Fargate
 
 Web, registry watcher, admin, and release tasks use Datadog in both staging and
@@ -183,6 +191,7 @@ After updating the SSM parameter, replace running tasks to load the new key.
 Verify web, watcher, and one-off admin/release tasks in staging before production
 rollout.
 See [shared task monitoring configuration](../ecs-task/README.md).
+
 
 [terraform]: https://terraform.io
 [docs.rs]: https://docs.rs
