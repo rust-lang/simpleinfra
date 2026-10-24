@@ -46,6 +46,7 @@ variable "instances" {
   description = "A map of instances with their machine types and disk sizes"
   type = map(object({
     instance_type = string
+    storage_type  = string
     storage       = number
   }))
 }
