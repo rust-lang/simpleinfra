@@ -15,6 +15,7 @@ inputs = {
     "dev-desktop-eu-2" = {
       # vCPUs: 32, RAM: 64 GiB, AMD Milan.
       instance_type = "c2d-highcpu-32"
+      storage_type  = "pd-balanced"
       storage       = 2000
     }
   }

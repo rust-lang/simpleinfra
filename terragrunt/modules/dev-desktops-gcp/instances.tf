@@ -43,7 +43,7 @@ resource "google_compute_instance" "instance" {
       # The default choice in the Google Cloud Console.
       # It uses SSDs but limits the performance to provide a
       # more economical price point than `pd-ssd`.
-      type = "pd-balanced"
+      type = each.value.storage_type
     }
   }
 

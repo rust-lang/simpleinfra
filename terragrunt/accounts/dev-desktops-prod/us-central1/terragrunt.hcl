@@ -10,11 +10,12 @@ include {
 inputs = {
   project = "dev-desktops-prod"
   region  = "us-central1"
-  zone    = "us-central1-a"
+  zone    = "us-central1-b"
   instances = {
     "dev-desktop-us-2" = {
       # vCPUs: 32, RAM: 64 GiB, AMD Milan.
-      instance_type = "c2d-highcpu-32"
+      instance_type = "c4d-highcpu-32"
+      storage_type = "hyperdisk-balanced"
       storage       = 2000
     }
   }
