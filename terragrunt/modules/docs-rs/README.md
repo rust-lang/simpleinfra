@@ -53,7 +53,7 @@ flowchart LR
 The web frontend runs on ECS/Fargate behind an Application Load Balancer, with
 DNS records in [Route 53]. This module does not provision a CDN. The web service
 has two desired tasks in both environments. Each task has 1 vCPU, 2 GiB memory
-and a local archive-index cache. ALB health checks use
+including sidecars, and a local archive-index cache. ALB health checks use
 `/-/health`. Each task uses PostgreSQL and S3.
 
 Set `web_count` in each environment's Terragrunt inputs to change the desired
@@ -78,11 +78,11 @@ the DSN requires new tasks or a builder restart to reload the value.
 `docs-rs-admin` is a standalone Fargate task using the CLI image's normal
 `tini` + `docs_rs_admin` entrypoint. It has no ECS service or load balancer.
 Override the `app` container command when calling `RunTask`, for example
-`["database", "migrate"]`. The database URL is injected from SSM and logs are
-written to `/ecs/docs-rs-admin`.
+`["database", "migrate"]`. The database URL is injected from SSM and application
+logs are sent to Datadog with `service:docs-rs-admin`.
 
 `docs-rs-release` derives its configuration from the admin task, sharing its
-image, IAM roles, environment, secrets, storage, and CloudWatch log group. It
+image, IAM roles, environment, secrets, storage, and Datadog sidecars. It
 overrides the entrypoint and command to run the packaged
 `/usr/local/bin/docs_rs_release.sh` through `tini` and `/bin/sh`.
 
@@ -116,7 +116,8 @@ The task runs `docs_rs_watcher start`, sharing the database and storage settings
 with the other containers. It uses its own database pool (maximum 10 connections),
 checks the registry every 30 seconds, and limits queued rebuilds to 200. Its
 registry index is stored under `/tmp` on ephemeral task storage and is fetched
-again after task replacement. Logs are written to `/ecs/docs-rs-registry-watcher`.
+again after task replacement. Application logs go directly to Datadog in both
+environments, with `service:docs-rs-registry-watcher`.
 Its security group allows outbound connections and no inbound connections.
 Database access and deletion of removed crates' S3 documentation are allowed.
 
@@ -129,6 +130,54 @@ repository updater token is injected from the existing SSM parameter
 `/docs-rs/github-access-token`, shared with builders. Rotate the parameter and
 restart both workloads to reload a changed token. GitLab tokens and Fastly
 configuration are not injected into this task yet.
+
+## Datadog on Fargate
+
+Web, registry watcher, admin, and release tasks use Datadog in both staging and
+production. They share the account-local SecureString parameter
+`/docs-rs/datadog-api-key`, configured in `config.tf`. The shared ECS module
+uses Datadog site `datadoghq.com`. Create the parameter before applying;
+Terraform reads its metadata, while task execution roles inject the API key.
+The API key is only exposed to the Agent and log router.
+
+The shared ECS task module uses the Datadog Fargate module, pinned to version
+`1.2.2`, adding `datadog-agent` and `datadog-log-router` alongside `app`.
+`ecs-app` forwards the same optional configuration for the web service. Release
+inherits the admin definition, including both sidecars, and changes only the
+family and application startup command. Release telemetry consequently uses
+`service:docs-rs-admin`; distinguish it using `task_family:docs-rs-release`.
+
+| Task | Task CPU | Task memory | Application memory limit |
+| --- | --- | --- | --- |
+| Web | 1 vCPU | 2 GiB | 1 GiB |
+| Admin / release | 0.5 vCPU | 2 GiB | 1 GiB |
+| Registry watcher | 1 vCPU | 5 GiB | 4 GiB |
+
+These budgets include 768 MiB for the Agent and a 256 MiB budget for Fluent Bit.
+The sidecars each reserve 128 CPU units; application CPU values are relative
+CPU shares. Docs.rs configures total task resources, including sidecars. The
+shared module reserves 256 CPU units and 1024 MiB for Datadog and assigns the
+remainder to the app. Datadog remains optional for other callers of the shared
+ECS modules.
+
+The Agent collects task/container metrics and receives application OpenTelemetry
+metrics at `http://localhost:4317`. FireLens ships JSON application logs to
+Datadog, tagged with the task's service name and GitHub deployment environment
+(`env:staging` or `env:production`). Agent logs also use FireLens; upstream does
+not ship router stdout/stderr. Application logs no longer appear in the task's
+CloudWatch log group. Newly launched standalone admin, release, and watcher tasks
+use the same configuration as their definitions.
+
+Apply the staging docs.rs Terragrunt unit, then confirm all three containers start,
+the app emits logs in Datadog, and metrics such as `ecs.fargate.mem.usage`,
+`ecs.fargate.cpu.usage`, `ecs.fargate.ephemeral_storage.utilized`, and application
+queue metrics appear. Check ECS task/container health and stopped reasons if
+startup fails; Agent logs appear in Datadog once FireLens is delivering logs.
+The upstream router memory-limit limitation is documented in the shared module.
+A missing SSM parameter or invalid API key must be resolved before expecting
+telemetry. Verify web, watcher, and one-off admin/release tasks in staging before
+production rollout.
+See [shared task monitoring configuration](../ecs-task/README.md).
 
 [terraform]: https://terraform.io
 [docs.rs]: https://docs.rs
