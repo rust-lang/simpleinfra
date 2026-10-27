@@ -3,10 +3,11 @@
 set -euo pipefail
 umask 077
 export AWS_PAGER=""
-# Expose setup failures through EC2's system log before container logging exists.
+# Keep setup output in the service journal and EC2's system log, even before
+# Datadog or container logging is available.
 # Save the service's journal descriptors for the foreground container below.
 exec 3>&1 4>&2
-exec > /dev/console 2>&1
+exec > >(tee --output-error=warn /dev/console) 2>&1
 config=/etc/docs-rs/host.json
 export AWS_DEFAULT_REGION
 AWS_DEFAULT_REGION=$(jq -r .region "$config")
@@ -34,7 +35,7 @@ docker pull "$image"
 # Remove only this service's stale container, never crate-build siblings.
 docker container rm --force docs-rs-builder >/dev/null 2>&1 || true
 
-# Application output stays in the journal and CloudWatch, off the EC2 console.
+# Application output goes to the service journal for Datadog, off the EC2 console.
 exec 1>&3 2>&4 3>&- 4>&-
 exec docker run --rm --name docs-rs-builder --network host \
     --stop-timeout 120 \
@@ -42,8 +43,4 @@ exec docker run --rm --name docs-rs-builder --network host \
     --volume /var/run/docker.sock:/var/run/docker.sock \
     --volume "$(jq -r .prefix "$config"):$(jq -r .prefix "$config")" \
     --volume "$(jq -r .workspace "$config"):$(jq -r .workspace "$config")" \
-    --log-driver awslogs \
-    --log-opt "awslogs-region=$AWS_DEFAULT_REGION" \
-    --log-opt "awslogs-group=$(jq -r .log_group "$config")" \
-    --log-opt "awslogs-stream=$(cat /etc/docs-rs/instance-id)" \
     "$image" start
