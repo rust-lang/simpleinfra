@@ -47,6 +47,7 @@ resource "aws_iam_role_policy" "builder_startup" {
         Resource = [
           aws_ssm_parameter.connection_url.arn,
           local.github_token_arn,
+          data.aws_ssm_parameter.sentry_dsn.arn,
         ]
       },
       {

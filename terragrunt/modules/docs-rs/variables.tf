@@ -70,6 +70,29 @@ variable "github_environment" {
   description = "The GitHub deployment environment used for GitHub Actions OIDC."
 }
 
+variable "sentry_environment" {
+  type        = string
+  nullable    = false
+  description = "Sentry environment name shared by all docs.rs workloads."
+
+  validation {
+    condition     = length(trimspace(var.sentry_environment)) > 0
+    error_message = "The Sentry environment must not be empty."
+  }
+}
+
+variable "sentry_traces_sample_rate" {
+  type        = number
+  default     = 0.001
+  nullable    = false
+  description = "Default Sentry trace sampling probability; docs.rs explicitly samples build transactions at 100%."
+
+  validation {
+    condition     = var.sentry_traces_sample_rate >= 0 && var.sentry_traces_sample_rate <= 1
+    error_message = "The Sentry trace sample rate must be between 0 and 1."
+  }
+}
+
 variable "s3_migration_enabled" {
   type        = bool
   description = "Enable manual S3 migration from a source bucket to the docs-rs storage bucket."
