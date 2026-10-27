@@ -37,10 +37,17 @@ docker container rm --force docs-rs-builder >/dev/null 2>&1 || true
 
 # Application output goes to the service journal for Datadog, off the EC2 console.
 exec 1>&3 2>&4 3>&- 4>&-
+# Rustwide gets sandbox host PIDs from Docker inspect. --pid=host exposes their
+# /proc/<pid>/cgroup files; --cgroupns=host keeps those paths relative to the host
+# cgroup root. The read-only /sys/fs/cgroup mount exposes memory.peak and
+# memory.events (OOM counters), which gVisor does not expose inside sandboxes.
+# Only this trusted controller gets host visibility; crate sandboxes stay isolated.
 exec docker run --rm --name docs-rs-builder --network host \
+    --pid=host --cgroupns=host \
     --stop-timeout 120 \
     --env-file /run/docs-rs/builder.env \
     --volume /var/run/docker.sock:/var/run/docker.sock \
+    --volume /sys/fs/cgroup:/sys/fs/cgroup:ro \
     --volume "$(jq -r .prefix "$config"):$(jq -r .prefix "$config")" \
     --volume "$(jq -r .workspace "$config"):$(jq -r .workspace "$config")" \
     "$image" start
