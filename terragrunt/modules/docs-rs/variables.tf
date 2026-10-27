@@ -30,6 +30,17 @@ variable "cluster_config" {
   description = "The configuration for the cluster this is running in"
 }
 
+variable "web_count" {
+  description = "Fixed desired number of web service tasks."
+  type        = number
+  nullable    = false
+
+  validation {
+    condition     = var.web_count >= 0 && floor(var.web_count) == var.web_count
+    error_message = "Web count must be a non-negative integer."
+  }
+}
+
 variable "builder_count" {
   description = "Fixed desired capacity of the identical builder Auto Scaling group."
   type        = number

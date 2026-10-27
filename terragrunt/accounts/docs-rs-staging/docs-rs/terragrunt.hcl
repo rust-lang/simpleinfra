@@ -27,6 +27,7 @@ inputs = {
   domain                    = "docs-rs-staging.rust-lang.net"
   bastion_security_group_id = dependency.vpc.outputs.bastion_security_group_id
   builder_image_version     = "latest" # Prefer a published SHA tag or digest for repeatable rollouts.
+  web_count                 = 2
   builder_count             = 2
   builder_config = {
     # Each host: 4 vCPU, 8 GiB RAM, with a 6 GiB build limit.

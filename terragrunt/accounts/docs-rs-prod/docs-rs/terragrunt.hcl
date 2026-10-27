@@ -26,6 +26,7 @@ inputs = {
   github_environment        = "production"
   domain                    = "docs-rs-prod.rust-lang.net"
   bastion_security_group_id = dependency.vpc.outputs.bastion_security_group_id
+  web_count                 = 2
   builder_count             = 2
   builder_config = {
     # 16 vCPU, 32 GiB RAM: headroom for 12-vCPU builds and 12 GiB memory exceptions.
