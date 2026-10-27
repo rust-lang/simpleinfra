@@ -52,11 +52,12 @@ flowchart LR
 
 The web frontend runs on ECS/Fargate behind an Application Load Balancer, with
 DNS records in [Route 53]. This module does not provision a CDN. The web service
-currently has one desired task, 0.25 vCPU, 512 MiB memory, and a local archive-index
-cache. ALB health checks use `/-/health`. Each task uses PostgreSQL and S3.
+has two desired tasks in both environments. Each task has 1 vCPU, 2 GiB memory
+and a local archive-index cache. ALB health checks use
+`/-/health`. Each task uses PostgreSQL and S3.
 
-The existing service supports multiple tasks by increasing `tasks_count` in
-`web-server.tf`; each task gets its own cache and database pool (up to ten
+Set `web_count` in each environment's Terragrunt inputs to change the desired
+number of tasks; each task gets its own cache and database pool (up to ten
 connections). No web autoscaling target or policy is configured.
 
 ## Admin task
