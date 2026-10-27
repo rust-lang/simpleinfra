@@ -15,6 +15,16 @@ resource "aws_iam_role" "task" {
       }
     ]
   })
+
+  lifecycle {
+    precondition {
+      condition = var.datadog == null ? true : (
+        var.cpu > 2 * local.datadog_container_cpu &&
+        var.memory > local.datadog_agent_memory + local.datadog_log_router_memory
+      )
+      error_message = "Task resources must leave CPU and memory for the application after reserving Datadog sidecars (${2 * local.datadog_container_cpu} CPU units and ${local.datadog_agent_memory + local.datadog_log_router_memory} MiB)."
+    }
+  }
 }
 
 // IAM Role used during the startup of the application, granting all
@@ -52,6 +62,7 @@ resource "aws_iam_role_policy" "task_execution" {
         Resource = concat(
           values(data.aws_ssm_parameter.task).*.arn,
           values(var.computed_secrets),
+          [for config in var.datadog[*] : config.api_key_parameter_arn],
         )
       },
 
