@@ -5,9 +5,11 @@ managed by the Rust Infrastructure team.
 
 ## Executing a playbook
 
-To execute a playbook you'll need to have Python 3 installed on the local
-machine and, if the environment requires it, AWS credentials. Then you can
-execute this command:
+To execute a playbook you'll need to have
+[uv](https://docs.astral.sh/uv/) version `0.13.6` or newer installed on the local
+machine and, if the environment requires it, AWS credentials.
+
+Then you can execute this command:
 
 ```
 ./apply <environment> <playbook>
