@@ -6,13 +6,13 @@ resource "aws_s3_bucket_lifecycle_configuration" "logs" {
   bucket = aws_s3_bucket.logs.id
 
   rule {
-    id     = "yearly-delete"
+    id     = "expire-logs"
     status = "Enabled"
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
     expiration {
-      days = 330
+      days = 30
     }
   }
 }
