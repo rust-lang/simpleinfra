@@ -3,9 +3,14 @@
 # requires-python = ">=3.12.16,<3.13"
 # dependencies = [
 #     "ansible==10.1.0",
-#     "boto3==1.26.94",
+#     "boto3==1.43.117",
+#     "botocore==1.43.117",
+#     "certifi==2026.10.19",
 #     "passlib==1.7.4",
 # ]
+#
+# [tool.uv]
+# required-version = ">=0.13.6"
 # ///
 
 import argparse
@@ -20,6 +25,27 @@ import platform
 BASE_PATH = pathlib.Path(__file__).resolve().parent
 
 
+def ansible_environment():
+    import botocore
+    import certifi
+
+    python_bundle = pathlib.Path(certifi.where())
+    aws_bundle = pathlib.Path(botocore.__file__).with_name("cacert.pem")
+
+    for bundle in (python_bundle, aws_bundle):
+        if not bundle.is_file():
+            raise SystemExit(f"Required CA bundle does not exist: {bundle}")
+
+    env = os.environ.copy()
+
+    # Select the CA bundles installed in the locked uv environment.
+    env["SSL_CERT_FILE"] = str(python_bundle)
+    env["REQUESTS_CA_BUNDLE"] = str(python_bundle)
+    env["AWS_CA_BUNDLE"] = str(aws_bundle)
+
+    return env
+
+
 def install_ansible_galaxy_dependencies():
     requirements = BASE_PATH / "requirements.yml"
     installed_requirements = BASE_PATH / ".installed-galaxy-requirements.yml"
@@ -32,7 +58,7 @@ def install_ansible_galaxy_dependencies():
     subprocess.run([
         sys.executable, "-m", "ansible.cli.galaxy",
         "install", "-r", str(requirements),
-    ], check=True)
+    ], check=True, env=ansible_environment())
 
     shutil.copy(str(requirements), str(installed_requirements))
 
@@ -76,7 +102,7 @@ def run_playbook(args):
         if args.verbose > 0:
             ansible_args += [f"-{'v' * args.verbose}"]
 
-        env = os.environ.copy()
+        env = ansible_environment()
         # Set environment variable if running on macOS to avoid python crash
         if platform.system() == "Darwin":
             env["OBJC_DISABLE_INITIALIZE_FORK_SAFETY"] = "true"
