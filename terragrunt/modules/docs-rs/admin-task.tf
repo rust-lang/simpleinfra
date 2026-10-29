@@ -3,9 +3,11 @@ module "admin" {
 
   name           = "docs-rs-admin"
   container_name = "app"
-  cpu            = 256
-  memory         = 512
-  port_mappings  = []
+  # Total task resources, including Datadog; leave 1 GiB for the app.
+  cpu           = 512
+  memory        = 2048
+  port_mappings = []
+  datadog       = local.datadog
 
   # Keep the image entrypoint (tini + docs_rs_admin); RunTask overrides arguments.
   command = ["--help"]

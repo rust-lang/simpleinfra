@@ -12,9 +12,11 @@ module "web" {
   name               = "docs-rs-web"
   repo               = "rust-lang/docs.rs"
 
-  cpu                  = 256
-  memory               = 512
-  tasks_count          = 1
+  # Total task resources, including Datadog; leave 1 GiB for the app.
+  cpu                  = 1024
+  memory               = 2048
+  datadog              = local.datadog
+  tasks_count          = var.web_count
   platform_version     = "1.4.0"
   ephemeral_storage_gb = 40
 

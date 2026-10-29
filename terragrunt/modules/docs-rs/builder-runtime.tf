@@ -22,17 +22,15 @@ locals {
     DOCSRS_BUILD_CPU_LIMIT                           = var.builder_config.build_cpu_limit
     DOCSRS_BUILD_DEFAULT_MEMORY_LIMIT                = var.builder_config.build_memory_limit
     DOCSRS_BUILD_WORKSPACE_REINITIALIZATION_INTERVAL = "2h"
+    OTEL_EXPORTER_OTLP_ENDPOINT                      = "http://localhost:4317"
+    OTEL_SERVICE_NAME                                = "docs-rs-builder"
+    OTEL_RESOURCE_ATTRIBUTES                         = "deployment.environment.name=${local.datadog.environment}"
   }) : name => tostring(value) }
 }
 
 resource "aws_iam_role_policy_attachment" "builder_ecr_pull" {
   role       = aws_iam_role.builder.name
   policy_arn = module.builder_ecr.policy_pull_arn
-}
-
-resource "aws_cloudwatch_log_group" "builder" {
-  name              = "/ecs/docs-rs-builder"
-  retention_in_days = 7
 }
 
 resource "aws_iam_role_policy" "builder_startup" {
@@ -47,12 +45,9 @@ resource "aws_iam_role_policy" "builder_startup" {
         Resource = [
           aws_ssm_parameter.connection_url.arn,
           local.github_token_arn,
+          data.aws_ssm_parameter.sentry_dsn.arn,
+          data.aws_ssm_parameter.datadog.arn,
         ]
-      },
-      {
-        Effect   = "Allow"
-        Action   = ["logs:CreateLogStream", "logs:PutLogEvents"]
-        Resource = "${aws_cloudwatch_log_group.builder.arn}:*"
       },
       {
         Effect   = "Allow"
