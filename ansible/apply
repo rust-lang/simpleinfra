@@ -3,9 +3,13 @@
 # requires-python = ">=3.12.16,<3.13"
 # dependencies = [
 #     "ansible==10.1.0",
-#     "boto3==1.26.94",
+#     "boto3==1.43.117",
+#     "certifi==2026.10.19",
 #     "passlib==1.7.4",
 # ]
+#
+# [tool.uv]
+# required-version = ">=0.13.6"
 # ///
 
 import argparse
