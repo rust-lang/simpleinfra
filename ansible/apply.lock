@@ -6,7 +6,6 @@ requires-python = ">=3.12.16, <3.13"
 requirements = [
     { name = "ansible", specifier = "==10.1.0" },
     { name = "boto3", specifier = "==1.43.117" },
-    { name = "botocore", specifier = "==1.43.117" },
     { name = "certifi", specifier = "==2026.10.19" },
     { name = "passlib", specifier = "==1.7.4" },
 ]
