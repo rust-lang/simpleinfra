@@ -116,16 +116,3 @@ The ECR repository, IAM roles, log group, and service resources remain shared.
 
 The `task_definition` output exposes the common settings needed by derived tasks
 such as docs.rs release, independent of which backend creates the definition.
-
-## Validation
-
-Run the following in this directory to install dependencies and validate the
-configuration without configuring a state backend:
-
-```sh
-terraform init -backend=false
-terraform validate
-```
-
-CI checks Terraform formatting repository-wide. This module currently has no
-Terraform test suite or module-specific CI test step.
