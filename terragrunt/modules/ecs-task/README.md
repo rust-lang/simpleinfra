@@ -42,11 +42,11 @@ include a separate OpenTelemetry Collector or automatically instrument APM.
 Application stdout/stderr uses `awsfirelens` and is sent directly to Datadog over
 TLS, with ECS metadata and service/environment tags. The router parses serialized
 JSON logs. App-specific fields may still need Datadog message/status remappers
-(for example Rust tracing's nested `fields.message`). Application logs are no
-longer copied to CloudWatch. Upstream also sends Agent output through FireLens;
-it does not configure log collection for the router's own stdout/stderr. The
-CloudWatch group remains for callers without Datadog. Tools reading application
-logs from CloudWatch must use Datadog for enabled tasks instead.
+(for example Rust tracing's nested `fields.message`). Upstream also sends Agent
+output through FireLens; it does not configure log collection for the router's
+own stdout/stderr. The
+CloudWatch group is used by tasks without Datadog. For tasks with Datadog enabled,
+application logs are available in Datadog only.
 
 The Agent is nonessential, and the app does not wait for its health check.
 An unhealthy or exited Agent therefore does not stop the task or block app

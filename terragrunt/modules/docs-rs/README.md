@@ -164,9 +164,9 @@ The Agent collects task/container metrics and receives application OpenTelemetry
 metrics at `http://localhost:4317`. FireLens ships JSON application logs to
 Datadog, tagged with the task's service name and GitHub deployment environment
 (`env:staging` or `env:production`). Agent logs also use FireLens; upstream does
-not ship router stdout/stderr. Application logs no longer appear in the task's
-CloudWatch log group. Newly launched standalone admin, release, and watcher tasks
-use the same configuration as their definitions.
+not ship router stdout/stderr. Application logs are available in Datadog only.
+Standalone admin, release, and watcher tasks use the same configuration as their
+definitions.
 
 Apply the staging docs.rs Terragrunt unit, then confirm all three containers start,
 the app emits logs in Datadog, and metrics such as `ecs.fargate.mem.usage`,
