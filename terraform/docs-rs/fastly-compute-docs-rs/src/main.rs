@@ -58,7 +58,7 @@ fn main(req: Request) -> Result<Response, Error> {
         Some(fastly::compute_runtime::hostname().to_owned()),
     );
 
-    let result = handle(req);
+    let result = handle(&mut access_log, req);
     let access_log = collect_response(&mut access_log, &result);
 
     if let Err(err) = build_and_send_log(access_log) {
@@ -88,11 +88,17 @@ fn build_and_send_log(log_line: LogLineV1Builder) -> Result<(), Error> {
     Ok(())
 }
 
-fn handle(mut req: Request) -> Result<Response, Error> {
+fn handle(access_log: &mut LogLineV1Builder, mut req: Request) -> Result<Response, Error> {
     let config = ConfigStore::open(DOCS_RS_CONFIG);
     let secrets = SecretStore::open(DOCS_RS_SECRET_STORE).expect("failed to open secret store");
 
     let shield = shield::Context::load(&config, &secrets, &mut req)?;
+    if shield.is_active() {
+        // we want to differentate requests on the shield POP, that go to the origin,
+        // from requests that are made between the edge POP & the shield POP.
+        access_log.on_shield(Some(shield.target_is_origin()));
+    }
+
     let ngwaf = ngwaf::NgWaf::load(&config);
 
     match req.get_method() {
@@ -155,6 +161,7 @@ fn handle(mut req: Request) -> Result<Response, Error> {
         None
     };
     tracing::Span::current().record("request_id", &request_id);
+    access_log.request_id(request_id);
 
     if shield.target_is_origin() {
         let origin_auth = secrets
