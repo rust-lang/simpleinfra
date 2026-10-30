@@ -81,8 +81,7 @@ fn handle_request(config: &Config, mut request: Request) -> Result<Response, Err
         return Ok(permanent_redirect(destination));
     }
 
-    set_ttl(config, &mut request);
-    set_surrogate_keys(&mut request);
+    set_cache_policy(config, &mut request);
     rewrite_urls_with_plus_character(&mut request);
     rewrite_download_urls(&mut request);
     rewrite_version_downloads_urls(&mut request);
@@ -122,15 +121,9 @@ fn limit_http_methods(request: &Request) -> Option<Response> {
     None
 }
 
-/// Set the TTL
+/// Set the cache policy
 ///
-/// A TTL header is added to the request to ensure that the content is cached for the given amount
-/// of time.
-fn set_ttl(config: &Config, request: &mut Request) {
-    request.set_ttl(config.static_ttl);
-}
-
-/// Set the surrogate keys
+/// A TTL is set on the request to ensure that the content is cached for the given amount of time.
 ///
 /// The crates.io backend attaches a comma-separated list of cache tags (e.g.
 /// `crate:serde,release:serde@1.0.0`) to the S3 objects as `cache-tags` metadata, which S3
@@ -138,7 +131,8 @@ fn set_ttl(config: &Config, request: &mut Request) {
 /// header before the response is cached and translate it into surrogate keys, so that e.g. all
 /// cached files of a crate can be purged with a single request. The header is removed from the
 /// response in the process, since it is an origin-internal detail.
-fn set_surrogate_keys(request: &mut Request) {
+fn set_cache_policy(config: &Config, request: &mut Request) {
+    request.set_ttl(config.static_ttl);
     request.set_after_send(|candidate| {
         if candidate.get_status().is_success() {
             if let Some(tags) = candidate.remove_header_str("x-amz-meta-cache-tags") {
