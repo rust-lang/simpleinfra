@@ -9,4 +9,13 @@ include {
 
 inputs = {
   env = "prod"
+
+  datadog_archives = {
+    bucket = "crates-io-datadog-archives"
+    services = {
+      "crates.io"              = "crates.io"
+      "static.crates.io"       = "static.crates.io"
+      "crates-io-fastly-index" = "crates-io-fastly-index"
+    }
+  }
 }
