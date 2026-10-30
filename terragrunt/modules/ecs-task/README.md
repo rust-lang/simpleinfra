@@ -7,7 +7,7 @@ CloudWatch log group. By default it runs one application container using the
 ## Optional Datadog monitoring
 
 Set `datadog` to delegate task creation to the pinned
-`DataDog/ecs-datadog/aws//modules/ecs_fargate` module (version `1.2.2`). It adds
+`DataDog/ecs-datadog/aws//modules/ecs_fargate` module. It adds
 a Datadog Agent and a Fluent Bit FireLens router:
 
 ```hcl
@@ -88,7 +88,7 @@ budget (256 MiB) are fixed internally. Tasks with 8 or more vCPUs
 require Linux Fargate platform 1.4.0 or newer. See the
 [AWS size table](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html).
 
-Upstream version `1.2.2` serializes the router memory input as `memory_limit_mib`
+The pinned upstream module serializes the router memory input as `memory_limit_mib`
 instead of ECS's `memory` field. It therefore does not establish a router-specific
 hard limit. We subtract its budget from the app's limit; the application, Agent,
 and overall task limits remain enforced. Verify router memory in staging.

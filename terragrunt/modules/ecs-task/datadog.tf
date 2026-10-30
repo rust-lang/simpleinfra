@@ -92,7 +92,7 @@ module "datadog_ecs_fargate_task" {
       # https://github.com/aws/aws-for-fluent-bit#aws-distro-for-fluent-bit-release-tags
       image_version = "stable"
       cpu           = local.datadog_container_cpu
-      # Upstream 1.2.2 emits this as memory_limit_mib, not ECS's memory field.
+      # Upstream emits this as memory_limit_mib, not ECS's memory field.
       # Treat it as a budget; only the task/app/Agent hard limits are enforced.
       memory_limit_mib                 = local.datadog_log_router_memory
       is_log_router_essential          = true

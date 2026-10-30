@@ -140,8 +140,8 @@ uses Datadog site `datadoghq.com`. Create the parameter before applying;
 Terraform reads its metadata, while task execution roles inject the API key.
 The API key is only exposed to the Agent and log router.
 
-The shared ECS task module uses the Datadog Fargate module, pinned to version
-`1.2.2`, adding `datadog-agent` and `datadog-log-router` alongside `app`.
+The shared ECS task module uses the Datadog Fargate module, adding
+`datadog-agent` and `datadog-log-router` alongside `app`.
 `ecs-app` forwards the same optional configuration for the web service. Release
 inherits the admin definition, including both sidecars, and changes only the
 family and application startup command. Release telemetry consequently uses
