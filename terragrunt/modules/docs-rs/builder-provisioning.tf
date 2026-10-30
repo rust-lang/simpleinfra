@@ -18,6 +18,7 @@ locals {
           secrets = {
             DOCSRS_DATABASE_URL       = aws_ssm_parameter.connection_url.name,
             DOCSRS_GITHUB_ACCESSTOKEN = local.github_token_parameter
+            SENTRY_DSN                = local.sentry_dsn_parameter
           }
           runsc_version = "20261012.0"
           runsc_sha256  = "7a440a035128a52f489b0bb76f60ac4df9cabe7cdf31dd5fd79a3e80f8a707ca"

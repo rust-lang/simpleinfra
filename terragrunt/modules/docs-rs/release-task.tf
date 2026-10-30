@@ -16,7 +16,14 @@ resource "aws_ecs_task_definition" "release" {
 
   container_definitions = jsonencode([
     for container in jsondecode(local.admin_task_definition.container_definitions) :
-    merge(container, container.name == "app" ? {
+    # ECS adds these empty arrays when reading back the admin definition.
+    # Include them during planning too, so a new admin revision cannot change
+    # the derived JSON midway through apply. Preserve any configured entries.
+    merge({
+      mountPoints    = []
+      systemControls = []
+      volumesFrom    = []
+      }, container, container.name == "app" ? {
       entryPoint = ["/usr/bin/tini", "--", "/bin/sh"]
       command    = ["/usr/local/bin/docs_rs_release.sh"]
     } : {})

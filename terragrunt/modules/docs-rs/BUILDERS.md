@@ -39,8 +39,9 @@ Per-crate memory exceptions can exceed the default build limit. Changing
 
 Terraform manages `/docs-rs/database-url`. The existing SecureString parameter
 `/docs-rs/github-access-token` must exist in each account and contain a valid GitHub
-token; it is shared with the registry watcher. Terraform reads its ARN without
-requesting decryption.
+token; it is shared with the registry watcher. Sentry reporting also requires
+the account-local SecureString `/docs-rs/sentry-dsn`. Terraform reads parameter
+ARNs without requesting decryption.
 
 Cloud-init installs Ubuntu packages and writes the configuration, scripts, and
 systemd units. Docker configuration and executable files are written after package
@@ -59,7 +60,7 @@ Terraform renders non-secret configuration, the selected image, and SSM paramete
 names into `/etc/docs-rs/host.json`. `builder.service` runs
 `/usr/local/sbin/docs-rs-builder`. On every service start the launcher:
 
-1. Fetches the database URL and GitHub token from SSM with the instance role.
+1. Fetches the database URL, GitHub token, and Sentry DSN from SSM with the instance role.
 2. Writes non-secret settings and secret values to a root-only
    `/run/docs-rs/builder.env`, rejecting empty or multiline secret values.
 3. Authenticates to ECR and pulls the configured image. ECR credentials are stored
@@ -72,7 +73,7 @@ not embedded in user data, command arguments, or Terraform state by this launche
 Container environment values remain accessible to administrators with Docker
 access. Secret rotations take effect on service restart or host replacement.
 
-The instance role grants SSM access to only the database and GitHub token
+The instance role grants SSM access to only the database, GitHub token, and Sentry
 parameters, ECR pull, S3 access to the docs.rs bucket, log-stream writes, and
 completion of its ASG's launch hook. No cross-account role assumption is needed.
 

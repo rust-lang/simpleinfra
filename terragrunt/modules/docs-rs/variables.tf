@@ -30,6 +30,17 @@ variable "cluster_config" {
   description = "The configuration for the cluster this is running in"
 }
 
+variable "web_count" {
+  description = "Fixed desired number of web service tasks."
+  type        = number
+  nullable    = false
+
+  validation {
+    condition     = var.web_count >= 0 && floor(var.web_count) == var.web_count
+    error_message = "Web count must be a non-negative integer."
+  }
+}
+
 variable "builder_count" {
   description = "Fixed desired capacity of the identical builder Auto Scaling group."
   type        = number
@@ -57,6 +68,29 @@ variable "builder_config" {
 variable "github_environment" {
   type        = string
   description = "The GitHub deployment environment used for GitHub Actions OIDC."
+}
+
+variable "sentry_environment" {
+  type        = string
+  nullable    = false
+  description = "Sentry environment name shared by all docs.rs workloads."
+
+  validation {
+    condition     = length(trimspace(var.sentry_environment)) > 0
+    error_message = "The Sentry environment must not be empty."
+  }
+}
+
+variable "sentry_traces_sample_rate" {
+  type        = number
+  default     = 0.001
+  nullable    = false
+  description = "Default Sentry trace sampling probability; docs.rs explicitly samples build transactions at 100%."
+
+  validation {
+    condition     = var.sentry_traces_sample_rate >= 0 && var.sentry_traces_sample_rate <= 1
+    error_message = "The Sentry trace sample rate must be between 0 and 1."
+  }
 }
 
 variable "s3_migration_enabled" {

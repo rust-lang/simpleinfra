@@ -52,12 +52,26 @@ flowchart LR
 
 The web frontend runs on ECS/Fargate behind an Application Load Balancer, with
 DNS records in [Route 53]. This module does not provision a CDN. The web service
-currently has one desired task, 0.25 vCPU, 512 MiB memory, and a local archive-index
-cache. ALB health checks use `/-/health`. Each task uses PostgreSQL and S3.
+has two desired tasks in both environments. Each task has 1 vCPU, 2 GiB memory
+and a local archive-index cache. ALB health checks use
+`/-/health`. Each task uses PostgreSQL and S3.
 
-The existing service supports multiple tasks by increasing `tasks_count` in
-`web-server.tf`; each task gets its own cache and database pool (up to ten
+Set `web_count` in each environment's Terragrunt inputs to change the desired
+number of tasks; each task gets its own cache and database pool (up to ten
 connections). No web autoscaling target or policy is configured.
+
+## Shared error reporting
+
+All workloads receive `SENTRY_DSN` from the account-local SecureString parameter
+`/docs-rs/sentry-dsn`. Create it with the desired project's DSN before applying
+this module. Terraform references the parameter without requesting decryption;
+ECS injects the value at task launch and builders fetch it at controller startup.
+
+`sentry_environment` sets `SENTRY_ENVIRONMENT` (`staging` or `prod` in the
+account inputs). `sentry_traces_sample_rate` sets `SENTRY_TRACES_SAMPLE_RATE`,
+defaults to `0.001`, and must be between 0 and 1. The application explicitly
+samples build transactions at 100% regardless of this default rate. Updating
+the DSN requires new tasks or a builder restart to reload the value.
 
 ## Admin task
 
