@@ -89,7 +89,8 @@ module "datadog_ecs_fargate_task" {
   dd_log_collection = {
     enabled = true
     fluentbit_config = {
-      image_version = "latest"
+      # https://github.com/aws/aws-for-fluent-bit#aws-distro-for-fluent-bit-release-tags
+      image_version = "stable"
       cpu           = local.datadog_container_cpu
       # Upstream 1.2.2 emits this as memory_limit_mib, not ECS's memory field.
       # Treat it as a budget; only the task/app/Agent hard limits are enforced.

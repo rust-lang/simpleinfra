@@ -79,7 +79,11 @@ task definition. Without Datadog, the module uses the supplied task totals
 without adding explicit container limits. Derived tasks inherit those same totals.
 
 The site is fixed to `datadoghq.com`. Both sidecars use their default public ECR
-repositories with the `latest` tag. Agent memory (768 MiB) and the router memory
+repositories. The Agent uses `latest`; the Fluent Bit router uses AWS's `stable`
+tag. The router tag can advance between task launches; pin `image_version` to a
+tested version number for reproducible rollouts. See
+[AWS for Fluent Bit release tags](https://github.com/aws/aws-for-fluent-bit#aws-distro-for-fluent-bit-release-tags).
+Agent memory (768 MiB) and the router memory
 budget (256 MiB) are fixed internally. Tasks with 8 or more vCPUs
 require Linux Fargate platform 1.4.0 or newer. See the
 [AWS size table](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-cpu-memory-error.html).
