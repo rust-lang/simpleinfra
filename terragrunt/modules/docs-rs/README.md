@@ -130,6 +130,24 @@ repository updater token is injected from the existing SSM parameter
 restart both workloads to reload a changed token. GitLab tokens and Fastly
 configuration are not injected into this task yet.
 
+### Daily database synchronization
+
+EventBridge Scheduler launches one standalone watcher task every day, overriding
+the `app` container command with
+`["database", "synchronize"]`. The schedule is named
+`docs-rs-consistency-check` in the `docs-rs` schedule group. It reuses the
+watcher's image, resources, environment, secrets, IAM roles, and network settings.
+The regular registry watcher service continues running alongside it.
+
+Schedules in the `docs-rs` group share the `docs-rs-scheduler` IAM role. It can
+launch any revision of `docs-rs-*` task definitions in this cluster and pass the
+`docs-rs-*` task roles and `ecs-task-execution--docs-rs-*` execution roles to ECS.
+Future scheduled jobs following these naming conventions can reuse the role.
+
+Synchronization logs go to `/ecs/docs-rs-registry-watcher` in a separate task
+stream. Scheduler retries failed launch requests up to three times within an
+hour; it does not monitor the command's exit status or retry application failures.
+
 [terraform]: https://terraform.io
 [docs.rs]: https://docs.rs
 [ECS]: https://aws.amazon.com/ecs
