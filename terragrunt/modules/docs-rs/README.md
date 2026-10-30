@@ -119,10 +119,11 @@ configuration are not injected into this task yet.
 The web, watcher, admin, and release ECS tasks receive
 `DOCSRS_REGISTRY_API_TOKEN` from the `/docs-rs/registry-api-token` SSM
 SecureString. Create that parameter in each docs.rs account before applying this
-module. Use a different token for staging and production, and store the same
-value in the matching crates.io WAF account at
+module. Use the token matching the crates.io environment this docs.rs
+environment is connected to. Store the same value in the crates.io WAF account at
 `/${env}/crates-io/webapp/docsrs-auth-token`. These copies are managed
-separately until cross-account secret sharing is configured.
+separately until cross-account secret sharing is configured. At the time of
+writing,
 
 [terraform]: https://terraform.io
 [docs.rs]: https://docs.rs
