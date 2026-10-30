@@ -54,6 +54,12 @@ resource "fastly_service_compute" "docs_rs" {
     region = "US"
   }
 
+  logging_datadog {
+    name   = "access_logs"
+    token  = data.aws_ssm_parameter.datadog_api_key.value
+    region = "US"
+  }
+
   domain {
     name = local.domain_name
   }
