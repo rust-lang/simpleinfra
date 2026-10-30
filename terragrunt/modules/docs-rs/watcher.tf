@@ -15,9 +15,12 @@ module "watcher" {
     DOCSRS_DELAY_BETWEEN_REGISTRY_FETCHES = "30s"
     DOCSRS_ONLY_EXISTING_CRATES           = true
   })
+
   computed_secrets = merge(local.common_computed_secrets, {
     DOCSRS_GITHUB_ACCESSTOKEN = local.github_token_arn
   })
+
+  secrets = local.common_secrets
 }
 
 resource "aws_security_group" "watcher" {
