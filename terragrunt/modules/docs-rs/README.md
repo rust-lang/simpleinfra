@@ -174,9 +174,14 @@ the app emits logs in Datadog, and metrics such as `ecs.fargate.mem.usage`,
 queue metrics appear. Check ECS task/container health and stopped reasons if
 startup fails; Agent logs appear in Datadog once FireLens is delivering logs.
 The upstream router memory-limit limitation is documented in the shared module.
-A missing SSM parameter or invalid API key must be resolved before expecting
-telemetry. Verify web, watcher, and one-off admin/release tasks in staging before
-production rollout.
+A missing or unreadable SSM parameter prevents task startup because ECS cannot
+inject the secret. An invalid or revoked API key prevents telemetry delivery;
+the Agent is nonessential and app startup does not depend on its health, so Agent
+failures do not stop web/watcher tasks or block admin/release commands. The
+FireLens router remains essential and a startup dependency for application logs.
+After updating the SSM parameter, replace running tasks to load the new key.
+Verify web, watcher, and one-off admin/release tasks in staging before production
+rollout.
 See [shared task monitoring configuration](../ecs-task/README.md).
 
 [terraform]: https://terraform.io

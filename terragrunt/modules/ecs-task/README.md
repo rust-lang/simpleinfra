@@ -48,10 +48,13 @@ it does not configure log collection for the router's own stdout/stderr. The
 CloudWatch group remains for callers without Datadog. Tools reading application
 logs from CloudWatch must use Datadog for enabled tasks instead.
 
-Both sidecars are essential containers. The app waits for their `HEALTHY`
-conditions, using upstream's health checks with a 30-second Agent probe timeout.
-These checks do not guarantee Datadog intake is reachable. ECS stops the task if
-an essential container exits.
+The Agent is nonessential, and the app does not wait for its health check.
+An unhealthy or exited Agent therefore does not stop the task or block app
+startup, including when the injected API key is invalid or revoked. The Agent
+retains its health check with a 30-second probe timeout for diagnostics.
+The log router remains essential, and the app waits for its `HEALTHY` condition.
+This check does not guarantee Datadog intake is reachable or accepts the API key.
+ECS stops the task if an essential container exits.
 The app remains essential, so short-lived admin commands still stop the whole
 task when they finish. Shutdown timeouts use ECS defaults from the upstream
 container definitions.

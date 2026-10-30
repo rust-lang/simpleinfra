@@ -56,10 +56,11 @@ module "datadog_ecs_fargate_task" {
   dd_service        = var.name
   dd_tags           = "env:${var.datadog.environment}"
 
-  dd_cpu                           = local.datadog_container_cpu
-  dd_memory_limit_mib              = local.datadog_agent_memory
-  dd_essential                     = true
-  dd_is_datadog_dependency_enabled = true
+  dd_cpu              = local.datadog_container_cpu
+  dd_memory_limit_mib = local.datadog_agent_memory
+  # Agent health/API key failures must not stop the app or block its startup.
+  dd_essential                     = false
+  dd_is_datadog_dependency_enabled = false
 
   # Allow the Agent's local health command (20s internal timeout) to finish
   # under CPU contention instead of having ECS kill the probe after 5s.
