@@ -38,6 +38,14 @@ resource "aws_ecs_service" "bors" {
 
   enable_ecs_managed_tags = true
 
+  force_new_deployment = true
+
+  triggers = {
+    # Forces a re-deployment when there is a change in the DB credentials,
+    # which are reflected by the DB endpoint
+    db_credentials_version = tostring(aws_ssm_parameter.db_endpoint.version)
+  }
+
   load_balancer {
     target_group_arn = aws_lb_target_group.primary.arn
     container_name   = "bors"
