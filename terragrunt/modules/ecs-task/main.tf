@@ -36,12 +36,6 @@ locals {
   }, var.command == null ? {} : { command = var.command }, local.datadog_app_settings)
 }
 
-# Preserve existing resource addresses for tasks without Datadog.
-moved {
-  from = aws_ecs_task_definition.task
-  to   = aws_ecs_task_definition.task[0]
-}
-
 resource "aws_ecs_task_definition" "task" {
   count = var.datadog == null ? 1 : 0
 

@@ -106,8 +106,8 @@ References: [Fargate integration](https://docs.datadoghq.com/integrations/aws-fa
 
 ## Resource addresses and toggling
 
-Tasks without Datadog retain `aws_ecs_task_definition.task[0]`. A `moved` block
-migrates the previous unindexed address without replacing unaffected tasks.
+Tasks without Datadog use `aws_ecs_task_definition.task[0]`. Terraform automatically
+maps the previous unindexed address to `[0]` without replacing unaffected tasks.
 Enabled tasks are owned by
 `module.datadog_ecs_fargate_task[0].aws_ecs_task_definition.this`. Enabling or
 disabling Datadog changes task-definition ownership and registers a new revision;
