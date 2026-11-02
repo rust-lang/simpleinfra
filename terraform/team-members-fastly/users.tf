@@ -24,7 +24,8 @@ locals {
     "jess" = {
       login = "jessizen@rustfoundation.org"
       name  = "Jess Izen"
-      role  = "user"
+      role     = "engineer"
+      services = local.crates_io_service_ids
     }
     "marcoieni" = {
       login = "marcoieni@rustfoundation.org"
