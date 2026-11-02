@@ -22,9 +22,10 @@ locals {
       role  = "superuser"
     }
     "jess" = {
-      login = "jessizen@rustfoundation.org"
-      name  = "Jess Izen"
-      role  = "user"
+      login    = "jessizen@rustfoundation.org"
+      name     = "Jess Izen"
+      role     = "engineer"
+      services = local.crates_io_service_ids
     }
     "marcoieni" = {
       login = "marcoieni@rustfoundation.org"
