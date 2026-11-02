@@ -17,7 +17,7 @@ inputs = {
   static_bucket_name     = "staging-crates-io"
   index_bucket_name      = "staging-crates-io-index"
 
-  static_ttl = 86400 // 1 day
+  static_ttl = 31536000 // 1 year
 
   webapp_origin_domain = "staging-crates-io.herokuapp.com"
 
