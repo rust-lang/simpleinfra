@@ -10,6 +10,7 @@ resource "aws_lb" "lb" {
   security_groups            = [aws_security_group.lb.id]
   ip_address_type            = "dualstack"
   drop_invalid_header_fields = true
+  idle_timeout               = 300
 
   tags = {
     Name = var.cluster_name
@@ -101,7 +102,7 @@ resource "aws_lb_listener" "lb_https" {
   load_balancer_arn = aws_lb.lb.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS-1-1-2017-01" // TLSv1.1
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09"
   certificate_arn   = module.default_lb_certificate.arn
 
   default_action {
