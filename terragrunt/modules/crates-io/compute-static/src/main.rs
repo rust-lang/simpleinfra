@@ -5,6 +5,7 @@ use fastly::{Error, Request, Response};
 use fastly_access_log::{collect_request, collect_response, LogLineV1Builder};
 use log::{info, warn, LevelFilter};
 use log_fastly::Logger;
+use std::time::Duration;
 
 use crate::config::Config;
 
@@ -12,6 +13,7 @@ mod config;
 
 const DATADOG_APP: &str = "crates.io";
 const DATADOG_SERVICE: &str = "static.crates.io";
+const ERROR_TTL: Duration = Duration::from_secs(10);
 const VERSION_DOWNLOADS: &str = "/archive/version-downloads/";
 const VERSION_DOWNLOADS_INDEX: &str = "/archive/version-downloads/index.html";
 const X_COMPRESS_HINT: &str = "X-Compress-Hint";
@@ -81,8 +83,7 @@ fn handle_request(config: &Config, mut request: Request) -> Result<Response, Err
         return Ok(permanent_redirect(destination));
     }
 
-    set_ttl(config, &mut request);
-    set_surrogate_keys(&mut request);
+    set_cache_policy(config, &mut request);
     rewrite_urls_with_plus_character(&mut request);
     rewrite_download_urls(&mut request);
     rewrite_version_downloads_urls(&mut request);
@@ -122,15 +123,9 @@ fn limit_http_methods(request: &Request) -> Option<Response> {
     None
 }
 
-/// Set the TTL
+/// Set the cache policy
 ///
-/// A TTL header is added to the request to ensure that the content is cached for the given amount
-/// of time.
-fn set_ttl(config: &Config, request: &mut Request) {
-    request.set_ttl(config.static_ttl);
-}
-
-/// Set the surrogate keys
+/// A TTL is set on the request to ensure that the content is cached for the given amount of time.
 ///
 /// The crates.io backend attaches a comma-separated list of cache tags (e.g.
 /// `crate:serde,release:serde@1.0.0`) to the S3 objects as `cache-tags` metadata, which S3
@@ -138,12 +133,24 @@ fn set_ttl(config: &Config, request: &mut Request) {
 /// header before the response is cached and translate it into surrogate keys, so that e.g. all
 /// cached files of a crate can be purged with a single request. The header is removed from the
 /// response in the process, since it is an origin-internal detail.
-fn set_surrogate_keys(request: &mut Request) {
+///
+/// Unsuccessful responses are cached only briefly. Nothing purges the cache when a missing file is
+/// uploaded later, so a long TTL would hide files like freshly rendered READMEs. S3 answers
+/// requests for missing objects with `403 Forbidden` when the requester lacks `s3:ListBucket`, so
+/// `403` responses are cached like `404` responses.
+fn set_cache_policy(config: &Config, request: &mut Request) {
+    request.set_ttl(config.static_ttl);
     request.set_after_send(|candidate| {
-        if candidate.get_status().is_success() {
+        let status = candidate.get_status();
+        if status.is_success() {
             if let Some(tags) = candidate.remove_header_str("x-amz-meta-cache-tags") {
                 candidate.set_surrogate_keys(parse_cache_tags(&tags));
             }
+        } else {
+            if status == StatusCode::FORBIDDEN {
+                candidate.set_cacheable();
+            }
+            candidate.set_ttl(ERROR_TTL);
         }
         Ok(())
     });
