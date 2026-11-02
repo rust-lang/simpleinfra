@@ -17,6 +17,8 @@ codegen-units = 1
 lto = "fat"
 
 [dependencies]
+aws-credential-types = "1.3.1"
+aws-sigv4 = { version = "1.6.4", default-features = false, features = ["sign-http", "http1"] }
 fastly = "0.13.1"
 fastly-access-log = { path = "../../../../crates/fastly-access-log" }
 log = "0.4.17"
