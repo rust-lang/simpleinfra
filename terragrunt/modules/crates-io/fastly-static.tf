@@ -112,6 +112,8 @@ resource "fastly_service_dictionary_items" "compute_static" {
   manage_items  = true
 
   items = {
+    "aws-access-key-id" : aws_iam_access_key.fastly_s3_static_reader.id
+    "aws-secret-access-key" : aws_iam_access_key.fastly_s3_static_reader.secret
     "cloudfront-url" : local.cloudfront_domain_name
     "datadog-env" : var.env
     "datadog-host" : var.static_domain_name
