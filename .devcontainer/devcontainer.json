@@ -1,0 +1,19 @@
+{
+  "name": "simpleinfra infrastructure tools",
+  "build": {
+    "dockerfile": "simpleinfra.dockerfile",
+    "context": "."
+  },
+  "containerUser": "dev",
+  "remoteUser": "dev",
+  "updateRemoteUserUID": true,
+  "overrideCommand": true,
+  "init": true,
+  "mounts": [
+    "source=simpleinfra-aws-cli-config,target=/home/dev/.aws,type=volume",
+    "source=simpleinfra-aws-sso-config,target=/home/dev/.config/aws-sso,type=volume",
+    "source=simpleinfra-cargo-registry,target=/home/dev/.cargo/registry,type=volume"
+  ],
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}"
+}
