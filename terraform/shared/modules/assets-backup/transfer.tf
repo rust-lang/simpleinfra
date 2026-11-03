@@ -22,6 +22,14 @@ resource "google_storage_transfer_job" "backup_transfer" {
 
     transfer_options {
       delete_objects_from_source_after_transfer = false
+
+      # Mirror s3 deletions. The backup bucket objects are versioned,
+      # so a deleted version is not directly accessible but available
+      # for restoration indefinitely (since there is no lifecycle policy).
+      #
+      # Hard deletes for eg GDPR require manual removal and should
+      # not be applied in the case of malicious bytes (security exemption).
+      delete_objects_unique_in_sink = true
     }
   }
 
