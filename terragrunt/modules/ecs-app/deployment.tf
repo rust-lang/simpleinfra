@@ -9,6 +9,7 @@ module "ecs_task" {
   cpu                  = var.cpu
   memory               = var.memory
   ephemeral_storage_gb = var.ephemeral_storage_gb
+  datadog              = var.datadog
 
   container_name        = local.container_name
   command               = var.command
