@@ -18,9 +18,10 @@ resource "google_storage_bucket" "backup_buckets" {
     enabled = true
   }
 
+  # Hardening against accidental console exposure:
   # Backups should never be publicly readable
-  public_access_prevention    = "enforced"
   # Access is managed through IAM, not object ACLs
+  public_access_prevention    = "enforced"
   uniform_bucket_level_access = true
 
   # Configure soft delete policy to retain deleted objects for recovery
