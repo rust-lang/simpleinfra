@@ -1,20 +1,27 @@
+locals {
+  # Exactly one task definition exists, depending on var.datadog. The Datadog
+  # module re-exports its aws_ecs_task_definition attributes under the same
+  # names, so either can be read like an `aws_ecs_task_definition`.
+  task_definition = one(concat(aws_ecs_task_definition.task, module.datadog_ecs_fargate_task))
+}
+
 output "task_arn" {
-  value = var.datadog == null ? aws_ecs_task_definition.task[0].arn : module.datadog_ecs_fargate_task[0].arn
+  value = local.task_definition.arn
 }
 
 output "task_definition" {
   description = "Task definition settings for derived tasks sharing the same image, roles, and configuration."
   value = {
-    arn                      = var.datadog == null ? aws_ecs_task_definition.task[0].arn : module.datadog_ecs_fargate_task[0].arn
-    cpu                      = tostring(var.cpu)
-    memory                   = tostring(var.memory)
-    network_mode             = "awsvpc"
-    task_role_arn            = aws_iam_role.task.arn
-    execution_role_arn       = aws_iam_role.task_execution.arn
-    requires_compatibilities = ["FARGATE"]
-    container_definitions    = var.datadog == null ? aws_ecs_task_definition.task[0].container_definitions : module.datadog_ecs_fargate_task[0].container_definitions
-    ephemeral_storage        = [{ size_in_gib = var.ephemeral_storage_gb }]
-    tags                     = var.datadog == null ? aws_ecs_task_definition.task[0].tags : module.datadog_ecs_fargate_task[0].tags
+    arn                      = local.task_definition.arn
+    cpu                      = local.task_definition.cpu
+    memory                   = local.task_definition.memory
+    network_mode             = local.task_definition.network_mode
+    task_role_arn            = local.task_definition.task_role_arn
+    execution_role_arn       = local.task_definition.execution_role_arn
+    requires_compatibilities = local.task_definition.requires_compatibilities
+    container_definitions    = local.task_definition.container_definitions
+    ephemeral_storage        = local.task_definition.ephemeral_storage
+    tags                     = local.task_definition.tags
   }
 }
 
