@@ -27,3 +27,12 @@ variable "datadog_log_sources" {
     error_message = "Datadog log sources must be non-empty strings."
   }
 }
+
+variable "datadog_archives" {
+  description = "Datadog log archive for this account: the S3 bucket to create and a map of archive name to Datadog service query value. Leave null to disable."
+  type = object({
+    bucket   = string
+    services = map(string)
+  })
+  default = null
+}
