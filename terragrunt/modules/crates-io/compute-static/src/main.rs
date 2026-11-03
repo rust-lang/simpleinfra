@@ -76,6 +76,10 @@ fn handle_request(config: &Config, mut request: Request) -> Result<Response, Err
         return Ok(response);
     }
 
+    // static.crates.io does not support query parameters. Ignoring them keeps clients from
+    // bypassing the cache and from passing S3 parameters like `response-content-type` to S3.
+    request.remove_query();
+
     if request.get_url().path() == "/archive/version-downloads" {
         let mut destination = request.get_url().clone();
         destination.set_path(VERSION_DOWNLOADS);
