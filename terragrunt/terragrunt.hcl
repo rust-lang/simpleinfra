@@ -12,12 +12,11 @@ remote_state {
     if_exists = "overwrite_terragrunt"
   }
   config = {
-    profile        = local.cmd.remote_state_profile
-    bucket         = local.cmd.remote_state_bucket
-    dynamodb_table = local.cmd.remote_state_dynamodb_table
+    profile      = local.cmd.remote_state_profile
+    bucket       = local.cmd.remote_state_bucket
     use_lockfile = true
-    region         = local.cmd.remote_state_region
-    key            = local.cmd.remote_state_key
+    region       = local.cmd.remote_state_region
+    key          = local.cmd.remote_state_key
   }
 }
 
