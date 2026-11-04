@@ -25,12 +25,9 @@ locals {
   }
 
   common_computed_secrets = {
-    DOCSRS_DATABASE_URL = aws_ssm_parameter.connection_url.arn
-    SENTRY_DSN          = data.aws_ssm_parameter.sentry_dsn.arn
-  }
-
-  common_secrets = {
-    DOCSRS_REGISTRY_API_TOKEN = "/docs-rs/registry-api-token"
+    DOCSRS_DATABASE_URL       = aws_ssm_parameter.connection_url.arn
+    DOCSRS_REGISTRY_API_TOKEN = data.aws_ssm_parameter.registry_api_token.arn
+    SENTRY_DSN                = data.aws_ssm_parameter.sentry_dsn.arn
   }
 }
 
@@ -43,6 +40,13 @@ resource "aws_ssm_parameter" "connection_url" {
 # Only the ARN is needed; do not decrypt the token during Terraform runs.
 data "aws_ssm_parameter" "github_token" {
   name            = local.github_token_parameter
+  with_decryption = false
+}
+
+# Supply the crates.io API token in each account's Parameter Store, outside
+# Terraform. Only the ARN is needed; do not decrypt the token during Terraform runs.
+data "aws_ssm_parameter" "registry_api_token" {
+  name            = "/docs-rs/registry-api-token"
   with_decryption = false
 }
 
