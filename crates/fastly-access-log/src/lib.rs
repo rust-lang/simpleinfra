@@ -141,7 +141,11 @@ pub fn collect_response(
 
 fn collect_error_response(log_line: &mut LogLineV1Builder) -> LogLineV1Builder {
     // No response was received, so this cannot have been a cache hit.
-    log_line.status(Some(500)).to_owned()
+    log_line
+        .bytes(None)
+        .content_type(None)
+        .status(Some(500))
+        .to_owned()
 }
 
 fn http_version_to_string(version: Version) -> Option<String> {
