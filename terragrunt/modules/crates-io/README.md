@@ -32,19 +32,15 @@ weight is zero.
 
 ### Fastly API rate limits
 
-Fastly NGWAF applies a per-IP limit of 600 requests per 10 minutes to normal
-requests. Requests with an `X-Docsrs-Authorization` header matching
-`docsrs_authorization_token` are excluded from that limit and have a separate
-shared limit of 10,000 requests per minute across all docs.rs instances. The
-shared token header is the rate-limit client key. Both limits block for five
-minutes and return HTTP 429 when exceeded.
+docs.rs uses a shared token to identify its registry requests so they can have
+a higher rate limit, shared across its instances.
 
 Before applying this module, create a `SecureString` SSM parameter at
-`/${env}/crates-io/webapp/docsrs-auth-token` in the crates.io WAF account. Set
+`/${env}/crates-io/webapp/docsrs-auth-token` in the
+`accounts/legacy/crates-io-{prod,staging}` accounts. Set
 its value to the same token stored at `/docs-rs/registry-api-token` in the
-matching docs.rs account. Terraform reads the parameter; it does not manage its
-value. Terraform state contains the decrypted value in the data source and
-Fastly rules, so protect state access accordingly.
+docs.rs accounts that use this crates.io environment. These copies are managed
+separately until cross-account secret sharing is configured.
 
 ### CDN origin authentication
 

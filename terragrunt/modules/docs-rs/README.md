@@ -73,6 +73,13 @@ defaults to `0.001`, and must be between 0 and 1. The application explicitly
 samples build transactions at 100% regardless of this default rate. Updating
 the DSN requires new tasks or a builder restart to reload the value.
 
+## Shared registry API token
+
+The registry API token identifies docs.rs requests for crates.io's higher rate
+limit. Follow the [token setup instructions](../crates-io/README.md#fastly-api-rate-limits)
+before applying this module. Each docs.rs account needs its own stored copy;
+environments connecting to the same crates.io environment must use the same token.
+
 ## Admin task
 
 `docs-rs-admin` is a standalone Fargate task using the CLI image's normal
@@ -131,15 +138,6 @@ repository updater token is injected from the existing SSM parameter
 restart both workloads to reload a changed token. GitLab tokens and Fastly
 configuration are not injected into this task yet.
 
-The web, watcher, admin, and release ECS tasks receive
-`DOCSRS_REGISTRY_API_TOKEN` from the `/docs-rs/registry-api-token` SSM
-SecureString. Create that parameter in each docs.rs account before applying this
-module. Use the token matching the crates.io environment this docs.rs
-environment is connected to. Store the same value in the crates.io WAF account at
-`/${env}/crates-io/webapp/docsrs-auth-token`. These copies are managed
-separately until cross-account secret sharing is configured. At the time of
-writing,
-
 ## Datadog on Fargate
 
 Web, registry watcher, admin, and release tasks use Datadog in both staging and
@@ -192,7 +190,6 @@ After updating the SSM parameter, replace running tasks to load the new key.
 Verify web, watcher, and one-off admin/release tasks in staging before production
 rollout.
 See [shared task monitoring configuration](../ecs-task/README.md).
-
 
 [terraform]: https://terraform.io
 [docs.rs]: https://docs.rs
