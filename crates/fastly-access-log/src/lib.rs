@@ -37,6 +37,13 @@ pub struct LogLineV1 {
     status: Option<u16>,
     tls: Option<TlsDetails>,
     url: String,
+    cache_hit: bool,
+    #[builder(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    on_shield: Option<bool>,
+    #[builder(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    request_id: Option<String>,
 }
 
 impl LogLineV1Builder {
@@ -133,6 +140,7 @@ pub fn collect_response(
                     .map(|content_type| content_type.to_string()),
             )
             .status(Some(response.get_status().as_u16()))
+            .cache_hit(response_is_cache_hit(response))
             .to_owned()
     } else {
         collect_error_response(log_line)
@@ -141,7 +149,29 @@ pub fn collect_response(
 
 fn collect_error_response(log_line: &mut LogLineV1Builder) -> LogLineV1Builder {
     // No response was received, so this cannot have been a cache hit.
-    log_line.status(Some(500)).to_owned()
+    log_line.status(Some(500)).cache_hit(false).to_owned()
+}
+
+/// Determine whether the cache lookup at this POP was a hit.
+///
+/// Fastly appends an `X-Cache` value at every cache layer. Earlier values can
+/// describe an upstream shield, while the final value describes this POP.
+/// Synthetic responses do not carry this header and are not cache hits.
+///
+/// See
+/// https://www.fastly.com/documentation/guides/concepts/shielding/#debugging
+fn response_is_cache_hit(response: &Response) -> bool {
+    is_cache_hit(
+        response
+            .get_header("X-Cache")
+            .and_then(|value| value.to_str().ok()),
+    )
+}
+
+fn is_cache_hit(x_cache: Option<&str>) -> bool {
+    x_cache
+        .and_then(|value| value.rsplit(',').next())
+        .is_some_and(|value| value.trim().eq_ignore_ascii_case("HIT"))
 }
 
 fn http_version_to_string(version: Version) -> Option<String> {
@@ -175,6 +205,7 @@ mod tests {
             .status(None)
             .tls(None)
             .url("https://example.test/".into())
+            .cache_hit(false)
             .to_owned()
     }
 
@@ -184,16 +215,95 @@ mod tests {
         let value: Value = serde_json::from_str(&serialized).unwrap();
 
         assert_eq!(value["version"], Value::String("1".into()));
+        assert_eq!(value["cache_hit"], Value::Bool(false));
         assert!(value["status"].is_null());
+        assert!(value.get("on_shield").is_none());
+        assert!(value.get("request_id").is_none());
+    }
+
+    #[test]
+    fn serialized_log_preserves_optional_request_fields() {
+        for on_shield in [true, false] {
+            let log = minimal_log_builder()
+                .on_shield(Some(on_shield))
+                .request_id(Some("request-123".into()))
+                .to_owned()
+                .build()
+                .unwrap();
+            let value: Value = serde_json::from_str(&log.to_json()).unwrap();
+
+            assert_eq!(value["on_shield"], Value::Bool(on_shield));
+            assert_eq!(value["request_id"], Value::String("request-123".into()));
+        }
+    }
+
+    // Response accessors require Fastly hostcalls supplied by Viceroy.
+    #[cfg(target_arch = "wasm32")]
+    #[test]
+    fn collected_responses_serialize_their_cache_status() {
+        for (x_cache, expected) in [
+            (Some("MISS, HIT"), true),
+            (Some("HIT, MISS"), false),
+            (None, false),
+        ] {
+            let mut response = Response::new()
+                .with_status(201)
+                .with_header("Content-Length", "42")
+                .with_header("Content-Type", "text/plain");
+            if let Some(x_cache) = x_cache {
+                response.set_header("X-Cache", x_cache);
+            }
+            let log = collect_response(&mut minimal_log_builder(), &Ok(response))
+                .build()
+                .unwrap();
+            let value: Value = serde_json::from_str(&log.to_json()).unwrap();
+
+            assert_eq!(value["cache_hit"], Value::Bool(expected), "{x_cache:?}");
+            assert_eq!(value["status"], Value::from(201));
+            assert_eq!(value["bytes"], Value::from(42));
+            assert_eq!(value["content_type"], Value::String("text/plain".into()));
+        }
+    }
+
+    #[test]
+    fn cache_hit_uses_the_final_x_cache_value() {
+        for (x_cache, expected) in [
+            (None, false),
+            (Some(""), false),
+            (Some("MISS"), false),
+            (Some("HIT"), true),
+            (Some(" hit "), true),
+            (Some("HIT, MISS"), false),
+            (Some("MISS, HIT"), true),
+            (Some("MISS, HIT, MISS"), false),
+            (Some("unknown"), false),
+        ] {
+            assert_eq!(is_cache_hit(x_cache), expected, "{x_cache:?}");
+        }
     }
 
     #[test]
     fn error_responses_are_logged_as_uncached_500s() {
-        let log = collect_error_response(&mut minimal_log_builder())
-            .build()
-            .unwrap();
-        let value = serde_json::to_value(log).unwrap();
+        let mut builder = minimal_log_builder();
+        builder.cache_hit(true);
+        let log = collect_error_response(&mut builder).build().unwrap();
+        let value: Value = serde_json::from_str(&log.to_json()).unwrap();
 
         assert_eq!(value["status"], Value::from(500));
+        assert_eq!(value["cache_hit"], Value::Bool(false));
+    }
+
+    // Linking collect_response also pulls in hostcalls from its success path.
+    #[cfg(target_arch = "wasm32")]
+    #[test]
+    fn collected_errors_reset_cache_hits() {
+        let mut builder = minimal_log_builder();
+        builder.cache_hit(true);
+        let response = Err(Error::msg("backend unavailable"));
+        let log = collect_response(&mut builder, &response).build().unwrap();
+        let value: Value = serde_json::from_str(&log.to_json()).unwrap();
+
+        assert_eq!(value["status"], Value::from(500));
+        assert_eq!(value["cache_hit"], Value::Bool(false));
     }
 }

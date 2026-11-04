@@ -41,6 +41,9 @@ jobs:
           - name: static.crates.io
             workspace: terragrunt/modules/crates-io/compute-static
             test-command: cargo nextest run
+          - name: access-log
+            workspace: .
+            test-command: cargo nextest run -p fastly-access-log --target wasm32-wasip1
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -57,6 +60,7 @@ jobs:
 
       - name: Install test tools
         run: |
+          rustup target add wasm32-wasip1
           cargo install viceroy --locked --version "$VICEROY_VERSION"
           cargo install cargo-nextest --locked --version "$NEXTEST_VERSION"
 
