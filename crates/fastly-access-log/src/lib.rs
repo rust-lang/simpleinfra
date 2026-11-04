@@ -168,8 +168,6 @@ mod tests {
         LogLineV1Builder::default()
             .ddtags("app:test,env:test".into())
             .service("test")
-            .bytes(None)
-            .content_type(None)
             .date_time(OffsetDateTime::UNIX_EPOCH)
             .edge_location(None)
             .host(None)
@@ -184,7 +182,14 @@ mod tests {
 
     #[test]
     fn serialized_log_has_the_expected_access_log_contract() {
-        let serialized = minimal_log_builder().build().unwrap().to_json();
+        let serialized = minimal_log_builder()
+            .bytes(None)
+            .content_type(None)
+            .to_owned()
+            .build()
+            .unwrap()
+            .to_json();
+
         let value: Value = serde_json::from_str(&serialized).unwrap();
 
         assert_eq!(value["version"], Value::String("1".into()));
@@ -198,6 +203,8 @@ mod tests {
             .unwrap();
         let value = serde_json::to_value(log).unwrap();
 
+        assert_eq!(value.get("bytes"), Some(&serde_json::Value::Null));
+        assert_eq!(value.get("content_type"), Some(&serde_json::Value::Null));
         assert_eq!(value["status"], Value::from(500));
     }
 }
