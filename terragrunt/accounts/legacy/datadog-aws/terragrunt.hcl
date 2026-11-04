@@ -14,7 +14,7 @@ inputs = {
   datadog_archives = {
     bucket = "static-rust-lang-org-datadog-archives"
     services = {
-      "static.rust-lang.org" = "static.rust-lang.org"
+      "static.rust-lang.org" = { service = "static.rust-lang.org" }
     }
   }
 }

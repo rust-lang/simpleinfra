@@ -87,7 +87,7 @@ resource "datadog_logs_archive" "s3_archive" {
 
   name = each.key
   // Some service names are shared with staging/dev, so restrict to this account's env
-  query        = "service:${each.value} env:${var.env}"
+  query        = "service:${each.value.service} env:${coalesce(each.value.env, var.env)}"
   include_tags = true
 
   s3_archive {
