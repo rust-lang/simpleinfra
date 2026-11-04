@@ -28,6 +28,7 @@ resource "datadog_role" "safe_readonly" {
       data.datadog_permissions.all.permissions.incident_settings_read,
       data.datadog_permissions.all.permissions.integrations_read,
       data.datadog_permissions.all.permissions.logs_live_tail,
+      data.datadog_permissions.all.permissions.logs_read_archives,
       data.datadog_permissions.all.permissions.logs_read_config,
       data.datadog_permissions.all.permissions.logs_read_data,
       data.datadog_permissions.all.permissions.logs_read_index_data,
