@@ -174,7 +174,7 @@ resource "fastly_ngwaf_workspace_rule" "webapp_docsrs_rate_limit" {
   }
 
   action {
-    signal        = "site.webapp-docsrs-rate-limit"
+    signal        = fastly_ngwaf_workspace_signal.webapp_docsrs_rate_limit.reference_id
     type          = "block_signal"
     response_code = local.webapp_rate_limit_response_code
   }
