@@ -31,8 +31,12 @@ variable "datadog_log_sources" {
 variable "datadog_archives" {
   description = "Datadog log archive for this account: the S3 bucket to create and a map of archive name to Datadog service query value. Leave null to disable."
   type = object({
-    bucket   = string
-    services = map(string)
+    bucket = string
+    services = map(object({
+      service = string
+      // Some log sources tag a different env than the account (e.g. "production")
+      env = optional(string)
+    }))
   })
   default = null
 }

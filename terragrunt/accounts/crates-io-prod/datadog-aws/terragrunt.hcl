@@ -13,9 +13,9 @@ inputs = {
   datadog_archives = {
     bucket = "crates-io-datadog-archives"
     services = {
-      "crates.io"              = "crates.io"
-      "static.crates.io"       = "static.crates.io"
-      "crates-io-fastly-index" = "crates-io-fastly-index"
+    "crates.io"              = { service = "crates-io" }
+    "static.crates.io"       = { service = "static.crates.io" }
+    "crates-io-fastly-index" = { service = "crates-io-fastly-index", env = "production" }
     }
   }
 }

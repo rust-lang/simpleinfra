@@ -13,7 +13,7 @@ inputs = {
   datadog_archives = {
     bucket = "docs-rs-datadog-archives"
     services = {
-      "docs.rs-nginx" = "\"docs.rs nginx\""
+      "docs.rs-nginx" = { service = "\"docs.rs nginx\"" }
     }
   }
 }
