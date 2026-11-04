@@ -1,3 +1,8 @@
+locals {
+  # Header docs.rs sends to authenticate its requests to crates.io.
+  docsrs_authorization_header = "X-Docsrs-Authorization"
+}
+
 # Next-Gen WAF workspace
 resource "fastly_ngwaf_workspace" "webapp" {
   name        = "${var.webapp_domain_name}-waf"
@@ -110,7 +115,7 @@ resource "fastly_ngwaf_workspace_rule" "webapp_per_ip_rate_limit" {
     condition {
       field    = "name"
       operator = "equals"
-      value    = "X-Docsrs-Authorization"
+      value    = local.docsrs_authorization_header
     }
     condition {
       field    = "value_string"
@@ -159,7 +164,7 @@ resource "fastly_ngwaf_workspace_rule" "webapp_docsrs_rate_limit" {
     condition {
       field    = "name"
       operator = "equals"
-      value    = "X-Docsrs-Authorization"
+      value    = local.docsrs_authorization_header
     }
     condition {
       field    = "value_string"
@@ -184,7 +189,7 @@ resource "fastly_ngwaf_workspace_rule" "webapp_docsrs_rate_limit" {
     # docs.rs instances share one rate-limit counter regardless of source IP.
     client_identifiers {
       type = "request_header"
-      name = "X-Docsrs-Authorization"
+      name = local.docsrs_authorization_header
     }
   }
 }
