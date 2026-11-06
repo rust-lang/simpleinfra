@@ -101,6 +101,22 @@ resource "aws_s3_bucket_policy" "static" {
         }
         Action   = "s3:GetObject"
         Resource = "${aws_s3_bucket.static.arn}/*"
+      },
+      {
+        // `s3:ListBucket` makes S3 answer requests for missing objects with
+        // `404 Not Found` instead of `403 Forbidden`.
+        Sid    = "CloudFrontRead"
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudfront.amazonaws.com"
+        }
+        Action   = ["s3:GetObject", "s3:ListBucket"]
+        Resource = [aws_s3_bucket.static.arn, "${aws_s3_bucket.static.arn}/*"]
+        Condition = {
+          StringEquals = {
+            "AWS:SourceArn" = aws_cloudfront_distribution.static.arn
+          }
+        }
       }
     ]
   })
@@ -152,6 +168,20 @@ resource "aws_s3_bucket_policy" "fallback" {
         }
         Action   = "s3:GetObject"
         Resource = "${aws_s3_bucket.fallback.arn}/*"
+      },
+      {
+        Sid    = "CloudFrontRead"
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudfront.amazonaws.com"
+        }
+        Action   = ["s3:GetObject", "s3:ListBucket"]
+        Resource = [aws_s3_bucket.fallback.arn, "${aws_s3_bucket.fallback.arn}/*"]
+        Condition = {
+          StringEquals = {
+            "AWS:SourceArn" = aws_cloudfront_distribution.static.arn
+          }
+        }
       }
     ]
   })
