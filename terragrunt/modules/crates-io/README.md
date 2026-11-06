@@ -30,6 +30,18 @@ In staging, CloudFront remains enabled and is available at
 `cloudfront-app.staging.crates.io` for direct testing, even if its DNS traffic
 weight is zero.
 
+### Fastly API rate limits
+
+docs.rs uses a shared token to identify its registry requests so they can have
+a higher rate limit, shared across its instances.
+
+Before applying this module, create a `SecureString` SSM parameter at
+`/${env}/crates-io/webapp/docsrs-auth-token` in the
+`accounts/legacy/crates-io-{prod,staging}` accounts. Set
+its value to the same token stored at `/docs-rs/registry-api-token` in the
+docs.rs accounts that use this crates.io environment. These copies are managed
+separately until cross-account secret sharing is configured.
+
 ### CDN origin authentication
 
 CloudFront and Fastly send `X-Crates-Origin-Auth` on requests to the Heroku

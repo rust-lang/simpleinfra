@@ -1,3 +1,8 @@
+locals {
+  # Header docs.rs sends to authenticate its requests to crates.io.
+  docsrs_authorization_header = "X-Docsrs-Authorization"
+}
+
 # Next-Gen WAF workspace
 resource "fastly_ngwaf_workspace" "webapp" {
   name        = "${var.webapp_domain_name}-waf"
@@ -80,19 +85,43 @@ resource "fastly_ngwaf_workspace_signal" "webapp_rate_limit" {
   description  = "webapp per-IP rate limiting"
 }
 
+resource "fastly_ngwaf_workspace_signal" "webapp_docsrs_rate_limit" {
+  workspace_id = fastly_ngwaf_workspace.webapp.id
+  name         = "webapp-docsrs-rate-limit"
+  description  = "docs.rs shared rate limiting"
+}
+
 resource "fastly_ngwaf_workspace_rule" "webapp_per_ip_rate_limit" {
   workspace_id = fastly_ngwaf_workspace.webapp.id
   type         = "rate_limit"
-  description  = "Rate limit per client IP to 3,600 requests per hour"
+  description  = "Rate limit non-docs.rs requests per client IP to 600 requests per 10 minutes"
   enabled      = true
 
   # Fastly NGWAF requires at least one rule condition.
-  # Match all request paths so the rate limit applies globally.
+  # Match all request paths, excluding requests with the docs.rs token below.
   group_operator = "all"
   condition {
     field    = "path"
     operator = "contains"
     value    = "/"
+  }
+
+  # Requests carrying the docs.rs token are counted by the separate rule below.
+  multival_condition {
+    field          = "request_header"
+    operator       = "does_not_exist"
+    group_operator = "all"
+
+    condition {
+      field    = "name"
+      operator = "equals"
+      value    = local.docsrs_authorization_header
+    }
+    condition {
+      field    = "value_string"
+      operator = "equals"
+      value    = data.aws_ssm_parameter.docsrs_authorization_token.value
+    }
   }
 
   # If the workspace mode isn't "block", then this rule is not enforced.
@@ -116,6 +145,51 @@ resource "fastly_ngwaf_workspace_rule" "webapp_per_ip_rate_limit" {
 
     client_identifiers {
       type = "ip"
+    }
+  }
+}
+
+resource "fastly_ngwaf_workspace_rule" "webapp_docsrs_rate_limit" {
+  workspace_id = fastly_ngwaf_workspace.webapp.id
+  type         = "rate_limit"
+  description  = "Rate limit docs.rs requests to 10,000 per minute across all clients"
+  enabled      = true
+
+  group_operator = "all"
+  multival_condition {
+    field          = "request_header"
+    operator       = "exists"
+    group_operator = "all"
+
+    condition {
+      field    = "name"
+      operator = "equals"
+      value    = local.docsrs_authorization_header
+    }
+    condition {
+      field    = "value_string"
+      operator = "equals"
+      value    = data.aws_ssm_parameter.docsrs_authorization_token.value
+    }
+  }
+
+  action {
+    signal        = fastly_ngwaf_workspace_signal.webapp_docsrs_rate_limit.reference_id
+    type          = "block_signal"
+    response_code = local.webapp_rate_limit_response_code
+  }
+
+  rate_limit {
+    signal    = fastly_ngwaf_workspace_signal.webapp_docsrs_rate_limit.reference_id
+    threshold = 10000
+    interval  = 60
+    duration  = 300
+
+    # Every authenticated docs.rs request has the same token value, so all
+    # docs.rs instances share one rate-limit counter regardless of source IP.
+    client_identifiers {
+      type = "request_header"
+      name = local.docsrs_authorization_header
     }
   }
 }

@@ -73,6 +73,13 @@ defaults to `0.001`, and must be between 0 and 1. The application explicitly
 samples build transactions at 100% regardless of this default rate. Updating
 the DSN requires new tasks or a builder restart to reload the value.
 
+## Shared registry API token
+
+The registry API token identifies docs.rs requests for crates.io's higher rate
+limit. Follow the [token setup instructions](../crates-io/README.md#fastly-api-rate-limits)
+before applying this module. Each docs.rs account needs its own stored copy;
+environments connecting to the same crates.io environment must use the same token.
+
 ## Admin task
 
 `docs-rs-admin` is a standalone Fargate task using the CLI image's normal
