@@ -116,12 +116,37 @@ jobs:
         run: |
           node --test terragrunt/modules/release-distribution/lambdas/doc-router/test.mjs
 
+  devcontainers:
+    name: devcontainers
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build and start the container
+        run: npx --yes "@devcontainers/cli" up --workspace-folder .
+
+      - name: Smoke test
+        run: |
+          npx --yes "@devcontainers/cli" exec --workspace-folder . \
+            bash -euo pipefail -c '
+              terraform version
+              terragrunt version
+              aws --version
+              gcloud --version
+              fastly version
+              python3 --version
+              uv --version
+              jq --version
+              cargo --version
+            '
   # Summary job for the merge queue.
   # ALL THE PREVIOUS JOBS NEED TO BE ADDED TO THE `needs` SECTION OF THIS JOB!
   CI:
     # Keep `name` matching the status check.
     name: CI
-    needs: [ terraform, actions-js, javascript-tests, rust, fastly-workers]
+    needs: [ terraform, actions-js, javascript-tests, rust, fastly-workers, devcontainers]
     # We need to ensure this job does *not* get skipped if its dependencies fail,
     # because a skipped job is considered a success by GitHub. So we have to
     # overwrite `if:`. We use `!cancelled()` to ensure the job does still not get run
