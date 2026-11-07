@@ -157,8 +157,8 @@ resource "aws_s3_bucket_inventory" "artifacts" {
   }
 }
 
-resource "aws_iam_role" "try_builds" {
-  name = "${local.iam_prefix}--try-role"
+resource "aws_iam_role" "from_github" {
+  name = "${local.iam_prefix}--github"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -171,7 +171,7 @@ resource "aws_iam_role" "try_builds" {
         }
         Condition = {
           StringEquals = {
-            "token.actions.githubusercontent.com:sub" = "repo:rust-lang/${var.repo}:ref:refs/heads/automation/bors/try"
+            "token.actions.githubusercontent.com:sub" = "repo:rust-lang/${var.repo}:environment:bors"
           }
         }
       }
@@ -179,8 +179,93 @@ resource "aws_iam_role" "try_builds" {
   })
 }
 
-resource "aws_iam_role_policy" "try_builds" {
-  name   = "put-objects"
-  role   = aws_iam_role.try_builds.id
-  policy = local.s3_policy
+resource "aws_iam_role_policy" "source_identity" {
+  name = "set-source-identity"
+  role = aws_iam_role.from_github.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "sts:AssumeRole",
+          "sts:TagSession",
+        ]
+        Resource = [
+          aws_iam_role.from_source.arn
+        ]
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role" "from_source" {
+  name = "${local.iam_prefix}--github-with-sha"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "sts:AssumeRole",
+          "sts:TagSession",
+        ]
+        Principal = {
+          AWS = aws_iam_role.from_github.arn
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "builds" {
+  name = "put-objects"
+  role = aws_iam_role.from_source.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "ArtifactsBucketWrite"
+        Effect = "Allow"
+        Resource = [
+          "${aws_s3_bucket.artifacts.arn}/${local.rustc_builds}",
+          "${aws_s3_bucket.artifacts.arn}/${local.rustc_builds}/$${aws:PrincipalTag/sha}/*",
+          "${aws_s3_bucket.artifacts.arn}/${local.rustc_builds_alt}",
+          "${aws_s3_bucket.artifacts.arn}/${local.rustc_builds_alt}/$${aws:PrincipalTag/sha}/*",
+        ]
+        Action = [
+          "s3:GetObject",
+          "s3:DeleteObject",
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+        ]
+        Condition = {
+          StringLike = {
+            // Requires that the session name be the right length to be a SHA-1 hash.
+            // This will need updating to support SHA-256 hashes (which are
+            // longer), but we don't currently have those.
+            "aws:PrincipalTag/sha" = "????????????????????????????????????????"
+          }
+        }
+      },
+      {
+        Sid      = "ArtifactsBucketList"
+        Effect   = "Allow"
+        Resource = "${aws_s3_bucket.artifacts.arn}"
+        Action = [
+          "s3:ListBucket",
+        ],
+      },
+      {
+        Sid      = "HeadBuckets",
+        Effect   = "Allow",
+        Resource = "*"
+        Action = [
+          "s3:HeadBucket",
+          "s3:GetBucketLocation",
+        ],
+      },
+    ]
+  })
 }
