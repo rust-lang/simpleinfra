@@ -23,12 +23,19 @@ resource "google_storage_transfer_job" "backup_transfer" {
     transfer_options {
       delete_objects_from_source_after_transfer = false
 
-      # Mirror s3 deletions. The backup bucket objects are versioned,
-      # so a deleted version is not directly accessible but available
-      # for restoration indefinitely (since there is no lifecycle policy).
+      # Mirror AWS S3 deletions into the backup buckets.
       #
-      # Hard deletes for eg GDPR require manual removal and should
-      # not be applied in the case of malicious bytes (security exemption).
+      # Mirroring a delete doesn't destroy data: the backup bucket is
+      # versioned, so the object only becomes a noncurrent version.
+      # That version is hidden from normal listings, but it can still
+      # be read and restored by its generation number. It's kept until someone
+      # deletes it, because the bucket has no lifecycle rule.
+      #
+      # To remove data for good (e.g. for GDPR), delete all noncurrent versions
+      # of the object by hand. Soft delete then keeps them for another 90 days.
+      # Never do this for malicious crate bytes (security exemption).
+      # See:
+      # https://github.com/rust-lang/infra-team/blob/main/service-catalog/rust-assets-backup/maintenance.md#backup-maintenance-
       delete_objects_unique_in_sink = true
     }
   }
