@@ -23,7 +23,7 @@ resource "google_storage_transfer_job" "backup_transfer" {
     transfer_options {
       delete_objects_from_source_after_transfer = false
 
-      # Mirror AWS S3 deletions into the backup buckets.
+      # Mirror AWS S3 deletions into the crates.io backup bucket only.
       #
       # Mirroring a delete doesn't destroy data: the backup bucket is
       # versioned, so the object only becomes a noncurrent version.
@@ -31,12 +31,12 @@ resource "google_storage_transfer_job" "backup_transfer" {
       # be read and restored by its generation number. It's kept until someone
       # deletes it, because the bucket has no lifecycle rule.
       #
-      # To remove data for good (e.g. for GDPR), delete all noncurrent versions
-      # of the object by hand. Soft delete then keeps them for another 90 days.
-      # Never do this for malicious crate bytes (security exemption).
+      # Please do not ever add a lifecycle rule to this, we want the retention
+      # and this is a GDPR exempt security retention.
+      #
       # See:
       # https://github.com/rust-lang/infra-team/blob/main/service-catalog/rust-assets-backup/maintenance.md#backup-maintenance-
-      delete_objects_unique_in_sink = true
+      delete_objects_unique_in_sink = each.key == "crates-io"
     }
   }
 

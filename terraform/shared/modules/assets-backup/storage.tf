@@ -18,6 +18,10 @@ resource "google_storage_bucket" "backup_buckets" {
     enabled = true
   }
 
+  # Please do not ever add a lifecycle rule to these buckets. We want to keep
+  # noncurrent versions forever: for crates.io this is a GDPR exempt security
+  # retention (see transfer.tf).
+
   # Configure soft delete policy to retain deleted objects for recovery
   # for a certain period of time
   soft_delete_policy {
