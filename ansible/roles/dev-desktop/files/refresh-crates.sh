@@ -23,4 +23,8 @@ fi
 
 # Re-fetch latest copies of crates into /var/cache/all-crates.
 # This will automatically skip downloading existing crates.
-"$HOME/.cargo/bin/get-all-crates" --index "./$INDEX_DIR" --out /var/cache/all-crates
+#
+# Limit concurrent downloads: get-all-crates buffers each downloaded crate in
+# memory and does not bound pending writes, so with the default (-j 50)
+# downloads outpace disk writes and the job runs out of memory.
+"$HOME/.cargo/bin/get-all-crates" -j 4 --index "./$INDEX_DIR" --out /var/cache/all-crates
