@@ -14,3 +14,7 @@ terragrunt-generated-*.tf
 .terragrunt-cache
 
 .aws-creds-mfa-arn
+
+# Devcontainers custom files, ignore everything inside this folder
+/.devcontainer/custom/*
+!/.devcontainer/custom/.gitkeep

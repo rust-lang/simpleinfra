@@ -22,6 +22,12 @@ resource "google_storage_bucket" "backup_buckets" {
   # noncurrent versions forever: for crates.io this is a GDPR exempt security
   # retention (see transfer.tf).
 
+  # Hardening against accidental console exposure:
+  # Backups should never be publicly readable
+  # Access is managed through IAM, not object ACLs
+  public_access_prevention    = "enforced"
+  uniform_bucket_level_access = true
+
   # Configure soft delete policy to retain deleted objects for recovery
   # for a certain period of time
   soft_delete_policy {
