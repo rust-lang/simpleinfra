@@ -22,3 +22,9 @@ aws-sigv4 = { version = "1.6.4", default-features = false, features = ["sign-htt
 fastly = "0.13.1"
 fastly-access-log = { path = "../../../../crates/fastly-access-log" }
 log = { version = "0.4.17", features = ["std"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+time = { version = "0.3.17", features = ["serde-human-readable"] }
+
+[dev-dependencies]
+time = { version = "0.3.17", features = ["macros"] }

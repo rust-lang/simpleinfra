@@ -203,6 +203,9 @@ dependencies = [
  "fastly",
  "fastly-access-log",
  "log",
+ "serde",
+ "serde_json",
+ "time",
 ]
 
 [[package]]

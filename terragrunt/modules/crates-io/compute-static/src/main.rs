@@ -18,6 +18,7 @@ mod config;
 
 const DATADOG_APP: &str = "crates.io";
 const DATADOG_SERVICE: &str = "static.crates.io";
+const DATADOG_SERVICE_LOGS_ENDPOINT: &str = "datadog-service-logs";
 const ERROR_TTL: Duration = Duration::from_secs(10);
 const VERSION_DOWNLOADS: &str = "/archive/version-downloads/";
 const VERSION_DOWNLOADS_INDEX: &str = "/archive/version-downloads/index.html";
@@ -59,7 +60,14 @@ fn main(request: Request) -> Result<Response, Error> {
 ///
 /// Request logs are written directly to their endpoints by `build_and_send_log()`.
 fn init_logging(config: &Config) {
-    ServiceLogger::new(&config.s3_service_logs_endpoint).init();
+    ServiceLogger::new(
+        DATADOG_SERVICE_LOGS_ENDPOINT,
+        DATADOG_SERVICE,
+        DATADOG_APP,
+        &config.datadog_env,
+        config.datadog_host.clone(),
+    )
+    .init();
 }
 
 /// Handle the request
