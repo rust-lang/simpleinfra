@@ -24,6 +24,14 @@ resource "aws_cloudfront_response_headers_policy" "static" {
   }
 }
 
+resource "aws_cloudfront_origin_access_control" "static" {
+  name                              = "${replace(var.static_domain_name, ".", "-")}--static"
+  description                       = var.static_domain_name
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
+}
+
 resource "aws_cloudfront_distribution" "static" {
   comment = var.static_domain_name
 
@@ -82,13 +90,15 @@ resource "aws_cloudfront_distribution" "static" {
   }
 
   origin {
-    origin_id   = "main"
-    domain_name = aws_s3_bucket.static.bucket_regional_domain_name
+    origin_id                = "main"
+    domain_name              = aws_s3_bucket.static.bucket_regional_domain_name
+    origin_access_control_id = aws_cloudfront_origin_access_control.static.id
   }
 
   origin {
-    origin_id   = "fallback"
-    domain_name = aws_s3_bucket.fallback.bucket_regional_domain_name
+    origin_id                = "fallback"
+    domain_name              = aws_s3_bucket.fallback.bucket_regional_domain_name
+    origin_access_control_id = aws_cloudfront_origin_access_control.static.id
   }
 
   origin_group {

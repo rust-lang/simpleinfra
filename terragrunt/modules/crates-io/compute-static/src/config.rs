@@ -1,5 +1,13 @@
+use aws_credential_types::Credentials;
+
 // Name of the dictionary. Must match the dictionary in `fastly-static.tf`.
 const DICTIONARY_NAME: &str = "compute_static";
+
+// Name of the dictionary item with the access key ID for S3
+const AWS_ACCESS_KEY_ID: &str = "aws-access-key-id";
+
+// Name of the dictionary item with the secret access key for S3
+const AWS_SECRET_ACCESS_KEY: &str = "aws-secret-access-key";
 
 // Name of the dictionary item with the CloudFront URL
 const CLOUDFRONT_URL: &str = "cloudfront-url";
@@ -32,6 +40,7 @@ const S3_SERVICE_LOGS_ENDPOINT: &str = "s3-service-logs-endpoint";
 pub struct Config {
     pub primary_host: String,
     pub fallback_host: String,
+    pub s3_credentials: Option<Credentials>,
     pub static_ttl: u32,
     pub cloudfront_url: String,
     pub datadog_env: String,
@@ -53,6 +62,13 @@ impl Config {
         let fallback_host = dictionary
             .get(FALLBACK_HOST)
             .expect("failed to get S3 fallback host from dictionary");
+
+        // Terraform updates the dictionary items only after it activates the service version, so
+        // the credentials can be missing for a short time after they are introduced.
+        let s3_credentials = dictionary
+            .get(AWS_ACCESS_KEY_ID)
+            .zip(dictionary.get(AWS_SECRET_ACCESS_KEY))
+            .map(|(id, secret)| Credentials::new(id, secret, None, None, DICTIONARY_NAME));
 
         // Look up time to cache crates
         let static_ttl = dictionary
@@ -86,6 +102,7 @@ impl Config {
         Self {
             primary_host,
             fallback_host,
+            s3_credentials,
             static_ttl,
             cloudfront_url,
             datadog_env,

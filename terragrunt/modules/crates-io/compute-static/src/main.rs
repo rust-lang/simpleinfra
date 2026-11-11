@@ -1,11 +1,13 @@
+use aws_credential_types::Credentials;
 use compute_static::compression::is_compressible_content_type;
+use compute_static::sigv4::sign_s3_request;
 use fastly::convert::ToHeaderValue;
 use fastly::http::{header, Method, StatusCode};
-use fastly::{Error, Request, Response};
+use fastly::{Backend, Error, Request, Response};
 use fastly_access_log::{collect_request, collect_response, LogLineV1Builder};
 use log::{info, warn, LevelFilter};
 use log_fastly::Logger;
-use std::time::Duration;
+use std::time::{Duration, SystemTime};
 
 use crate::config::Config;
 
@@ -88,6 +90,7 @@ fn handle_request(config: &Config, mut request: Request) -> Result<Response, Err
     }
 
     set_cache_policy(config, &mut request);
+    rewrite_root_url(&mut request);
     rewrite_urls_with_plus_character(&mut request);
     rewrite_download_urls(&mut request);
     rewrite_version_downloads_urls(&mut request);
@@ -163,6 +166,19 @@ fn set_cache_policy(config: &Config, request: &mut Request) {
 /// Split a comma-separated `cache-tags` metadata value into individual cache tags
 fn parse_cache_tags(tags: &str) -> impl Iterator<Item = &str> {
     tags.split(',').map(str::trim).filter(|tag| !tag.is_empty())
+}
+
+/// Rewrite `/` to `/index.html`
+///
+/// S3 answers requests for the bucket root with a listing of the bucket contents if the requester
+/// is allowed to list them. CloudFront requests `/index.html` instead through its default root
+/// object, so the root is rewritten the same way here.
+fn rewrite_root_url(request: &mut Request) {
+    let mut url = request.get_url_mut();
+
+    if url.path() == "/" {
+        url.set_path("/index.html");
+    }
 }
 
 /// Rewrite URLs with a plus character
@@ -242,7 +258,9 @@ fn redirect_to_cloudfront(config: &Config, path: &str) -> Result<Response, Error
 /// queried. If the response indicates a server issue (status code >= 500), the request is sent to
 /// a fallback bucket in a different geographical region.
 fn send_request_to_s3(config: &Config, request: &Request) -> Result<Response, Error> {
-    let primary_request = request.clone_without_body();
+    let mut primary_request = request.clone_without_body();
+    let credentials = config.s3_credentials.clone();
+    sign_on_cache_miss(&mut primary_request, &config.primary_host, credentials);
 
     let mut response = primary_request.send(&config.primary_host)?;
     let status_code = response.get_status().as_u16();
@@ -253,7 +271,9 @@ fn send_request_to_s3(config: &Config, request: &Request) -> Result<Response, Er
             config.primary_host, status_code
         );
 
-        let fallback_request = request.clone_without_body();
+        let mut fallback_request = request.clone_without_body();
+        let credentials = config.s3_credentials.clone();
+        sign_on_cache_miss(&mut fallback_request, &config.fallback_host, credentials);
         response = fallback_request.send(&config.fallback_host)?;
     }
 
@@ -273,6 +293,49 @@ fn send_request_to_s3(config: &Config, request: &Request) -> Result<Response, Er
     }
 
     Ok(response)
+}
+
+/// Sign the request to S3 if it misses the cache
+///
+/// Signed requests authenticate as an IAM user with `s3:ListBucket`, so that S3 answers requests for
+/// missing objects with `404 Not Found` instead of `403 Forbidden`. If signing fails, the request is
+/// sent unsigned, which works as long as the buckets are publicly readable.
+fn sign_on_cache_miss(request: &mut Request, backend: &str, credentials: Option<Credentials>) {
+    let backend = backend.to_string();
+    request.set_before_send(move |request| {
+        let result = credentials
+            .clone()
+            .ok_or_else(|| Error::msg("credentials are missing"))
+            .and_then(|credentials| {
+                let host = Backend::from_name(&backend)?.get_host();
+
+                // The backends are named after the regions of their buckets
+                let region = &backend;
+
+                sign_request(request, &host, region, credentials, SystemTime::now())
+            });
+
+        if let Err(error) = result {
+            warn!("Sending unsigned request to S3: {error}");
+        }
+        Ok(())
+    });
+}
+
+/// Add the SigV4 authentication headers to a request to S3
+fn sign_request(
+    request: &mut Request,
+    host: &str,
+    region: &str,
+    credentials: Credentials,
+    time: SystemTime,
+) -> Result<(), Error> {
+    let method = request.get_method_str();
+    let path = request.get_path();
+    for (name, value) in sign_s3_request(method, host, path, region, credentials, time)? {
+        request.set_header(name, value);
+    }
+    Ok(())
 }
 
 /// Return an empty 416 response when a partial response starts at or beyond EOF.
@@ -372,6 +435,7 @@ fn build_and_send_log(log_line: LogLineV1Builder, config: &Config) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::time::UNIX_EPOCH;
 
     #[test]
     fn test_unsatisfiable_range_response() {
@@ -441,6 +505,27 @@ mod tests {
     }
 
     #[test]
+    fn test_sign_request() {
+        let url = "https://static.crates.io/crates/serde/serde-1.0.0-alpha.1%2Bfoo.crate";
+        let mut request = Request::head(url);
+
+        let secret = "wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY";
+        let credentials = Credentials::new("AKIDEXAMPLE", secret, None, None, "test");
+        let time = UNIX_EPOCH + Duration::from_secs(1440938160); // 2015-08-30T12:36:00Z
+
+        let host = "crates-io-fallback.s3.eu-west-1.amazonaws.com";
+        sign_request(&mut request, host, "eu-west-1", credentials, time).unwrap();
+
+        assert_eq!(request.get_url_str(), url);
+        assert_eq!(
+            request.get_header_str("x-amz-date"),
+            Some("20150830T123600Z")
+        );
+        let expected = "AWS4-HMAC-SHA256 Credential=AKIDEXAMPLE/20150830/eu-west-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=ef43c349ab6c9384e9f7d8157c3aa3fab9a712ca91b58c40e9ffb147285e167a";
+        assert_eq!(request.get_header_str("authorization"), Some(expected));
+    }
+
+    #[test]
     fn test_parse_cache_tags() {
         fn test(input: &str, expected: &[&str]) {
             assert_eq!(parse_cache_tags(input).collect::<Vec<_>>(), expected);
@@ -457,6 +542,24 @@ mod tests {
         );
         test("", &[]);
         test(" , ", &[]);
+    }
+
+    #[test]
+    fn test_rewrite_root_url() {
+        fn test(url: &str, expected: &str) {
+            let mut request = Request::get(url);
+            rewrite_root_url(&mut request);
+            assert_eq!(request.get_url_str(), expected);
+        }
+
+        test(
+            "https://static.crates.io/",
+            "https://static.crates.io/index.html",
+        );
+        test(
+            "https://static.crates.io/crates/",
+            "https://static.crates.io/crates/",
+        );
     }
 
     #[test]
