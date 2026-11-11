@@ -258,24 +258,15 @@ fn redirect_to_cloudfront(config: &Config, path: &str) -> Result<Response, Error
 /// queried. If the response indicates a server issue (status code >= 500), the request is sent to
 /// a fallback bucket in a different geographical region.
 fn send_request_to_s3(config: &Config, request: &Request) -> Result<Response, Error> {
-    let mut primary_request = request.clone_without_body();
-    let credentials = config.s3_credentials.clone();
-    sign_on_cache_miss(&mut primary_request, &config.primary_host, credentials);
-
-    let mut response = primary_request.send(&config.primary_host)?;
-    let status_code = response.get_status().as_u16();
-
-    if status_code >= 500 {
-        warn!(
-            "Request to host {} returned status code {}",
-            config.primary_host, status_code
-        );
-
-        let mut fallback_request = request.clone_without_body();
-        let credentials = config.s3_credentials.clone();
-        sign_on_cache_miss(&mut fallback_request, &config.fallback_host, credentials);
-        response = fallback_request.send(&config.fallback_host)?;
-    }
+    let mut response = send_with_fallback(
+        |host| {
+            let mut request = request.clone_without_body();
+            sign_on_cache_miss(&mut request, host, config.s3_credentials.clone());
+            request.send(host)
+        },
+        &config.primary_host,
+        &config.fallback_host,
+    )?;
 
     if let Some(response) = unsatisfiable_range_response(&response) {
         return Ok(response);
@@ -293,6 +284,23 @@ fn send_request_to_s3(config: &Config, request: &Request) -> Result<Response, Er
     }
 
     Ok(response)
+}
+
+/// Send a request to the primary host and retry it on the fallback host if the primary host
+/// responds with a server error (status code >= 500).
+fn send_with_fallback<E>(
+    send: impl Fn(&str) -> Result<Response, E>,
+    primary_host: &str,
+    fallback_host: &str,
+) -> Result<Response, E> {
+    let response = send(primary_host)?;
+    let status_code = response.get_status().as_u16();
+    if status_code < 500 {
+        return Ok(response);
+    }
+
+    warn!("Request to host {primary_host} returned status code {status_code}");
+    send(fallback_host)
 }
 
 /// Sign the request to S3 if it misses the cache
@@ -435,7 +443,54 @@ fn build_and_send_log(log_line: LogLineV1Builder, config: &Config) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::cell::RefCell;
     use std::time::UNIX_EPOCH;
+
+    const PRIMARY: &str = "primary";
+    const FALLBACK: &str = "fallback";
+
+    /// Run `send_with_fallback()` against a fallback that always responds with `200 OK` and
+    /// return the result together with the hosts that were tried.
+    fn send_with_primary(
+        primary: Result<StatusCode, &'static str>,
+    ) -> (Result<Response, &'static str>, Vec<String>) {
+        let hosts = RefCell::new(Vec::new());
+        let result = send_with_fallback(
+            |host| {
+                hosts.borrow_mut().push(host.to_string());
+                match host {
+                    PRIMARY => primary.map(Response::from_status),
+                    _ => Ok(Response::from_status(StatusCode::OK)),
+                }
+            },
+            PRIMARY,
+            FALLBACK,
+        );
+        (result, hosts.into_inner())
+    }
+
+    #[test]
+    fn test_send_with_fallback_uses_primary_response() {
+        for status in [StatusCode::OK, StatusCode::NOT_FOUND] {
+            let (result, hosts) = send_with_primary(Ok(status));
+            assert_eq!(result.unwrap().get_status(), status);
+            assert_eq!(hosts, [PRIMARY]);
+        }
+    }
+
+    #[test]
+    fn test_send_with_fallback_retries_server_errors() {
+        let (result, hosts) = send_with_primary(Ok(StatusCode::SERVICE_UNAVAILABLE));
+        assert_eq!(result.unwrap().get_status(), StatusCode::OK);
+        assert_eq!(hosts, [PRIMARY, FALLBACK]);
+    }
+
+    #[test]
+    fn test_send_with_fallback_send_error() {
+        let (result, hosts) = send_with_primary(Err("connection refused"));
+        assert_eq!(result.unwrap_err(), "connection refused");
+        assert_eq!(hosts, [PRIMARY]);
+    }
 
     #[test]
     fn test_unsatisfiable_range_response() {
