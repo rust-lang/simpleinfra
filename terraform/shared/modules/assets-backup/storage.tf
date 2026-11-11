@@ -18,6 +18,10 @@ resource "google_storage_bucket" "backup_buckets" {
     enabled = true
   }
 
+  # Please do not ever add a lifecycle rule to these buckets. We want to keep
+  # noncurrent versions forever: for crates.io this is a GDPR exempt security
+  # retention (see transfer.tf).
+
   # Hardening against accidental console exposure:
   # Backups should never be publicly readable
   # Access is managed through IAM, not object ACLs
