@@ -7,6 +7,7 @@ use fastly::{Backend, Error, Request, Response};
 use fastly_access_log::{collect_request, collect_response, LogLineV1Builder};
 use log::{info, warn, LevelFilter};
 use log_fastly::Logger;
+use std::fmt::Display;
 use std::time::{Duration, SystemTime};
 
 use crate::config::Config;
@@ -255,8 +256,8 @@ fn redirect_to_cloudfront(config: &Config, path: &str) -> Result<Response, Error
 /// Forward client request to S3
 ///
 /// The request that was received by the client is forwarded to S3. First, the primary bucket is
-/// queried. If the response indicates a server issue (status code >= 500), the request is sent to
-/// a fallback bucket in a different geographical region.
+/// queried. If the response indicates a server issue (status code >= 500) or the request fails
+/// without a response, the request is sent to a fallback bucket in a different geographical region.
 fn send_request_to_s3(config: &Config, request: &Request) -> Result<Response, Error> {
     let mut response = send_with_fallback(
         |host| {
@@ -287,19 +288,21 @@ fn send_request_to_s3(config: &Config, request: &Request) -> Result<Response, Er
 }
 
 /// Send a request to the primary host and retry it on the fallback host if the primary host
-/// responds with a server error (status code >= 500).
-fn send_with_fallback<E>(
+/// responds with a server error (status code >= 500) or the request fails without a response.
+fn send_with_fallback<E: Display>(
     send: impl Fn(&str) -> Result<Response, E>,
     primary_host: &str,
     fallback_host: &str,
 ) -> Result<Response, E> {
-    let response = send(primary_host)?;
-    let status_code = response.get_status().as_u16();
-    if status_code < 500 {
-        return Ok(response);
+    match send(primary_host) {
+        Ok(response) if response.get_status().as_u16() < 500 => return Ok(response),
+        Ok(response) => {
+            let status_code = response.get_status().as_u16();
+            warn!("Request to host {primary_host} returned status code {status_code}");
+        }
+        Err(error) => warn!("Request to host {primary_host} failed: {error}"),
     }
 
-    warn!("Request to host {primary_host} returned status code {status_code}");
     send(fallback_host)
 }
 
@@ -486,10 +489,16 @@ mod tests {
     }
 
     #[test]
-    fn test_send_with_fallback_send_error() {
+    fn test_send_with_fallback_retries_send_errors() {
         let (result, hosts) = send_with_primary(Err("connection refused"));
-        assert_eq!(result.unwrap_err(), "connection refused");
-        assert_eq!(hosts, [PRIMARY]);
+        assert_eq!(result.unwrap().get_status(), StatusCode::OK);
+        assert_eq!(hosts, [PRIMARY, FALLBACK]);
+    }
+
+    #[test]
+    fn test_send_with_fallback_returns_fallback_send_error() {
+        let result = send_with_fallback(|host: &str| Err(host.to_string()), PRIMARY, FALLBACK);
+        assert_eq!(result.unwrap_err(), FALLBACK);
     }
 
     #[test]
