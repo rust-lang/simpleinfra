@@ -3,11 +3,13 @@ use compute_static::compression::is_compressible_content_type;
 use compute_static::sigv4::sign_s3_request;
 use fastly::convert::ToHeaderValue;
 use fastly::http::{header, Method, StatusCode};
+use fastly::log::Endpoint;
 use fastly::{Backend, Error, Request, Response};
 use fastly_access_log::{collect_request, collect_response, LogLineV1Builder};
-use log::{info, warn, LevelFilter};
+use log::{warn, LevelFilter};
 use log_fastly::Logger;
 use std::fmt::Display;
+use std::io::Write;
 use std::time::{Duration, SystemTime};
 
 use crate::config::Config;
@@ -55,15 +57,13 @@ fn main(request: Request) -> Result<Response, Error> {
 
 /// Initialize the logger
 ///
-/// Fastly provides its own logger implementation that streams logs to pre-configured endpoints. We
-/// have created one endpoint for request logs and one for service logs.
+/// Fastly provides its own logger implementation that streams logs to a pre-configured endpoint for
+/// service logs. Request logs are written directly to their endpoints by `build_and_send_log()`.
 ///
 /// Logs are echoed to stdout as well to enable tailing the logs with the Fastly CLI.
 fn init_logging(config: &Config) {
     Logger::builder()
         .max_level(LevelFilter::Debug)
-        .endpoint(config.datadog_request_logs_endpoint.clone())
-        .endpoint(config.s3_request_logs_endpoint.clone())
         .default_endpoint(config.s3_service_logs_endpoint.clone())
         .echo_stdout(true)
         .init();
@@ -431,10 +431,12 @@ fn build_and_send_log(log_line: LogLineV1Builder, config: &Config) {
             let serialized_log = log.to_json();
 
             for endpoint in [
-                config.datadog_request_logs_endpoint.as_str(),
-                config.s3_request_logs_endpoint.as_str(),
+                &config.datadog_request_logs_endpoint,
+                &config.s3_request_logs_endpoint,
             ] {
-                info!(target: endpoint, "{serialized_log}");
+                let _ = Endpoint::from_name(endpoint).write(serialized_log.as_bytes());
+                // Show request logs in `fastly log-tail`
+                println!("{serialized_log}");
             }
         }
         Err(error) => {
