@@ -88,6 +88,7 @@ fn handle_request(config: &Config, mut request: Request) -> Result<Response, Err
     }
 
     set_cache_policy(config, &mut request);
+    rewrite_root_url(&mut request);
     rewrite_urls_with_plus_character(&mut request);
     rewrite_download_urls(&mut request);
     rewrite_version_downloads_urls(&mut request);
@@ -163,6 +164,19 @@ fn set_cache_policy(config: &Config, request: &mut Request) {
 /// Split a comma-separated `cache-tags` metadata value into individual cache tags
 fn parse_cache_tags(tags: &str) -> impl Iterator<Item = &str> {
     tags.split(',').map(str::trim).filter(|tag| !tag.is_empty())
+}
+
+/// Rewrite `/` to `/index.html`
+///
+/// S3 answers requests for the bucket root with a listing of the bucket contents if the requester
+/// is allowed to list them. CloudFront requests `/index.html` instead through its default root
+/// object, so the root is rewritten the same way here.
+fn rewrite_root_url(request: &mut Request) {
+    let mut url = request.get_url_mut();
+
+    if url.path() == "/" {
+        url.set_path("/index.html");
+    }
 }
 
 /// Rewrite URLs with a plus character
@@ -457,6 +471,24 @@ mod tests {
         );
         test("", &[]);
         test(" , ", &[]);
+    }
+
+    #[test]
+    fn test_rewrite_root_url() {
+        fn test(url: &str, expected: &str) {
+            let mut request = Request::get(url);
+            rewrite_root_url(&mut request);
+            assert_eq!(request.get_url_str(), expected);
+        }
+
+        test(
+            "https://static.crates.io/",
+            "https://static.crates.io/index.html",
+        );
+        test(
+            "https://static.crates.io/crates/",
+            "https://static.crates.io/crates/",
+        );
     }
 
     #[test]
