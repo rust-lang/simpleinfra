@@ -23,6 +23,7 @@ const X_COMPRESS_HINT: &str = "X-Compress-Hint";
 #[fastly::main]
 fn main(request: Request) -> Result<Response, Error> {
     let config = Config::from_dictionary();
+    init_logging(&config);
 
     // Forward purge requests immediately to a backend
     // https://developer.fastly.com/learning/concepts/purging/#forwarding-purge-requests
@@ -30,7 +31,6 @@ fn main(request: Request) -> Result<Response, Error> {
         return send_request_to_s3(&config, &request);
     }
 
-    init_logging(&config);
     let mut log = collect_request(
         &request,
         DATADOG_SERVICE,
