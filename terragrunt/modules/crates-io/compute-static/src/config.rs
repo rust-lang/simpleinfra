@@ -40,7 +40,7 @@ const S3_SERVICE_LOGS_ENDPOINT: &str = "s3-service-logs-endpoint";
 pub struct Config {
     pub primary_host: String,
     pub fallback_host: String,
-    pub s3_credentials: Option<Credentials>,
+    pub s3_credentials: Credentials,
     pub static_ttl: u32,
     pub cloudfront_url: String,
     pub datadog_env: String,
@@ -63,12 +63,20 @@ impl Config {
             .get(FALLBACK_HOST)
             .expect("failed to get S3 fallback host from dictionary");
 
-        // Terraform updates the dictionary items only after it activates the service version, so
-        // the credentials can be missing for a short time after they are introduced.
-        let s3_credentials = dictionary
+        // Look up the credentials for S3
+        let aws_access_key_id = dictionary
             .get(AWS_ACCESS_KEY_ID)
-            .zip(dictionary.get(AWS_SECRET_ACCESS_KEY))
-            .map(|(id, secret)| Credentials::new(id, secret, None, None, DICTIONARY_NAME));
+            .expect("failed to get AWS access key ID from dictionary");
+        let aws_secret_access_key = dictionary
+            .get(AWS_SECRET_ACCESS_KEY)
+            .expect("failed to get AWS secret access key from dictionary");
+        let s3_credentials = Credentials::new(
+            aws_access_key_id,
+            aws_secret_access_key,
+            None,
+            None,
+            DICTIONARY_NAME,
+        );
 
         // Look up time to cache crates
         let static_ttl = dictionary

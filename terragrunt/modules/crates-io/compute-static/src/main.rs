@@ -2,6 +2,7 @@ use aws_credential_types::Credentials;
 use compute_static::compression::is_compressible_content_type;
 use compute_static::sigv4::sign_s3_request;
 use fastly::convert::ToHeaderValue;
+use fastly::http::request::SendErrorCause;
 use fastly::http::{header, Method, StatusCode};
 use fastly::{Backend, Error, Request, Response};
 use fastly_access_log::{collect_request, collect_response, LogLineV1Builder};
@@ -299,26 +300,25 @@ fn send_request_to_s3(config: &Config, request: &Request) -> Result<Response, Er
 ///
 /// Signed requests authenticate as an IAM user with `s3:ListBucket`, so that S3 answers requests for
 /// missing objects with `404 Not Found` instead of `403 Forbidden`. If signing fails, the request is
-/// sent unsigned, which works as long as the buckets are publicly readable.
-fn sign_on_cache_miss(request: &mut Request, backend: &str, credentials: Option<Credentials>) {
+/// not sent.
+fn sign_on_cache_miss(request: &mut Request, backend: &str, credentials: Credentials) {
     let backend = backend.to_string();
     request.set_before_send(move |request| {
-        let result = credentials
-            .clone()
-            .ok_or_else(|| Error::msg("credentials are missing"))
-            .and_then(|credentials| {
-                let host = Backend::from_name(&backend)?.get_host();
+        let credentials = credentials.clone();
+        Backend::from_name(&backend)
+            .map_err(Error::from)
+            .and_then(|s3_backend| {
+                let host = s3_backend.get_host();
 
                 // The backends are named after the regions of their buckets
                 let region = &backend;
 
                 sign_request(request, &host, region, credentials, SystemTime::now())
-            });
-
-        if let Err(error) = result {
-            warn!("Sending unsigned request to S3: {error}");
-        }
-        Ok(())
+            })
+            .map_err(|error| {
+                warn!("Failed to sign request to S3: {error}");
+                SendErrorCause::Custom(error)
+            })
     });
 }
 
