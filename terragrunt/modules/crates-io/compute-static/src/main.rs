@@ -1,13 +1,13 @@
 use aws_credential_types::Credentials;
 use compute_static::compression::is_compressible_content_type;
+use compute_static::service_log::ServiceLogger;
 use compute_static::sigv4::sign_s3_request;
 use fastly::convert::ToHeaderValue;
 use fastly::http::{header, Method, StatusCode};
 use fastly::log::Endpoint;
 use fastly::{Backend, Error, Request, Response};
 use fastly_access_log::{collect_request, collect_response, LogLineV1Builder};
-use log::{warn, LevelFilter};
-use log_fastly::Logger;
+use log::warn;
 use std::fmt::Display;
 use std::io::Write;
 use std::time::{Duration, SystemTime};
@@ -55,18 +55,11 @@ fn main(request: Request) -> Result<Response, Error> {
     response
 }
 
-/// Initialize the logger
+/// Initialize the logger for service logs
 ///
-/// Fastly provides its own logger implementation that streams logs to a pre-configured endpoint for
-/// service logs. Request logs are written directly to their endpoints by `build_and_send_log()`.
-///
-/// Logs are echoed to stdout as well to enable tailing the logs with the Fastly CLI.
+/// Request logs are written directly to their endpoints by `build_and_send_log()`.
 fn init_logging(config: &Config) {
-    Logger::builder()
-        .max_level(LevelFilter::Debug)
-        .default_endpoint(config.s3_service_logs_endpoint.clone())
-        .echo_stdout(true)
-        .init();
+    ServiceLogger::new(&config.s3_service_logs_endpoint).init();
 }
 
 /// Handle the request
