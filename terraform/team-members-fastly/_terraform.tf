@@ -18,5 +18,3 @@ terraform {
     encrypt      = true
   }
 }
-
-provider "fastly" {}
