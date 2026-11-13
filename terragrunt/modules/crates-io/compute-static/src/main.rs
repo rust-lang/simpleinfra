@@ -1,13 +1,15 @@
 use aws_credential_types::Credentials;
 use compute_static::compression::is_compressible_content_type;
+use compute_static::service_log::ServiceLogger;
 use compute_static::sigv4::sign_s3_request;
 use fastly::convert::ToHeaderValue;
 use fastly::http::{header, Method, StatusCode};
+use fastly::log::Endpoint;
 use fastly::{Backend, Error, Request, Response};
 use fastly_access_log::{collect_request, collect_response, LogLineV1Builder};
-use log::{info, warn, LevelFilter};
-use log_fastly::Logger;
+use log::warn;
 use std::fmt::Display;
+use std::io::Write;
 use std::time::{Duration, SystemTime};
 
 use crate::config::Config;
@@ -16,6 +18,7 @@ mod config;
 
 const DATADOG_APP: &str = "crates.io";
 const DATADOG_SERVICE: &str = "static.crates.io";
+const DATADOG_SERVICE_LOGS_ENDPOINT: &str = "datadog-service-logs";
 const ERROR_TTL: Duration = Duration::from_secs(10);
 const VERSION_DOWNLOADS: &str = "/archive/version-downloads/";
 const VERSION_DOWNLOADS_INDEX: &str = "/archive/version-downloads/index.html";
@@ -53,20 +56,18 @@ fn main(request: Request) -> Result<Response, Error> {
     response
 }
 
-/// Initialize the logger
+/// Initialize the logger for service logs
 ///
-/// Fastly provides its own logger implementation that streams logs to pre-configured endpoints. We
-/// have created one endpoint for request logs and one for service logs.
-///
-/// Logs are echoed to stdout as well to enable tailing the logs with the Fastly CLI.
+/// Request logs are written directly to their endpoints by `build_and_send_log()`.
 fn init_logging(config: &Config) {
-    Logger::builder()
-        .max_level(LevelFilter::Debug)
-        .endpoint(config.datadog_request_logs_endpoint.clone())
-        .endpoint(config.s3_request_logs_endpoint.clone())
-        .default_endpoint(config.s3_service_logs_endpoint.clone())
-        .echo_stdout(true)
-        .init();
+    ServiceLogger::new(
+        DATADOG_SERVICE_LOGS_ENDPOINT,
+        DATADOG_SERVICE,
+        DATADOG_APP,
+        &config.datadog_env,
+        config.datadog_host.clone(),
+    )
+    .init();
 }
 
 /// Handle the request
@@ -431,10 +432,12 @@ fn build_and_send_log(log_line: LogLineV1Builder, config: &Config) {
             let serialized_log = log.to_json();
 
             for endpoint in [
-                config.datadog_request_logs_endpoint.as_str(),
-                config.s3_request_logs_endpoint.as_str(),
+                &config.datadog_request_logs_endpoint,
+                &config.s3_request_logs_endpoint,
             ] {
-                info!(target: endpoint, "{serialized_log}");
+                let _ = Endpoint::from_name(endpoint).write(serialized_log.as_bytes());
+                // Show request logs in `fastly log-tail`
+                println!("{serialized_log}");
             }
         }
         Err(error) => {
