@@ -1,5 +1,5 @@
 // This file contains the definition of the resources needed to store the
-// Terraform State, **except** the underlying S3 bucket and DynamoDB table.
+// Terraform State, **except** the underlying S3 bucket.
 //
 // Those are not configured through Terraform to avoid cyclic dependencies: the
 // cycle could make solving issues if things go wrong way harder.

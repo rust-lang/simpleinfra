@@ -9,9 +9,9 @@ Terragrunt.
 functionality that we find useful. The features of Terragrunt we use are:
 
   - [Managed state files](https://terragrunt.gruntwork.io/docs/getting-started/quick-start/#keep-your-backend-configuration-dry):
-    Terragrunt can create the S3 bucket and DynamoDB tables that Terraform needs
-    to store its state. Automating their creation ensures consistency across
-    environments.
+    Terragrunt can create the S3 bucket that Terraform needs to store its state.
+    Automating its creation ensures consistency across environments. State
+    locking uses S3 lockfiles (`<key>.tflock`) in the same bucket.
 
 ## Directory Structure
 
