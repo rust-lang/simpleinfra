@@ -7,6 +7,7 @@ use fastly::{Backend, Error, Request, Response};
 use fastly_access_log::{collect_request, collect_response, LogLineV1Builder};
 use log::{info, warn, LevelFilter};
 use log_fastly::Logger;
+use std::fmt::Display;
 use std::time::{Duration, SystemTime};
 
 use crate::config::Config;
@@ -255,27 +256,18 @@ fn redirect_to_cloudfront(config: &Config, path: &str) -> Result<Response, Error
 /// Forward client request to S3
 ///
 /// The request that was received by the client is forwarded to S3. First, the primary bucket is
-/// queried. If the response indicates a server issue (status code >= 500), the request is sent to
-/// a fallback bucket in a different geographical region.
+/// queried. If the response indicates a server issue (status code >= 500) or the request fails
+/// without a response, the request is sent to a fallback bucket in a different geographical region.
 fn send_request_to_s3(config: &Config, request: &Request) -> Result<Response, Error> {
-    let mut primary_request = request.clone_without_body();
-    let credentials = config.s3_credentials.clone();
-    sign_on_cache_miss(&mut primary_request, &config.primary_host, credentials);
-
-    let mut response = primary_request.send(&config.primary_host)?;
-    let status_code = response.get_status().as_u16();
-
-    if status_code >= 500 {
-        warn!(
-            "Request to host {} returned status code {}",
-            config.primary_host, status_code
-        );
-
-        let mut fallback_request = request.clone_without_body();
-        let credentials = config.s3_credentials.clone();
-        sign_on_cache_miss(&mut fallback_request, &config.fallback_host, credentials);
-        response = fallback_request.send(&config.fallback_host)?;
-    }
+    let mut response = send_with_fallback(
+        |host| {
+            let mut request = request.clone_without_body();
+            sign_on_cache_miss(&mut request, host, config.s3_credentials.clone());
+            request.send(host)
+        },
+        &config.primary_host,
+        &config.fallback_host,
+    )?;
 
     if let Some(response) = unsatisfiable_range_response(&response) {
         return Ok(response);
@@ -293,6 +285,25 @@ fn send_request_to_s3(config: &Config, request: &Request) -> Result<Response, Er
     }
 
     Ok(response)
+}
+
+/// Send a request to the primary host and retry it on the fallback host if the primary host
+/// responds with a server error (status code >= 500) or the request fails without a response.
+fn send_with_fallback<E: Display>(
+    send: impl Fn(&str) -> Result<Response, E>,
+    primary_host: &str,
+    fallback_host: &str,
+) -> Result<Response, E> {
+    match send(primary_host) {
+        Ok(response) if response.get_status().as_u16() < 500 => return Ok(response),
+        Ok(response) => {
+            let status_code = response.get_status().as_u16();
+            warn!("Request to host {primary_host} returned status code {status_code}");
+        }
+        Err(error) => warn!("Request to host {primary_host} failed: {error}"),
+    }
+
+    send(fallback_host)
 }
 
 /// Sign the request to S3 if it misses the cache
@@ -435,7 +446,60 @@ fn build_and_send_log(log_line: LogLineV1Builder, config: &Config) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::cell::RefCell;
     use std::time::UNIX_EPOCH;
+
+    const PRIMARY: &str = "primary";
+    const FALLBACK: &str = "fallback";
+
+    /// Run `send_with_fallback()` against a fallback that always responds with `200 OK` and
+    /// return the result together with the hosts that were tried.
+    fn send_with_primary(
+        primary: Result<StatusCode, &'static str>,
+    ) -> (Result<Response, &'static str>, Vec<String>) {
+        let hosts = RefCell::new(Vec::new());
+        let result = send_with_fallback(
+            |host| {
+                hosts.borrow_mut().push(host.to_string());
+                match host {
+                    PRIMARY => primary.map(Response::from_status),
+                    _ => Ok(Response::from_status(StatusCode::OK)),
+                }
+            },
+            PRIMARY,
+            FALLBACK,
+        );
+        (result, hosts.into_inner())
+    }
+
+    #[test]
+    fn test_send_with_fallback_uses_primary_response() {
+        for status in [StatusCode::OK, StatusCode::NOT_FOUND] {
+            let (result, hosts) = send_with_primary(Ok(status));
+            assert_eq!(result.unwrap().get_status(), status);
+            assert_eq!(hosts, [PRIMARY]);
+        }
+    }
+
+    #[test]
+    fn test_send_with_fallback_retries_server_errors() {
+        let (result, hosts) = send_with_primary(Ok(StatusCode::SERVICE_UNAVAILABLE));
+        assert_eq!(result.unwrap().get_status(), StatusCode::OK);
+        assert_eq!(hosts, [PRIMARY, FALLBACK]);
+    }
+
+    #[test]
+    fn test_send_with_fallback_retries_send_errors() {
+        let (result, hosts) = send_with_primary(Err("connection refused"));
+        assert_eq!(result.unwrap().get_status(), StatusCode::OK);
+        assert_eq!(hosts, [PRIMARY, FALLBACK]);
+    }
+
+    #[test]
+    fn test_send_with_fallback_returns_fallback_send_error() {
+        let result = send_with_fallback(|host: &str| Err(host.to_string()), PRIMARY, FALLBACK);
+        assert_eq!(result.unwrap_err(), FALLBACK);
+    }
 
     #[test]
     fn test_unsatisfiable_range_response() {
