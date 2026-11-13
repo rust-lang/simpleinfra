@@ -5,6 +5,8 @@ locals {
   cmd = jsondecode(run_cmd("--terragrunt-quiet", "${get_parent_terragrunt_dir()}/terragrunt-locals.py", get_original_terragrunt_dir()))
 }
 
+terraform_version_constraint = ">= 1.10"
+
 remote_state {
   backend = "s3"
   generate = {
@@ -12,12 +14,11 @@ remote_state {
     if_exists = "overwrite_terragrunt"
   }
   config = {
-    profile        = local.cmd.remote_state_profile
-    bucket         = local.cmd.remote_state_bucket
-    dynamodb_table = local.cmd.remote_state_dynamodb_table
+    profile      = local.cmd.remote_state_profile
+    bucket       = local.cmd.remote_state_bucket
     use_lockfile = true
-    region         = local.cmd.remote_state_region
-    key            = local.cmd.remote_state_key
+    region       = local.cmd.remote_state_region
+    key          = local.cmd.remote_state_key
   }
 }
 
