@@ -16,6 +16,3 @@ terraform {
     }
   }
 }
-
-provider "datadog" {}
-provider "fastly" {}
