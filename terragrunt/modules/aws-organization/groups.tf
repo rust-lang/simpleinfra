@@ -340,6 +340,8 @@ resource "aws_ssoadmin_permission_set_inline_policy" "rustup_read" {
         Resource = [
           "arn:aws:s3:::rustup-builds",
           "arn:aws:s3:::rustup-builds/*",
+          "arn:aws:s3:::dev-static-rust-lang-org",
+          "arn:aws:s3:::dev-static-rust-lang-org/*",
           "arn:aws:s3:::www.rustup.rs",
           "arn:aws:s3:::www.rustup.rs/*",
         ]
