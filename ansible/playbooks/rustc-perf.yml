@@ -82,6 +82,8 @@
         value: -1
         state: present
         sysctl_set: yes
+        # Ubuntu 26+ doesn't read /etc/sysctl.conf anymore
+        sysctl_file: /etc/sysctl.d/99-perf.conf
         reload: yes
 
     # kernel.nmi_watchdog only exists on x86
@@ -91,6 +93,8 @@
         value: 0
         state: present
         sysctl_set: yes
+        # Ubuntu 26+ doesn't read /etc/sysctl.conf anymore
+        sysctl_file: /etc/sysctl.d/99-perf.conf
         reload: yes
       when: ansible_architecture == "x86_64"
 
@@ -100,6 +104,8 @@
         value: 0
         state: present
         sysctl_set: yes
+        # Ubuntu 26+ doesn't read /etc/sysctl.conf anymore
+        sysctl_file: /etc/sysctl.d/99-perf.conf
         reload: yes
 
     - name: Discourage swapping
@@ -108,6 +114,8 @@
         value: 10
         state: present
         sysctl_set: yes
+        # Ubuntu 26+ doesn't read /etc/sysctl.conf anymore
+        sysctl_file: /etc/sysctl.d/99-perf.conf
         reload: yes
 
     - name: Create systemd service to disable hyper-threading and frequency scaling
