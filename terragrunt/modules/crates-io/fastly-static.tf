@@ -85,6 +85,8 @@ resource "fastly_service_compute" "static" {
     compression_codec = "zstd"
   }
 
+  # Unused since the service logs are sent to Datadog. Kept so that older service versions keep
+  # working after a rollback.
   logging_s3 {
     name        = "s3-${local.service_logs_endpoint}"
     bucket_name = aws_s3_bucket.logs.bucket
@@ -98,6 +100,11 @@ resource "fastly_service_compute" "static" {
 
   logging_datadog {
     name  = "datadog-${local.request_logs_endpoint}"
+    token = data.aws_ssm_parameter.datadog_token.value
+  }
+
+  logging_datadog {
+    name  = "datadog-${local.service_logs_endpoint}"
     token = data.aws_ssm_parameter.datadog_token.value
   }
 }
@@ -121,6 +128,7 @@ resource "fastly_service_dictionary_items" "compute_static" {
     "s3-fallback-host" : local.fallback_host_name
     "s3-primary-host" : local.primary_host_name
     "s3-request-logs-endpoint" : "s3-${local.request_logs_endpoint}"
+    # Unused, see the `logging_s3` block for the service logs above
     "s3-service-logs-endpoint" : "s3-${local.service_logs_endpoint}"
     "static-ttl" : var.static_ttl
   }

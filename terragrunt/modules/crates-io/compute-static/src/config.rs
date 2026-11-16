@@ -33,9 +33,6 @@ const DATADOG_REQUEST_LOGS_ENDPOINT: &str = "datadog-request-logs-endpoint";
 // Name of the directory item with the S3 logging endpoint for requests
 const S3_REQUEST_LOGS_ENDPOINT: &str = "s3-request-logs-endpoint";
 
-// Name of the directory item with the S3 logging endpoint for the worker
-const S3_SERVICE_LOGS_ENDPOINT: &str = "s3-service-logs-endpoint";
-
 #[derive(Debug)]
 pub struct Config {
     pub primary_host: String,
@@ -47,7 +44,6 @@ pub struct Config {
     pub datadog_host: String,
     pub datadog_request_logs_endpoint: String,
     pub s3_request_logs_endpoint: String,
-    pub s3_service_logs_endpoint: String,
 }
 
 impl Config {
@@ -87,9 +83,6 @@ impl Config {
         let s3_request_logs_endpoint = dictionary
             .get(S3_REQUEST_LOGS_ENDPOINT)
             .expect("failed to get endpoint for request logs from dictionary");
-        let s3_service_logs_endpoint = dictionary
-            .get(S3_SERVICE_LOGS_ENDPOINT)
-            .expect("failed to get endpoint for service logs from dictionary");
 
         // Look up the tags for Datadog
         let datadog_env = dictionary
@@ -109,7 +102,6 @@ impl Config {
             datadog_host,
             datadog_request_logs_endpoint,
             s3_request_logs_endpoint,
-            s3_service_logs_endpoint,
         }
     }
 }
