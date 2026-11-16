@@ -10,7 +10,7 @@
   become_user: crates-io-downloader
 
 - name: Install get-all-crates
-  shell: "PATH=$PATH:$HOME/.cargo/bin cargo install get-all-crates --version 0.1.22 --locked"
+  shell: "PATH=$PATH:$HOME/.cargo/bin cargo install get-all-crates --version 0.1.27 --locked"
   become_user: crates-io-downloader
 
 - name: Set up get-all-crates systemd service
