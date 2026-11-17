@@ -5,6 +5,10 @@ umask 022
 export DEBIAN_FRONTEND=noninteractive
 export AWS_PAGER=""
 
+# Preserve cloud-init output while also recording bootstrap failures in the
+# journal and EC2 console. Keep console/file output if journal delivery fails.
+exec > >(tee --output-error=warn /dev/console >(systemd-cat --identifier=docs-rs-builder-bootstrap)) 2>&1
+
 . /etc/os-release
 if [ "$ID" != ubuntu ] || [ "$VERSION_ID" != 24.04 ] || [ "$(uname -m)" != x86_64 ]; then
     echo 'Builder bootstrap requires Ubuntu 24.04 amd64' >&2
@@ -33,7 +37,6 @@ fi
 AWS_REGION=$(jq -r .region /etc/docs-rs/host.json)
 export AWS_DEFAULT_REGION="$AWS_REGION"
 instance_id=$(cloud-init query v1.instance_id)
-printf '%s\n' "$instance_id" > /etc/docs-rs/instance-id
 prefix=$(jq -r .prefix /etc/docs-rs/host.json)
 workspace=$(jq -r .workspace /etc/docs-rs/host.json)
 
@@ -47,6 +50,27 @@ if ! command -v aws >/dev/null 2>&1; then
 fi
 
 install -d -m 0755 /etc/docker "$prefix" "$workspace"
+
+# Install the host Agent without passing its API key through installer arguments
+# or environment. The installer preserves an existing configuration file.
+install -d -m 0755 /etc/datadog-agent
+install -m 0600 /dev/null /etc/datadog-agent/datadog.yaml
+aws ssm get-parameter --name "$(jq -r .datadog_api_key_parameter /etc/docs-rs/host.json)" \
+    --with-decryption --output json \
+    | jq --exit-status --raw-output '
+        .Parameter.Value |
+        if type != "string" or length == 0 or test("[\r\n]")
+        then error("Datadog API key must be a nonempty single-line string")
+        else "api_key: " + tojson end' > /etc/datadog-agent/datadog.yaml
+cat /etc/docs-rs/datadog.yaml >> /etc/datadog-agent/datadog.yaml
+curl --fail --silent --show-error --location --retry 5 \
+    https://install.datadoghq.com/scripts/install_script_agent7.sh -o "$workdir/install-datadog.sh"
+DD_INSTALL_ONLY=true bash "$workdir/install-datadog.sh"
+chown root:dd-agent /etc/datadog-agent/datadog.yaml
+chmod 0640 /etc/datadog-agent/datadog.yaml
+usermod -a -G docker,systemd-journal dd-agent
+systemctl enable datadog-agent.service
+systemctl restart datadog-agent.service
 
 runsc_version=$(jq -r .runsc_version /etc/docs-rs/host.json)
 curl --fail --silent --show-error --location --retry 5 \
