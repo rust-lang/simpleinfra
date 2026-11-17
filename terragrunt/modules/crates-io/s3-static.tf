@@ -94,15 +94,6 @@ resource "aws_s3_bucket_policy" "static" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "PublicReadGetObject",
-        Effect = "Allow"
-        Principal = {
-          AWS = "*"
-        }
-        Action   = "s3:GetObject"
-        Resource = "${aws_s3_bucket.static.arn}/*"
-      },
-      {
         // `s3:ListBucket` makes S3 answer requests for missing objects with
         // `404 Not Found` instead of `403 Forbidden`.
         Sid    = "CloudFrontRead"
@@ -120,6 +111,15 @@ resource "aws_s3_bucket_policy" "static" {
       }
     ]
   })
+}
+
+resource "aws_s3_bucket_public_access_block" "static" {
+  bucket = aws_s3_bucket.static.id
+
+  restrict_public_buckets = true
+  ignore_public_acls      = true
+  block_public_acls       = true
+  block_public_policy     = true
 }
 
 resource "aws_s3_bucket_inventory" "static" {
@@ -161,15 +161,6 @@ resource "aws_s3_bucket_policy" "fallback" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = "PublicReadGetObject",
-        Effect = "Allow"
-        Principal = {
-          AWS = "*"
-        }
-        Action   = "s3:GetObject"
-        Resource = "${aws_s3_bucket.fallback.arn}/*"
-      },
-      {
         Sid    = "CloudFrontRead"
         Effect = "Allow"
         Principal = {
@@ -185,4 +176,15 @@ resource "aws_s3_bucket_policy" "fallback" {
       }
     ]
   })
+}
+
+resource "aws_s3_bucket_public_access_block" "fallback" {
+  provider = aws.eu-west-1
+
+  bucket = aws_s3_bucket.fallback.id
+
+  restrict_public_buckets = true
+  ignore_public_acls      = true
+  block_public_acls       = true
+  block_public_policy     = true
 }
