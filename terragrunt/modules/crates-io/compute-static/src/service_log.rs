@@ -17,16 +17,28 @@ pub struct ServiceLogger {
     ddtags: String,
     host: String,
     server_datacenter: Option<String>,
+    request_id: Option<String>,
 }
 
 impl ServiceLogger {
-    pub fn new(endpoint: &str, service: &'static str, app: &str, env: &str, host: String) -> Self {
+    /// Creates a logger for the request with the given request ID
+    ///
+    /// Each sandbox handles a single request, so the request ID is the same for all records.
+    pub fn new(
+        endpoint: &str,
+        service: &'static str,
+        app: &str,
+        env: &str,
+        host: String,
+        request_id: Option<String>,
+    ) -> Self {
         Self {
             endpoint: Endpoint::from_name(endpoint),
             service,
             ddtags: format!("app:{app},env:{env}"),
             host,
             server_datacenter: var("FASTLY_POP").ok(),
+            request_id,
         }
     }
 
@@ -43,6 +55,7 @@ impl ServiceLogger {
             ddtags: &self.ddtags,
             host: &self.host,
             server_datacenter: self.server_datacenter.as_deref(),
+            request_id: self.request_id.as_deref(),
             date,
             status: datadog_status(record.level()),
             message: record.args().to_string(),
@@ -82,6 +95,8 @@ struct ServiceLogLine<'a> {
     ddtags: &'a str,
     host: &'a str,
     server_datacenter: Option<&'a str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    request_id: Option<&'a str>,
     #[serde(with = "time::serde::rfc3339")]
     date: OffsetDateTime,
     status: &'static str,
@@ -105,14 +120,15 @@ mod tests {
     use serde_json::{json, Value};
     use time::macros::datetime;
 
-    #[test]
-    fn test_line() {
+    /// Serialize a warning with a logger that has the given request ID
+    fn line(request_id: Option<&str>) -> Value {
         let logger = ServiceLogger {
             endpoint: Endpoint::from_name("datadog-service-logs"),
             service: "static.crates.io",
             ddtags: "app:crates.io,env:prod".into(),
             host: "static.crates.io".into(),
             server_datacenter: Some("FRA".into()),
+            request_id: request_id.map(Into::into),
         };
 
         let record = Record::builder()
@@ -121,19 +137,29 @@ mod tests {
             .build();
 
         let date = datetime!(2026-11-11 14:13:20.231373 UTC);
-        let line: Value = serde_json::from_str(&logger.line(&record, date).unwrap()).unwrap();
+        serde_json::from_str(&logger.line(&record, date).unwrap()).unwrap()
+    }
+
+    #[test]
+    fn test_line() {
         assert_eq!(
-            line,
+            line(Some("7b1e3e4f2c5d4a6b")),
             json!({
                 "ddsource": "fastly",
                 "service": "static.crates.io",
                 "ddtags": "app:crates.io,env:prod",
                 "host": "static.crates.io",
                 "server_datacenter": "FRA",
+                "request_id": "7b1e3e4f2c5d4a6b",
                 "date": "2026-11-11T14:13:20.231373Z",
                 "status": "warn",
                 "message": "S3 returned status code 503",
             })
         );
+    }
+
+    #[test]
+    fn test_line_without_request_id() {
+        assert!(line(None).get("request_id").is_none());
     }
 }

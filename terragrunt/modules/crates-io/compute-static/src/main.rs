@@ -28,7 +28,8 @@ const X_COMPRESS_HINT: &str = "X-Compress-Hint";
 #[fastly::main]
 fn main(request: Request) -> Result<Response, Error> {
     let config = Config::from_dictionary();
-    init_logging(&config);
+    let request_id = request.get_client_request_id().map(str::to_owned);
+    init_logging(&config, request_id.clone());
 
     // Forward purge requests immediately to a backend
     // https://developer.fastly.com/learning/concepts/purging/#forwarding-purge-requests
@@ -43,6 +44,7 @@ fn main(request: Request) -> Result<Response, Error> {
         &config.datadog_env,
         Some(config.datadog_host.clone()),
     );
+    log.request_id(request_id);
 
     let has_origin_header = request.get_header("Origin").is_some();
     let mut response = handle_request(&config, request);
@@ -60,13 +62,14 @@ fn main(request: Request) -> Result<Response, Error> {
 /// Initialize the logger for service logs
 ///
 /// Request logs are written directly to their endpoints by `build_and_send_log()`.
-fn init_logging(config: &Config) {
+fn init_logging(config: &Config, request_id: Option<String>) {
     ServiceLogger::new(
         DATADOG_SERVICE_LOGS_ENDPOINT,
         DATADOG_SERVICE,
         DATADOG_APP,
         &config.datadog_env,
         config.datadog_host.clone(),
+        request_id,
     )
     .init();
 }
