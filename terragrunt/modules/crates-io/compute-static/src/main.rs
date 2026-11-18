@@ -330,10 +330,7 @@ fn sign_on_cache_miss(request: &mut Request, backend: &str, credentials: Credent
 
                 sign_request(request, &host, region, credentials, SystemTime::now())
             })
-            .map_err(|error| {
-                warn!("Failed to sign request to S3: {error}");
-                SendErrorCause::Custom(error)
-            })
+            .map_err(SendErrorCause::Custom)
     });
 }
 
