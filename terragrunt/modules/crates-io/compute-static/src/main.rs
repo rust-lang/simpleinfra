@@ -8,7 +8,7 @@ use fastly::http::{header, Method, StatusCode};
 use fastly::log::Endpoint;
 use fastly::{Backend, Error, Request, Response};
 use fastly_access_log::{collect_request, collect_response, LogLineV1Builder};
-use log::warn;
+use log::{error, warn};
 use std::fmt::Display;
 use std::io::Write;
 use std::time::{Duration, SystemTime};
@@ -294,21 +294,38 @@ fn send_request_to_s3(config: &Config, request: &Request) -> Result<Response, Er
 
 /// Send a request to the primary host and retry it on the fallback host if the primary host
 /// responds with a server error (status code >= 500) or the request fails without a response.
+///
+/// A fallback that responds with a 2xx or 3xx status code is logged as a warning. Any other
+/// fallback result is logged as an error, because the client does not get the requested file.
 fn send_with_fallback<E: Display>(
     send: impl Fn(&str) -> Result<Response, E>,
     primary_host: &str,
     fallback_host: &str,
 ) -> Result<Response, E> {
-    match send(primary_host) {
+    let primary_failure = match send(primary_host) {
         Ok(response) if response.get_status().as_u16() < 500 => return Ok(response),
-        Ok(response) => {
-            let status_code = response.get_status().as_u16();
-            warn!("Request to host {primary_host} returned status code {status_code}");
-        }
-        Err(error) => warn!("Request to host {primary_host} failed: {error}"),
+        Ok(response) => response.get_status().to_string(),
+        Err(error) => error.to_string(),
+    };
+
+    let result = send(fallback_host);
+    let fallback_failure = match &result {
+        Ok(response) if response.get_status().is_success() => None,
+        Ok(response) if response.get_status().is_redirection() => None,
+        Ok(response) => Some(response.get_status().to_string()),
+        Err(error) => Some(error.to_string()),
+    };
+
+    match fallback_failure {
+        None => warn!(
+            "Fallback to {fallback_host} succeeded after {primary_host} failed ({primary_failure})"
+        ),
+        Some(fallback_failure) => error!(
+            "Fallback to {fallback_host} failed ({fallback_failure}) after {primary_host} failed ({primary_failure})"
+        ),
     }
 
-    send(fallback_host)
+    result
 }
 
 /// Sign the request to S3 if it misses the cache
@@ -330,10 +347,7 @@ fn sign_on_cache_miss(request: &mut Request, backend: &str, credentials: Credent
 
                 sign_request(request, &host, region, credentials, SystemTime::now())
             })
-            .map_err(|error| {
-                warn!("Failed to sign request to S3: {error}");
-                SendErrorCause::Custom(error)
-            })
+            .map_err(SendErrorCause::Custom)
     });
 }
 
