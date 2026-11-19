@@ -8,6 +8,13 @@ locals {
 
   request_logs_endpoint = "request-logs"
   service_logs_endpoint = "service-logs"
+
+  # S3 closes idle connections after about 6 seconds. Closing them earlier on
+  # the Fastly side avoids reusing a connection that S3 is concurrently closing.
+  s3_keepalive_time = 4
+
+  # Allow a retransmitted TCP SYN to reach the remote S3 region
+  s3_connect_timeout = 3000
 }
 
 data "aws_ssm_parameter" "datadog_token" {
@@ -51,6 +58,9 @@ resource "fastly_service_compute" "static" {
     use_ssl           = true
     port              = 443
     ssl_cert_hostname = aws_s3_bucket.static.bucket_regional_domain_name
+
+    keepalive_time  = local.s3_keepalive_time
+    connect_timeout = local.s3_connect_timeout
   }
 
   backend {
@@ -63,6 +73,9 @@ resource "fastly_service_compute" "static" {
     use_ssl           = true
     port              = 443
     ssl_cert_hostname = aws_s3_bucket.fallback.bucket_regional_domain_name
+
+    keepalive_time  = local.s3_keepalive_time
+    connect_timeout = local.s3_connect_timeout
   }
 
   dictionary {
