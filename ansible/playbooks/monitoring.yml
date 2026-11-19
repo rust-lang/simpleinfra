@@ -127,10 +127,13 @@
               - fastly-exporter.infra.rust-lang.org
 
       prometheus_rule_groups:
+        # NodeDown, DiskFull and TooMuchRamUsage only cover the monitoring host (`{{ inventory_hostname }}`),
+        # which the Datadog monitors exclude.
+        # I.e. the monitoring host monitors itself during this migration period to Datadog.
         - name: node
           rules:
             - alert: NodeDown
-              expr: up{job="node"} == 0
+              expr: up{job="node",instance="{{ inventory_hostname }}:9100"} == 0
               for: 2m
               annotations:
                 summary: "{{ '{{ $labels.instance }}' }} is down"
@@ -144,16 +147,14 @@
                 description: "The systemd unit {{ '{{ $labels.name }}' }} on the {{ '{{ $labels.instance }}' }} instance failed to execute."
 
             - alert: DiskFull
-              expr: node_filesystem_avail_bytes{fstype!="tmpfs",fstype!="fuse.lxcfs"} / node_filesystem_size_bytes{fstype!="tmpfs",fstype!="fuse.lxcfs"} < 0.10
+              expr: node_filesystem_avail_bytes{instance="{{ inventory_hostname }}:9100",fstype!="tmpfs",fstype!="fuse.lxcfs"} / node_filesystem_size_bytes{instance="{{ inventory_hostname }}:9100",fstype!="tmpfs",fstype!="fuse.lxcfs"} < 0.10
               for: 1m
               annotations:
                 summary: "Filesystem {{ '{{ $labels.mountpoint }}' }} on {{ '{{ $labels.instance }}' }} is full"
                 description: "There is less than 10% disk space left on the mount point {{ '{{ $labels.mountpoint }}' }} (device {{ '{{ $labels.device }}' }}) of the instance {{ '{{ $labels.instance }}' }}."
 
-            # This alert is disabled because Crater is expected to
-            # use a lot of RAM.
             - alert: TooMuchRamUsage
-              expr: node_memory_MemAvailable_bytes{instance!~"crater\\.infra\\.rust-lang\\.org.*"} / node_memory_MemTotal_bytes{instance!~"crater\\.infra\\.rust-lang\\.org.*"} < 0.2
+              expr: node_memory_MemAvailable_bytes{instance="{{ inventory_hostname }}:9100"} / node_memory_MemTotal_bytes{instance="{{ inventory_hostname }}:9100"} < 0.2
               for: 1m
               annotations:
                 summary: "High RAM usage on {{ '{{ $labels.instance }}' }}"
@@ -184,31 +185,11 @@
                 summary: "Self-Hosted runner {{ '{{ $labels.runner }}' }} in repo {{ '{{ $labels.repo }}' }} is offline"
                 description: "GitHub is reporting that the self-hosted runner {{ '{{ $labels.runner }}' }} in the repo {{ '{{ $labels.repo }}' }} is offline. This could be caused by the machine hosting the runner having problems, or by the runner software being out of date."
 
-        - name: playground
-          rules:
-            - alert: PlaygroundDown
-              expr: sum(increase(playground_request_duration_seconds_count[5m])) == 0
-              for: 1m
-              annotations:
-                summary: "play.rust-lang.org is down"
-                description: "No requests have been serviced by the playground in the last five minutes."
-
       alertmanager_route:
         group_by: ['alertname']
         group_wait: 30s
         group_interval: 5m
         receiver: zulip-infra
-
-        routes:
-          # Suppress disk full alerts for Crater agents. They're supposed to go
-          # near the limit and they're configured to handle things properly,
-          # cleaning up unused files when they reach a threshold.
-          - receiver: devnull
-            match:
-              job: node
-              alertname: DiskFull
-            match_re:
-              instance: ^crater-[^\.]+\.infra\.rust-lang\.org:9100$
 
       alertmanager_receivers:
         - name: zulip-infra
@@ -219,8 +200,6 @@
               title_link: "https://grafana.rust-lang.org"
               text: "{{ '{{ range .Alerts }}**{{ if eq .Status \"firing\" }}Fired{{ else }}Resolved{{ end }}: {{ .Annotations.summary }}**\n{{ .Annotations.description }}\n{{ end }}' }}"
               send_resolved: true
-
-        - name: devnull
 
       grafana_github_teams:
         - 2357301  # rust-lang/infra
