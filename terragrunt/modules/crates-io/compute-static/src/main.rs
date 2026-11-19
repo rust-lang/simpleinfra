@@ -262,8 +262,11 @@ fn redirect_to_cloudfront(config: &Config, path: &str) -> Result<Response, Error
 ///
 /// The request that was received by the client is forwarded to S3. First, the primary bucket is
 /// queried. If the response indicates a server issue (status code >= 500) or the request fails
-/// without a response, the request is sent to a fallback bucket in a different geographical region.
+/// without a response, requests for replicated files are sent to a fallback bucket in a different
+/// geographical region.
 fn send_request_to_s3(config: &Config, request: &Request) -> Result<Response, Error> {
+    let fallback_host = is_replicated(request.get_path()).then_some(config.fallback_host.as_str());
+
     let mut response = send_with_fallback(
         |host| {
             let mut request = request.clone_without_body();
@@ -271,7 +274,7 @@ fn send_request_to_s3(config: &Config, request: &Request) -> Result<Response, Er
             request.send(host)
         },
         &config.primary_host,
-        &config.fallback_host,
+        fallback_host,
     )?;
 
     if let Some(response) = unsatisfiable_range_response(&response) {
@@ -292,20 +295,34 @@ fn send_request_to_s3(config: &Config, request: &Request) -> Result<Response, Er
     Ok(response)
 }
 
+/// Check whether the S3 replication rule copies the file at `path` to the fallback bucket
+///
+/// Must match the `aws_s3_bucket_replication_configuration.static` resource in `s3-static.tf`.
+fn is_replicated(path: &str) -> bool {
+    path.starts_with("/crates/")
+}
+
 /// Send a request to the primary host and retry it on the fallback host if the primary host
 /// responds with a server error (status code >= 500) or the request fails without a response.
 ///
 /// A fallback that responds with a 2xx or 3xx status code is logged as a warning. Any other
-/// fallback result is logged as an error, because the client does not get the requested file.
+/// fallback result, or a failure without a fallback host, is logged as an error, because the
+/// client does not get the requested file.
 fn send_with_fallback<E: Display>(
     send: impl Fn(&str) -> Result<Response, E>,
     primary_host: &str,
-    fallback_host: &str,
+    fallback_host: Option<&str>,
 ) -> Result<Response, E> {
-    let primary_failure = match send(primary_host) {
-        Ok(response) if response.get_status().as_u16() < 500 => return Ok(response),
+    let primary_result = send(primary_host);
+    let primary_failure = match &primary_result {
+        Ok(response) if response.get_status().as_u16() < 500 => return primary_result,
         Ok(response) => response.get_status().to_string(),
         Err(error) => error.to_string(),
+    };
+
+    let Some(fallback_host) = fallback_host else {
+        error!("Request to {primary_host} failed ({primary_failure}) without fallback");
+        return primary_result;
     };
 
     let result = send(fallback_host);
@@ -487,7 +504,7 @@ mod tests {
                 }
             },
             PRIMARY,
-            FALLBACK,
+            Some(FALLBACK),
         );
         (result, hosts.into_inner())
     }
@@ -517,8 +534,17 @@ mod tests {
 
     #[test]
     fn test_send_with_fallback_returns_fallback_send_error() {
-        let result = send_with_fallback(|host: &str| Err(host.to_string()), PRIMARY, FALLBACK);
+        let result =
+            send_with_fallback(|host: &str| Err(host.to_string()), PRIMARY, Some(FALLBACK));
         assert_eq!(result.unwrap_err(), FALLBACK);
+    }
+
+    #[test]
+    fn test_is_replicated() {
+        assert!(is_replicated("/crates/serde/serde-1.0.0.crate"));
+        assert!(!is_replicated("/readmes/serde/serde-1.0.0.html"));
+        assert!(!is_replicated("/archive/version-downloads/index.html"));
+        assert!(!is_replicated("/crates"));
     }
 
     #[test]
