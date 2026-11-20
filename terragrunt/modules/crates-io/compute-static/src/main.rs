@@ -302,27 +302,34 @@ fn is_replicated(path: &str) -> bool {
     path.starts_with("/crates/")
 }
 
-/// Send a request to the primary host and retry it on the fallback host if the primary host
-/// responds with a server error (status code >= 500) or the request fails without a response.
+/// Send a request to the primary host and retry it once if the primary host responds with a server
+/// error (status code >= 500) or the request fails without a response. If the retry fails as well,
+/// the request is sent to the fallback host.
 ///
-/// A fallback that responds with a 2xx or 3xx status code is logged as a warning. Any other
-/// fallback result, or a failure without a fallback host, is logged as an error, because the
-/// client does not get the requested file.
+/// A successful retry on the primary host, or a fallback that responds with a 2xx or 3xx status
+/// code, is logged as a warning. Any other fallback result, or a failure without a fallback host,
+/// is logged as an error, because the client does not get the requested file.
 fn send_with_fallback<E: Display>(
     send: impl Fn(&str) -> Result<Response, E>,
     primary_host: &str,
     fallback_host: Option<&str>,
 ) -> Result<Response, E> {
-    let primary_result = send(primary_host);
-    let primary_failure = match &primary_result {
-        Ok(response) if response.get_status().as_u16() < 500 => return primary_result,
-        Ok(response) => response.get_status().to_string(),
-        Err(error) => error.to_string(),
+    let first_result = send(primary_host);
+    let Some(first_failure) = server_failure(&first_result) else {
+        return first_result;
     };
+
+    let retry_result = send(primary_host);
+    let Some(retry_failure) = server_failure(&retry_result) else {
+        warn!("Retry on {primary_host} succeeded after it failed ({first_failure})");
+        return retry_result;
+    };
+
+    let primary_failure = format!("{first_failure}, then {retry_failure}");
 
     let Some(fallback_host) = fallback_host else {
         error!("Request to {primary_host} failed ({primary_failure}) without fallback");
-        return primary_result;
+        return retry_result;
     };
 
     let result = send(fallback_host);
@@ -343,6 +350,15 @@ fn send_with_fallback<E: Display>(
     }
 
     result
+}
+
+/// Describe why a request to S3 failed, or return `None` if the response can be used
+fn server_failure<E: Display>(result: &Result<Response, E>) -> Option<String> {
+    match result {
+        Ok(response) if response.get_status().as_u16() < 500 => None,
+        Ok(response) => Some(response.get_status().to_string()),
+        Err(error) => Some(error.to_string()),
+    }
 }
 
 /// Sign the request to S3 if it misses the cache
@@ -519,17 +535,36 @@ mod tests {
     }
 
     #[test]
+    fn test_send_with_fallback_retries_primary() {
+        let hosts = RefCell::new(Vec::new());
+        let result = send_with_fallback(
+            |host| {
+                let mut hosts = hosts.borrow_mut();
+                hosts.push(host.to_string());
+                match hosts.len() {
+                    1 => Err("connection closed"),
+                    _ => Ok(Response::from_status(StatusCode::OK)),
+                }
+            },
+            PRIMARY,
+            Some(FALLBACK),
+        );
+        assert_eq!(result.unwrap().get_status(), StatusCode::OK);
+        assert_eq!(hosts.into_inner(), [PRIMARY, PRIMARY]);
+    }
+
+    #[test]
     fn test_send_with_fallback_retries_server_errors() {
         let (result, hosts) = send_with_primary(Ok(StatusCode::SERVICE_UNAVAILABLE));
         assert_eq!(result.unwrap().get_status(), StatusCode::OK);
-        assert_eq!(hosts, [PRIMARY, FALLBACK]);
+        assert_eq!(hosts, [PRIMARY, PRIMARY, FALLBACK]);
     }
 
     #[test]
     fn test_send_with_fallback_retries_send_errors() {
         let (result, hosts) = send_with_primary(Err("connection refused"));
         assert_eq!(result.unwrap().get_status(), StatusCode::OK);
-        assert_eq!(hosts, [PRIMARY, FALLBACK]);
+        assert_eq!(hosts, [PRIMARY, PRIMARY, FALLBACK]);
     }
 
     #[test]
