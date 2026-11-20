@@ -47,6 +47,31 @@ for each module. S3 lockfiles (`<key>.tflock`) prevent concurrent changes to
 that state. The GCS-backed modules use their configured GCS buckets and native
 state locking.
 
+## Accounts
+
+The [`accounts`](accounts) directory contains the configuration of the AWS
+accounts that have been migrated from [Terragrunt](../terragrunt/README.md). It
+is organized as `accounts/<account>/<name>`, for example
+`accounts/bors-staging/app`. Each of those directories is a root module:
+`_terraform.tf` configures the state backend and the AWS provider, and `main.tf`
+calls a module from [`terragrunt/modules`](../terragrunt/modules).
+
+Unlike the other modules in this directory, their state is stored in the account
+itself: in the `terraform-state-<account id>` S3 bucket in the `us-east-1`
+region, under the key `<name>.tfstate`. Follow the same convention when adding a
+root module to an account.
+
+The AWS profile is named after the account and is set in `_terraform.tf`.
+[Configure it](../terragrunt/README.md#configure-aws-profiles), then apply the
+configuration from the directory:
+
+```shell
+aws sso login --profile bors-staging
+cd accounts/bors-staging/app
+terraform init
+terraform plan
+```
+
 ## Resources
 
 * [Terraform documentation][tf-docs]
