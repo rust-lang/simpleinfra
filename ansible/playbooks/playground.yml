@@ -27,6 +27,9 @@
           process_config:
             enabled: "true"
 
+        datadog_checks:
+          systemd: "{{ global_datadog_systemd_check }}"
+
     - role: letsencrypt
       dummy_certs: "{{ vars_letsencrypt_dummy_certs }}"
       email: admin@rust-lang.org

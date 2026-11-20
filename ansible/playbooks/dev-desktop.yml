@@ -13,6 +13,8 @@
       allow_ssh_extra_groups: dev-desktop-allow-ssh
 
     - role: datadog.datadog
+      tags:
+        - monitoring
       vars:
         datadog_api_key: "{{ vars_datadog_api_key }}"
         datadog_site: "datadoghq.com"
@@ -23,5 +25,8 @@
             - "service:dev-desktops"
           process_config:
             enabled: "true"
+
+        datadog_checks:
+          systemd: "{{ global_datadog_systemd_check }}"
 
     - role: dev-desktop
