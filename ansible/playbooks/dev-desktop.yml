@@ -13,6 +13,8 @@
       allow_ssh_extra_groups: dev-desktop-allow-ssh
 
     - role: datadog.datadog
+      tags:
+        - monitoring
       vars:
         datadog_api_key: "{{ vars_datadog_api_key }}"
         datadog_site: "datadoghq.com"

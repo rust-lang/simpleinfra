@@ -11,6 +11,8 @@
       sudo_users: "{{ global_sudo_users }}"
 
     - role: datadog.datadog
+      tags:
+        - monitoring
       vars:
         datadog_api_key: "{{ vars_datadog_api_key }}"
         datadog_site: "datadoghq.com"
