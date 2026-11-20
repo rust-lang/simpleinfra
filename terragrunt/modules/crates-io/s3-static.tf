@@ -58,10 +58,6 @@ resource "aws_s3_bucket_replication_configuration" "static" {
     id     = "crates"
     status = "Enabled"
 
-    filter {
-      prefix = "crates/"
-    }
-
     destination {
       bucket        = aws_s3_bucket.fallback.arn
       storage_class = "INTELLIGENT_TIERING"
