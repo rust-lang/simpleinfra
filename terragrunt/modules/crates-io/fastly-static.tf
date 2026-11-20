@@ -95,6 +95,7 @@ resource "fastly_service_compute" "static" {
     domain      = "s3.us-west-1.amazonaws.com"
     path        = "/fastly-requests/${var.static_domain_name}/"
 
+    message_type      = "blank"
     compression_codec = "zstd"
   }
 
