@@ -120,7 +120,7 @@
               - fastly-exporter.infra.rust-lang.org
 
       prometheus_rule_groups:
-        # NodeDown, DiskFull and TooMuchRamUsage only cover the monitoring host (`{{ inventory_hostname }}`),
+        # NodeDown, SystemdUnitFailed, DiskFull and TooMuchRamUsage only cover the monitoring host (`{{ inventory_hostname }}`),
         # which the Datadog monitors exclude.
         # I.e. the monitoring host monitors itself during this migration period to Datadog.
         - name: node
@@ -133,7 +133,7 @@
                 description: "Prometheus wasn't able to reach the instance {{ '{{ $labels.instance }}' }} for more than 2 minutes."
 
             - alert: SystemdUnitFailed
-              expr: node_systemd_unit_state{state="failed",job="node"} == 1
+              expr: node_systemd_unit_state{state="failed",job="node",instance="{{ inventory_hostname }}:9100"} == 1
               for: 1m
               annotations:
                 summary: "{{ '{{ $labels.name }}' }} on {{ '{{ $labels.instance }}' }} failed"

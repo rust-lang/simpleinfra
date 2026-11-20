@@ -33,4 +33,7 @@
           process_config:
             enabled: "true"
 
+        datadog_checks:
+          systemd: "{{ global_datadog_systemd_check }}"
+
     - role: bastion

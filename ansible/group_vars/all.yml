@@ -9,6 +9,17 @@ global_sudo_users:
 global_collect_metrics_from:
   - 52.9.166.219 # monitoring.infra.rust-lang.org
 
+# Configuration of the Datadog Agent `systemd` check, used by the
+# SystemdUnitFailed Datadog monitor through the `systemd.units_by_state` metric.
+# That metric counts all the units of the host, but the check doesn't start
+# without at least one unit to monitor in detail, so it monitors the unit of the
+# Datadog Agent itself.
+global_datadog_systemd_check:
+  init_config:
+  instances:
+    - unit_names:
+        - datadog-agent.service
+
 # Version of https://github.com/prometheus/node_exporter to install on our
 # instances. The checksum is the hash of the downloadable tarball for the
 # specified architecture, found in the GitHub releases.
