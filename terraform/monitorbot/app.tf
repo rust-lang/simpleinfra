@@ -40,7 +40,7 @@ module "monitorbot" {
 }
 
 // Generate the secret key used to access the metrics and store it in AWS
-// Parameter Store. Prometheus will then fetch the credentials from it.
+// Parameter Store.
 
 resource "random_password" "secret" {
   length  = 32
