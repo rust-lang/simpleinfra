@@ -27,6 +27,10 @@ const VERSION_DOWNLOADS: &str = "/archive/version-downloads/";
 const VERSION_DOWNLOADS_INDEX: &str = "/archive/version-downloads/index.html";
 const X_COMPRESS_HINT: &str = "X-Compress-Hint";
 
+/// Seconds that clients should wait before retrying a file that has not been
+/// replicated yet. cargo caps `Retry-After` at 10 seconds.
+const NOT_REPLICATED_RETRY_AFTER_SECONDS: u32 = 10;
+
 #[fastly::main]
 fn main(request: Request) -> Result<Response, Error> {
     let config = Config::from_dictionary();
@@ -349,14 +353,28 @@ fn send_with_fallback<E: Display>(
         Err(error) => Some(error.to_string()),
     };
 
-    match fallback_failure {
-        None => warn!(
+    let Some(fallback_failure) = fallback_failure else {
+        warn!(
             "Fallback to {fallback_host} succeeded after {primary_host} failed ({primary_failure})"
-        ),
-        Some(fallback_failure) => error!(
-            "Fallback to {fallback_host} failed ({fallback_failure}) after {primary_host} failed ({primary_failure})"
-        ),
+        );
+        return result;
+    };
+
+    // Inject Retry-After if fallback returns 404.
+    // This gives a chance to cargo clients using networking defaults
+    // to hit the replicated file in a retry
+    if matches!(&result, Ok(response) if response.get_status() == StatusCode::NOT_FOUND) {
+        error!("Fallback to {fallback_host} not found, retry-after signaled to client.");
+        let response = Response::from_status(StatusCode::SERVICE_UNAVAILABLE).with_header(
+            header::RETRY_AFTER,
+            NOT_REPLICATED_RETRY_AFTER_SECONDS.to_string(),
+        );
+        return Ok(response);
     }
+
+    error!(
+        "Fallback to {fallback_host} failed ({fallback_failure}) after {primary_host} failed ({primary_failure})"
+    );
 
     result
 }
