@@ -7,7 +7,7 @@ resource "aws_lambda_function" "image_builder" {
   architectures = ["arm64"]
 
   handler      = "index.handler"
-  runtime      = "python3.13"
+  runtime      = "python3.15"
   package_type = "Zip"
   timeout      = 900
   memory_size  = 1024
