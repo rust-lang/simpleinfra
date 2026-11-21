@@ -93,6 +93,8 @@
       - libxcb-render0-dev
       - libxcb-shape0-dev
       - libxcb-xfixes0-dev
+      # Necessary for tools linking the system sqlite (e.g. cargo-docset)
+      - libsqlite3-dev
     state: present
 
 # we don't need it because we don't need to send emails
