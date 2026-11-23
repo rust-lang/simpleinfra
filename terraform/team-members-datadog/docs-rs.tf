@@ -33,6 +33,7 @@ resource "datadog_role" "docs_rs" {
       data.datadog_permissions.all.permissions.sheets_read,
       data.datadog_permissions.all.permissions.sheets_write,
       data.datadog_permissions.all.permissions.embeddable_graphs_share,
+      data.datadog_permissions.all.permissions.late_metrics_config_write,
     ])
 
     content {
