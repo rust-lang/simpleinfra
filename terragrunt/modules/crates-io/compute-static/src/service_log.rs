@@ -117,7 +117,7 @@ fn datadog_status(level: Level) -> &'static str {
 mod tests {
     use super::*;
     use log::Level;
-    use serde_json::{json, Value};
+    use serde_json::{Value, json};
     use time::macros::datetime;
 
     /// Serialize a warning with a logger that has the given request ID
