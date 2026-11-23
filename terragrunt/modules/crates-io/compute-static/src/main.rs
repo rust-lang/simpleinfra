@@ -485,7 +485,7 @@ fn build_and_send_log(log_line: LogLineV1Builder, config: &Config) {
                 &config.datadog_request_logs_endpoint,
                 &config.s3_request_logs_endpoint,
             ] {
-                let _ = Endpoint::from_name(endpoint).write(serialized_log.as_bytes());
+                send_log(endpoint, &serialized_log);
                 // Show request logs in `fastly log-tail`
                 println!("{serialized_log}");
             }
@@ -494,6 +494,11 @@ fn build_and_send_log(log_line: LogLineV1Builder, config: &Config) {
             warn!("failed to serialize request log: {error}");
         }
     };
+}
+
+/// Write a log line to a logging endpoint, ignoring failures
+fn send_log(endpoint: &str, line: &str) {
+    let _ = Endpoint::from_name(endpoint).write(line.as_bytes());
 }
 
 #[cfg(test)]
