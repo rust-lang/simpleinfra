@@ -6,6 +6,7 @@ locals {
     "ubiratan"  = local.users.ubiratan
     "walter"    = local.users.walter
     "jess"      = local.users.jess
+    "david"     = local.users.david
   }
 }
 
