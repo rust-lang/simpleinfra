@@ -1,17 +1,19 @@
 use aws_credential_types::Credentials;
 use compute_static::compression::is_compressible_content_type;
+use compute_static::download_log::CrateDownload;
 use compute_static::service_log::ServiceLogger;
 use compute_static::sigv4::sign_s3_request;
 use fastly::convert::ToHeaderValue;
 use fastly::http::request::SendErrorCause;
-use fastly::http::{header, Method, StatusCode};
+use fastly::http::{Method, StatusCode, header};
 use fastly::log::Endpoint;
 use fastly::{Backend, Error, Request, Response};
-use fastly_access_log::{collect_request, collect_response, LogLineV1Builder};
+use fastly_access_log::{LogLineV1Builder, collect_request, collect_response};
 use log::{error, warn};
 use std::fmt::Display;
 use std::io::Write;
 use std::time::{Duration, SystemTime};
+use time::OffsetDateTime;
 
 use crate::config::Config;
 
@@ -45,6 +47,7 @@ fn main(request: Request) -> Result<Response, Error> {
         Some(config.datadog_host.clone()),
     );
     log.request_id(request_id);
+    let crate_download = CrateDownload::from_request(&request, OffsetDateTime::now_utc().date());
 
     let has_origin_header = request.get_header("Origin").is_some();
     let mut response = handle_request(&config, request);
@@ -55,6 +58,12 @@ fn main(request: Request) -> Result<Response, Error> {
 
     let log = collect_response(&mut log, &response);
     build_and_send_log(log, &config);
+    if let Some(crate_download) = crate_download
+        && let Ok(response) = &response
+        && response.get_status() == StatusCode::OK
+    {
+        send_log(&config.s3_request_logs_endpoint, &crate_download.log_line());
+    }
 
     response
 }
@@ -480,20 +489,19 @@ fn build_and_send_log(log_line: LogLineV1Builder, config: &Config) {
     match log_line.build() {
         Ok(log) => {
             let serialized_log = log.to_json();
-
-            for endpoint in [
-                &config.datadog_request_logs_endpoint,
-                &config.s3_request_logs_endpoint,
-            ] {
-                let _ = Endpoint::from_name(endpoint).write(serialized_log.as_bytes());
-                // Show request logs in `fastly log-tail`
-                println!("{serialized_log}");
-            }
+            send_log(&config.datadog_request_logs_endpoint, &serialized_log);
+            // Show request logs in `fastly log-tail`
+            println!("{serialized_log}");
         }
         Err(error) => {
             warn!("failed to serialize request log: {error}");
         }
     };
+}
+
+/// Write a log line to a logging endpoint, ignoring failures
+fn send_log(endpoint: &str, line: &str) {
+    let _ = Endpoint::from_name(endpoint).write(line.as_bytes());
 }
 
 #[cfg(test)]

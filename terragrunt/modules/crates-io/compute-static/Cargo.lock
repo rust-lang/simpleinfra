@@ -203,6 +203,7 @@ dependencies = [
  "fastly",
  "fastly-access-log",
  "log",
+ "percent-encoding",
  "serde",
  "serde_json",
  "time",
