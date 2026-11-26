@@ -9,4 +9,5 @@ include {
 
 inputs = {
   repo = "bors-kindergarten"
+  env  = "staging"
 }
