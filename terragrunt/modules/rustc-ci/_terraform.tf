@@ -28,6 +28,11 @@ data "terraform_remote_state" "shared" {
   }
 }
 
+variable "env" {
+  description = "Either staging or prod, used to distinguish otherwise overlapping resources"
+  type        = string
+}
+
 variable "repo" {
   description = "GitHub repository to authorize. E.g. `rust`. GitHub org is hardcoded to `rust-lang`."
   type        = string
