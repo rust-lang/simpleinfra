@@ -81,6 +81,14 @@ module "ecs_task" {
       {
         "name": "RUST_LOG",
         "value": "triagebot=info"
+      },
+      {
+        "name": "GITHUB_APP_ID",
+        "value": "59835"
+      },
+      {
+        "name": "GITHUB_APP_INSTALLATION_ID",
+        "value": "7785844"
       }
     ],
     "secrets": [
