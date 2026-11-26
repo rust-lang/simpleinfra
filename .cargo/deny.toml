@@ -1,0 +1,29 @@
+# This config is shared by all Cargo projects in the repository, so the
+# `unused-*` lints are disabled for entries that only apply to some of them.
+
+[advisories]
+unused-ignored-advisory = "allow"
+ignore = [
+    { id = "RUSTSEC-2026-0543", reason = "`chrono` is unmaintained, but no vulnerability is known" },
+]
+
+[licenses]
+unused-allowed-license = "allow"
+allow = [
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-3-Clause",
+    "MIT",
+    "Unicode-3.0",
+    "Unicode-DFS-2016",
+]
+
+[licenses.private]
+ignore = true
+
+[bans]
+multiple-versions = "allow"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
