@@ -3,6 +3,7 @@ authors = ["Oli Scherer <github35764891676564198441@oli-obk.de>"]
 edition = "2021"
 name = "team_login"
 version = "0.1.0"
+publish = false
 
 [dependencies]
 miniserde = "0.1"

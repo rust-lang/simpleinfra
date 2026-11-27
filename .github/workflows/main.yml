@@ -145,12 +145,47 @@ jobs:
               jq --version
               cargo --version
             '
+
+  cargo-deny:
+    name: cargo-deny
+    runs-on: ubuntu-24.04
+    env:
+      # renovate: datasource=crate depName=cargo-deny
+      CARGO_DENY_VERSION: "0.22.1"
+      CARGO_TERM_COLOR: always
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: taiki-e/install-action@cfdb7ed4ccc7c7dce37759eae89dc5674b469b39 # v2.90.3
+        with:
+          tool: cargo-deny@${{ env.CARGO_DENY_VERSION }}
+
+      - name: Check all Cargo lockfiles
+        run: |
+          config="$PWD/.cargo/deny.toml"
+
+          # Ansible builds `team_login` standalone with its own lockfile, but in
+          # this repository it is a root workspace member, which makes cargo use
+          # the root lockfile. A copy outside the repository uses its own lockfile.
+          team_login="ansible/roles/dev-desktop/files/team_login"
+          cp -r "$team_login" "$RUNNER_TEMP/team_login"
+
+          status=0
+          for lockfile in $(git ls-files '*Cargo.lock'); do
+            dir="$(dirname "$lockfile")"
+            if [ "$dir" = "$team_login" ]; then
+              dir="$RUNNER_TEMP/team_login"
+            fi
+            echo "Checking $lockfile"
+            cargo deny --manifest-path "$dir/Cargo.toml" --config "$config" check || status=1
+          done
+          exit "$status"
   # Summary job for the merge queue.
   # ALL THE PREVIOUS JOBS NEED TO BE ADDED TO THE `needs` SECTION OF THIS JOB!
   CI:
     # Keep `name` matching the status check.
     name: CI
-    needs: [ terraform, actions-js, javascript-tests, rust, fastly-workers, devcontainers]
+    needs: [ terraform, actions-js, javascript-tests, rust, fastly-workers, devcontainers, cargo-deny]
     # We need to ensure this job does *not* get skipped if its dependencies fail,
     # because a skipped job is considered a success by GitHub. So we have to
     # overwrite `if:`. We use `!cancelled()` to ensure the job does still not get run
