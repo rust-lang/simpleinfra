@@ -195,6 +195,26 @@ resource "aws_iam_role_policy" "source_identity" {
           aws_iam_role.from_source.arn
         ]
       },
+      {
+        Sid    = "ArtifactsBucketWrite"
+        Effect = "Allow"
+        Resource = [
+          "${aws_s3_bucket.artifacts.arn}/${local.rustc_builds}/$${aws:TransactionContext/IdentityProvider/github-sha}/*",
+          "${aws_s3_bucket.artifacts.arn}/${local.rustc_builds_alt}/$${aws:TransactionContext/IdentityProvider/github-sha}/*",
+        ]
+        Action = [
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+        ]
+        Condition = {
+          StringLike = {
+            // Requires that the session name be the right length to be a SHA-1 hash.
+            // This will need updating to support SHA-256 hashes (which are
+            // longer), but we don't currently have those.
+            "aws:TransactionContext/IdentityProvider/github-sha" = "????????????????????????????????????????"
+          }
+        }
+      }
     ]
   })
 }
@@ -214,7 +234,7 @@ resource "aws_iam_role" "from_source" {
         Principal = {
           AWS = aws_iam_role.from_github.arn
         }
-      }
+      },
     ]
   })
 }
