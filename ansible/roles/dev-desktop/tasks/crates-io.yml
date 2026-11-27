@@ -32,6 +32,12 @@
     daemon_reload: true
   when: get_all_crates_timer is changed or get_all_crates_service is changed
 
+- name: Enable get-all-crates timer
+  systemd:
+    name: get-all-crates.timer
+    enabled: true
+    state: started
+
 - name: setup all-crates directory
   file:
     path: /var/cache/all-crates
