@@ -1,7 +1,7 @@
 use derive_builder::Builder;
 use fastly::{Error, Request, Response, http::Version};
 use serde::Serialize;
-use std::{env::var, net::IpAddr};
+use std::{borrow::Cow, env::var, net::IpAddr};
 use time::OffsetDateTime;
 
 #[derive(Debug, Serialize)]
@@ -85,17 +85,11 @@ pub fn collect_request(
 ) -> LogLineV1Builder {
     let http_details = HttpDetailsBuilder::default()
         .protocol(http_version_to_string(request.get_version()))
-        .referer(
-            request
-                .get_header("Referer")
-                .and_then(|s| s.to_str().ok())
-                .map(str::to_owned),
-        )
+        .referer(request.get_header_str_lossy("Referer").map(Cow::into_owned))
         .useragent(
             request
-                .get_header("User-Agent")
-                .and_then(|s| s.to_str().ok())
-                .map(str::to_owned),
+                .get_header_str_lossy("User-Agent")
+                .map(Cow::into_owned),
         )
         .build()
         .ok();
@@ -319,5 +313,26 @@ mod tests {
 
         assert_eq!(value["status"], Value::from(500));
         assert_eq!(value["cache_hit"], Value::Bool(false));
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    #[test]
+    fn collected_requests_log_non_ascii_headers() {
+        for (header, expected) in [
+            ("".as_bytes(), ""),
+            ("Mozilla ✓".as_bytes(), "Mozilla ✓"),
+            (b"\xffcargo", "\u{FFFD}cargo"),
+        ] {
+            let request = Request::get("https://example.test/")
+                .with_header("User-Agent", header)
+                .with_header("Referer", header);
+            let mut builder = collect_request(&request, "test", "test", "test", None);
+            let log = collect_error_response(&mut builder).build().unwrap();
+            let value: Value = serde_json::from_str(&log.to_json()).unwrap();
+            let http = &value["http"];
+
+            assert_eq!(http["useragent"], Value::from(expected));
+            assert_eq!(http["referer"], Value::from(expected));
+        }
     }
 }
