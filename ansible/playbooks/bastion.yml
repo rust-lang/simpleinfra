@@ -22,6 +22,8 @@
       unprivileged_users: "{{ vars_bastion_unprivileged_users }}"
 
     - role: datadog.datadog
+      tags:
+        - monitoring
       vars:
         datadog_api_key: "{{ vars_datadog_api_key }}"
         datadog_site: "datadoghq.com"
@@ -32,5 +34,8 @@
             - "service:bastion"
           process_config:
             enabled: "true"
+
+        datadog_checks:
+          systemd: "{{ global_datadog_systemd_check }}"
 
     - role: bastion
