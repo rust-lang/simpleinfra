@@ -22,7 +22,9 @@ variable "architecture" {
 source "amazon-ebs" "ubuntu" {
   ami_name = "${var.ami_name}"
 
-  instance_type = var.architecture == "x86_64" ? "c8a.medium" : "c9g.medium"
+  // Once https://github.com/canonical/cloud-init/pull/7278 is shipped, we can
+  // probably switch back to a smaller aarch64 instance.
+  instance_type = var.architecture == "x86_64" ? "c8a.medium" : "c9g.large"
   region        = "us-east-2"
 
   temporary_security_group_source_public_ip = true
