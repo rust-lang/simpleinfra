@@ -1,0 +1,13 @@
+module "bors" {
+  source = "../../../../terragrunt/modules/bors"
+
+  domain          = "bors-staging.rust-lang.net"
+  public_url      = "bors-staging.rust-lang.net"
+  gh_app_id       = "343095"
+  trusted_sub     = "repo:rust-lang/bors:environment:staging"
+  oauth_client_id = "Ov23liTJD2gXjfBvmjZN"
+  zulip_username  = "bors-staging-bot@rust-lang.zulipchat.com"
+  cpu             = 256
+  memory          = 512
+  ec2_runner_role = "arn:aws:iam::442426873467:role/gha-runner-management"
+}
